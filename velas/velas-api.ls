@@ -2,7 +2,7 @@ require! {
     \./velas-web3.ls
     \./addresses.ls
     \./velas-solana-web3.ls
-    \./staking.js : \NStaking
+    \./velas-staking.js : \NStaking
     \prelude-ls : {find}
 }
 abis =
@@ -31,7 +31,7 @@ module.exports = (store)->
     web3Solana = velas-solana-web3 store
     networks =
         mainnet: \https://explorer.velas.com/rpc
-        testnet: \https://testnet.velas.com/rpc
+        testnet: \http://bootstrap.testnet.veladev.net:8899/
     api =
         Staking      : web3.eth.contract(abis.Staking).at(staking-address)
         NativeStaking: new NStaking({NODE_HOST: networks[network]})

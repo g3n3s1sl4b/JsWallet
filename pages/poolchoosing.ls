@@ -7,8 +7,7 @@ require! {
     \bignumber.js
     \../get-lang.ls
     \../history-funcs.ls
-    #\../staking/funcs.ls : { query-pools }
-    \../staking-funcs.ls : { query-pools, query-accounts, convert-pools-to-view-model, convert-accounts-to-view-model }
+    \../staking/funcs.ls : { query-pools }
     \./icon.ls
     \prelude-ls : { map, split, filter, find, foldl, sort-by, unique, head, each }
     \../math.ls : { div, times, plus, minus }
@@ -30,7 +29,7 @@ require! {
     \./claim-stake.ls
     \../staking/can-make-staking.ls
     \./epoch.ls
-    \./confirmation.ls : { alert }
+    \./confirmation.ls : { alert, notify }
     \../components/button.ls
     \../components/address-holder.ls
     \./alert-txn.ls
@@ -80,6 +79,13 @@ require! {
     @media(max-width:$ipad)
         width: 100%
         margin: 0
+    .float-left
+        float: left
+    .float-right
+        float: right
+    span.color
+        color: #cc8b1a
+        font-weight: bold
     .staking-content
         overflow: hidden
         background: transparent
@@ -212,7 +218,8 @@ require! {
                         animation: breathe 3s ease-in infinite
                         -moz-transition: breathe 3s ease-in infinite
                         -web-kit-transition: breathe 3s ease-in infinite
-                        height: calc(100vh - 105px)
+                        height: auto
+                        max-height: 400px
                         .stake-pointer
                             background: rgb(37, 87, 127)
                         &.lockup
@@ -232,6 +239,8 @@ require! {
                             &.with-stake
                                 filter: saturate(6.5)
                         tr
+                            &.chosen
+                                background: #305673
                             &.active
                                 color: var(--color-td)
                             &.inactive
@@ -280,7 +289,6 @@ require! {
                         border: 1px solid rgba(240, 237, 237, 0.16)
                         white-space: nowrap
                         font-size: 13px
-                        overflow: scroll
                         @media(max-width:800px)
                             text-align: left
                     .left
@@ -572,18 +580,6 @@ as-callback = (p, cb)->
     p.catch (err) -> cb err
     p.then (data)->
         cb null, data
-get-pair = (wallet, path, index, password, with-keystore)->
-    w = wallet.derive-path(path).derive-child(index).get-wallet!
-    address  = "0x" + w.get-address!.to-string(\hex)
-    salt = Buffer.from('dc9e4a98886738bd8aae134a1f89aaa5a502c3fbd10e336136d4d5fe47448ad6', 'hex')
-    iv = Buffer.from('cecacd85e9cb89788b5aab2f93361233', 'hex')
-    uuid = Buffer.from('7e59dc028d42d09db29aa8a0f862cc81', 'hex')
-    kdf = 'pbkdf2'
-    #console.log \keystore, with-keystore
-    keystore =
-        | with-keystore => w.toV3String(password, { salt, iv, uuid, kdf })
-        | _ => ""
-    { address, keystore }
 to-keystore = (store, with-keystore)->
     mnemonic = seedmem.mnemonic
     seed = bip39.mnemonic-to-seed(mnemonic)
@@ -615,27 +611,28 @@ staking-content = (store, web3t)->
         pool = store.staking.chosenPool
         myStake = +pool.myStake
         myStake >= 10000
-    become-validator = ->
-        err, options <- get-options
-        return alert store, err, cb if err?
-        err <- can-make-staking store, web3t
-        return alert store, err, cb if err?
+    delegate = ->
+        wallet =
+            store.current.account.wallets
+                |> find -> it.coin.token is \vlx_native
+        return null if not wallet?
+        #err, options <- get-options
+        #return alert store, err, cb if err?
+        #err <- can-make-staking store, web3t
+        #return alert store, err, cb if err?
         return alert store, "please choose the pool", cb if not store.staking.chosen-pool?
-        type = typeof! store.staking.add.add-validator-stake
-        return alert store, "please enter correct amount, got #{type}", cb if type not in <[ String Number ]>
-        stake = store.staking.add.add-validator-stake `times` (10^18)
-        data = web3t.velas.Staking.stake.get-data store.staking.chosen-pool.address, stake
-        #console.log \after-stake
-        to = web3t.velas.Staking.address
-        console.log "Staking to" to
-        #console.log \to, { to, data, amount }
-        amount = store.staking.add.add-validator-stake
-        #console.log \after-stake, to, amount
-        err <- web3t.vlx2.send-transaction { to, data, amount }
-        #return cb err if err?
-        return store.staking.add.result = "#{err}" if err?
-        #store.staking.add.result = "success"
-        <- staking.init { store, web3t }
+        account = store.staking.chosen-account
+        pool = store.staking.chosen-pool
+        #
+        pay-account = web3t.velas.NativeStaking.accounts |> find (-> it.address is account.address)
+        return cb null if not pay-account
+        console.log ""
+        err, result <- as-callback web3t.velas.NativeStaking.delegate(pay-account.address, pool.address)
+        console.log "result" result
+        console.error "Result sending:" err if err?
+        alert store, err.toString! if err?
+        <- notify store, "FUNDS DELEGATED"
+        navigate store, web3t, \validators
     change-address = ->
         store.staking.add.add-validator = it.target.value
     change-stake = !->
@@ -716,7 +713,7 @@ staking-content = (store, web3t)->
         amount = 0
         err <- web3t.vlx2.send-transaction { to, data, amount }
         store.current.page = \staking
-    your-balance = " #{round-human get-balance!} "
+    your-balance = " #{store.staking.chosenAccount.balance} "
     your-staking-amount = store.staking.stakeAmountTotal `div` (10^18)
     your-staking = " #{round-human your-staking-amount}"
     vlx-token = "VLX"
@@ -727,29 +724,18 @@ staking-content = (store, web3t)->
         my-stake =
             | +item.my-stake is 0 => item.withdraw-amount
             | _ => item.my-stake
-        my-stake = 0 if !my-stake?
-        #lockupStaking = store.lockups.lockupStaking[item.address]
-        #if (not !my-stake?) and lockupStaking? and lockupStaking.length > 0 then
-            #extra-stake = lockupStaking |> foldl plus, 0
-            #my-stake = extra-stake `plus` my-stake
+        my-stake = 0 if !my-stake?  
         index = store.staking.pools.index-of(item) + 1
         choose-pull = ->
             page = \choosestaker
-            store.pages.push(page) if store.pages.length > 0 and page isnt store.pages[store.pages.length - 1]
+            #store.pages.push(page) if store.pages.length > 0 and page isnt store.pages[store.pages.length - 1]
             cb = (err, data)->
                 alert store, err, console~log if err?
             store.staking.pools |> map (-> it.checked = no)
             item.checked = yes
             store.staking.chosen-pool = item
             store.staking.add.new-address = ""
-            store.staking.error = ""
-            claim-stake.calc-reward store, web3t
-            staking-address = store.staking.keystore.staking.address
-            err, amount <- web3t.velas.Staking.stakeAmount item.address, staking-address
-            return cb err if err?
-            store.staking.stake-amount-total = amount.to-fixed!
-            err <- exit-stake.init { store, web3t }
-            return cb err if err?
+            store.staking.error = "" 
         to-eth = ->
             item.eth = not item.eth
         reward =
@@ -773,7 +759,8 @@ staking-content = (store, web3t)->
             | item.vote-power? => "#{item.vote-power}%"
             | _ => "..."
         mystake-class = if +my-stake > 0 then "with-stake" else ""
-        tr.pug(class="#{item.status}")
+        chosen = if store.staking.chosen-pool? and store.staking.chosen-pool.address is item.address then "chosen" else ""
+        tr.pug(class="#{item.status} #{chosen}")
             td.pug
                 span.pug.circle(class="#{item.status}") #{index}
             td.pug(datacolumn='Staker Address' title="#{item.address}")
@@ -816,28 +803,26 @@ staking-content = (store, web3t)->
         background: style.app.stats
     .pug.staking-content.delegate
         .pug.main-sections
-            stake-accounts {store, web3t}
-            if not store.staking.chosen-pool? and not store.lockups.chosen-lockup?
-                .form-group.pug(id="pools")
-                    alert-txn { store }
-                    .pug.section
-                        .title.pug
-                            h3.pug Validators
-                            .pug
-                                .loader.pug(on-click=refresh style=icon-style title="refresh" class="#{isSpinned}")
-                                    icon \Sync, 25
-                        .description.pug.table-scroll
-                            table.pug
-                                thead.pug
-                                    tr.pug
-                                        td.pug(width="3%" style=stats) #
-                                        td.pug(width="10%" style=staker-pool-style) Validator
-                                        td.pug(width="25%" style=stats) #{lang.total-stake}
-                                        td.pug(width="25%" style=stats) #{lang.my-stake}
-                                        td.pug(width="5%" style=stats) #{lang.stakers}
-                                        td.pug(width="4%" style=stats) #{lang.selectPool}
-                                tbody.pug
-                                    store.staking.pools |> map build-staker store, web3t
+            .form-group.pug(id="pools")
+                alert-txn { store }
+                .pug.section
+                    .title.pug
+                        h3.pug Please select a validator
+                        .pug
+                            .loader.pug(on-click=refresh style=icon-style title="refresh" class="#{isSpinned}")
+                                icon \Sync, 25
+                    .description.pug.table-scroll
+                        table.pug
+                            thead.pug
+                                tr.pug
+                                    td.pug(width="3%" style=stats) #
+                                    td.pug(width="10%" style=staker-pool-style) Validator
+                                    td.pug(width="25%" style=stats) #{lang.total-stake}
+                                    td.pug(width="25%" style=stats) #{lang.my-stake}
+                                    td.pug(width="5%" style=stats) #{lang.stakers}
+                                    td.pug(width="4%" style=stats) Select
+                            tbody.pug
+                                store.staking.pools |> map build-staker store, web3t
         if store.staking.chosen-pool?
             .pug.single-section.form-group(id="choosen-pull")
                 .pug.section
@@ -847,51 +832,20 @@ staking-content = (store, web3t)->
                         span.pug
                             | #{store.staking.chosen-pool.address}
                             img.pug.check(src="#{icons.img-check}")
-                        .buttons.pug
-                            button { store, on-click: cancel-pool , type: \secondary , icon : "back" , text: "Back to Pools" id="cancel-pool"}
-                if +store.staking.stake-amount-total is 0
-                    .pug.section
-                        .title.pug
-                            h3.pug #{lang.validator}
-                        .description.pug
-                            .pug.left
-                                label.pug #{lang.stake}
-                                amount-field { store, value: store.staking.add.add-validator-stake , on-change: change-stake , placeholder: lang.stake, token: "vlx2", id:"choose-staker-vlx-input" }
-                                .pug.balance
-                                    span.pug.small-btns
-                                        button.small.pug(style=button-primary3-style on-click=use-min) #{lang.min}
-                                        button.small.pug(style=button-primary3-style on-click=use-max) #{lang.max}
-                                    span.pug #{lang.balance}:
-                                    span.pug.color #{your-balance}
-                                        img.label-coin.pug(src="#{icons.vlx-icon}")
-                                        span.pug.color #{vlx-token}
-                            button { store, on-click: become-validator , type: \secondary , icon : \apply , text: \btnApply }
-                if +store.staking.stake-amount-total > 0
-                    .pug.section
-                        .title.pug
-                            h3.pug #{lang.staking}
-                        .description.pug
-                            .pug.left
-                                .pug.balance
-                                    span.pug #{lang.yourStaking}:
-                                    span.pug.color #{your-staking}
-                                    span.pug.color #{vlx-token}
-                                hr.pug
-                                label.pug #{lang.stakeMore}
-                                amount-field { store, value: store.staking.add.add-validator-stake , on-change: change-stake , placeholder: lang.stake, token: "vlx2", id:"choose-staker-vlx-input" }
-                                .pug.balance
-                                    span.pug.small-btns
-                                        button.small.pug(style=button-primary3-style on-click=use-min) #{lang.min}
-                                        button.small.pug(style=button-primary3-style on-click=use-max) #{lang.max}
-                                    span.pug #{lang.balance}:
-                                    span.pug.color #{your-balance}
-                                        img.label-coin.pug(src="#{icons.vlx-icon}")
-                                        span.pug.color #{vlx-token}
-                            button { store, on-click: become-validator , type: \secondary , icon : \apply , text: \btnApply }
-                #claim-stake store, web3t
-                #exit-stake store, web3t
-                #move-stake store, web3t
-validators = ({ store, web3t })->
+                .pug.section
+                    .title.pug
+                        h3.pug #{lang.validator}
+                    .description.pug
+                        .pug.left.float-left
+                            span.pug Delgate
+                            span.pug.color #{your-balance} VLX
+                            span.pug to
+                            .pug.chosen-pool(title="#{store.staking.chosen-pool.address}")
+                                span.pug
+                                    | #{store.staking.chosen-pool.address}
+                                    img.pug.check(src="#{icons.img-check}")
+                        button { store, classes="float-right" on-click: delegate , type: \secondary , icon : \apply , text: \btnApply }
+pool-chosing = ({ store, web3t })->
     lang = get-lang store
     { go-back } = history-funcs store, web3t
     goto-search = ->
@@ -935,54 +889,4 @@ stringify = (value) ->
         round-human(parse-float value `div` (10^18))
     else
         '..'
-validators.init = ({ store, web3t }, cb)!->
-    #return cb null if store.staking.pools-are-loading is yes
-    store.staking.max-withdraw = 0
-    random = ->
-        Math.random!
-    store.current.page = "validators"
-    store.staking.pools = []
-    store.staking.accounts = []
-    store.staking.delegators = {}
-    store.staking.withdraw-amount = 0
-    store.staking.stake-amount-total = 0
-    store.staking.keystore = to-keystore store, no
-    store.staking.reward = null
-    store.staking.all-pools-loaded = no
-    store.staking.pools-are-loading = yes
-    store.staking.chosen-pool = null
-    store.staking.add.add-validator-stake = 0
-    index-is-different = store.current.accountIndex isnt store.staking.accountIndex
-    if store.staking.pools-network is store.current.network then
-        if (store.staking.all-pools-loaded? and store.staking.all-pools-loaded is yes and not index-is-different)
-            return cb null
-    else
-        store.staking.pools-network = store.current.network
-    store.staking.pools = []
-    err, epoch <- web3t.velas.Staking.stakingEpoch
-    store.staking.epoch = epoch.to-fixed!
-    wallet = store.current.account.wallets |> find (-> it.coin.token is \vlx_native)
-    return cb null if not wallet?
-    web3t.velas.NativeStaking.setAccountPublicKey(wallet.publicKey)
-    web3t.velas.NativeStaking.setAccountSecretKey(wallet.secretKey)
-    err, parsedProgramAccounts <- as-callback web3t.velas.NativeStaking.getParsedProgramAccounts()
-    parsedProgramAccounts = [] if err?
-    store.staking.parsedProgramAccounts = parsedProgramAccounts 
-    # get validators array
-    on-progress = ->
-        store.staking.pools = convert-pools-to-view-model [...it]
-    err, pools <- query-pools store, web3t, on-progress
-    return cb err if err?
-    store.staking.pools = convert-pools-to-view-model pools
-    # end validators array
-    #store.staking.accounts = accounts
-    err, res <- as-callback web3t.velas.NativeStaking.getInfo()
-    console.log ".getInfo" res
-    ###
-    ###
-    on-progress = ->
-        store.staking.accounts = convert-accounts-to-view-model [...it]
-    err, result <- query-accounts store, web3t, on-progress
-    return cb err if err?
-    store.staking.accounts = convert-accounts-to-view-model result
-module.exports = validators
+module.exports = pool-chosing

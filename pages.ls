@@ -23,6 +23,7 @@ require! {
     \./pages/search.ls
     \./pages/resources2.ls
     \./pages/choosestaker.ls
+    \./pages/validators.ls
     \./pages/videostorage.ls
     \./pages/videostoragedetails.ls
     \./pages/info.ls
@@ -35,6 +36,7 @@ require! {
     \./pages/downloadwallet.ls
     \./pages/vote.ls
     \./pages/util.ls
+    \./pages/poolchoosing.ls
 }
 is-in-iframe = window != window.parent
 if is-in-iframe
@@ -79,6 +81,8 @@ else
     export search
     export resources2
     export choosestaker
+    export validators
+    export poolchoosing
     export videostorage
     export videostoragedetails
     export info

@@ -5,8 +5,11 @@ Connection = velasSolanaWeb3.Connection;
 StakeProgram = velasSolanaWeb3.StakeProgram;
 Authorized = velasSolanaWeb3.Authorized;
 Lockup = velasSolanaWeb3.Lockup;
+SystemProgram = velasSolanaWeb3.SystemProgram;
+Transaction = velasSolanaWeb3.Transaction;
+Account = velasSolanaWeb3.Account;
 
-class Staking {
+class VelasStaking {
 
     // validate options.authorization;
     constructor(options) {
@@ -15,7 +18,7 @@ class Staking {
         this.sol           = 1000000000;
         this.min_stake     = 10000;
         this.max_epoch     = '18446744073709551615';
-
+        this.secretKey     = options.secretKey;
         this.accounts   = [];
         this.validators = [];
     }
@@ -27,8 +30,12 @@ class Staking {
     setAccountPublicKey(publicKey) {
         this.authorization.publicKey = publicKey;
     }
+    setAccountSecretKey(secretKey) {
+        this.secretKey = secretKey;
+    }
 
     async getStakeActivation(address) {
+        console.log("getStakeActivation");
         try {
             const publicKey  = new PublicKey(address);
             const activation = await this.connection.getStakeActivation(publicKey);
@@ -178,6 +185,7 @@ class Staking {
                 seed,
                 stakePubkey: stakeAccountWithSeed,
             });
+            console.log("transaction", transaction);
         } catch(e) {
             return {
                 error: "prepare_transaction_error",
@@ -201,18 +209,34 @@ class Staking {
         return base58PublicKey.slice(0,6);
     };
 
+    async getOwnStakingAccounts(accounts) {
+        var ref$, ref1$, ref2$, ref3$, ref4$, ref5$;
+        let owner = this.getAccountPublicKey();
+        accounts = accounts.filter(item => {
+            if (deepEq$(typeof item != 'undefined' && item !== null ? (ref$ = item.account) != null ? (ref1$ = ref$.data) != null ? (ref2$ = ref1$.parsed) != null ? (ref3$ = ref2$.info) != null ? (ref4$ = ref3$.meta) != null ? (ref5$ = ref4$.authorized) != null ? ref5$.staker : void 8 : void 8 : void 8 : void 8 : void 8 : void 8 : void 8, owner.toBase58(), '===')) {
+                return true;
+            }
+            return false;
+        });
+        return accounts;
+    }
+
     async getStakingAccounts(accounts) {
+        var  ref$, ref1$, ref2$, ref3$, ref4$, ref5$;
         console.log("[getStakingAccounts]")
         let owner = this.getAccountPublicKey();
         console.log("owner", owner)
 
         accounts = accounts.filter(item => {
-            if (item?.account?.data?.parsed?.info?.meta?.authorized?.staker === owner.toBase58()) return true;
+            if (deepEq$(typeof item != 'undefined' && item !== null ? (ref$ = item.account) != null ? (ref1$ = ref$.data) != null ? (ref2$ = ref1$.parsed) != null ? (ref3$ = ref2$.info) != null ? (ref4$ = ref3$.meta) != null ? (ref5$ = ref4$.authorized) != null ? ref5$.staker : void 8 : void 8 : void 8 : void 8 : void 8 : void 8 : void 8, owner.toBase58(), '===')) {
+                return true;
+            }
             return false;
         });
 
         for (var i in accounts) {
-            const rent = accounts[i].account?.data?.parsed?.info?.meta?.rentExemptReserve;
+            var rent, ref$, ref1$, ref2$, ref3$, ref4$;
+            rent = (ref$ = accounts[i].account) != null ? (ref1$ = ref$.data) != null ? (ref2$ = ref1$.parsed) != null ? (ref3$ = ref2$.info) != null ? (ref4$ = ref3$.meta) != null ? ref4$.rentExemptReserve : void 8 : void 8 : void 8 : void 8 : void 8;
             accounts[i].seed    = await this.checkSeed(accounts[i].pubkey.toBase58());
             accounts[i].address = accounts[i].pubkey.toBase58();
             accounts[i].key     = accounts[i].address;
@@ -221,20 +245,41 @@ class Staking {
             accounts[i].status  = `Not delegated`;
             accounts[i].validator = `-`;
 
-            if (accounts[i].account?.data?.parsed?.info?.stake) {
-                const activationEpoch   = Number(accounts[i].account?.data?.parsed?.info?.stake.delegation.activationEpoch);
-                const deactivationEpoch = Number(accounts[i].account?.data?.parsed?.info?.stake.delegation.deactivationEpoch);
+            if ((ref$ = accounts[i].account) != null && ((ref1$ = ref$.data) != null && ((ref2$ = ref1$.parsed) != null && ((ref3$ = ref2$.info) != null && ref3$.stake)))) {
+                const activationEpoch = Number((ref$ = accounts[i].account) != null ? (ref1$ = ref$.data) != null ? (ref2$ = ref1$.parsed) != null ? (ref3$ = ref2$.info) != null ? ref3$.stake.delegation.activationEpoch : void 8 : void 8 : void 8 : void 8);
+                const deactivationEpoch = Number((ref$ = accounts[i].account) != null ? (ref1$ = ref$.data) != null ? (ref2$ = ref1$.parsed) != null ? (ref3$ = ref2$.info) != null ? ref3$.stake.delegation.deactivationEpoch : void 8 : void 8 : void 8 : void 8);
 
                 if (deactivationEpoch > activationEpoch || activationEpoch === this.max_epoch) {
                     accounts[i].status    = `loading`;
-                    accounts[i].validator = accounts[i].account?.data?.parsed?.info?.stake?.delegation?.voter;
+                    if((ref4$ = ref3$.delegation) != null) {
+                        accounts[i].validator = ref4$.voter;
+                    }
                 };
             };
         };
 
         return accounts;
     };
+    
+    async getParsedProgramAccounts(){
+        const accounts = await this.connection.getParsedProgramAccounts(StakeProgram.programId);
+        const delegators = {};
+        for (var a in accounts) {
+            var ref$, ref1$, ref2$, ref3$, ref4$, ref5$;
+            if (((ref$ = accounts[a].account) != null ? (ref1$ = ref$.data) != null ? (ref2$ = ref1$.parsed) != null ? (ref3$ = ref2$.info) != null ? (ref4$ = ref3$.stake) != null ? ref4$.delegation : void 8 : void 8 : void 8 : void 8 : void 8) != null) {
+                const voter = (ref$ = accounts[a].account) != null ? (ref1$ = ref$.data) != null ? (ref2$ = ref1$.parsed) != null ? (ref3$ = ref2$.info) != null ? (ref4$ = ref3$.stake) != null ? (ref5$ = ref4$.delegation) != null ? ref5$.voter : void 8 : void 8 : void 8 : void 8 : void 8 : void 8;
+                const activationEpoch = Number(ref5$.activationEpoch || 0);
+                const deactivationEpoch = Number(ref5$.deactivationEpoch || 0);
 
+                if (voter && (deactivationEpoch > activationEpoch || activationEpoch === this.max_epoch)) {
+                    delegators[voter] = delegators[voter] ? delegators[voter] + 1 : 1;
+                }
+                ;
+            }
+        }; 
+        return accounts;
+    }
+    
     async getInfo() {
         const accounts = await this.connection.getParsedProgramAccounts(StakeProgram.programId);
         console.log("accounts", accounts)
@@ -242,17 +287,19 @@ class Staking {
         const stakes     = {};
 
         for (var a in accounts) {
-            const voter             =        accounts[a].account?.data?.parsed?.info?.stake?.delegation?.voter
-            const activationEpoch   = Number(accounts[a].account?.data?.parsed?.info?.stake?.delegation?.activationEpoch   || 0);
-            const deactivationEpoch = Number(accounts[a].account?.data?.parsed?.info?.stake?.delegation?.deactivationEpoch || 0);
+            var ref$, ref1$, ref2$, ref3$, ref4$, ref5$;
+            if (((ref$ = accounts[a].account) != null ? (ref1$ = ref$.data) != null ? (ref2$ = ref1$.parsed) != null ? (ref3$ = ref2$.info) != null ? (ref4$ = ref3$.stake) != null ? ref4$.delegation : void 8 : void 8 : void 8 : void 8 : void 8) != null) {
+                const voter = (ref$ = accounts[a].account) != null ? (ref1$ = ref$.data) != null ? (ref2$ = ref1$.parsed) != null ? (ref3$ = ref2$.info) != null ? (ref4$ = ref3$.stake) != null ? (ref5$ = ref4$.delegation) != null ? ref5$.voter : void 8 : void 8 : void 8 : void 8 : void 8 : void 8;
+                const activationEpoch = Number(ref5$.activationEpoch || 0);
+                const deactivationEpoch = Number(ref5$.deactivationEpoch || 0);
 
-            if (voter && (deactivationEpoch > activationEpoch || activationEpoch === this.max_epoch)) {
-                delegators[voter] = delegators[voter] ? delegators[voter] + 1 : 1;
-            };
+                if (voter && (deactivationEpoch > activationEpoch || activationEpoch === this.max_epoch)) {
+                    delegators[voter] = delegators[voter] ? delegators[voter] + 1 : 1;
+                }
+                ;
+            }
         };
-        console.log("delegators", delegators)
         this.accounts   = await this.getStakingAccounts(accounts);
-        console.log("this.accounts", this.accounts)
         this.validators = await this.getStakingValidators();
 
         for (var s in this.accounts) {
@@ -291,16 +338,18 @@ class Staking {
                 description: e.message,
             };
         };
-
-        return new Promise((resolve) => {
-            // this.client.sendTransaction( this.authorization.access_token, { transaction: transaction.serializeMessage() }, (err, result) => {
-            //     if (err) {
-            //         resolve(err);
-            //     } else {
-            //         resolve(result);
-            //     };
-            // });
-        });
+        let signature;
+       
+        let tx = new Transaction({recentBlockhash: transaction.recentBlockhash}).add(transaction);
+        const payAccount = new Account(this.secretKey);
+        let result = await this.connection.sendTransaction(
+            tx,
+            [payAccount]
+        );
+        console.log("result !", result);
+         
+        return result;
+        
     };
 
     async userinfo() {
@@ -317,4 +366,89 @@ class Staking {
     };
 };
 
-module.exports = Staking;
+function deepEq$(x, y, type){
+    var toString = {}.toString, hasOwnProperty = {}.hasOwnProperty,
+        has = function (obj, key) { return hasOwnProperty.call(obj, key); };
+    var first = true;
+    return eq(x, y, []);
+    function eq(a, b, stack) {
+        var className, length, size, result, alength, blength, r, key, ref, sizeB;
+        if (a == null || b == null) { return a === b; }
+        if (a.__placeholder__ || b.__placeholder__) { return true; }
+        if (a === b) { return a !== 0 || 1 / a == 1 / b; }
+        className = toString.call(a);
+        if (toString.call(b) != className) { return false; }
+        switch (className) {
+            case '[object String]': return a == String(b);
+            case '[object Number]':
+                return a != +a ? b != +b : (a == 0 ? 1 / a == 1 / b : a == +b);
+            case '[object Date]':
+            case '[object Boolean]':
+                return +a == +b;
+            case '[object RegExp]':
+                return a.source == b.source &&
+                    a.global == b.global &&
+                    a.multiline == b.multiline &&
+                    a.ignoreCase == b.ignoreCase;
+        }
+        if (typeof a != 'object' || typeof b != 'object') { return false; }
+        length = stack.length;
+        while (length--) { if (stack[length] == a) { return true; } }
+        stack.push(a);
+        size = 0;
+        result = true;
+        if (className == '[object Array]') {
+            alength = a.length;
+            blength = b.length;
+            if (first) {
+                switch (type) {
+                    case '===': result = alength === blength; break;
+                    case '<==': result = alength <= blength; break;
+                    case '<<=': result = alength < blength; break;
+                }
+                size = alength;
+                first = false;
+            } else {
+                result = alength === blength;
+                size = alength;
+            }
+            if (result) {
+                while (size--) {
+                    if (!(result = size in a == size in b && eq(a[size], b[size], stack))){ break; }
+                }
+            }
+        } else {
+            if ('constructor' in a != 'constructor' in b || a.constructor != b.constructor) {
+                return false;
+            }
+            for (key in a) {
+                if (has(a, key)) {
+                    size++;
+                    if (!(result = has(b, key) && eq(a[key], b[key], stack))) { break; }
+                }
+            }
+            if (result) {
+                sizeB = 0;
+                for (key in b) {
+                    if (has(b, key)) { ++sizeB; }
+                }
+                if (first) {
+                    if (type === '<<=') {
+                        result = size < sizeB;
+                    } else if (type === '<==') {
+                        result = size <= sizeB
+                    } else {
+                        result = size === sizeB;
+                    }
+                } else {
+                    first = false;
+                    result = size === sizeB;
+                }
+            }
+        }
+        stack.pop();
+        return result;
+    }
+}
+
+module.exports = VelasStaking;
