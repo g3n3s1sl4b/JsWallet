@@ -207,6 +207,7 @@ module.exports = (store, web3t)->
     export name = send.coin.name ? token
     fee-token = (wallet.network.tx-fee-in ? send.coin.token).to-upper-case!
     is-data = (send.data ? "").length > 0
+    bridge-fee-token = wallet.network.txBridgeFeeIn
     choose-auto = ->
         return if has-send-error!  
         send.fee-type = \auto
@@ -263,6 +264,7 @@ module.exports = (store, web3t)->
     export wallet
     export pending
     export fee-token
+    export bridge-fee-token    
     export primary-button-style
     export recipient-change
     export amount-change
