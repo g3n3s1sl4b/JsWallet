@@ -356,7 +356,7 @@ require! {
         .button-container
             text-align: center
             .buttons
-                margin-top: 40px
+                margin-top: 20px
                 text-align: center
                 border-radius: $border
                 width: 100%
@@ -390,7 +390,7 @@ form-group = (classes, title, style, content)->
         label.pug.control-label(style=style) #{title}
         content!
 send = ({ store, web3t })->
-    { token, name, fee-token, network, send, wallet, pending, recipient-change, amount-change, amount-usd-change, amount-eur-change, use-max-amount, show-data, show-label, history, cancel, send-anyway, swap-back, choose-auto, round5edit, round5, is-data, encode-decode, change-amount, invoice } = send-funcs store, web3t
+    { token, name, fee-token, bridge-fee-token, network, send, wallet, pending, recipient-change, amount-change, amount-usd-change, amount-eur-change, use-max-amount, show-data, show-label, history, cancel, send-anyway, swap-back, choose-auto, round5edit, round5, is-data, encode-decode, change-amount, invoice } = send-funcs store, web3t
     return send-contract { store, web3t } if send.details is no
     send.sending = false
     { go-back } = history-funcs store, web3t
@@ -454,6 +454,7 @@ send = ({ store, web3t })->
         if store.current.open-menu then \hide else \ ""
     token-display = if token == \VLX2 then \VLX else token
     fee-token-display = if fee-token == \VLX2 then \VLX else fee-token
+    bridge-fee-token-display = (bridge-fee-token ? "").to-upper-case!
     go-back-from-send = ->
         send.error = ''
         go-back!  
@@ -573,8 +574,8 @@ send = ({ store, web3t })->
                                 td.pug Token bridge fee
                                 td.pug
                                     span.pug(title="#{send.amount-send-fee}") #{send.foreign-network-fee}
-                                        img.label-coin.pug(src="#{send.coin.image}")
-                                        span.pug(title="#{send.foreign-network-fee}") #{fee-token-display}
+                                        img.label-coin.pug(src="#{store.current.send.foreign-coin-image}")
+                                        span.pug(title="#{bridge-fee-token-display}") #{bridge-fee-token-display}
                                     .pug.usd $ #{round5 (send.amount-send-foreign-fee-usd ? 0)}
             .pug.button-container
                 .pug.buttons
@@ -603,8 +604,13 @@ module.exports.init = ({ store, web3t }, cb)->
     return cb err if err?
     store.current.send.foreign-network-fee = fee
     { wallet } = send-funcs store, web3t
-    if fee? then
-        store.current.send.amount-send-foreign-fee-usd = wallet.usdRate `times` fee
+    console.log "wallet" wallet   
+    if fee? and wallet.network.txBridgeFeeIn? then
+        bridge-fee-token = wallet.network.txBridgeFeeIn
+        second-wallet = wallets |> find (-> it.coin.token is bridge-fee-token)
+        usdRate = if second-wallet? then second-wallet.usdRate else "0"
+        store.current.send.amount-send-foreign-fee-usd = usdRate `times` fee
+        store.current.send.foreign-coin-image = second-wallet.coin.image
     return cb null if current-wallet.address is wallet.address
     return cb null if not wallet?
     return cb null if not web3t[wallet.coin.token]?   
