@@ -128,6 +128,7 @@ module.exports = (store, web3t)->
         send.amount = 0
         send.amount-send = 0  
         err, _data <- perform-send-safe 
+        send.error = err if err?    
         return cb err if err?
         notify-form-result send.id, null, _data
         store.current.last-tx-url = | send.network.api.linktx => send.network.api.linktx.replace \:hash, _data
