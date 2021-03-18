@@ -350,6 +350,7 @@ require! {
             padding: 0 4px
             font-size: 12px
             max-height: 20px
+            font-weight: 400
             overflow: hidden
         .bold
             font-weight: bold
@@ -460,7 +461,10 @@ send = ({ store, web3t })->
         go-back!  
     makeDisabled = send.amount-send <= 0
     token = store.current.send.coin.token
-    send-func = if token is \vlx_erc20 then swap-back else send-anyway
+    is-swap = store.current.send.is-swap is yes
+    send-func =
+        | token is \vlx_erc20 and is-swap => swap-back
+        | _ => send-anyway
     disabled = not send.to? or send.to.trim!.length is 0 or (send.error.index-of "address") > -1     
     receiver-is-swap-contract = contracts.is-swap-contract(store, send.to)
     get-recipient = (address)->
