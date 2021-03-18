@@ -73,7 +73,7 @@ require! {
                         float: right !important
                     display: none
             .top-left
-                width: 80% !important
+                width: 100% !important
             .top-middle
                 width: 32% !important
                 text-align: center !important
