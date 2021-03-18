@@ -80,12 +80,16 @@ change-amount-generic = (field)-> (store, amount-send, fast, cb)->
         | (result-amount-send ? "").length is 0 => tx-fee
         | result-amount-send is \0 => tx-fee
         | result-amount-send is 0 => tx-fee
+        | fee-token isnt token => result-amount-send
         | _ => result-amount-send `plus` tx-fee
     send.amount-charged-usd =  send.amount-charged `times` usd-rate
     send.amount-send-fee-usd = tx-fee `times` fee-usd-rate
+    amount-to-charge =
+        | fee-token is token => wallet.balance `minus` result-amount-send `minus` send.amount-send-fee 
+        | _ => wallet.balance `minus` result-amount-send     
     send.error =
         | wallet.balance is \... => "Balance is not yet loaded"
-        | parse-float(wallet.balance `minus` result-amount-send `minus` send.amount-send-fee) < 0 => "Not Enough Funds"
+        | parse-float(amount-to-charge) < 0 => "Not Enough Funds"
         | _ => ""
     cb null
 export change-amount-send = (store, amount-send, fast, cb)->
