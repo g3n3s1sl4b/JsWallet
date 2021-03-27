@@ -22,10 +22,9 @@ require! {
 module.exports = ({ web3t, wallet, store, id })->
     return null if not wallet.network.networks?
     return null if not (store.current.send.isSwap? and store.current.send.isSwap is yes)
+    return null if not wallet.network.networks? or Object.keys(wallet.network.networks).length is 0
     network-labels = Object.keys(wallet.network.networks)  /* ['evm', 'native'] */
     getNetworkById = (id)->
-        console.log "wallet.network.networks" wallet.network.networks
-        console.log "id" id
         wallet.network.networks["#{id}"]
     style = get-primary-info store
     style2 = color: "#{style.app.icon}"
