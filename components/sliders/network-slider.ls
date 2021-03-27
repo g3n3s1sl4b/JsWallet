@@ -3,19 +3,30 @@ require! {
     \../../get-primary-info.ls
     \../../round5.ls
     \../../round.ls
-    \prelude-ls : { find }
+    \prelude-ls : { find, obj-to-pairs }
     \../../math.ls : { times }
     \../../icon.ls
     \../../icons.ls
+    \../../swaping/networks.ls : "token-networks"       
 }
 .network-slider
-    .button
+    .navigation-button
+        transition: opacity 0.2
+        &:hover
+            opacity: 0.9
         .button-inner
             position: relative
             img
                 height: 15px !important
                 top: 0 !important
-module.exports = ({ store, value, id })->
+module.exports = ({ web3t, wallet, store, id })->
+    return null if not wallet.network.networks?
+    return null if not (store.current.send.isSwap? and store.current.send.isSwap is yes)
+    network-labels = Object.keys(wallet.network.networks)  /* ['evm', 'native'] */
+    getNetworkById = (id)->
+        console.log "wallet.network.networks" wallet.network.networks
+        console.log "id" id
+        wallet.network.networks["#{id}"]
     style = get-primary-info store
     style2 = color: "#{style.app.icon}"
     input-style2 =
@@ -28,24 +39,30 @@ module.exports = ({ store, value, id })->
         background: style.app.primary2
         background-color: style.app.primary2-spare
     ###
-    network-type = store.current.network
-    networks = store.current.send.networks
-    display-value = store.current.send.chosen-network["#{network-type}"].to-upper-case!
+    display-value = store.current.send.chosen-network.name.to-upper-case!
     ###   
-    on-change-contract-network = (event)->   
-        store.current.send.chosen-network["#{network-type}"] = event.target.value
-    form-group = (title, style, content)->
-        .pug.form-group
-            label.pug.control-label(style=style) #{title}
-            content!
+    go = (inc)-> ->
+        current = network-labels.index-of(store.current.send.chosen-network.id)
+        lenght = network-labels.length
+        index = current + inc 
+        if (current + inc) >= lenght then 
+            index = 0 
+        else if (current + inc) < 0 then
+            index = lenght - 1
+        chosen-network-id = network-labels[index]
+        store.current.send.chosenNetwork = getNetworkById(chosen-network-id)
+        store.current.send.to = token-networks.get-default-recipient-address(store)
+        store.current.send.error = ''
+    goback = go(-1)
+    goForw = go(1)       
     .pug.network-slider
         label.pug.control-label(style=style2) Choose Network
         .pug
-            span.pug.button.left(on-click style=button-primary2-style)
+            span.pug.button.navigation-button.left(on-click=goback style=button-primary2-style)
                 .pug.button-inner
                     img.icon-svg.pug(src="#{icons.arrow-left}")
             span.pug.bold
-                input.pug.change-network(value="#{display-value}" style=input-style2 on-change=on-change-contract-network disabled=true)
-            span.pug.button.right(on-click style=button-primary2-style)
+                input.pug.change-network(value="#{display-value}" style=input-style2  disabled=true)
+            span.pug.button.navigation-button.right(on-click=goForw style=button-primary2-style)
                 .pug.button-inner
                     img.icon-svg.pug(src="#{icons.arrow-right}")
