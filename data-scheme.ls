@@ -14,9 +14,8 @@ saved-seed = seedmem.saved!
 create-send =->
     id: ""
     to: ""
-    chosen-network: 
-        testnet: "Ethereum"
-        mainnet: "Ethereum"    
+    chosen-network: {} 
+    contract-address: null  
     details: yes
     propose-escrow: no
     address: ''
