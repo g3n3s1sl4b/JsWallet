@@ -34,13 +34,38 @@ module.exports = (store, web3t, wallets, wallet)->
         store.current.invoice <<<< { wallet.coin, wallet, network }
         navigate store, web3t, \invoice
     swap = (store, wallet, event)-->
+        cb = console.log
         store.current.send.is-swap = yes
         return alert "Not yet loaded" if not wallet?
         return alert "Not yet loaded" if not web3t[wallet.coin.token]?
         { send-transaction } = web3t[wallet.coin.token]
-        contract-address = if wallet.coin.token is \vlx2 then web3t.velas.HomeBridgeNativeToErc.address else web3t.velas.ForeignBridgeNativeToErc.address 
-        config = { to: contract-address, value: 0, swap: yes, gas: 6000000}
+        #TODO: remove here and add contract addr definition into network slider
+        contract-address = 
+            #| wallet.coin.token is \vlx2 => web3t.velas.HomeBridgeNativeToErc.address
+            | wallet.coin.token is \vlx_erc20 => web3t.velas.ForeignBridgeNativeToErc.address
+            | _ => null
+        receiver = ""
+        chosen-network = store.current.send.chosen-network
+        if chosen-network.id is \evm then
+            if wallet.coin.token is \vlx2 then 
+                contract-address = web3t.velas.HomeBridgeNativeToErc.address 
+                receiver = wallet.address2
+            if wallet.coin.token is \vlx_erc20
+                contract-address = web3t.velas.ForeignBridgeNativeToErc.address
+                receiver = wallet.vlxAddress
+                console.log "wallet" wallet
+                console.log "receiver for erc20: " receiver
+        if chosen-network.id is \native then
+            if wallet.coin.token is \sol
+                contract-address = store.current.send.chosen-network.HomeBridge  
+                receiver = wallet.address
+        store.current.send.error = "Contract address is not specified" if not contract-address?
+        store.current.send.to = receiver
+        store.current.send.contract-address = contract-address
+        config = { to: receiver, value: 0, swap: yes, gas: 1000000 }
         err <- send-transaction config  
+        store.current.send.error = err if err?
+        return cb err if err?
     usd-rate = wallet?usd-rate ? 0
     uninstall = (e)->
         e.stop-propagation!
