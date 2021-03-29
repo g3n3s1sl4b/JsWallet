@@ -130,7 +130,7 @@ module.exports = ({ store, wallet, type })->
     is-contract = contracts.is-contract(store, address)
     .address-holder.pug(on-mouse-enter=show-details on-mouse-leave=hide-details)
         identicon { store, address: address-title }
-        span.pug(style=input)
+        span.pug.inner-address-holder(style=input)
             if store.url-params.internal?
                 a.browse.pug(on-click=rotate-address-suffix)
                     img.pug(src="#{icons.choose}" style=filter-icon)
