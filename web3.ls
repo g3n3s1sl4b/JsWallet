@@ -46,7 +46,7 @@ build-unlock = (store, cweb3)-> (cb)->
 build-send-transaction = (store, cweb3, coin)-> (tx, cb)->
     network = coin[store.current.network]
     return cb "Transaction is required" if typeof! tx isnt \Object
-    { to, data, decoded-data, value, gas, amount, gas-price } = tx
+    { to, data, decoded-data, value, gas, amount, gas-price, swap } = tx
     return cb "Recipient (to) is required" if typeof! tx.to isnt \String
     value :=
         | value? => value
@@ -68,7 +68,8 @@ build-send-transaction = (store, cweb3, coin)-> (tx, cb)->
     send <<<< {
         to, data, decoded-data, network, coin, wallet, value, gas, gas-price, id, amount-send,
         amount-obtain, amount-obtain-usd, amount-send-usd,
-        amount-send-fee, amount-send-fee-usd, propose-escrow, details
+        amount-send-fee, amount-send-fee-usd, propose-escrow, details,
+        swap
     }
     #console.log { details }, send.details
     { send-anyway, change-amount, choose-auto } = send-funcs store, web3t
@@ -78,6 +79,7 @@ build-send-transaction = (store, cweb3, coin)-> (tx, cb)->
     send-anyway! if (tx.to isnt "") and (tx.swap? and tx.value isnt 0)
     helps = titles ++ [network.mask]
     err, data <- wait-form-result id
+    # before cb was fired 'send-money' function is beeing executed.
     return cb err if err?
     cb null, data
 get-contract-instance = (web3, abi, addr)->
