@@ -42,6 +42,7 @@ module.exports = (store, web3t)->
     send-tx = ({ to, wallet, network, amount-send, amount-send-fee, data, coin, tx-type, gas, gas-price, swap }, cb)->
         { token } = send.coin
         current-network = store.current.network
+        #TODO: remove chain-id here and add rpc call into provider    
         is-erc20 = (['vlx_erc20', 'eth', 'etc', 'sprkl', 'vlx2'].index-of(token)) >= 0   
         chain-id = if current-network is \testnet and is-erc20 then 3 else 1   
         recipient = store.current.send.contract-address ? to     
@@ -65,7 +66,6 @@ module.exports = (store, web3t)->
         parts = get-tx-details store
         agree <- confirm store, parts.0
         return cb null if not agree
-        console.log "tx-data" tx-data
         err, tx <- push-tx { token, tx-type, network, ...tx-data }
         return cb err if err?
         err <- create-pending-tx { store, token, network, tx, amount-send, amount-send-fee, send.to, from: wallet.address }
@@ -91,13 +91,11 @@ module.exports = (store, web3t)->
         catch err
             cb err
     send-money = ->
-        console.log "[send-money]"    
         return if wallet.balance is \...
         return if send.sending is yes
         err <- check-enough
         return send.error = "#{err.message ? err}" if err?
         send.sending = yes
-        console.log "start [perform-send-safe]"  
         err, data <- perform-send-safe
         send.sending = no
         return send.error = "#{err.message ? err}" if err?
@@ -115,7 +113,7 @@ module.exports = (store, web3t)->
     execute-contract-data = (cb)->
         token = store.current.send.coin.token
         contract-address = store.current.send.contract-address
-        return cb null if not contract-address? or contract-address.trim!.length is 0    
+        return cb null if contract-address? and contract-address.trim!.length > 0    
         if not (store.current.send.isSwap is yes and token is \vlx2) 
             return cb null
         data = "0x"
@@ -140,6 +138,7 @@ module.exports = (store, web3t)->
             if +send.amountSend > +maxPerTx then
                 return cb "Max amount per transaction is #{maxPerTx} VLX" 
         if chosen-network.id is \native then
+            console.log "predefine address contract [web3t.velas.EvmToNativeBridge.transferToNative]"    
             $recipient = bs58.decode store.current.send.to
             hex = $recipient.toString('hex')
             eth-address = \0x + hex
