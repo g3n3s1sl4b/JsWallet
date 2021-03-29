@@ -137,7 +137,14 @@ require! {
             >.form-group
                 &.sender, &.receiver
                     input 
-                        padding: 0 10px 0 40px 
+                        padding: 0 10px 0 45px 
+                        text-align: left
+                &.sender
+                    .address-holder .inner-address-holder
+                        text-align: left
+                        padding-left: 45px
+                &.receiver input
+                    text-align: left !important
                 .identicon
                     ~ span
                         background: var(--input)
@@ -458,6 +465,7 @@ send = ({ store, web3t })->
     show-class =
         if store.current.open-menu then \hide else \ ""
     token-display = if token == \VLX2 then \VLX else token
+    token-display-short = token-display.split("_")[0]
     fee-token-display = if fee-token == \VLX2 then \VLX else fee-token
     fee-token-display = 
         | bridge-fee-token? => bridge-fee-token
@@ -529,7 +537,7 @@ send = ({ store, web3t })->
                             .input-wrapper.pug(style=input-style)
                                 .label.crypto.pug
                                     img.label-coin.pug(src="#{send.coin.image}")
-                                    | #{token-display}
+                                    | #{token-display-short}
                                 amount-field { store, value: "#{round5edit send.amount-send}", on-change: amount-change, placeholder="0", id="send-amount", token, disabled }
                             if active-usd is \active
                                 .input-wrapper.small.pug(style=amount-style)
@@ -579,6 +587,8 @@ module.exports.init = ({ store, web3t }, cb)->
     return cb null if not wallet?
     return cb null if send.sending is yes
     store.current.send.foreign-network-fee = 0
+    store.current.send.amountCharged = 0
+    store.current.send.amountChargedUsd = 0
     if store.current.send.is-swap isnt yes
         store.current.send.contract-address = null
     is-swap-contract = contracts.is-swap-contract(store, send.to)
