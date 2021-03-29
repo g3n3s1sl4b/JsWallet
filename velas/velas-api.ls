@@ -9,6 +9,7 @@ abis =
     Development  : require("../../web3t/contracts/VelasDevelopment.json").abi
     Resolver     : require("../../web3t/contracts/LockupResolver.json").abi
     Timelock     : require("../../web3t/contracts/LockupTimelock.json").abi
+    EvmToNativeBridge: require("../../web3t/contracts/EvmToNativeBridge.json").abi 
     HomeBridgeNativeToErc  : require("../../web3t/contracts/HomeBridgeNativeToErc.json").abi 
     ForeignBridgeNativeToErc : require("../../web3t/contracts/ForeignBridgeNativeToErc.json").abi 
     ERC20BridgeToken: require("../../web3t/contracts/ERC20BridgeToken.json").abi    
@@ -22,7 +23,8 @@ module.exports = (store)->
     resolver-contract-address = addresses[network].ResolverAuRa 
     homeBridgeAddress = addresses[network].HomeBridge  
     foreignBridgeAddress = addresses[network].ForeignBridge
-    ERC20BridgeToken = addresses[network].ERC20BridgeToken   
+    ERC20BridgeToken = addresses[network].ERC20BridgeToken
+    EvmToNativeBridgeAddress = addresses[network].EvmToNative   
     api =
         Staking      : web3.eth.contract(abis.Staking).at(staking-address)
         StakingLockup: web3.eth.contract(abis.Staking)
@@ -32,6 +34,7 @@ module.exports = (store)->
         Resolver     : web3.eth.contract(abis.Resolver).at(resolver-contract-address)
         Timelock     : web3.eth.contract(abis.Timelock) 
         web3         : web3.eth
+        EvmToNativeBridge : web3.eth.contract(abis.EvmToNativeBridge).at(EvmToNativeBridgeAddress)     
         HomeBridgeNativeToErc : web3.eth.contract(abis.HomeBridgeNativeToErc).at(homeBridgeAddress)
         ForeignBridgeNativeToErc : web3.eth.contract(abis.ForeignBridgeNativeToErc).at(foreignBridgeAddress)
         ERC20BridgeToken : web3.eth.contract(abis.ERC20BridgeToken).at(ERC20BridgeToken) 
