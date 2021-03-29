@@ -589,6 +589,7 @@ module.exports.init = ({ store, web3t }, cb)->
     store.current.send.foreign-network-fee = 0
     store.current.send.amountCharged = 0
     store.current.send.amountChargedUsd = 0
+    store.current.send.error = ''
     if store.current.send.is-swap isnt yes
         store.current.send.contract-address = null
     is-swap-contract = contracts.is-swap-contract(store, send.to)
@@ -602,7 +603,9 @@ module.exports.init = ({ store, web3t }, cb)->
         default-network = networks[network-keys.0].name
     /* If it is Swap! */
     if wallet.network.networks? and (store.current.send.isSwap is yes) then
-        store.current.send.chosenNetwork = wallet.network.networks.evm
+        store.current.send.chosenNetwork = 
+            | wallet.network.networks.evm? => wallet.network.networks.evm
+            | _ => wallet.network.networks.native
         store.current.send.to = token-networks.get-default-recipient-address(store) 
     { wallets } = wallets-funcs store, web3t
     current-wallet =
