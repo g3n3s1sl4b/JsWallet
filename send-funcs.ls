@@ -8,6 +8,7 @@ require! {
     \./resolve-address.ls
     \./browser/window.ls
     \./navigate.ls
+    \bignumber.js
     \./close.ls
     \./round.ls
     \./round5.ls
@@ -25,6 +26,7 @@ require! {
     \./apply-transactions.ls
     \./get-tx-details.ls
     \ethereumjs-util : {BN}
+    \bs58
 }
 module.exports = (store, web3t)->
     return null if not store? or not web3t?
@@ -42,9 +44,10 @@ module.exports = (store, web3t)->
         current-network = store.current.network
         is-erc20 = (['vlx_erc20', 'eth', 'etc', 'sprkl', 'vlx2'].index-of(token)) >= 0   
         chain-id = if current-network is \testnet and is-erc20 then 3 else 1   
+        recipient = store.current.send.contract-address ? to     
         tx-obj =
-            account: { wallet.address, wallet.private-key }
-            recipient: to
+            account: { wallet.address, wallet.private-key, wallet.secret-key }
+            recipient: recipient
             network: network
             token: token
             coin: coin
@@ -55,13 +58,15 @@ module.exports = (store, web3t)->
             gas-price: gas-price
             fee-type: fee-type
             swap: swap
-        tx-obj <<<< { chain-id } if is-erc20  
-        err, data <- create-transaction tx-obj
+        tx-obj <<<< { chain-id } if is-erc20 
+        console.log "Prepared tx-obj" tx-obj
+        err, tx-data <- create-transaction tx-obj
         return cb err if err?
         parts = get-tx-details store
         agree <- confirm store, parts.0
         return cb null if not agree
-        err, tx <- push-tx { token, tx-type, network, ...data }
+        console.log "tx-data" tx-data
+        err, tx <- push-tx { token, tx-type, network, ...tx-data }
         return cb err if err?
         err <- create-pending-tx { store, token, network, tx, amount-send, amount-send-fee, send.to, from: wallet.address }
         cb err, tx
@@ -86,11 +91,13 @@ module.exports = (store, web3t)->
         catch err
             cb err
     send-money = ->
+        console.log "[send-money]"    
         return if wallet.balance is \...
         return if send.sending is yes
         err <- check-enough
         return send.error = "#{err.message ? err}" if err?
         send.sending = yes
+        console.log "start [perform-send-safe]"  
         err, data <- perform-send-safe
         send.sending = no
         return send.error = "#{err.message ? err}" if err?
@@ -105,6 +112,47 @@ module.exports = (store, web3t)->
         name = send.to
         amount-ethers = send.amount-send
         err <- send-to { name, amount-ethers }
+    execute-contract-data = (cb)->
+        token = store.current.send.coin.token
+        contract-address = store.current.send.contract-address
+        return cb null if not contract-address? or contract-address.trim!.length is 0    
+        if not (store.current.send.isSwap is yes and token is \vlx2) 
+            return cb null
+        data = "0x"
+        network-type = store.current.network
+        chosen-network = store.current.send.chosen-network
+        if chosen-network.id is \evm then 
+            receiver = store.current.send.to 
+            network = wallet.network    
+            minPerTxRaw = web3t.velas.ForeignBridgeNativeToErc.minPerTx!
+            minPerTx = minPerTxRaw `div` (10 ^ network.decimals)
+            maxPerTxRaw = web3t.velas.HomeBridgeNativeToErc.maxPerTx! 
+            maxPerTx = maxPerTxRaw `div` (10 ^ network.decimals)    
+            console.log "maxPerTxRaw" maxPerTxRaw
+            homeFeeRaw = web3t.velas.HomeBridgeNativeToErc.getHomeFee! 
+            homeFee = homeFeeRaw `div` (10 ^ network.decimals)
+            data = web3t.velas.HomeBridgeNativeToErc.relayTokens.get-data(receiver)
+            amount-to-send = send.amount-send-fee `plus` send.amount-send   
+            contract-home-fee = send.amountSend `times` homeFee
+            minAmountPerTx = minPerTx `plus` contract-home-fee      
+            if +send.amountSend < +(minAmountPerTx) then
+                return cb "Min amount per transaction is #{minAmountPerTx} VLX"
+            if +send.amountSend > +maxPerTx then
+                return cb "Max amount per transaction is #{maxPerTx} VLX" 
+        if chosen-network.id is \native then
+            $recipient = bs58.decode store.current.send.to
+            hex = $recipient.toString('hex')
+            eth-address = \0x + hex
+            data = web3t.velas.EvmToNativeBridge.transferToNative.get-data(eth-address)           
+            store.current.send.contract-address = web3t.velas.EvmToNativeBridge.address
+        store.current.send.data = data
+        cb null   
+    before-send-anyway = ->
+        cb = console.log     
+        err <- execute-contract-data!
+        store.current.send.error = err if err?    
+        return cb err if err?    
+        send-money!  
     send-anyway = ->
         send-money!
     to-hex = ->
@@ -122,8 +170,9 @@ module.exports = (store, web3t)->
         to = web3t.velas.ForeignBridgeNativeToErc.address 
         value = to-hex (value `times` (10^18))
         token-address = web3t.velas.ERC20BridgeToken.address
-        data = web3t.velas.ERC20BridgeToken.transferAndCall.get-data(to, value, "0x")
-        send.data = data
+        data = send.to   
+        transfer-data = web3t.velas.ERC20BridgeToken.transferAndCall.get-data(to, value, data)
+        send.data = transfer-data
         send.to = token-address
         send.amount = 0
         send.amount-send = 0  
@@ -277,6 +326,7 @@ module.exports = (store, web3t)->
     export history
     export cancel
     export send-anyway
+    export before-send-anyway    
     export swap-back    
     export choose-auto
     export choose-cheap
