@@ -59,6 +59,10 @@ module.exports = (store, web3t, wallets, wallet)->
             if wallet.coin.token is \sol
                 contract-address = store.current.send.chosen-network.HomeBridge  
                 receiver = wallet.address
+        if wallet.coin.token in <[ vlx ]> then
+            default-receiver-wallet = store.current.account.wallets |> find (-> it.coin.token is \vlx2)
+            return cb "Receiver wallet for token #{wallet.coin.token} not found." if not default-receiver-wallet?
+            receiver = default-receiver-wallet.address2
         store.current.send.error = "Contract address is not specified" if not contract-address?
         store.current.send.to = receiver
         store.current.send.contract-address = contract-address
