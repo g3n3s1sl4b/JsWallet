@@ -15,5 +15,5 @@ require! {
     \../web3t/plugins/vlx_erc20-coin.js : vlx_erc20
 }
 module.exports = (cb) ->
-    def = [ eth, usdt, syx, syx2, usdt_erc20, ltc, vlx_erc20, sol ]
+    def = [ eth, usdt, syx, syx2, usdt_erc20, ltc, vlx_erc20 ]
     cb null, def
