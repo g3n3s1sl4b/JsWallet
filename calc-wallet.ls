@@ -37,7 +37,8 @@ calc-wallet = (store, cb)->
             | usd-rate is \.. => \..
             | _ => round5 (usd-rate `times` btc-rate)
         err, balance <- get-balance { wallet.address, wallet.network, token, account: { wallet.address, wallet.private-key } }
-        return cb err if err?
+        console.error "#{token} get-balance error:" err if err?
+        balance = "0" if err?
         pending-sent = 0
         #    store.transactions.all
         #        |> filter (.token is token)
@@ -57,9 +58,7 @@ calc-wallet = (store, cb)->
         state-before = state.balance-usd
         #convert state.balance-usd to string as bignumber can throw exception for numbers
         state.balance-usd = state.balance-usd + ''
-        state.balance-usd =
-            | usd-rate is \.. => 0
-            | _ => state.balance-usd `plus` balance-usd-current
+        state.balance-usd = state.balance-usd `plus` balance-usd-current
         #console.log { state-before, state.balance-usd, balance-usd-current }
         cb!
     loaders =
