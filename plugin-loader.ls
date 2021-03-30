@@ -29,5 +29,4 @@ export get-coins = (store, cb)->
         items |> filter (.type is \coin)
             |> filter (.enabled isnt no)
     all =  base ++ installed
-    console.log "all tolkens are:" all 
     cb null, all
