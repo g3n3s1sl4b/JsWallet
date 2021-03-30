@@ -343,7 +343,7 @@ require! {
         width: 100%
         overflow-y: scroll
         margin-top: -1px
-        height: calc(100vh - 390px)
+        height: calc(100vh - 420px)
         opacity: .8
         .head, .record
             &.record
@@ -787,14 +787,6 @@ render-transaction = (store, web3t, tran)-->
                 .pug(title="#{amount}" style=amount-pending)
                     span.sign.direction.pug #{sign(type)}
                     amount-beautify amount, 8
-                if no
-                    .pug(title="#{amount}" style=amount-pending)
-                        #span.sign.direction.pug #{sign(type)}
-                        #amount-beautify amount, 8
-                if no
-                    .pug.gray(style=lightText)
-                        span.pug.fee #{lang.fee}:
-                        amount-beautify fee, 10
             .cell.pug.status(style=menu-style)
                 if pending is yes
                     span.pug

@@ -66,7 +66,8 @@ change-amount-generic = (field)-> (store, amount-send, fast, cb)->
     send.amount-send-usd = calc-usd store, amount-send
     send.amount-send-eur = calc-eur store, amount-send
     calc-fee-fun = if fast then calc-fee else calc-fee-proxy
-    err, calced-fee <- calc-fee-fun { token, send.to, send.data, send.network, amount: result-amount-send, fee-type, tx-type, account }
+    send-to = store.current.send.wallet.address
+    err, calced-fee <- calc-fee-fun { store, token, to: send-to, send.data, send.network, amount: result-amount-send, fee-type, tx-type, account }
     send.error = "Calc Fee Error: #{err.message ? err}" if err?
     return cb "Calc Fee Error: #{err.message ? err}" if err?
     tx-fee =
@@ -80,12 +81,16 @@ change-amount-generic = (field)-> (store, amount-send, fast, cb)->
         | (result-amount-send ? "").length is 0 => tx-fee
         | result-amount-send is \0 => tx-fee
         | result-amount-send is 0 => tx-fee
+        | fee-token isnt token => result-amount-send
         | _ => result-amount-send `plus` tx-fee
     send.amount-charged-usd =  send.amount-charged `times` usd-rate
     send.amount-send-fee-usd = tx-fee `times` fee-usd-rate
+    amount-to-charge =
+        | fee-token is token => wallet.balance `minus` result-amount-send `minus` send.amount-send-fee 
+        | _ => wallet.balance `minus` result-amount-send     
     send.error =
         | wallet.balance is \... => "Balance is not yet loaded"
-        | parse-float(wallet.balance `minus` result-amount-send `minus` send.amount-send-fee) < 0 => "Not Enough Funds"
+        | parse-float(amount-to-charge) < 0 => "Not Enough Funds"
         | _ => ""
     cb null
 export change-amount-send = (store, amount-send, fast, cb)->
@@ -117,7 +122,8 @@ export change-amount-send = (store, amount-send, fast, cb)->
     send.amount-obtain = result-amount-send
     send.amount-obtain-usd = send.amount-obtain `times` usd-rate
     calc-fee-fun = if fast then calc-fee else calc-fee-proxy
-    err, calced-fee <- calc-fee-fun { token, send.to, send.data, send.network, amount: result-amount-send, fee-type, tx-type, account }
+    send-to = store.current.send.wallet.address
+    err, calced-fee <- calc-fee-fun { token, to: send-to, send.data, send.network, amount: result-amount-send, fee-type, tx-type, account }
     send.error = "Calc Fee Error: #{err.message ? err}" if err?
     return cb "Calc Fee Error: #{err.message ? err}" if err?
     tx-fee =
@@ -172,7 +178,8 @@ export change-amount-calc-fiat = (store, amount-send, fast, cb)->
     send.amount-obtain = result-amount-send
     send.amount-obtain-usd = send.amount-obtain `times` usd-rate   
     calc-fee-fun = if fast then calc-fee else calc-fee-proxy
-    err, calced-fee <- calc-fee-fun { token, send.to, send.data, send.network, amount: result-amount-send, fee-type, tx-type, account }
+    send-to = store.current.send.wallet.address
+    err, calced-fee <- calc-fee-fun { token, to: send-to, send.data, send.network, amount: result-amount-send, fee-type, tx-type, account }
     send.error = "Calc Fee Error: #{err.message ? err}" if err?
     return cb "Calc Fee Error: #{err.message ? err}" if err?
     tx-fee =

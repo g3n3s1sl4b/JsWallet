@@ -29,7 +29,7 @@ require! {
         background-size: cover
         background-repeat: no-repeat
         background-position: top right
-        padding: 30px
+        padding: 20px
         box-sizing: border-box
     .wallets
         @import scheme
@@ -73,7 +73,7 @@ require! {
                         float: right !important
                     display: none
             .top-left
-                width: 80% !important
+                width: 100% !important
             .top-middle
                 width: 32% !important
                 text-align: center !important

@@ -1,6 +1,7 @@
 require! {
     \prelude-ls : { map, filter, obj-to-pairs }
     \./velas/addresses.ls
+    \./contracts.ls    
 }
 get-address-label = (wallet)->
     | wallet.coin.token in <[ xem eos ]> => \account
@@ -24,7 +25,7 @@ export get-address-title = (wallet, address-suffix)->
         | typeof! address is \Null => "..."
         | _ => "n/a"
     res
-export get-address-display = (wallet, address-suffix) ->
+export get-address-display = (store, wallet, address-suffix) ->
     address = get-address(wallet, address-suffix)
     if not address.starts-with \V
         return address

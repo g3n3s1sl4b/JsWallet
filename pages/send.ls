@@ -1,7 +1,7 @@
 require! {
     \react
     \../send-funcs.ls
-    \prelude-ls : { map, find }
+    \prelude-ls : { map, find, keys, filter }
     \../get-primary-info.ls
     \./icon.ls
     \../get-lang.ls
@@ -19,6 +19,12 @@ require! {
     \../history-funcs.ls
     \../components/burger.ls
     \../components/amount-field.ls
+    \../components/sliders/network-slider.ls
+    \../math.ls : { times }
+    \ethereumjs-util : {BN}
+    \../velas/addresses.ls
+    \../contracts.ls
+    \../swaping/networks.ls : \token-networks
 }
 .content
     position: relative
@@ -129,10 +135,20 @@ require! {
             text-align: left
             margin: auto 10px
             >.form-group
+                &.sender, &.receiver
+                    input 
+                        padding: 0 10px 0 45px 
+                        text-align: left
+                &.sender
+                    .address-holder .inner-address-holder
+                        text-align: left
+                        padding-left: 45px
+                &.receiver input
+                    text-align: left !important
                 .identicon
                     ~ span
                         background: var(--input)
-                &:nth-child(2)
+                &:nth-child(2), &:nth-child(3)
                     div
                         position: relative
                         img
@@ -145,10 +161,28 @@ require! {
                             margin: 0px
                         input
                             text-align: center
-                >.control-label
+                .control-label
                     padding-top: 5px
                     padding-left: $label-padding
                     font-size: $label-font
+                &.network
+                    div
+                        position: relative
+                    .button
+                        width: 12px
+                        height: 16px
+                        display: inline-block
+                        padding: 9px
+                        border-radius: var(--border-btn)
+                        cursor: pointer
+                        vertical-align: top
+                        position: absolute
+                        &.left
+                            left: 0
+                        &.right
+                            right: 0
+                        svg
+                            vertical-align: inherit !important
                 margin-top: 4px
                 .address
                     padding: 0px
@@ -327,13 +361,14 @@ require! {
             padding: 0 4px
             font-size: 12px
             max-height: 20px
+            font-weight: 400
             overflow: hidden
         .bold
             font-weight: bold
         .button-container
             text-align: center
             .buttons
-                margin-top: 40px
+                margin-top: 20px
                 text-align: center
                 border-radius: $border
                 width: 100%
@@ -362,13 +397,14 @@ require! {
                     &:hover
                         background: rgba(#6CA7ED, 0.2)
                         opacity: .9
-form-group = (title, style, content)->
-    .pug.form-group
+form-group = (classes, title, style, content)->
+    .pug.form-group(class="#{classes}")
         label.pug.control-label(style=style) #{title}
         content!
 send = ({ store, web3t })->
-    { token, name, fee-token, network, send, wallet, pending, recipient-change, amount-change, amount-usd-change, amount-eur-change, use-max-amount, show-data, show-label, history, cancel, send-anyway, choose-auto, round5edit, round5, is-data, encode-decode, change-amount, invoice } = send-funcs store, web3t
+    { token, name, fee-token, bridge-fee-token, network, send, wallet, pending, recipient-change, amount-change, amount-usd-change, amount-eur-change, use-max-amount, show-data, show-label, history, cancel, send-anyway, before-send-anyway, swap-back, choose-auto, round5edit, round5, is-data, encode-decode, change-amount, invoice } = send-funcs store, web3t
     return send-contract { store, web3t } if send.details is no
+    send.sending = false
     { go-back } = history-funcs store, web3t
     return go-back! if not wallet?
     round-money = (val)->
@@ -397,6 +433,11 @@ send = ({ store, web3t })->
         color: style.app.text2
         background: style.app.primary3
         background-color: style.app.primary3-spare
+    button-primary2-style=
+        border: "1px solid #{style.app.wallet}"
+        color: style.app.text
+        background: style.app.primary2
+        background-color: style.app.primary2-spare
     crypto-background =
         background: style.app.wallet
         width: "50%"
@@ -424,13 +465,30 @@ send = ({ store, web3t })->
     show-class =
         if store.current.open-menu then \hide else \ ""
     token-display = if token == \VLX2 then \VLX else token
+    token-display-short = token-display.split("_")[0]
     fee-token-display = if fee-token == \VLX2 then \VLX else fee-token
+    fee-token-display = 
+        | bridge-fee-token? => bridge-fee-token
+        | _ =>  fee-token-display
+    fee-token-display = fee-token-display.to-upper-case!
+    fee-coin-image = 
+        | send.fee-coin-image? => send.fee-coin-image
+        |_ => send.coin.image
     go-back-from-send = ->
         send.error = ''
         go-back!  
     makeDisabled = send.amount-send <= 0
-    token = store.current.send.coin.token 
-    disabled = not send.to? or send.to.trim!.length is 0 or (send.error.index-of "address") > -1  
+    token = store.current.send.coin.token
+    is-swap = store.current.send.is-swap is yes
+    send-func =
+        | token is \vlx_erc20 and is-swap => swap-back
+        | _ => before-send-anyway
+    disabled = not send.to? or send.to.trim!.length is 0 or (send.error.index-of "address") > -1     
+    receiver-is-swap-contract = contracts.is-swap-contract(store, store.current.send.contract-address)
+    visible-error = if send.error? and send.error.length > 0 then "visible" else ""
+    get-recipient = (address)->
+        address
+    recipient = get-recipient(send.to)
     .pug.content
         .pug.title(style=border-header)
             .pug.header(class="#{show-class}") #{lang.send}
@@ -464,20 +522,22 @@ send = ({ store, web3t })->
                                     icon \Inbox, 20
                                 span.pug.more-text(style=more-text) #{lang.history}
             form.pug
-                form-group lang.from, icon-style, ->
+                form-group \sender, lang.from, icon-style, ->
                     .address.pug(style=border-style)
                         address-holder { store, wallet }
-                form-group lang.to, icon-style, ->
+                .pug.slider.network.form-group
+                    network-slider { web3t, wallet, store}
+                form-group \receiver, lang.to, icon-style, ->
                     .pug
                         identicon { store, address: send.to }
-                        input.pug(type='text' style=input-style on-change=recipient-change value="#{send.to}" placeholder="#{store.current.send-to-mask}" id="send-recipient")
-                form-group lang.amount, icon-style, ->
+                        input.pug(type='text' style=input-style on-change=recipient-change value="#{recipient}" placeholder="#{store.current.send-to-mask}" id="send-recipient" )
+                form-group \send-amount, lang.amount, icon-style, ->
                     .pug
                         .pug.amount-field
                             .input-wrapper.pug(style=input-style)
                                 .label.crypto.pug
                                     img.label-coin.pug(src="#{send.coin.image}")
-                                    | #{token-display}
+                                    | #{token-display-short}
                                 amount-field { store, value: "#{round5edit send.amount-send}", on-change: amount-change, placeholder="0", id="send-amount", token, disabled }
                             if active-usd is \active
                                 .input-wrapper.small.pug(style=amount-style)
@@ -496,9 +556,9 @@ send = ({ store, web3t })->
                                     span.pug #{token-display}
                                 if +wallet.pending-sent >0 and no
                                     span.pug.pending #{'(' + pending + ' ' + lang.pending + ')'}
-                        .pug.control-label.not-enough.text-left(title="#{send.error}") #{send.error}
+                        .pug.control-label.not-enough.text-left(title="#{send.error}" class="#{visible-error}") #{send.error}
                 if is-data
-                    form-group 'Data', icon-style, ->
+                    form-group \contract-data, 'Data', icon-style, ->
                         .pug.smart-contract(style=input-style) #{show-data!}
                 trx-fee { store, web3t, wallet }
                 table.pug(style=border-style)
@@ -514,24 +574,54 @@ send = ({ store, web3t })->
                             td.pug #{lang.fee}
                             td.pug
                                 span.pug(title="#{send.amount-send-fee}") #{round5 send.amount-send-fee}
-                                    img.label-coin.pug(src="#{send.coin.image}")
+                                    img.label-coin.pug(src="#{fee-coin-image}")
                                     span.pug(title="#{send.amount-send-fee}") #{fee-token-display}
                                 .pug.usd $ #{round5 send.amount-send-fee-usd}
             .pug.button-container
                 .pug.buttons
-                    button { store, text: \send , on-click: send-anyway , loading: send.sending, type: \primary, error: send.error, makeDisabled: makeDisabled, id: "send-confirm" }
+                    button { store, text: \send , on-click: send-func , loading: send.sending, type: \primary, error: send.error, makeDisabled: makeDisabled, id: "send-confirm" }
                     button { store, text: \cancel , on-click: cancel, icon: \close2, id: "send-cancel" }
 module.exports = send
 module.exports.init = ({ store, web3t }, cb)->
     { wallet } = send-funcs store, web3t
     return cb null if not wallet?
+    return cb null if send.sending is yes
+    store.current.send.foreign-network-fee = 0
+    store.current.send.amountCharged = 0
+    store.current.send.amountChargedUsd = 0
+    store.current.send.error = ''
+    if store.current.send.is-swap isnt yes
+        store.current.send.contract-address = null
+    is-swap-contract = contracts.is-swap-contract(store, send.to)
+    if is-swap-contract then
+        contract-address = if wallet.coin.token is \vlx2 then web3t.velas.HomeBridgeNativeToErc.address else web3t.velas.ForeignBridgeNativeToErc.address 
+        store.current.send.to = contract-address
+        network-type = store.current.network
+        networks = wallet.coin["#{network-type}s"]
+        store.current.send.networks = networks
+        network-keys = networks |> keys
+        default-network = networks[network-keys.0].name
+    /* If it is Swap! */
+    if wallet.network.networks? and (store.current.send.isSwap is yes) then
+        store.current.send.chosenNetwork = 
+            | wallet.network.networks.evm? => wallet.network.networks.evm
+            | _ => wallet.network.networks.native
+        store.current.send.to = token-networks.get-default-recipient-address(store) 
     { wallets } = wallets-funcs store, web3t
     current-wallet =
         wallets |> find (-> it.coin.token is wallet.coin.token)
-    return cb null if current-wallet.address is wallet.address
+    err, fee <- contracts.get-home-network-fee({store, web3t}, store.current.send.to)
+    store.current.send.foreign-network-fee = fee
     { wallet } = send-funcs store, web3t
+    store.current.send.fee-coin-image = wallet.coin.image   
+    if wallet.network.txBridgeFeeIn? and (wallet.coin.token isnt wallet.network.txBridgeFeeIn) then
+        bridge-fee-token = wallet.network.txBridgeFeeIn
+        second-wallet = wallets |> find (-> it.coin.token is bridge-fee-token)
+        store.current.send.fee-coin-image = second-wallet.coin.image
+    return cb null if current-wallet.address is wallet.address
     return cb null if not wallet?
-    return cb null if not web3t[wallet.coin.token]?
+    return cb null if not web3t[wallet.coin.token]?   
     { send-transaction } = web3t[wallet.coin.token]
     err <- send-transaction { to: "", value: 0 }
+    send.sending = false
     cb null

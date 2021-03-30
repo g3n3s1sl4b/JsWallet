@@ -14,6 +14,8 @@ saved-seed = seedmem.saved!
 create-send =->
     id: ""
     to: ""
+    chosen-network: {} 
+    contract-address: null  
     details: yes
     propose-escrow: no
     address: ''
@@ -30,6 +32,7 @@ create-send =->
     amount-send-fee-usd: \0
     amount-obtain: \0
     data: ""
+    is-swap: no 
     decoded-data: ""
     show-data-mode: \encoded
     error: ''
@@ -107,6 +110,8 @@ store =
     interop:
         is-address-queried: no
         origin: no
+    HomeBridgeNativeToErc: {}
+    ForeignBridgeNativeToErc: {}   
     lockups:
         currentTimelock: null    
         stake-amount-total: 0  

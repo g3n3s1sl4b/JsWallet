@@ -17,7 +17,7 @@ require! {
 }
 .wallet-detailed
     @import scheme
-    height: 200px
+    height: 240px
     box-sizing: border-box
     $tablet: 1200px
     >.wallet-part
@@ -28,17 +28,28 @@ require! {
         width: 50%
         @media screen and (max-width: $tablet)
             padding: 0
+        .with-swap
+            display: flex
+            button
+                flex: 1
+                margin: 0 5px 0 !important
+                &:first-child
+                    margin-left: 0 !important
+            .wallet-swap img
+                filter: invert(1)
         &.left
             text-align: left
             @media screen and (max-width: $tablet)
                 width: 60%
             >.buttons
                 margin-top: 15px
+                width: calc((130px * 2) + 10px)
                 .btn
                     margin: 0
                     width: 130px
                     &:last-child
                         margin-left: 10px
+                        margin: 0 0 5px !important
             >.details
                 display: none
             .uninstall
@@ -145,7 +156,7 @@ require! {
                 width: inherit
 cb = console~log
 module.exports = (store, web3t, wallets, wallet)-->
-    { uninstall, wallet, balance, balance-usd, pending, send, receive, usd-rate } = wallet-funcs store, web3t, wallets, wallet
+    { uninstall, wallet, balance, balance-usd, pending, send, receive, swap, usd-rate } = wallet-funcs store, web3t, wallets, wallet
     lang = get-lang store
     style = get-primary-info store
     label-uninstall =
@@ -162,6 +173,7 @@ module.exports = (store, web3t, wallets, wallet)-->
     name = wallet.coin.name ? wallet.coin.token
     receive-click = receive(wallet)
     send-click = send(wallet)
+    swap-click = swap(store, wallet)
     token = wallet.coin.token.to-upper-case!
     style = get-primary-info store
     color1 =
@@ -207,7 +219,7 @@ module.exports = (store, web3t, wallets, wallet)-->
                 .wallet-header-part.right.pug
                     .pug
                         span.title.pug(class="#{placeholder}") #{name}
-                        if wallet.coin.token not in <[ btc vlx2 ]>
+                        if wallet.coin.token not in <[ btc vlx2 vlx ]>
                             span.pug.uninstall(on-click=uninstall style=uninstall-style) #{label-uninstall}
                     .balance.pug(class="#{placeholder}")
                         .pug.token-balance(title="#{wallet.balance}")
@@ -220,9 +232,18 @@ module.exports = (store, web3t, wallets, wallet)-->
                             .pug.pending
                                 span.pug -#{ pending }
             address-holder { store, wallet, type: \bg }
-            .buttons.pug
-                button { store, on-click=send-click, text: \send , icon: \send , type: \secondary, id: "wallets-send", makeDisabled=no }
-                button { store, on-click=receive-click, text: \receive , icon: \get  , type : \primary, id: "wallets-receive", makeDisabled=no }
+            if store.current.network is \testnet and [\VLX_ERC20,\VLX2,\VLX].index-of(token) > -1 then
+                .buttons.pug
+                    .with-swap.pug
+                        button { store, on-click=send-click, text: \send , icon: \send , type: \secondary, id: "wallets-send", makeDisabled=no }
+                        button { store, on-click=receive-click, text: \receive , icon: \get  , type : \primary, id: "wallets-receive", makeDisabled=no }
+                    .with-swap.pug
+                        button { store, on-click=swap-click, text: \swap , icon: \swap  , id: "wallet-swap", makeDisabled=no, classes="wallet-swap" }                       
+            else
+                .buttons.pug
+                    .with-swap.pug
+                        button { store, on-click=send-click, text: \send , icon: \send , type: \secondary, id: "wallets-send", makeDisabled=no }
+                        button { store, on-click=receive-click, text: \receive , icon: \get  , type : \primary, id: "wallets-receive", makeDisabled=no }
             .details.pug
                 .price.pug(class="#{placeholder}" title="#{balance-usd}") $#{ round-human balance-usd }
                 .name.pug(class="#{placeholder}" title="#{usd-rate}") $#{ round-human usd-rate}
