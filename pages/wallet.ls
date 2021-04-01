@@ -275,7 +275,7 @@ module.exports = (store, web3t, wallets, wallet)-->
     wallet-is-disabled  = isNaN(wallet.balance) or isNaN(wallet.balanceUsd)
     is-loading = store.current.refreshing is yes
     disabled-class = if not is-loading and wallet-is-disabled then "disabled-wallet-item" else ""
-    .wallet.pug.wallet-item(class="#{big} #{disabled-class}" key="#{token-display}" style=border-style)
+    .wallet.pug.wallet-item(class="#{big} #{disabled-class}" key="#{token}" style=border-style)
         .wallet-top.pug(on-click=expand)
             .top-left.pug(style=wallet-style)
                 .img.pug(class="#{placeholder-coin}")
