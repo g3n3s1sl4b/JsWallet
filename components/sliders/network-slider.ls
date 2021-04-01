@@ -3,7 +3,7 @@ require! {
     \../../get-primary-info.ls
     \../../round5.ls
     \../../round.ls
-    \prelude-ls : { find, obj-to-pairs }
+    \prelude-ls : { find, filter, obj-to-pairs, pairs-to-obj, map }
     \../../math.ls : { times }
     \../../icon.ls
     \../../icons.ls
@@ -23,9 +23,14 @@ module.exports = ({ web3t, wallet, store, id })->
     return null if not wallet.network.networks?
     return null if not (store.current.send.isSwap? and store.current.send.isSwap is yes)
     return null if not wallet.network.networks? or Object.keys(wallet.network.networks).length is 0
-    network-labels = Object.keys(wallet.network.networks)  /* ['evm', 'native'] */
+    available-networks = 
+        wallet.network.networks 
+            |> obj-to-pairs
+            |> filter (-> (not it[1].disabled?) or it[1].disabled is no)
+            |> pairs-to-obj
+    network-labels = Object.keys(available-networks)
     getNetworkById = (id)->
-        wallet.network.networks["#{id}"]
+        available-networks["#{id}"]
     style = get-primary-info store
     style2 = color: "#{style.app.icon}"
     input-style2 =
@@ -52,6 +57,7 @@ module.exports = ({ web3t, wallet, store, id })->
         store.current.send.chosenNetwork = getNetworkById(chosen-network-id)
         store.current.send.to = token-networks.get-default-recipient-address(store)
         store.current.send.error = ''
+        store.current.send.data = null
     goback = go(-1)
     goForw = go(1)       
     .pug.network-slider
