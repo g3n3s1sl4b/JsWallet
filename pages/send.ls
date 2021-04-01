@@ -1,7 +1,7 @@
 require! {
     \react
     \../send-funcs.ls
-    \prelude-ls : { map, find, keys, filter }
+    \prelude-ls : { map, find, keys, filter, pairs-to-obj, obj-to-pairs }
     \../get-primary-info.ls
     \./icon.ls
     \../get-lang.ls
@@ -402,7 +402,7 @@ form-group = (classes, title, style, content)->
         label.pug.control-label(style=style) #{title}
         content!
 send = ({ store, web3t })->
-    { token, name, fee-token, bridge-fee-token, network, send, wallet, pending, recipient-change, amount-change, amount-usd-change, amount-eur-change, use-max-amount, show-data, show-label, history, cancel, send-anyway, before-send-anyway, swap-back, choose-auto, round5edit, round5, is-data, encode-decode, change-amount, invoice } = send-funcs store, web3t
+    { token, name, fee-token, bridge-fee-token, network, send, wallet, pending, recipient-change, amount-change, amount-usd-change, amount-eur-change, use-max-amount, show-data, show-label, history, cancel, send-anyway, before-send-anyway, choose-auto, round5edit, round5, is-data, encode-decode, change-amount, invoice } = send-funcs store, web3t
     return send-contract { store, web3t } if send.details is no
     send.sending = false
     { go-back } = history-funcs store, web3t
@@ -480,18 +480,17 @@ send = ({ store, web3t })->
     makeDisabled = send.amount-send <= 0
     token = store.current.send.coin.token
     is-swap = store.current.send.is-swap is yes
-    send-func =
-        | token is \vlx_erc20 and is-swap => swap-back
-        | _ => before-send-anyway
+    send-func = before-send-anyway
     disabled = not send.to? or send.to.trim!.length is 0 or (send.error.index-of "address") > -1     
     receiver-is-swap-contract = contracts.is-swap-contract(store, store.current.send.contract-address)
     visible-error = if send.error? and send.error.length > 0 then "visible" else ""
     get-recipient = (address)->
         address
     recipient = get-recipient(send.to)
+    title = if store.current.send.is-swap isnt yes then lang.send else \Swap
     .pug.content
         .pug.title(style=border-header)
-            .pug.header(class="#{show-class}") #{lang.send}
+            .pug.header(class="#{show-class}") #{title}
             .pug.close(on-click=go-back-from-send)
                 img.icon-svg.pug(src="#{icons.arrow-left}")
             burger store, web3t
@@ -603,10 +602,18 @@ module.exports.init = ({ store, web3t }, cb)->
         default-network = networks[network-keys.0].name
     /* If it is Swap! */
     if wallet.network.networks? and (store.current.send.isSwap is yes) then
-        store.current.send.chosenNetwork = 
-            | wallet.network.networks.evm? => wallet.network.networks.evm
-            | _ => wallet.network.networks.native
-        store.current.send.to = token-networks.get-default-recipient-address(store) 
+        available-networks = 
+            wallet.network.networks 
+                |> obj-to-pairs
+                |> filter (-> (not it[1].disabled?) or it[1].disabled is no)
+                |> pairs-to-obj
+        wallet-swap-networks-ids = Object.keys(available-networks)
+        if wallet-swap-networks-ids.length > 0
+            default-network = wallet.network.networks[wallet-swap-networks-ids[0]]
+            store.current.send.chosenNetwork = default-network 
+            store.current.send.to = token-networks.get-default-recipient-address(store)  
+        else
+            console.error "networks prop in #{store.current.send.token} wallet is defined but is empty"    
     { wallets } = wallets-funcs store, web3t
     current-wallet =
         wallets |> find (-> it.coin.token is wallet.coin.token)
