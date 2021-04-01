@@ -14,7 +14,7 @@ choose-random-pool = (pools) ->
     for pool in pools
         total-stake += parse-float pool.stake
     point = Math.random! * total-stake
-    return 0 if +total-stake is 0    
+    return 0 if +total-stake is 0
     i = 0
     counter = 0
     while counter < point
@@ -25,7 +25,7 @@ simulate-choose-validators = (pools) ->
     pools-copy = [...pools]
     validators = []
     for i from 1 to VALIDATOR_COUNT
-        return validators if pools-copy.length is 0    
+        return validators if pools-copy.length is 0
         pool-index = choose-random-pool pools-copy
         validators.push pools-copy[pool-index]
         pools-copy.splice pool-index, 1
@@ -64,11 +64,11 @@ fill-pools = ({ store, web3t, on-progress, on-finish }, [item, ...rest]) ->
     if not item? then
         store.staking.all-pools-loaded = yes
         store.staking.pools-are-loading = no
-        return on-finish null, [] 
+        return on-finish null, []
     if (([\choosestaker, \info].index-of(store.current.page)) is -1) then
         store.staking.all-pools-loaded = no
         store.staking.pools-are-loading = no
-        return on-finish null, []      
+        return on-finish null, []
     err, data <- web3t.velas.Staking.stakeAmountTotal item.address
     return on-finish err if err?
     item.stake = data

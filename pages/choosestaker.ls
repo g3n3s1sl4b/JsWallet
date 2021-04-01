@@ -56,7 +56,7 @@ require! {
         svg
             width: 12px
             cursor: pointer
-        &.spin > svg   
+        &.spin > svg
             @keyframes spin
                 from
                     transform: rotate(0deg)
@@ -67,7 +67,7 @@ require! {
             animation-iteration-count: infinite
             animation-timing-function: linear
         &.disabled
-            opacity: 0.3    
+            opacity: 0.3
     .icon-right
         height: 12px
         top: 2px
@@ -201,7 +201,7 @@ require! {
                             td,td
                                 padding: 0 3px
                         .choose-pool
-                            max-width: 50px 
+                            max-width: 50px
                     &.table-scroll
                         overflow-x: scroll
                         background: linear-gradient(var(--color1) 30%, rgba(50,18,96, 0)), linear-gradient(rgba(50,18,96, 0), var(--color1) 70%) 0 100%, radial-gradient(farthest-side at 50% 0, var(--color2), rgba(0,0,0,0)), radial-gradient(farthest-side at 50% 100%, var(--color2), rgba(0,0,0,0)) 0 100%
@@ -213,7 +213,7 @@ require! {
                         -web-kit-transition: breathe 3s ease-in infinite
                         height: calc(100vh - 105px)
                         .stake-pointer
-                            background: rgb(37, 87, 127)   
+                            background: rgb(37, 87, 127)
                         &.lockup
                             height: auto
                         .address-holder
@@ -841,7 +841,7 @@ staking-content = (store, web3t)->
                                         td.pug(width="5%" style=stats) #{lang.stakers}
                                         td.pug(width="4%" style=stats) #{lang.selectPool}
                                 tbody.pug
-                                    store.staking.pools |> map build-staker store, web3t              
+                                    store.staking.pools |> map build-staker store, web3t
         if store.staking.chosen-pool?
             .pug.single-section.form-group(id="choosen-pull")
                 .pug.section
@@ -975,7 +975,7 @@ staking.init = ({ store, web3t }, cb)->
     index-is-different = store.current.accountIndex isnt store.staking.accountIndex
     if store.staking.pools-network is store.current.network then
         if (store.staking.all-pools-loaded? and store.staking.all-pools-loaded is yes and not index-is-different)
-            return cb null        
+            return cb null
     else
         store.staking.pools-network = store.current.network
     store.staking.pools = []
