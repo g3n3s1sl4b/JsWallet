@@ -91,7 +91,7 @@ trx-fee = ({ store, web3t, wallet })->
         if value.starts-with \.
             value = "0" + value
         choose-custom value
-    fee-currency = wallet.network.tx-fee-in ? send.coin.token
+    fee-currency = wallet.network.tx-fee-in ? (wallet.coin.nickname ? "").to-upper-case!
     token-display = if fee-currency == \vlx2 then \vlx else fee-currency
     border-style = border: "1px solid #{style.app.border}"
     text = color: "#{style.app.icon}"

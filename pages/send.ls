@@ -464,9 +464,10 @@ send = ({ store, web3t })->
     active-eur = active-class \eur
     show-class =
         if store.current.open-menu then \hide else \ ""
-    token-display = if token == \VLX2 then \VLX else token
-    token-display-short = token-display.split("_")[0]
-    fee-token-display = if fee-token == \VLX2 then \VLX else fee-token
+    token-display = (wallet.coin.nickname ? "").to-upper-case!
+    fee-token-display = 
+        | fee-token in <[ VLX2 VLX_EVM VLX_NATIVE ]> => \VLX
+        | _ => fee-token
     fee-token-display = 
         | bridge-fee-token? => bridge-fee-token
         | _ =>  fee-token-display
@@ -536,7 +537,7 @@ send = ({ store, web3t })->
                             .input-wrapper.pug(style=input-style)
                                 .label.crypto.pug
                                     img.label-coin.pug(src="#{send.coin.image}")
-                                    | #{token-display-short}
+                                    | #{token-display}
                                 amount-field { store, value: "#{round5edit send.amount-send}", on-change: amount-change, placeholder="0", id="send-amount", token, disabled }
                             if active-usd is \active
                                 .input-wrapper.small.pug(style=amount-style)
