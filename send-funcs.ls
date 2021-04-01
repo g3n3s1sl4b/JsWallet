@@ -27,6 +27,7 @@ require! {
     \./get-tx-details.ls
     \ethereumjs-util : {BN}
     \bs58
+    \assert        
 }
 module.exports = (store, web3t)->
     return null if not store? or not web3t?
@@ -45,7 +46,11 @@ module.exports = (store, web3t)->
         #TODO: remove chain-id here and add rpc call into provider    
         is-erc20 = (['vlx_erc20', 'eth', 'etc', 'sprkl', 'vlx2'].index-of(token)) >= 0   
         chain-id = if current-network is \testnet and is-erc20 then 3 else 1   
-        recipient = store.current.send.contract-address ? to     
+        chosen-network = store.current.send.chosen-network
+        receiver = store.current.send.contract-address ? to    
+        recipient =
+            | chosen-network? and chosen-network.id is \legacy => to-eth-address(receiver)     
+            | _ => receiver
         tx-obj =
             account: { wallet.address, wallet.private-key, wallet.secret-key }
             recipient: recipient
@@ -111,40 +116,86 @@ module.exports = (store, web3t)->
         amount-ethers = send.amount-send
         err <- send-to { name, amount-ethers }
     execute-contract-data = (cb)->
-        token = store.current.send.coin.token
-        contract-address = store.current.send.contract-address
-        return cb null if contract-address? and contract-address.trim!.length > 0    
-        if not (store.current.send.isSwap is yes and token is \vlx2) 
-            return cb null
-        data = "0x"
-        network-type = store.current.network
+        return cb null if not store.current.send.chosen-network?
         chosen-network = store.current.send.chosen-network
-        if chosen-network.id is \evm then 
+        token = store.current.send.coin.token
+        if chosen-network.id in <[ evm legacy ]> and token in <[ vlx_evm vlx2 ]>   
+            store.current.send.contractAddress = null 
+            return cb null 
+        wallet = store.current.send.wallet  
+        contract-address = store.current.send.contract-address     
+        data = ""
+        network-type = store.current.network
+        /* Swap from ERC20 to LEGACY (VLX) */    
+        if token is \vlx_erc20 and chosen-network.id is \legacy
+            console.log "Swap from ERC20 to LEGACY (VLX)" 
+            send.swap = yes    
+            value = store.current.send.amountSend
+            send-to = web3t.velas.ForeignBridgeNativeToErc.address 
+            value = to-hex (value `times` (10^18))
+            token-address = web3t.velas.ERC20BridgeToken.address   
+            network = wallet.network    
+            #/*
+            # * Get minPerTx from HomeBridge  (not Foreign?)  
+            # */ 
+            minPerTxRaw = web3t.velas.HomeBridgeNativeToErc.minPerTx!
+            minPerTx = minPerTxRaw `div` (10 ^ network.decimals)
+            console.log "home minPerTxRaw" minPerTxRaw     
+            #/*
+            # * Get maxPerTx from HomeBridge  (not Foreign?)  
+            # */
+            maxPerTxRaw = web3t.velas.HomeBridgeNativeToErc.maxPerTx!
+            maxPerTx = maxPerTxRaw `div` (10 ^ network.decimals)
+            console.log "Home maxPerTxRaw" maxPerTxRaw      
+            homeFeeRaw = web3t.velas.ForeignBridgeNativeToErc.getHomeFee! 
+            homeFee = homeFeeRaw `div` (10 ^ network.decimals)
+            contract-home-fee = send.amountSend `times` homeFee
+            minAmountPerTx = minPerTx `plus` contract-home-fee 
+            console.log "minAmountPerTx" minAmountPerTx
+            #
+            if +send.amountSend < +(minAmountPerTx) then
+                return cb "Min amount per transaction is #{minAmountPerTx} VLX"
+            if +send.amountSend > +maxPerTx then
+                return cb "Max amount per transaction is #{maxPerTx} VLX"  
+            #    
+            data = web3t.velas.ERC20BridgeToken.transferAndCall.get-data(send-to, value, to-eth-address(send.to))
+            send.data = data
+            send.contract-address = web3t.velas.ERC20BridgeToken.address  
+            send.amount = 0
+            send.amount-send = 0
+        /* Swap from LEGACY (VLX) to ERC20 */ 
+        if token is \vlx2 and chosen-network.id is \vlx_erc20 then 
+            store.current.send.contract-address = chosen-network.HomeBridge    
             receiver = store.current.send.to 
             network = wallet.network    
-            minPerTxRaw = web3t.velas.ForeignBridgeNativeToErc.minPerTx!
+            minPerTxRaw = web3t.velas.HomeBridgeNativeToErc.minPerTx!
             minPerTx = minPerTxRaw `div` (10 ^ network.decimals)
             maxPerTxRaw = web3t.velas.HomeBridgeNativeToErc.maxPerTx! 
             maxPerTx = maxPerTxRaw `div` (10 ^ network.decimals)    
             console.log "maxPerTxRaw" maxPerTxRaw
             homeFeeRaw = web3t.velas.HomeBridgeNativeToErc.getHomeFee! 
             homeFee = homeFeeRaw `div` (10 ^ network.decimals)
+            console.log "relay tokens to receiver" receiver    
             data = web3t.velas.HomeBridgeNativeToErc.relayTokens.get-data(receiver)
             amount-to-send = send.amount-send-fee `plus` send.amount-send   
             contract-home-fee = send.amountSend `times` homeFee
-            minAmountPerTx = minPerTx `plus` contract-home-fee      
+            console.log "contract-home-fee" contract-home-fee    
+            ONE_PERCENT = minPerTx `times` "0.01"    
+            minAmountPerTx = minPerTx `plus` contract-home-fee `plus` ONE_PERCENT `plus` "2"    
             if +send.amountSend < +(minAmountPerTx) then
                 return cb "Min amount per transaction is #{minAmountPerTx} VLX"
             if +send.amountSend > +maxPerTx then
                 return cb "Max amount per transaction is #{maxPerTx} VLX" 
+        /**
+            * Swap into native */   
         if chosen-network.id is \native then
-            console.log "predefine address contract [web3t.velas.EvmToNativeBridge.transferToNative]"    
-            $recipient = bs58.decode store.current.send.to
+            console.log "Swap into native"    
+            $recipient = bs58.decode send.to
             hex = $recipient.toString('hex')
             eth-address = \0x + hex
             data = web3t.velas.EvmToNativeBridge.transferToNative.get-data(eth-address)           
             store.current.send.contract-address = web3t.velas.EvmToNativeBridge.address
-        store.current.send.data = data
+        send.data = data
         cb null   
     before-send-anyway = ->
         cb = console.log     
@@ -155,34 +206,7 @@ module.exports = (store, web3t)->
     send-anyway = ->
         send-money!
     to-hex = ->
-        new BN(it)
-    swap-back = ->
-        cb = console.log  
-        return cb null if not store.current.send.amountSend?
-        return if wallet.balance is \...
-        return if send.sending is yes
-        err <- check-enough
-        return send.error = "#{err.message ? err}" if err?
-        send.sending = yes 
-        send.swap = \foreign_to_erc     
-        value = store.current.send.amountSend
-        to = web3t.velas.ForeignBridgeNativeToErc.address 
-        value = to-hex (value `times` (10^18))
-        token-address = web3t.velas.ERC20BridgeToken.address
-        data = send.to   
-        transfer-data = web3t.velas.ERC20BridgeToken.transferAndCall.get-data(to, value, data)
-        send.data = transfer-data
-        send.to = token-address
-        send.amount = 0
-        send.amount-send = 0  
-        err, _data <- perform-send-safe 
-        send.error = err if err?    
-        return cb err if err?
-        notify-form-result send.id, null, _data
-        store.current.last-tx-url = | send.network.api.linktx => send.network.api.linktx.replace \:hash, _data
-            | send.network.api.url => "#{send.network.api.url}/tx/#{_data}"
-        navigate store, web3t, \sent
-        <- web3t.refresh 
+        new BN(it)  
     cancel = (event)->
         navigate store, web3t, \wallets
         notify-form-result send.id, "Cancelled by user"
@@ -326,7 +350,6 @@ module.exports = (store, web3t)->
     export cancel
     export send-anyway
     export before-send-anyway    
-    export swap-back    
     export choose-auto
     export choose-cheap
     export choose-custom
