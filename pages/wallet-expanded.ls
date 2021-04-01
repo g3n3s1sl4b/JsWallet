@@ -175,6 +175,7 @@ module.exports = (store, web3t, wallets, wallet)-->
     send-click = send(wallet)
     swap-click = swap(store, wallet)
     token = wallet.coin.token.to-upper-case!
+    tokenDisplay = (wallet.coin.nickname ? "").to-upper-case!
     style = get-primary-info store
     color1 =
         color: style.app.text
@@ -208,7 +209,6 @@ module.exports = (store, web3t, wallets, wallet)-->
     color-label2=
         background: style.app.primary1
         background-color: style.app.primary1-spare
-    token-display = if token == \VLX2 then \VLX else token
     makeDisabled = store.current.refreshing
     .wallet-detailed.pug(key="#{token}" style=wallet-style)
         .wallet-part.left.pug(style=text)
@@ -224,7 +224,7 @@ module.exports = (store, web3t, wallets, wallet)-->
                     .balance.pug(class="#{placeholder}")
                         .pug.token-balance(title="#{wallet.balance}")
                             span.pug #{ round-human wallet.balance }
-                            span.pug #{ token-display }
+                            span.pug #{ tokenDisplay }
                         .pug.usd-balance(class="#{placeholder}" title="#{balance-usd}")
                             span.pug #{ round-human balance-usd }
                             span.pug USD

@@ -269,13 +269,13 @@ module.exports = (store, web3t, wallets, wallet)-->
     receive-click = receive(wallet)
     send-click = send(wallet)
     swap-click = swap(wallet)
-    token = wallet.coin.token.to-upper-case!
-    token-display = if token == \VLX2 then \VLX else token
+    token = wallet.coin.token
+    token-display = (wallet.coin.nickname ? "").to-upper-case!
     makeDisabled = store.current.refreshing
     wallet-is-disabled  = isNaN(wallet.balance) or isNaN(wallet.balanceUsd)
     is-loading = store.current.refreshing is yes
     disabled-class = if not is-loading and wallet-is-disabled then "disabled-wallet-item" else ""
-    .wallet.pug.wallet-item(class="#{big} #{disabled-class}" key="#{wallet.coin.token}" style=border-style)
+    .wallet.pug.wallet-item(class="#{big} #{disabled-class}" key="#{token-display}" style=border-style)
         .wallet-top.pug(on-click=expand)
             .top-left.pug(style=wallet-style)
                 .img.pug(class="#{placeholder-coin}")
@@ -296,7 +296,7 @@ module.exports = (store, web3t, wallets, wallet)-->
                     .balance.pug(class="#{placeholder}")
                         span.pug(title="#{wallet.balance}") #{ round-human wallet.balance }
                             img.label-coin.pug(class="#{placeholder-coin}" src="#{wallet.coin.image}")
-                            span.pug #{ wallet.coin.token.to-upper-case! }
+                            span.pug #{ token-display }
                         if +wallet.pending-sent >0
                             .pug.pending
                                 span.pug -#{ pending }
@@ -307,16 +307,14 @@ module.exports = (store, web3t, wallets, wallet)-->
                             .pug expand
                 button { store, on-click=send-click, text: \send , icon: \send , type: \secondary }
                 button { store, on-click=receive-click, text: \receive , icon: \get  , type : \primary }
-                if token is \VLX_ERC20 then
+                if token in <[ vlx, sol, vlx2, vlx_erc20 ]> then
                     button {    store, on-click=swap-click, text: \swap , icon: \swap  , id: "wallet-swap", makeDisabled=no, classes="wallet-swap" }
-                else if token is \VLX2 then
-                    button { store, on-click=swap-click, text: \swap , icon: \swap  , id: "wallet-swap", makeDisabled=no, classes="wallet-swap" }
         .wallet-middle.pug(style=border)
             address-holder { store, wallet, type: \bg }
-            if wallet.coin.token not in <[ btc vlx2 ]>
+            if token not in <[ btc vlx2 ]>
                 .pug.uninstall(on-click=uninstall style=wallet-style) #{label-uninstall}
         .wallet-middle.title-balance.pug(style=border)
             .name.pug(class="#{placeholder}" title="#{usd-rate}") $#{ round-human(usd-rate)}
             .name.per.pug(class="#{placeholder}")
                 span.pug #{lang.per}
-                | #{ wallet.coin.token.to-upper-case! }
+                | #{ token-display }
