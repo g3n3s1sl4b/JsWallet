@@ -232,7 +232,7 @@ module.exports = (store, web3t, wallets, wallet)-->
                             .pug.pending
                                 span.pug -#{ pending }
             address-holder { store, wallet, type: \bg }
-            if store.current.network is \testnet and [\VLX_ERC20,\VLX2,\VLX].index-of(token) > -1 then
+            if store.current.network is \testnet and (wallet.network.networks? and Object.keys(wallet.network.networks).length > 0) then
                 .buttons.pug
                     .with-swap.pug
                         button { store, on-click=send-click, text: \send , icon: \send , type: \secondary, id: "wallets-send", makeDisabled=no }
