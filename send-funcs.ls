@@ -189,9 +189,13 @@ module.exports = (store, web3t)->
         /**
             * Swap into native */   
         if chosen-network.id is \native then
-            console.log "Swap into native"    
-            $recipient = bs58.decode send.to
-            hex = $recipient.toString('hex')
+            console.log "Swap into native"
+            $recipient = ""
+            try
+                $recipient = bs58.decode send.to
+                hex = $recipient.toString('hex')
+            catch err
+                return cb "Please enter valid address"
             eth-address = \0x + hex
             data = web3t.velas.EvmToNativeBridge.transferToNative.get-data(eth-address)           
             store.current.send.contract-address = web3t.velas.EvmToNativeBridge.address
