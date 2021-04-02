@@ -926,7 +926,7 @@ module.exports = ({ store, web3t })->
                                 img.pug(src="#{coin.image}")
         .pug
             .pug.table(style=border-t)
-                store.transactions.applied |> take 20 |> map render-transaction store, web3t
+                store.transactions.applied |> take 30 |> map render-transaction store, web3t
             if length is 0
                 .pug.nothin-to-show(style=menu-style)
                     img.pug(style=nothing-icon src="#{icons.search-history}"
