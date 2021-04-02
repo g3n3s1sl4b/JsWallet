@@ -219,7 +219,7 @@ module.exports = (store, web3t, wallets, wallet)-->
                 .wallet-header-part.right.pug
                     .pug
                         span.title.pug(class="#{placeholder}") #{name}
-                        if wallet.coin.token not in <[ btc vlx2 vlx ]>
+                        if wallet.coin.token not in <[ btc vlx2 vlx_native ]>
                             span.pug.uninstall(on-click=uninstall style=uninstall-style) #{label-uninstall}
                     .balance.pug(class="#{placeholder}")
                         .pug.token-balance(title="#{wallet.balance}")
