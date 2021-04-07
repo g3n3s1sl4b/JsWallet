@@ -137,6 +137,7 @@ store =
             add-validator-stake: "" 
             add-validator-topup: "" 
     staking:
+        accounts: []
         reward-info: []
         exit-tab: ''
         maxWithdrawOrderAllowed: 0
