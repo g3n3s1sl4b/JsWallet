@@ -83,20 +83,14 @@ fill-pools = ({ store, web3t, on-progress, on-finish }, [item, ...rest]) ->
     #return on-finish err if err?
     tokenAccountsFilter = {}
     ownerAddress = item.votePubkey
-    console.log "item.votePubkey" bs58.decode(ownerAddress)
-    err, account <- as-callback(web3t.velas.Connection.getAccountInfo(bs58.decode(ownerAddress), 'confirmed'))
-    console.log "account" account 
-    console.error err if err?
-    p = web3t.velas.Connection.getTokenAccountsByOwner bs58.decode(ownerAddress), tokenAccountsFilter
-    err, delegators <- as-callback(p)
-    console.log "delegators" err, delegators
-    console.error err if err?
-    console.log "delegators" delegators
+    err, res <- as-callback web3t.velas.NativeStaking.getInfo()
+    console.log ".getInfo" res
     return on-finish err if err?
     item.stakers = delegators.length + 1
-    err, mining-address <- web3t.velas.ValidatorSet.miningByStakingAddress(item.address)
-    return on-finish err if err?
-    item.mining-address = mining-address
+    #err, mining-address <- web3t.velas.ValidatorSet.miningByStakingAddress(item.address)
+    #return on-finish err if err?
+    #item.mining-address = mining-address
+    item.mining-address = ''
     err, validator-reward-percent <- web3t.velas.BlockReward.validatorRewardPercent item.address
     return on-finish err if err?
     item.validator-reward-percent = validator-reward-percent `div` 10000
@@ -123,11 +117,10 @@ fill-pools = ({ store, web3t, on-progress, on-finish }, [item, ...rest]) ->
         on-progress [item, ...pools]
     fill-pools { store, web3t, on-progress: on-progress-local, on-finish: on-finish-local }, rest
 query-pools-web3t = (store, web3t, on-progress, on-finish) ->
-    connection = web3t.velas.Connection
-    err, result <- as-callback connection.getVoteAccounts('confirmed')
+    err, result <- as-callback web3t.velas.NativeStaking.getStakingValidators()
     return cb err if err?
-    pools = result.current
-    console.log "pools2:" pools     
+    pools = result
+    console.log "Validators are:" result
     #err, pools-inactive <- web3t.velas.Staking.getPoolsInactive
     #return cb err if err?
     #err, pools <- web3t.velas.Staking.getPools

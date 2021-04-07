@@ -37,6 +37,7 @@ require! {
     \./move-stake.ls
     \../seed.ls : seedmem
     \../components/burger.ls
+    \./stake/accounts.ls : \stake-accounts
 }
 .staking
     @import scheme
@@ -767,21 +768,20 @@ staking-content = (store, web3t)->
                 | reward > 75 => \orange
                 | reward > 40 => "rgb(165, 174, 81)"
                 | _ => "rgb(38, 219, 85)"
-        vlx2 =
-            store.current.account.wallets |> find (.coin.token is \vlx2)
+        vlx_native =
+            store.current.account.wallets |> find (.coin.token is \vlx_native)
         wallet =
-            address: ethToVlx item.address
-            network: vlx2.network
-            coin: vlx2.coin
+            address: item.address
+            network: vlx_native.network
+            coin: vlx_native.coin
         vote-power =
             | item.vote-power? => "#{item.vote-power}%"
             | _ => "..."
         mystake-class = if +my-stake > 0 then "with-stake" else ""
-        pointer-class = if store.lockups.lockupStakingAddress? and (store.lockups.lockupStakingAddress is item.address) then "stake-pointer" else ""
-        tr.pug(class="#{item.status} #{pointer-class}")
+        tr.pug(class="#{item.status}")
             td.pug
                 span.pug.circle(class="#{item.status}") #{index}
-            td.pug(datacolumn='Staker Address' title="#{ethToVlx item.address}")
+            td.pug(datacolumn='Staker Address' title="#{item.address}")
                 address-holder { store, wallet }
             td.pug #{stake}
             td.pug #{item.validator-probability}
@@ -822,7 +822,7 @@ staking-content = (store, web3t)->
         background: style.app.stats
     .pug.staking-content.delegate
         .pug.main-sections
-            #lockups {store, web3t}
+            stake-accounts {store, web3t}
             if not store.staking.chosen-pool? and not store.lockups.chosen-lockup?
                 .form-group.pug(id="pools")
                     alert-txn { store }
@@ -938,19 +938,21 @@ staking = ({ store, web3t })->
             switch-account store, web3t
         staking-content store, web3t
 convert-pools-to-view-model = (pools) ->
+    console.log "[convert pools]" pools
     pools
         |> map -> {
-            address: it.address,
+            address: it.key,
             checked: no,
-            stake: if it.activatedStake? then round-human(parse-float it.activatedStake `div` (10^9)) else '..',
-            stake-initial: if it.stake? then parse-float it.stake `div` (10^18) else 0,
+            stake: if it.stake? then it.stake else '..',
+            stake-initial: if it.activatedStake? then parse-float it.activatedStake `div` (10^9) else 0,
+            lastVote: it.lastVote
             #node-stake: if it.node-stake? then round-human(parse-float it.node-stake `div` (10^18)) else '..',
             #delegate-stake: if it.node-stake? then round-human(parse-float (it.stake - it.node-stake) `div` (10^18)) else '..',
-            stakers: if it.stakers? then it.stakers else '..',
+            stakers: if it.delegators? then it.delegators else '..',
             eth: no,
-            is-validator: it.my-stake isnt \0,
-            status: it.status,
-            my-stake: it.my-stake,
+            is-validator: it.stakes.length isnt 0,
+            status: "active",
+            my-stake: it.stakes |> foldl plus, 0
             withdraw-amount: \0,
             validator-probability: if it.validator-probability? then round-human(it.validator-probability*100) + \% else '..'
             #delegate-roi: if it.delegate-reward? then (it.delegate-reward && round-human(it.delegate-reward / (it.stake - it.node-stake) * 100)) + \% else '..',
@@ -987,10 +989,16 @@ staking.init = ({ store, web3t }, cb)->
     cb null
     on-progress = ->
         store.staking.pools = convert-pools-to-view-model [...it]
-    err, pools <- query-pools store, web3t, on-progress
-    return cb err if err?
-    console.log "pools"  pools
-    store.staking.pools = convert-pools-to-view-model pools
+    wallet = store.current.account.wallets |> find (-> it.coin.token is \vlx_native)
+    return cb null if not wallet?
+    web3t.velas.NativeStaking.setAccountPublicKey(wallet.publicKey)
+    err, res <- as-callback web3t.velas.NativeStaking.getInfo()
+    console.log ".getInfo" res
+    { accounts, validators } = res
+    #err, pools <- query-pools store, web3t, on-progress
+    #return cb err if err?
+    store.staking.pools = convert-pools-to-view-model validators
+    store.staking.accounts = accounts
 module.exports = staking
 staking.focus = ({ store, web3t }, cb)->
     #return cb null if store.staking.pools.0.stake isnt '...'
