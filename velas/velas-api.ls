@@ -2,6 +2,8 @@ require! {
     \./velas-web3.ls
     \./addresses.ls
     \./velas-solana-web3.ls
+    \./staking.js : \NStaking
+    \prelude-ls : {find}
 }
 abis =
     Staking      : require("../../web3t/contracts/StakingAuRa.json").abi
@@ -26,11 +28,13 @@ module.exports = (store)->
     foreignBridgeAddress = addresses[network].ForeignBridge
     ERC20BridgeToken = addresses[network].ERC20BridgeToken
     EvmToNativeBridgeAddress = addresses[network].EvmToNative
-    web3Solana = velas-solana-web3 store 
-    console.log "web3Solana" web3Solana 
+    web3Solana = velas-solana-web3 store
+    networks =
+        mainnet: \https://explorer.velas.com/rpc
+        testnet: \https://testnet.velas.com/rpc
     api =
         Staking      : web3.eth.contract(abis.Staking).at(staking-address)
-        Native       : web3Solana
+        NativeStaking: new NStaking({NODE_HOST: networks[network]})
         Connection   : new web3Solana.Connection(web3Solana._rpcEndpoint)  
         StakingLockup: web3.eth.contract(abis.Staking)
         ValidatorSet : web3.eth.contract(abis.ValidatorSet).at(validatorSet-address)
