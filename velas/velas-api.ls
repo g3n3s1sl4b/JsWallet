@@ -1,6 +1,7 @@
 require! {
     \./velas-web3.ls
     \./addresses.ls
+    \./velas-solana-web3.ls
 }
 abis =
     Staking      : require("../../web3t/contracts/StakingAuRa.json").abi
@@ -24,9 +25,13 @@ module.exports = (store)->
     homeBridgeAddress = addresses[network].HomeBridge  
     foreignBridgeAddress = addresses[network].ForeignBridge
     ERC20BridgeToken = addresses[network].ERC20BridgeToken
-    EvmToNativeBridgeAddress = addresses[network].EvmToNative   
+    EvmToNativeBridgeAddress = addresses[network].EvmToNative
+    web3Solana = velas-solana-web3 store 
+    console.log "web3Solana" web3Solana 
     api =
         Staking      : web3.eth.contract(abis.Staking).at(staking-address)
+        Native       : web3Solana
+        Connection   : new web3Solana.Connection(web3Solana._rpcEndpoint)  
         StakingLockup: web3.eth.contract(abis.Staking)
         ValidatorSet : web3.eth.contract(abis.ValidatorSet).at(validatorSet-address)
         BlockReward  : web3.eth.contract(abis.BlockReward).at(blockReward-address)
