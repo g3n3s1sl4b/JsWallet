@@ -26,7 +26,7 @@ require! {
     \../../icons.ls
     \../placeholder.ls
     \../epoch.ls
-    \../confirmation.ls : { alert, notify }
+    \../confirmation.ls : { alert, notify, confirm }
     \../../components/button.ls
     \../../components/address-holder.ls
     \../alert-txn.ls
@@ -356,7 +356,7 @@ require! {
                                 border-bottom: 1px solid #6e1d96
                                 background: #37156d
                     .btn
-                        margin: 10px 0
+                        margin: 10px 20px 10px 0
                         @media (max-width: 800px)
                             margin: 10px auto 0
                     .step-content
@@ -628,14 +628,6 @@ staking-content = (store, web3t)->
         alert store, err.toString! if err?
         <- notify store, "FUNDS DELEGATED"
         navigate store, web3t, \validators
-    change-address = ->
-        store.staking.add.add-validator = it.target.value
-    change-stake = !->
-        try
-            value = new bignumber(it.target.value).toFixed!.to-string!
-            store.staking.add.add-validator-stake = value
-        catch err
-            console.log "[Change-stake]: #{err}"
     velas-node-applied-template =
         pairs
             |> velas-node-template
@@ -696,16 +688,6 @@ staking-content = (store, web3t)->
         #err, options <- get-options
         #return alert store, err, cb if err?
         store.staking.add.add-validator-stake = Math.max (get-balance! `minus` 0.1), 0
-    vote-for-change = ->
-        err, can <- web3t.velas.ValidatorSet.emitInitiateChangeCallable
-        return alert store, err, cb if err?
-        return alert store, lang.actionProhibited, cb if can isnt yes
-        data = web3t.velas.ValidatorSet.emitInitiateChange.get-data!
-        #console.log { data }
-        to = web3t.velas.ValidatorSet.address
-        amount = 0
-        err <- web3t.vlx2.send-transaction { to, data, amount }
-        store.current.page = \staking
     your-balance = " #{store.staking.chosenAccount.balance} "
     your-staking-amount = store.staking.stakeAmountTotal `div` (10^18)
     your-staking = " #{round-human your-staking-amount}"
@@ -713,16 +695,6 @@ staking-content = (store, web3t)->
     isSpinned = if ((store.staking.all-pools-loaded is no or !store.staking.all-pools-loaded?) and store.staking.pools-are-loading is yes) then "spin disabled" else ""
     cancel-pool = ->
         store.staking.chosenAccount = null
-    activate = (step)-> ->
-        store.current.step = step
-    activate-first = activate \first
-    activate-second = activate \second
-    activate-third = activate \third
-    active-class = (step)->
-        if store.current.step is step then 'active' else ''
-    active-first = active-class \first
-    active-second = active-class \second
-    active-third = active-class \third
     refresh = ->
         store.staking.all-pools-loaded = no
         if ((store.staking.all-pools-loaded is no or !store.staking.all-pools-loaded?) and store.staking.pools-are-loading is yes)
@@ -733,6 +705,17 @@ staking-content = (store, web3t)->
         err <- staking.init { store, web3t }
         return cb err if err?
         cb null, \done
+    delegate = ->
+        navigate store, web3t, \poolchoosing
+    undelegate = ->
+        agree <- confirm store, "Are you sure you would to undelegate?"
+        return if agree is no
+        #
+        err, result <- as-callback web3t.velas.NativeStaking.undelegate(store.staking.chosenAccount.address)
+        console.error "Undelegate error: " err if err?
+        return alert store, err.toString! if err?
+        <- notify store, "FUNDS UNDELEGATED"
+        navigate store, web3t, \validators
     icon-style =
         color: style.app.loader
         margin-top: "10px"
@@ -742,6 +725,10 @@ staking-content = (store, web3t)->
         background: style.app.stats
     stats=
         background: style.app.stats
+    validator = store.staking.pools |> find (-> it.address is store.staking.chosenAccount.validator)
+    credits_observed = ( validator?credits_observed ? 0)
+    active_stake = round-human(store.staking.chosenAccount.balanceRaw `minus` store.staking.chosenAccount.rent)
+    delegated_stake = active_stake
     .pug.staking-content.delegate
         .pug.single-section.form-group(id="choosen-pull")
             .pug.section
@@ -796,13 +783,13 @@ staking-content = (store, web3t)->
                     h3.pug Credits observed
                 .description.pug
                     span.pug
-                        | #{0} VLX
+                        | #{credits_observed}
             .pug.section
                 .title.pug
                     h3.pug Active stake
                 .description.pug
                     span.pug
-                        | #{0} VLX
+                        | #{active_stake} VLX
             .pug.section
                 .title.pug
                     h3.pug Inactive stake
@@ -814,7 +801,17 @@ staking-content = (store, web3t)->
                     h3.pug Delegated Stake
                 .description.pug
                     span.pug
-                        | #{0} VLX
+                        | #{delegated_stake} VLX
+            .pug.section
+                .title.pug
+                    h2.pug Actions
+                .description.pug
+                    .pug.buttons
+                        if store.staking.chosenAccount.validator is "-"
+                            button { store, on-click: delegate , type: \secondary , text: "Delegate" icon : \arrowRight }
+                        else
+                            button { store, on-click: undelegate , type: \secondary , text: "Undelegate" icon : \arrowLeft, classes: "action-undelegate" }
+                        button { store, on-click: delegate , type: \secondary , text: "Split" icon : \arrowLeft, classes: "action-split" }
 account-details = ({ store, web3t })->
     lang = get-lang store
     { go-back } = history-funcs store, web3t

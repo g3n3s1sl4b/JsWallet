@@ -139,6 +139,11 @@ staking-accounts-content = (store, web3t)->
             address: item.address
             network: vlx.network
             coin: vlx.coin
+        wallet-validator =
+            address: validator
+            network: vlx.network
+            coin: vlx.coin
+        noop = ->
         # Select contract from list  
         undelegate = ->
             #err, options <- get-options
@@ -169,7 +174,8 @@ staking-accounts-content = (store, web3t)->
             td.pug(datacolumn='Staker Address' title="#{address}")
                 address-holder-popup { store, wallet, item}
             td.pug #{balance}
-            td.pug #{validator}
+            td.pug(datacolumn='Validator Address' title="#{validator}")
+                address-holder-popup { store, wallet: wallet-validator, item, on-click: noop }
             td.pug #{seed}
             td.pug #{status}
             td.pug
