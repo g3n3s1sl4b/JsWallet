@@ -52,6 +52,15 @@ require! {
     box-sizing: border-box
     padding: 0px
     background: transparent
+    .stake-item
+        background: #628881
+        color: white
+        font-weight: bold
+        text-align: center
+        margin-bottom: 5px
+        cursor: pointer
+        &:last-child
+            margin-bottom: 0
     .loader
         svg
             width: 12px
@@ -722,9 +731,17 @@ staking-content = (store, web3t)->
         checked = item.checked
         stake = item.stake
         my-stake =
-            | +item.my-stake is 0 => item.withdraw-amount
+            | +item.my-stake.length is 0 => []
             | _ => item.my-stake
-        my-stake = 0 if !my-stake?  
+        build-my-stake = (stake)->
+            show-details = ->
+                account = store.staking.accounts |> find (-> it.seed is stake.seed)
+                return null if not account?
+                store.staking.chosen-account = account
+                navigate store, web3t, \account_details
+            .pug(class="stake-item" on-click=show-details)
+                .pug.name
+                    span.pug #{stake.seed}
         index = store.staking.pools.index-of(item) + 1
         choose-pull = ->
             page = \choosestaker
@@ -766,7 +783,8 @@ staking-content = (store, web3t)->
             td.pug(datacolumn='Staker Address' title="#{item.address}")
                 address-holder { store, wallet }
             td.pug #{stake}
-            td.pug(class="#{mystake-class}") #{stringify my-stake}
+            td.pug(class="#{mystake-class}")
+                my-stake |> map build-my-stake
             td.pug #{item.stakers}
             td.pug
                 button { store, on-click: choose-pull , type: \secondary , icon : \arrowRight }
@@ -825,13 +843,6 @@ staking-content = (store, web3t)->
                                 store.staking.pools |> map build-staker store, web3t
         if store.staking.chosen-pool?
             .pug.single-section.form-group(id="choosen-pull")
-                .pug.section
-                    .title.pug
-                        h3.pug Pool
-                    .pug.chosen-pool(title="#{store.staking.chosen-pool.address}")
-                        span.pug
-                            | #{store.staking.chosen-pool.address}
-                            img.pug.check(src="#{icons.img-check}")
                 .pug.section
                     .title.pug
                         h3.pug #{lang.validator}
