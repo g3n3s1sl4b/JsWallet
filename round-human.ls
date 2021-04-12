@@ -9,5 +9,5 @@ module.exports = (value)->
     return \.. if value is \..
     [head, dec] = value.to-string!.split(\.)
     first-head = add-commas head
-    return "#{first-head}.00" if (dec ? "").length is 0
+    return "#{first-head}" if (dec ? "").length is 0
     "#{first-head}.#{dec.substr 0, 4}"
