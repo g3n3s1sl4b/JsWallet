@@ -14,7 +14,7 @@ fill-pools = ({ store, web3t, on-progress, on-finish }, [item, ...rest]) ->
         store.staking.all-pools-loaded = yes
         store.staking.pools-are-loading = no
         return on-finish null, []
-    if (([\validators, \info].index-of(store.current.page)) is -1) then
+    if (([\validators, \info, \account_details, \pool_details].index-of(store.current.page)) is -1) then
         store.staking.all-pools-loaded = no
         store.staking.pools-are-loading = no
         return on-finish null, []
@@ -76,7 +76,7 @@ fill-accounts = ({ store, web3t, on-progress, on-finish }, [item, ...rest]) ->
         store.staking.all-pools-loaded = yes
         store.staking.pools-are-loading = no
         return on-finish null, []
-    if (([\validators, \info].index-of(store.current.page)) is -1) then
+    if (([\validators, \info, \account_details, \pool_details].index-of(store.current.page)) is -1) then
         store.staking.all-pools-loaded = no
         store.staking.pools-are-loading = no
         return on-finish null, []
@@ -88,7 +88,7 @@ fill-accounts = ({ store, web3t, on-progress, on-finish }, [item, ...rest]) ->
     item.rentRaw = rent
     item.balanceRaw = if rent? then (item.account.lamports `minus` rent) else '-'
     item.balance = if rent? then (Math.round((item.account.lamports `minus` rent) `div` (10^9)) `times` 100) `div` 100  else "-"
-    item.rent    = if rent? then  Math.round((rent `div` (10^9)) `times` 100) `div` 100 else "-"
+    item.rent    = if rent? then (rent `div` (10^9)) else "-"
     item.status  = "Not delegated"
     item.validator = "-"
     if (item.account?data?parsed?info?stake) then
@@ -111,7 +111,7 @@ convert-accounts-to-view-model = (accounts) ->
             address: it.key ? '..'
             key: it.key
             balance: if it.balance? then it.balance else '..'
-            rent: if it.rent? then Math.round((it.rent `div` (10^9)) `times` 100) `div` 100 else "-"
+            rent: if it.rent? then it.rent else "-"
             lastVote: it.lastVote ? '..'
             seed: it.seed ? '..'
             validator:  it.validator ? "-",

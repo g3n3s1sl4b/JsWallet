@@ -144,6 +144,7 @@ store =
         withdrawAmount: 0
         maxWithdrawAllowed: 0
         orderedWithdrawAmount: 0
+        poolsAreLoading: no   
         add:
             add-validator: ""
             add-validator-stake: ""
@@ -166,6 +167,7 @@ store =
         pools: []
         pool-was-choosed: no  
         chosen-pool: null
+        chosen-account: null    
         stake-amount-total: 0
         max-withdraw: 0
         delegators: 0
@@ -225,6 +227,7 @@ store =
         device: get-device!
         size: get-size!
         list: 0
+        prompt-type: "" 
         prompt-answer: ""
         prompt: no
         prompt-password: no 
@@ -266,7 +269,7 @@ store =
         notification: null    
         alert: null
         demo: location.href.index-of('web3.space/wallet') > -1
-        network: \mainnet
+        network: \testnet
         pin: ""
         last-tx-url: ""
         try-edit-seed: no
