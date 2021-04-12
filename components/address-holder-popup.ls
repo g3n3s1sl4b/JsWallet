@@ -91,7 +91,7 @@ require! {
             user-select: text !important
             &.active
                 color: orange
-module.exports = ({ store, wallet, type, item })->
+module.exports = ({ store, wallet, type, on-click, item })->
     style = get-primary-info store
     address-suffix = store.current.address-suffix
     address-input=
