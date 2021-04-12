@@ -167,7 +167,7 @@ staking-accounts-content = (store, web3t)->
             td.pug
                 span.pug.circle(class="#{item.status}") #{index}
             td.pug(datacolumn='Staker Address' title="#{address}")
-                address-holder-popup { store, wallet }
+                address-holder-popup { store, wallet, item}
             td.pug #{balance}
             td.pug #{validator}
             td.pug #{seed}

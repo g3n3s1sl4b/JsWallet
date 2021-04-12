@@ -37,6 +37,7 @@ require! {
     \./pages/vote.ls
     \./pages/util.ls
     \./pages/poolchoosing.ls
+    \./pages/stake/account_details.ls
 }
 is-in-iframe = window != window.parent
 if is-in-iframe
@@ -83,6 +84,7 @@ else
     export choosestaker
     export validators
     export poolchoosing
+    export account_details
     export videostorage
     export videostoragedetails
     export info
