@@ -708,8 +708,10 @@ staking-content = (store, web3t)->
     withdraw = ->
         agree <- confirm store, "Are you sure you would to withdraw?"
         return if agree is no
-        { balanceRaw, rent, address } = store.staking.chosenAccount
-        amount = balanceRaw `minus` rent
+        { balanceRaw, rent, address, account } = store.staking.chosenAccount
+        amount = account.lamports `plus` rent
+        console.log "Try to withdraw #{amount} VLX"
+        #return
         err, result <- as-callback web3t.velas.NativeStaking.withdraw(address, amount)
         console.error "Undelegate error: " err if err?
         return alert store, err.toString! if err?
