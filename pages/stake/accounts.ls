@@ -205,10 +205,10 @@ staking-accounts-content = (store, web3t)->
         return if amount+"".trim!.length is 0
         amount = amount * 10^9
         err, result <- as-callback web3t.velas.NativeStaking.createAccount(amount)
-        console.log "result" result
         console.error "Result sending:" err if err?
-        alert store, err.toString! if err?
+        return alert store, err.toString! if err?
         notify store, "ACCOUNT CREATED AND FUNDS DEPOSITED", cb
+        navigate store, web3t, "validators"
     .pug.staking-accounts-content
         .pug
             .form-group.pug(id="create-staking-account")

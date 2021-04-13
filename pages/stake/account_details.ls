@@ -619,7 +619,7 @@ staking-content = (store, web3t)->
         return alert store, "please choose the account", cb if not store.staking.chosenAccount?
         account = store.staking.chosenAccount
         #
-        pay-account = web3t.velas.NativeStaking.accounts |> find (-> it.address is account.address)
+        pay-account = store.staking.accounts |> find (-> it.address is account.address)
         return cb null if not pay-account
         console.log ""
         err, result <- as-callback web3t.velas.NativeStaking.delegate(pay-account.address, account.address)
@@ -705,6 +705,16 @@ staking-content = (store, web3t)->
         err <- staking.init { store, web3t }
         return cb err if err?
         cb null, \done
+    withdraw = ->
+        agree <- confirm store, "Are you sure you would to withdraw?"
+        return if agree is no
+        { balanceRaw, rent, address } = store.staking.chosenAccount
+        amount = balanceRaw `minus` rent
+        err, result <- as-callback web3t.velas.NativeStaking.withdraw(address, amount)
+        console.error "Undelegate error: " err if err?
+        return alert store, err.toString! if err?
+        <- notify store, "FUNDS WITHDRAWED!"
+        navigate store, web3t, \validators
     delegate = ->
         navigate store, web3t, \poolchoosing
     undelegate = ->
@@ -725,10 +735,17 @@ staking-content = (store, web3t)->
         background: style.app.stats
     stats=
         background: style.app.stats
+    has-validator = store.staking.chosenAccount.validator isnt ""
     validator = store.staking.pools |> find (-> it.address is store.staking.chosenAccount.validator)
     credits_observed = ( validator?credits_observed ? 0)
-    active_stake = round-human(store.staking.chosenAccount.balanceRaw `minus` store.staking.chosenAccount.rent)
+    active_stake =
+        | not has-validator =>  0
+        | _ => round-human(store.staking.chosenAccount.balanceRaw `minus` store.staking.chosenAccount.rent)
+    inactive_stake =
+        | has-validator =>  0
+        | _ => round-human(store.staking.chosenAccount.balanceRaw `minus` store.staking.chosenAccount.rent)
     delegated_stake = active_stake
+    validator = if store.staking.chosenAccount.validator is "" then "-" else store.staking.chosenAccount.validator
     .pug.staking-content.delegate
         .pug.single-section.form-group(id="choosen-pull")
             .pug.section
@@ -777,7 +794,7 @@ staking-content = (store, web3t)->
                     h3.pug Validator
                 .description.pug
                     span.pug
-                        | #{store.staking.chosenAccount.validator}
+                        | #{validator}
             .pug.section
                 .title.pug
                     h3.pug Credits observed
@@ -795,7 +812,7 @@ staking-content = (store, web3t)->
                     h3.pug Inactive stake
                 .description.pug
                     span.pug
-                        | #{0} VLX
+                        | #{inactive_stake} VLX
             .pug.section
                 .title.pug
                     h3.pug Delegated Stake
@@ -807,8 +824,9 @@ staking-content = (store, web3t)->
                     h2.pug Actions
                 .description.pug
                     .pug.buttons
-                        if store.staking.chosenAccount.validator is "-"
+                        if not has-validator
                             button { store, on-click: delegate , type: \secondary , text: "Delegate" icon : \arrowRight }
+                            button { store, on-click: withdraw , type: \secondary , text: "Withdraw" icon : \arrowLeft }
                         else
                             button { store, on-click: undelegate , type: \secondary , text: "Undelegate" icon : \arrowLeft, classes: "action-undelegate" }
                         button { store, on-click: delegate , type: \secondary , text: "Split" icon : \arrowLeft, classes: "action-split" }
