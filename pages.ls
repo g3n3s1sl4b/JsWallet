@@ -23,7 +23,6 @@ require! {
     \./pages/search.ls
     \./pages/resources2.ls
     \./pages/choosestaker.ls
-    \./pages/validators.ls
     \./pages/videostorage.ls
     \./pages/videostoragedetails.ls
     \./pages/info.ls
@@ -80,7 +79,6 @@ else
     export search
     export resources2
     export choosestaker
-    export validators
     export videostorage
     export videostoragedetails
     export info
