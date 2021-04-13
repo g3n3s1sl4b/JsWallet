@@ -93,7 +93,11 @@ staking-accounts-content = (store, web3t)->
             store.staking.add.add-validator-stake = value
         catch err
             console.log "[Change-stake]: #{err}"
-    return null if not pairs.mining?
+    get-balance = ->
+        wallet =
+            store.current.account.wallets
+                |> find -> it.coin.token is \vlx_native
+        wallet?balance ? 0
     get-options = (cb)->
         err, data <- web3t.velas.Staking.candidateMinStake
         return cb err if err?
@@ -204,6 +208,8 @@ staking-accounts-content = (store, web3t)->
         amount <- prompt store, "How much would you like to deposit?"
         return if amount+"".trim!.length is 0
         min_stake = web3t.velas.NativeStaking.min_stake
+        main_balance = get-balance!
+        return alert store, "Balance is not enough to create staking account (#{min_stake} VLX)" if +min_stake > +main_balance
         return alert store, "Minimal stake must be #{min_stake} VLX" if +min_stake > +amount
         amount = amount * 10^9
         err, result <- as-callback web3t.velas.NativeStaking.createAccount(amount)
