@@ -23,6 +23,7 @@ require! {
     \../../../web3t/addresses.js : { ethToVlx, vlxToEth }
     \../switch-account.ls
     \../../round-human.ls
+    \../../round-number.ls
     \../../icons.ls
     \../placeholder.ls
     \../epoch.ls
@@ -47,6 +48,10 @@ require! {
     box-sizing: border-box
     padding: 0px
     background: transparent
+    .usd-amount
+        opacity: 0.65
+        font-size: 10px
+        margin-left: 10px
     .loader
         svg
             width: 12px
@@ -598,6 +603,10 @@ staking-content = (store, web3t)->
         color: style.app.text2
         background: style.app.primary3
         background-color: style.app.primary3-spare
+    seed-style =
+        background: style.app.primary2
+        background-color: style.app.primary2-spare
+        padding: 5px
     filter-icon=
         filter: style.app.filterIcon
     comming-soon =
@@ -607,10 +616,10 @@ staking-content = (store, web3t)->
         account = store.staking.chosenAccount
         myStake = +account.myStake
         myStake >= 10000
+    wallet =
+        store.current.account.wallets
+            |> find -> it.coin.token is \vlx_native
     delegate = ->
-        wallet =
-            store.current.account.wallets
-                |> find -> it.coin.token is \vlx_native
         return null if not wallet?
         #err, options <- get-options
         #return alert store, err, cb if err?
@@ -711,7 +720,6 @@ staking-content = (store, web3t)->
         { balanceRaw, rent, address, account } = store.staking.chosenAccount
         amount = account.lamports `plus` rent
         console.log "Try to withdraw #{amount} VLX"
-        #return
         err, result <- as-callback web3t.velas.NativeStaking.withdraw(address, amount)
         console.error "Undelegate error: " err if err?
         return alert store, err.toString! if err?
@@ -742,11 +750,17 @@ staking-content = (store, web3t)->
     credits_observed = ( validator?credits_observed ? 0)
     active_stake =
         | not has-validator =>  0
-        | _ => round-human(store.staking.chosenAccount.balanceRaw `minus` store.staking.chosenAccount.rent)
+        | _ => store.staking.chosenAccount.balanceRaw `minus` store.staking.chosenAccount.rent
     inactive_stake =
         | has-validator =>  0
-        | _ => round-human(store.staking.chosenAccount.balanceRaw `minus` store.staking.chosenAccount.rent)
+        | _ => store.staking.chosenAccount.balanceRaw `minus` store.staking.chosenAccount.rent
     delegated_stake = active_stake
+    usd-rate = wallet?usdRate ? 0
+    usd-balance = round-number(store.staking.chosenAccount.balanceRaw `times` usd-rate, {decimals:2})
+    usd-rent = round-number(store.staking.chosenAccount.rent `times` usd-rate,{decimals:2})
+    usd-active_stake = round-number(active_stake `times` usd-rate, {decimals:2})
+    usd-inactive_stake = round-number(inactive_stake `times` usd-rate, {decimals:2})
+    usd-delegated_stake = round-number(delegated_stake `times` usd-rate, {decimals:2})
     validator = if store.staking.chosenAccount.validator is "" then "-" else store.staking.chosenAccount.validator
     .pug.staking-content.delegate
         .pug.single-section.form-group(id="choosen-pull")
@@ -765,7 +779,7 @@ staking-content = (store, web3t)->
                 .title.pug
                     h3.pug Seed
                 .description.pug
-                    span.pug
+                    span.pug(style=seed-style)
                         | #{store.staking.chosenAccount.seed}
             .pug.section
                 .title.pug
@@ -773,12 +787,16 @@ staking-content = (store, web3t)->
                 .description.pug
                     span.pug
                         | #{store.staking.chosenAccount.rent} VLX
+                    span.pug.usd-amount
+                        | $#{usd-rent}
             .pug.section
                 .title.pug
                     h3.pug Balance
                 .description.pug
                     span.pug
                         | #{store.staking.chosenAccount.balance} VLX
+                    span.pug.usd-amount
+                        | $#{usd-balance}
             .pug
             .pug
             .pug.section
@@ -795,8 +813,9 @@ staking-content = (store, web3t)->
                 .title.pug
                     h3.pug Validator
                 .description.pug
-                    span.pug
+                    span.pug.chosen-account
                         | #{validator}
+                        img.pug.check(src="#{icons.img-check}")
             .pug.section
                 .title.pug
                     h3.pug Credits observed
@@ -808,19 +827,25 @@ staking-content = (store, web3t)->
                     h3.pug Active stake
                 .description.pug
                     span.pug
-                        | #{active_stake} VLX
+                        | #{round-human(active_stake)} VLX
+                    span.pug.usd-amount
+                        | $#{usd-active_stake}
             .pug.section
                 .title.pug
                     h3.pug Inactive stake
                 .description.pug
                     span.pug
-                        | #{inactive_stake} VLX
+                        | #{round-human(inactive_stake)} VLX
+                    span.pug.usd-amount
+                        | $#{usd-inactive_stake}
             .pug.section
                 .title.pug
                     h3.pug Delegated Stake
                 .description.pug
                     span.pug
-                        | #{delegated_stake} VLX
+                        | #{round-human(delegated_stake)} VLX
+                    span.pug.usd-amount
+                        | $#{usd-delegated_stake}
             .pug.section
                 .title.pug
                     h2.pug Actions
