@@ -728,11 +728,11 @@ staking-content = (store, web3t)->
                             thead.pug
                                 tr.pug
                                     td.pug(width="3%" style=stats) #
-                                    td.pug(width="10%" style=staker-pool-style) Validator
-                                    td.pug(width="25%" style=stats) #{lang.total-stake}
+                                    td.pug(width="30%" style=staker-pool-style) Validator
+                                    td.pug(width="15%" style=stats) #{lang.total-stake}
                                     td.pug(width="5%" style=stats) Fee
                                     td.pug(width="10%" style=stats) Last Vote
-                                    td.pug(width="25%" style=stats) #{lang.my-stake}
+                                    td.pug(width="10%" style=stats) #{lang.my-stake}
                                     td.pug(width="5%" style=stats) #{lang.stakers}
                             tbody.pug
                                 store.staking.pools |> map build-staker store, web3t
