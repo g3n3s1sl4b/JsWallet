@@ -116,6 +116,12 @@ fill-accounts = ({ store, web3t, on-progress, on-finish }, [item, ...rest]) ->
         if (deactivationEpoch > activationEpoch or activationEpoch is web3t.velas.NativeStaking.max_epoch) then
             item.status    = "loading"
             item.validator = item.account?data?parsed?info?stake?delegation?voter
+    err, stakeActivation <- as-callback web3t.velas.NativeStaking.getStakeActivation(item.address)
+    if not err?
+        item.status = stakeActivation.state
+        item.active_stake = stakeActivation.active
+        item.inactive_stake = stakeActivation.inactive
+    return alert store, err, cb if err?
     on-progress [item, ...rest] if on-progress?
     on-finish-local = (err, pools) ->
         on-finish err, [item, ...pools]
@@ -136,6 +142,8 @@ convert-accounts-to-view-model = (accounts) ->
             seed: it.seed ? '..'
             validator:  it?validator ? ""
             status: it.status ? "Not delegated"
+            active_stake = it?active_stake ? 0
+            inactive_stake = it?inactive_stake ? 0
         }
 ##################
 convert-pools-to-view-model = (pools) ->

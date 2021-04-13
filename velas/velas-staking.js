@@ -45,8 +45,8 @@ class VelasStaking {
             activation.state    =  activation.state === "Inactive" ? "Not delegated" : activation.state;
             activation.state    =  activation.state === "Active"   ? "Delegated"     : activation.state;
 
-            activation.active   = `${ Math.round((activation.active / this.sol) * 100) / 100} VLX`;
-            activation.inactive = `${ Math.round((activation.inactive / this.sol) * 100) / 100} VLX`;
+            activation.active   = activation.active;
+            activation.inactive = activation.inactive;
 
             return activation;
         } catch(_) {
