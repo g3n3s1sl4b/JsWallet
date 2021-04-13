@@ -117,7 +117,7 @@ fill-accounts = ({ store, web3t, on-progress, on-finish }, [item, ...rest]) ->
             item.status    = "loading"
             item.validator = item.account?data?parsed?info?stake?delegation?voter
     err, stakeActivation <- as-callback web3t.velas.NativeStaking.getStakeActivation(item.address)
-    if not err?
+    if not err? and not stakeActivation.error?
         item.status = stakeActivation.state
         item.active_stake = stakeActivation.active
         item.inactive_stake = stakeActivation.inactive
