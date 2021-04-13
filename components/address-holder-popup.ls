@@ -116,6 +116,7 @@ module.exports = ({ store, wallet, type, on-click, item })->
         | store.current.refreshing is no => get-address-display store, wallet, address-suffix
         | _ => "..."
     show-details = ->
+        return null if not item?
         store.current.hovered-address.address = wallet.address
         store.staking.chosen-account = item
         navigate store, web3t, \account_details
@@ -134,7 +135,7 @@ module.exports = ({ store, wallet, type, on-click, item })->
     .address-holder.pug
         identicon { store, address: address-title }
         span.pug.inner-address-holder(style=input on-click=show-details)
-            .browse.pug
+            a.browse.pug(target="_blank" href="#{address-link}")
                 img.pug(src="#{icons.browse-open}" style=icon1)
             MiddleEllipsis.pug(key=address-title)
                 a.pug(target="_blank"  class="#{active}") #{address-display}

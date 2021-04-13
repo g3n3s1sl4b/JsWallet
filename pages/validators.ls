@@ -33,6 +33,7 @@ require! {
     \./confirmation.ls : { alert }
     \../components/button.ls
     \../components/address-holder.ls
+    \../components/address-holder-popup.ls
     \./alert-txn.ls
     \../components/amount-field.ls
     \./move-stake.ls
@@ -678,7 +679,7 @@ staking-content = (store, web3t)->
             td.pug
                 span.pug.circle(class="#{item.status}") #{index}
             td.pug(datacolumn='Staker Address' title="#{item.address}")
-                address-holder { store, wallet }
+                address-holder-popup { store, wallet }
             td.pug #{stake}
             td.pug #{fee}%
             td.pug #{lastVote}
