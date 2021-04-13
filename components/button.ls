@@ -23,6 +23,8 @@ require! {
     cursor: pointer
     box-sizing: border-box
     transition: all 0.5s
+    &.action-undelegate
+        filter: hue-rotate(231deg)        
     &:hover
         background: rgba(#6CA7ED, 0.2)
         opacity: 0.9

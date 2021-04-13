@@ -16,6 +16,9 @@ require! {
     width: 100%
     box-sizing: border-box
     background: rgba(black, 0.7)
+    display: flex
+    justify-content: center
+    align-items: center
     .icon-svg-apply
         position: relative
         height: 12px
@@ -36,6 +39,7 @@ require! {
         margin: 10px
         border-radius: var(--border-btn)
         width: calc(100% - 20px)
+        max-width: 550px
         box-shadow: 7px 10px 13px #0000001f, -16px 20px 13px #00000024
         input
             border-radius: var(--border-btn)

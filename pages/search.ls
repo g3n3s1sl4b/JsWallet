@@ -313,7 +313,7 @@ dapps = (store, web3t)->
     goto-resources2 = ->
         navigate store, web3t, \resources2
     goto-choose-staker = ->
-        navigate store, web3t, \choosestaker
+        navigate store, web3t, \validators
     goto-videostorage = ->
         navigate store, web3t, \videostorage
     goto-soundstorage = ->
