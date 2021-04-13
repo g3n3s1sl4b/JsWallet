@@ -121,7 +121,7 @@ fill-accounts = ({ store, web3t, on-progress, on-finish }, [item, ...rest]) ->
         item.status = stakeActivation.state
         item.active_stake = stakeActivation.active
         item.inactive_stake = stakeActivation.inactive
-    return alert store, err, cb if err?
+    #return alert store, err, cb if err?
     on-progress [item, ...rest] if on-progress?
     on-finish-local = (err, pools) ->
         on-finish err, [item, ...pools]
