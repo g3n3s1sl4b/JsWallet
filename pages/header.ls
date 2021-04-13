@@ -304,7 +304,7 @@ module.exports = (store, web3)->
     goto-staking = ->
         navigate store, web3t, \staking
     goto-choose-staker = ->
-        navigate store, web3t, \validators
+        navigate store, web3t, \choosestaker
     goto-info = ->
         navigate store, web3t, \info
     open-submenu = ->

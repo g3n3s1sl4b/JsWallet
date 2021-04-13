@@ -324,7 +324,7 @@ module.exports = (store, web3t)->
     goto-resources = ->
         navigate store, web3t, \resources
     goto-choose-staker = ->
-        navigate store, web3t, \validators
+        navigate store, web3t, \choosestaker
         store.menu.show = no
     goto-info = ->
         navigate store, web3t, \info
