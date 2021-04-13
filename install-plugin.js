@@ -15,8 +15,6 @@
   ltc = require('../web3t/plugins/ltc-coin.js');
   usdt = require('../web3t/plugins/usdt-coin.js');
   usdt_erc20 = require('../web3t/plugins/usdt_erc20.json');
-  vlx_evm = require('../web3t/plugins/vlx-coin.js');
-  vlx_erc20 = require('../web3t/plugins/vlx_erc20-coin.js');
   currentConfigs = {
     dash: dash,
     eth: eth,
@@ -25,8 +23,6 @@
     usdt: usdt,
     usdt_erc20: usdt_erc20,
     ltc: ltc,
-    vlx_erc20: vlx_erc20,
-    vlx_evm: vlx_evm
   };
   requiredFields = ['type', 'token', 'enabled'];
   notIn = function(arr, arr2){
