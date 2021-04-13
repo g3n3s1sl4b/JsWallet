@@ -31,7 +31,7 @@ module.exports = (store)->
     web3Solana = velas-solana-web3 store
     networks =
         mainnet: \https://explorer.velas.com/rpc
-        testnet: \http://bootstrap.testnet.veladev.net:8899/
+        testnet: \https://explorer.testnet.velas.com/rpc
     api =
         Staking      : web3.eth.contract(abis.Staking).at(staking-address)
         NativeStaking: new NStaking({NODE_HOST: networks[network]})
