@@ -633,7 +633,7 @@ staking-content = (store, web3t)->
         account = store.staking.chosen-account
         pool = store.staking.chosen-pool
         #
-        pay-account = web3t.velas.NativeStaking.accounts |> find (-> it.address is account.address)
+        pay-account = store.staking.accounts |> find (-> it.address is account.address)
         return cb null if not pay-account
         console.log ""
         err, result <- as-callback web3t.velas.NativeStaking.delegate(pay-account.address, pool.address)
