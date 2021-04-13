@@ -221,7 +221,6 @@ require! {
                         animation: breathe 3s ease-in infinite
                         -moz-transition: breathe 3s ease-in infinite
                         -web-kit-transition: breathe 3s ease-in infinite
-                        height: calc(100vh - 105px)
                         .stake-pointer
                             background: rgb(37, 87, 127)
                         &.lockup
@@ -581,29 +580,6 @@ as-callback = (p, cb)->
     p.catch (err) -> cb err
     p.then (data)->
         cb null, data
-get-pair = (wallet, path, index, password, with-keystore)->
-    w = wallet.derive-path(path).derive-child(index).get-wallet!
-    address  = "0x" + w.get-address!.to-string(\hex)
-    salt = Buffer.from('dc9e4a98886738bd8aae134a1f89aaa5a502c3fbd10e336136d4d5fe47448ad6', 'hex')
-    iv = Buffer.from('cecacd85e9cb89788b5aab2f93361233', 'hex')
-    uuid = Buffer.from('7e59dc028d42d09db29aa8a0f862cc81', 'hex')
-    kdf = 'pbkdf2'
-    #console.log \keystore, with-keystore
-    keystore =
-        | with-keystore => w.toV3String(password, { salt, iv, uuid, kdf })
-        | _ => ""
-    { address, keystore }
-to-keystore = (store, with-keystore)->
-    mnemonic = seedmem.mnemonic
-    seed = bip39.mnemonic-to-seed(mnemonic)
-    wallet = hdkey.from-master-seed(seed)
-    index = store.current.account-index
-    password = md5 wallet.derive-path("m1").derive-child(index).get-wallet!.get-address!.to-string(\hex)
-    staking =
-        | store.url-params.anotheracc? => { address: window.toEthAddress(store.url-params.anotheracc) }
-        | _ => get-pair wallet, \m0 , index, password, no
-    mining  = get-pair wallet, \m0/2 , index, password, with-keystore
-    { staking, mining, password }
 show-validator = (store, web3t)-> (validator)->
     li.pug #{validator}
 staking-content = (store, web3t)->
@@ -619,75 +595,14 @@ staking-content = (store, web3t)->
         filter: style.app.filterIcon
     comming-soon =
         opacity: ".3"
-    pairs = store.staking.keystore
     i-stake-choosen-pool = ->
         pool = store.staking.chosenPool
         myStake = +pool.myStake
         myStake >= 10000
-    become-validator = ->
-        err, options <- get-options
-        return alert store, err, cb if err?
-        err <- can-make-staking store, web3t
-        return alert store, err, cb if err?
-        return alert store, "please choose the pool", cb if not store.staking.chosen-pool?
-        type = typeof! store.staking.add.add-validator-stake
-        return alert store, "please enter correct amount, got #{type}", cb if type not in <[ String Number ]>
-        stake = store.staking.add.add-validator-stake `times` (10^18)
-        data = web3t.velas.Staking.stake.get-data store.staking.chosen-pool.address, stake
-        #console.log \after-stake
-        to = web3t.velas.Staking.address
-        console.log "Staking to" to
-        #console.log \to, { to, data, amount }
-        amount = store.staking.add.add-validator-stake
-        #console.log \after-stake, to, amount
-        err <- web3t.vlx2.send-transaction { to, data, amount }
-        #return cb err if err?
-        return store.staking.add.result = "#{err}" if err?
-        #store.staking.add.result = "success"
-        <- staking.init { store, web3t }
-    change-address = ->
-        store.staking.add.add-validator = it.target.value
-    change-stake = !->
-        try
-            value = new bignumber(it.target.value).toFixed!.to-string!
-            store.staking.add.add-validator-stake = value
-        catch err
-            console.log "[Change-stake]: #{err}"
-    velas-node-applied-template =
-        pairs
-            |> velas-node-template
-            |> split "\n"
-    velas-node-applied-template-line =
-        pairs
-            |> velas-node-template
-            |> btoa
-            |> -> "echo '#{it}' | base64 --decode | sh"
-    return null if not pairs.mining?
-    show-script = ->
-        store.staking.keystore = to-keystore store, yes
     {  account-left, account-right, change-account-index } = menu-funcs store, web3t
-    update-current = (func)-> (data)->
-        func data
-        <- staking.init { store, web3t }
-        store.staking.keystore = to-keystore store, no
-    account-left-proxy   = update-current account-left
-    account-right-proxy  = update-current account-right
-    change-account-index-proxy = update-current change-account-index
     line-style =
         padding: "10px"
         width: \100%
-    activate = (tab)-> ->
-        store.staking.tab = tab
-    activate-line = activate \line
-    activate-string = activate \string
-    activate-ssh = activate \ssh
-    activate-do = activate \do
-    active-class = (tab)->
-        if store.staking.tab is tab then 'active' else ''
-    active-line = active-class \line
-    active-string = active-class \string
-    active-ssh = active-class \ssh
-    active-do = active-class \do
     get-balance = ->
         wallet =
             store.current.account.wallets
@@ -715,16 +630,6 @@ staking-content = (store, web3t)->
         #err, options <- get-options
         #return alert store, err, cb if err?
         store.staking.add.add-validator-stake = Math.max (get-balance! `minus` 0.1), 0
-    vote-for-change = ->
-        err, can <- web3t.velas.ValidatorSet.emitInitiateChangeCallable
-        return alert store, err, cb if err?
-        return alert store, lang.actionProhibited, cb if can isnt yes
-        data = web3t.velas.ValidatorSet.emitInitiateChange.get-data!
-        #console.log { data }
-        to = web3t.velas.ValidatorSet.address
-        amount = 0
-        err <- web3t.vlx2.send-transaction { to, data, amount }
-        store.current.page = \staking
     your-balance = " #{round-human get-balance!} "
     your-staking-amount = store.staking.stakeAmountTotal `div` (10^18)
     your-staking = " #{round-human your-staking-amount}"
@@ -748,23 +653,6 @@ staking-content = (store, web3t)->
         fee = item.commission
         lastVote = item.lastVote
         index = store.staking.pools.index-of(item) + 1
-        choose-pull = ->
-            page = \choosestaker
-            store.pages.push(page) if store.pages.length > 0 and page isnt store.pages[store.pages.length - 1]
-            cb = (err, data)->
-                alert store, err, console~log if err?
-            store.staking.pools |> map (-> it.checked = no)
-            item.checked = yes
-            store.staking.chosen-pool = item
-            store.staking.add.new-address = ""
-            store.staking.error = ""
-            claim-stake.calc-reward store, web3t
-            staking-address = store.staking.keystore.staking.address
-            err, amount <- web3t.velas.Staking.stakeAmount item.address, staking-address
-            return cb err if err?
-            store.staking.stake-amount-total = amount.to-fixed!
-            err <- exit-stake.init { store, web3t }
-            return cb err if err?
         reward =
             | item.validator-reward-percent is ".." => ".."
             | _ => (100 - +item.validator-reward-percent) * 1.4285714286
@@ -777,7 +665,7 @@ staking-content = (store, web3t)->
                 | _ => "rgb(38, 219, 85)"
         vlx_native =
             store.current.account.wallets |> find (.coin.token is \vlx_native)
-        return if not vlx_native?
+        return null if not vlx_native?
         wallet =
             address: item.address
             network: vlx_native.network
@@ -799,16 +687,6 @@ staking-content = (store, web3t)->
             td.pug #{item.stakers}
     cancel-pool = ->
         store.staking.chosen-pool = null
-    activate = (step)-> ->
-        store.current.step = step
-    activate-first = activate \first
-    activate-second = activate \second
-    activate-third = activate \third
-    active-class = (step)->
-        if store.current.step is step then 'active' else ''
-    active-first = active-class \first
-    active-second = active-class \second
-    active-third = active-class \third
     refresh = ->
         store.staking.all-pools-loaded = no
         if ((store.staking.all-pools-loaded is no or !store.staking.all-pools-loaded?) and store.staking.pools-are-loading is yes)
@@ -860,6 +738,8 @@ staking-content = (store, web3t)->
 validators = ({ store, web3t })->
     lang = get-lang store
     { go-back } = history-funcs store, web3t
+    wallet = store.current.account.wallets |> find (-> it.coin.token is \vlx_native)
+    return cb null if not wallet?
     goto-search = ->
         navigate store, web3t, \search
     info = get-primary-info store
@@ -913,7 +793,6 @@ validators.init = ({ store, web3t }, cb)!->
     store.staking.delegators = {}
     store.staking.withdraw-amount = 0
     store.staking.stake-amount-total = 0
-    store.staking.keystore = to-keystore store, no
     store.staking.reward = null
     store.staking.all-pools-loaded = no
     store.staking.pools-are-loading = yes
