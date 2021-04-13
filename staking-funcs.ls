@@ -14,6 +14,7 @@ get-stakes-from-stakes-accounts = (store, item)->
     found = store.staking.accounts
         |> filter (it)->
             stake-data = it?account?data?parsed?info?stake?delegation
+            return no if not stake-data?
             +stake-data.activationEpoch < +stake-data.deactivationEpoch and stake-data?voter is item.key
     stakes =
         | found.length > 0 =>
@@ -107,7 +108,7 @@ fill-accounts = ({ store, web3t, on-progress, on-finish }, [item, ...rest]) ->
     item.balance = if rent? then (Math.round((item.account.lamports `minus` rent) `div` (10^9)) `times` 100) `div` 100  else "-"
     item.rent    = if rent? then (rent `div` (10^9)) else "-"
     item.status  = "Not delegated"
-    item.validator = "-"
+    item.validator = null
     item.account = item.account
     if (item.account?data?parsed?info?stake) then
         activationEpoch   = Number(item.account?data?parsed?info?stake.delegation.activationEpoch)
@@ -133,8 +134,8 @@ convert-accounts-to-view-model = (accounts) ->
             rent: if it.rent? then it.rent else "-"
             lastVote: it.lastVote ? '..'
             seed: it.seed ? '..'
-            validator:  it.validator ? "-",
-            status: it.status ? "Not delegated",
+            validator:  it?validator ? ""
+            status: it.status ? "Not delegated"
         }
 ##################
 convert-pools-to-view-model = (pools) ->
