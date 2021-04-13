@@ -237,8 +237,8 @@ staking-accounts-content = (store, web3t)->
                                 tr.pug
                                     td.pug(width="3%" style=stats) #
                                     td.pug(width="40%" style=staker-pool-style) Account
-                                    td.pug(width="20%" style=stats) Balance
-                                    td.pug(width="20%" style=stats) Validator
+                                    td.pug(width="10%" style=stats) Balance
+                                    td.pug(width="30%" style=stats) Validator
                                     td.pug(width="7%" style=stats) Seed
                                     td.pug(width="10%" style=stats) Status
                             tbody.pug
