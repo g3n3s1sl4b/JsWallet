@@ -203,6 +203,8 @@ staking-accounts-content = (store, web3t)->
         cb = console.log 
         amount <- prompt store, "How much would you like to deposit?"
         return if amount+"".trim!.length is 0
+        min_stake = web3t.velas.NativeStaking.min_stake
+        return alert store, "Minimal stake must be #{min_stake} VLX" if +min_stake > +amount
         amount = amount * 10^9
         err, result <- as-callback web3t.velas.NativeStaking.createAccount(amount)
         console.error "Result sending:" err if err?
