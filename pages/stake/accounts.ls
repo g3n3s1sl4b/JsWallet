@@ -60,6 +60,8 @@ as-callback = (p, cb)->
         .table-scroll.lockup
             table
                 td
+                    &.validator-address
+                        text-align: center
                     border: none
 cb = console.log
 show-validator = (store, web3t)-> (validator)->
@@ -134,8 +136,12 @@ staking-accounts-content = (store, web3t)->
         null
     build = (store, web3t)-> (item)->
         return null if not item? or not item.key?
+        console.log "acc item" item
         { account, address, balance, key, rent, seed, status, validator } = item
         index = store.staking.accounts.index-of(item) + 1
+        $status =
+            | status is 'inactive' => "Not Delegated"
+            | _ => status
         vlx =
             store.current.account.wallets |> find (.coin.token is \vlx_native)
         return null if not vlx?
@@ -147,7 +153,6 @@ staking-accounts-content = (store, web3t)->
             address: validator
             network: vlx.network
             coin: vlx.coin
-        noop = ->
         # Select contract from list  
         undelegate = ->
             #err, options <- get-options
@@ -166,8 +171,8 @@ staking-accounts-content = (store, web3t)->
             store.staking.chosen-account = item
             navigate store, web3t, \poolchoosing
             cb null
-        $button = 
-            | item.status is "Not delegated" =>
+        $button =
+            | item.status is "inactive" =>
                 button { store, text: \Delegate, on-click: choose , type: \secondary , icon : \arrowRight } 
             | _ => button { store, classes: "action-undelegate" text: \Undelegate, on-click: undelegate , type: \secondary , icon : \arrowLeft }  
         show-stake-place = ->
@@ -178,10 +183,13 @@ staking-accounts-content = (store, web3t)->
             td.pug(datacolumn='Staker Address' title="#{address}")
                 address-holder-popup { store, wallet, item}
             td.pug #{balance}
-            td.pug(datacolumn='Validator Address' title="#{validator}")
-                address-holder-popup { store, wallet: wallet-validator, item, on-click: noop }
+            td.pug(class="validator-address" title="#{validator}")
+                if validator? and validator isnt ""
+                    address-holder-popup { store, wallet: wallet-validator, item }
+                else
+                    "---"
             td.pug #{seed}
-            td.pug #{status}
+            td.pug #{$status}
             td.pug
                 $button
     cancel = ->
@@ -216,7 +224,7 @@ staking-accounts-content = (store, web3t)->
         err, result <- as-callback web3t.velas.NativeStaking.createAccount(amount)
         console.error "Result sending:" err if err?
         return alert store, err.toString! if err?
-        notify store, "ACCOUNT CREATED AND FUNDS DEPOSITED", cb
+        <- notify store, "ACCOUNT CREATED AND FUNDS DEPOSITED"
         navigate store, web3t, "validators"
     .pug.staking-accounts-content
         .pug
