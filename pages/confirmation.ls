@@ -7,6 +7,26 @@ require! {
     \../components/text-field.ls   
 }
 .confirmation
+    @-webkit-keyframes appear
+        from
+            opacity: 0
+        to
+            opacity: 1
+    @-moz-keyframes appear
+        from
+            opacity: 0
+        to
+            opacity: 1
+    @-o-keyframes appear
+        from
+            opacity: 0
+        to
+            opacity: 1
+    @keyframes appear
+        from
+            opacity: 0
+        to
+            opacity: 1
     @import scheme
     position: fixed
     z-index: 99999999
@@ -19,6 +39,7 @@ require! {
     display: flex
     justify-content: center
     align-items: center
+    animation: appear .1s ease-in
     .icon-svg-apply
         position: relative
         height: 12px
