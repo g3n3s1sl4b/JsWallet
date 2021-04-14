@@ -757,7 +757,7 @@ staking-content = (store, web3t)->
     usd-active_stake = round-number(active_stake `times` usd-rate, {decimals:2})
     usd-inactive_stake = round-number(inactive_stake `times` usd-rate, {decimals:2})
     usd-delegated_stake = round-number(delegated_stake `times` usd-rate, {decimals:2})
-    validator = if store.staking.chosenAccount.validator is "" then "-" else store.staking.chosenAccount.validator
+    validator = if store.staking.chosenAccount.validator is "" then "---" else store.staking.chosenAccount.validator
     .pug.staking-content.delegate
         .pug.single-section.form-group(id="choosen-pull")
             .pug.section
@@ -811,7 +811,8 @@ staking-content = (store, web3t)->
                 .description.pug
                     span.pug.chosen-account
                         | #{validator}
-                        img.pug.check(src="#{icons.img-check}")
+                        if store.staking.chosenAccount.validator isnt ""
+                            img.pug.check(src="#{icons.img-check}")
             .pug.section
                 .title.pug
                     h3.pug Credits observed

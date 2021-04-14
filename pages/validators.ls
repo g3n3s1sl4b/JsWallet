@@ -241,7 +241,7 @@ require! {
                             &.with-stake
                                 filter: saturate(6.5)
                         tr
-                            &.active
+                            &.activating, &.active
                                 color: var(--color-td)
                             &.inactive
                                 color: orange
@@ -256,7 +256,7 @@ require! {
                                 line-height: 1.6
                                 border-radius: 4px
                                 background: gray
-                                &.active
+                                &.active, &.activating
                                     background: rgb(38, 219, 85)
                                 &.inactive
                                     background: orange
