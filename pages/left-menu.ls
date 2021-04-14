@@ -370,25 +370,9 @@ module.exports = (store, web3t)->
                     span.arrow_box.pug #{lang.your-wallets}
                     img.pug(src="#{icons.wallet}" style=wallet-icon)
             if store.preference.settings-visible is yes
-                .menu-item.pug(on-click=open-submenu style=icon-style class="#{staking + ' ' + menu-staking + ' ' + info-active + ' ' + staking-active + ' ' + delegate-active}" on-mouse-leave=menu-out id="menu-staking")
+                .menu-item.pug(on-click=goto-choose-staker style=icon-style class="#{delegate-active}" id="menu-delegate")
                     span.arrow_box.pug #{lang.staking}
                     img.pug(src="#{icons.staking}"style=icon-color)
-                    img.more.pug(src="#{icons.arrow-down}")
-                    .menu.pug.arrow_box
-                        ul.pug
-                            li.pug(on-click=goto-staking style=icon-style class="#{staking-active}" id="menu-node")
-                                img.pug(src="#{icons.node}" style=icon-node)
-                                | #{lang.install-node}
-                            li.pug(on-click=goto-choose-staker style=icon-style class="#{delegate-active}" id="menu-delegate")
-                                img.pug(src="#{icons.delegate}" style=icon-node)
-                                | #{lang.delegate-stake}
-                            if no
-                                li.pug(on-click=goto-claim style=icon-style class="#{claim-active}")
-                                    img.pug(src="#{icons.claim}" style=icon-node)
-                                    | #{lang.claim-reward}
-                            li.pug(on-click=goto-info style=icon-style class="#{info-active}" id="menu-stats")
-                                img.pug(src="#{icons.info}" style=icon-node)
-                                | #{lang.stats}
             if store.preference.settings-visible is yes
                 .menu-item.pug(on-click=goto-search style=icon-style class="#{search}" id="menu-search")
                     span.arrow_box.pug #{lang.search}
