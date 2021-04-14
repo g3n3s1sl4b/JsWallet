@@ -222,6 +222,10 @@ require! {
         width: 100%
         border-top: 1px solid #213040
         display: inline-block
+as-callback = (p, cb)->
+    p.catch (err) -> cb err
+    p.then (data)->
+        cb null, data
 module.exports = (store, web3t)->
     return null if not store.current.account?
     { wallets, go-up, can-up, go-down, can-down } = wallets-funcs store, web3t
@@ -261,22 +265,27 @@ module.exports = (store, web3t)->
         cb = alert
         store.current.current-epoch = not store.current.current-epoch
         return if not store.current.current-epoch
-        err, staking-epoch <- web3t.velas.Staking.stakingEpoch
-        return cb "#{err}" if err?
-        err, next-block <- web3t.velas.Staking.stakingEpochEndBlock
-        return cb err if err?
+        err, epochInfo <- as-callback web3t.velas.NativeStaking.getCurrentEpochInfo()
+        console.error err if err?
+        return cb null if err?
+        { epoch, blockHeight, slotIndex, slotsInEpoch, transactionCount } = epochInfo
+        next-block = slotsInEpoch
         err, start-block <- web3t.velas.Staking.stakingEpochStartBlock
         return cb err if err?
-        err, current-block <- web3t.velas.web3.getBlockNumber
-        return cb err if err?
-        seconds = (next-block `minus` current-block) `times` 5
-        all = (next-block `minus` start-block) `times` 5
-        rest = all `minus` seconds
-        console.log store.dashboard.epoch-percent , all, seconds
-        store.dashboard.epoch-percent = 100 - ( 100 `div` all ) `times` seconds
+        current-block = blockHeight
+        seconds-per-block = 0.8
+        seconds = (epochInfo.slotsInEpoch `minus` epochInfo.slotIndex) `times` seconds-per-block
+        epoch-time = epochInfo.slotsInEpoch `times` seconds-per-block
+        rest = epoch-time `minus` seconds
+        store.dashboard.epoch-percent = 100 - ( 100 `div` epoch-time ) `times` seconds
         store.dashboard.epoch-next = moment!.add(seconds, 'seconds').from-now!
         store.dashboard.current-block = current-block
-        store.dashboard.epoch = staking-epoch.to-fixed!
+        store.dashboard.epoch = epoch
+        err, epochSchedule <- as-callback web3t.velas.NativeStaking.getEpochSchedule()
+        console.error err if err?
+        return cb null if err?
+        {firstNormalEpoch, firstNormalSlot, leaderScheduleSlotOffset,slotsPerEpoch, warmup} = epochSchedule
+        store.dashboard.warmup = (warmup ? "").toString().to-upper-case!
     edit-account-name = ->
         store.current.edit-account-name = current-account-name!
     default-account-name = -> "#{lang.account} #{store.current.account-index}"
@@ -318,6 +327,8 @@ module.exports = (store, web3t)->
                             .col.folder-menu.pug
                                 .pug #{store.dashboard.epoch}
                                 span.pug #{lang.current-epoch}
+                            .col.folder-many.pug
+                                span.pug WARM UP - #{(store.dashboard.warmup ? "...")}
                             .col.folder-menu.pug
                                 .pug
                                     progress.pug(value="#{store.dashboard.epoch-percent}" max="100")
