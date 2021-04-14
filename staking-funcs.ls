@@ -37,7 +37,6 @@ fill-pools = ({ store, web3t, on-progress, on-finish }, [item, ...rest]) ->
     item.address = item.key
     item.stake = item.stake
     item.stake-initial = item.activatedStake
-    item.status = "Not delegated"
     item.status = status
     item.commission = item.commission
     item.credits_observed =
@@ -107,7 +106,7 @@ fill-accounts = ({ store, web3t, on-progress, on-finish }, [item, ...rest]) ->
     item.balanceRaw = if rent? then (item.account.lamports `minus` rent) else '-'
     item.balance = if rent? then (Math.round((item.account.lamports `minus` rent) `div` (10^9)) `times` 100) `div` 100  else "-"
     item.rent    = if rent? then (rent `div` (10^9)) else "-"
-    item.status  = "Not delegated"
+    item.status  = "inactive"
     item.validator = null
     item.account = item.account
     if (item.account?data?parsed?info?stake) then
@@ -141,7 +140,7 @@ convert-accounts-to-view-model = (accounts) ->
             lastVote: it.lastVote ? '..'
             seed: it.seed ? '..'
             validator:  it?validator ? ""
-            status: it.status ? "Not delegated"
+            status: it.status ? "inactive"
             active_stake = it?active_stake ? 0
             inactive_stake = it?inactive_stake ? 0
         }
