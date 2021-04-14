@@ -34,6 +34,15 @@ class VelasStaking {
         this.secretKey = secretKey;
     }
 
+    async getCurrentEpochInfo() {
+        const info = await this.connection.getEpochInfo();
+        return info;
+    }
+
+    async getEpochSchedule() {
+        return await this.connection.getEpochSchedule();
+    }
+
     async getStakeActivation(address) {
         console.log("getStakeActivation");
         try {
@@ -41,9 +50,8 @@ class VelasStaking {
             const activation = await this.connection.getStakeActivation(publicKey);
 
 
-            activation.state    =  activation.state.charAt(0).toUpperCase() + activation.state.slice(1);
-            activation.state    =  activation.state === "Inactive" ? "Not delegated" : activation.state;
-            activation.state    =  activation.state === "Active"   ? "Delegated"     : activation.state;
+            //activation.state    =  activation.state === "Inactive" ? "Not delegated" : activation.state;
+            //activation.state    =  activation.state === "Active"   ? "Delegated"     : activation.state;
 
             activation.active   = activation.active;
             activation.inactive = activation.inactive;
@@ -242,7 +250,7 @@ class VelasStaking {
             accounts[i].key     = accounts[i].address;
             accounts[i].balance = rent ? `${(Math.round((accounts[i].account.lamports - rent) / this.sol) * 100) / 100 } VLX` : `-`;
             accounts[i].rent    = rent ? `${ Math.round((rent / this.sol) * 100) / 100 } VLX` : `-`;
-            accounts[i].status  = `Not delegated`;
+            accounts[i].status  = `inactive`;
             accounts[i].validator = `-`;
 
             if ((ref$ = accounts[i].account) != null && ((ref1$ = ref$.data) != null && ((ref2$ = ref1$.parsed) != null && ((ref3$ = ref2$.info) != null && ref3$.stake)))) {
