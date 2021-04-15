@@ -635,9 +635,7 @@ staking-content = (store, web3t)->
         #
         pay-account = store.staking.accounts |> find (-> it.address is account.address)
         return cb null if not pay-account
-        console.log ""
         err, result <- as-callback web3t.velas.NativeStaking.delegate(pay-account.address, pool.address)
-        console.log "result" result
         console.error "Result sending:" err if err?
         alert store, err.toString! if err?
         <- notify store, "FUNDS DELEGATED"
