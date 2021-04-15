@@ -226,9 +226,9 @@ staking-accounts-content = (store, web3t)->
         min_stake = web3t.velas.NativeStaking.min_stake
         main_balance = get-balance!
         return alert store, "Balance is not enough to create staking account (#{min_stake} VLX)" if +min_stake > +main_balance
-        return alert store, "Minimal stake must be #{(min_stake + 1)} VLX" if +min_stake  > +(amount + 1)
-        return alert store, "Balance is not enough to spend #{(amount + 1)} VLX" if +main_balance < +amount
-        amount = (amount `plus` 1) * 10^9
+        return alert store, "Minimal stake must be #{(min_stake)} VLX" if +min_stake  > +(amount)
+        return alert store, "Balance is not enough to spend #{(amount)} VLX" if +main_balance < +amount
+        amount = amount * 10^9
         err, result <- as-callback web3t.velas.NativeStaking.createAccount(amount)
         console.error "Result sending:" err if err?
         return alert store, err.toString! if err?
