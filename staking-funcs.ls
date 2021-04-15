@@ -86,16 +86,16 @@ query-accounts-web3t = (store, web3t, on-progress, on-finish) ->
     accs = [] if err?  
     console.log "accs" accs 
     return on-finish err if err?
-    store.staking.pools-are-loading = yes
+    store.staking.accounts-are-loading = yes
     fill-accounts { store, web3t, on-progress, on-finish }, accs
 fill-accounts = ({ store, web3t, on-progress, on-finish }, [item, ...rest]) ->
     if not item? then
-        store.staking.all-pools-loaded = yes
-        store.staking.pools-are-loading = no
+        store.staking.all-accounts-loaded = yes
+        store.staking.accounts-are-loading = no
         return on-finish null, []
     if (([\validators, \info, \account_details, \pool_details].index-of(store.current.page)) is -1) then
-        store.staking.all-pools-loaded = no
-        store.staking.pools-are-loading = no
+        store.staking.all-accounts-loaded = no
+        store.staking.accounts-are-loading = no
         return on-finish null, []
     rent = item.account?data?parsed?info?meta?rentExemptReserve
     err, seed <- as-callback web3t.velas.NativeStaking.checkSeed(item.pubkey.toBase58())
