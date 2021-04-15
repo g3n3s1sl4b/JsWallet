@@ -48,6 +48,8 @@ require! {
     box-sizing: border-box
     padding: 0px
     background: transparent
+    .buttons
+        display: flex
     .usd-amount
         opacity: 0.65
         font-size: 10px
@@ -773,7 +775,8 @@ staking-content = (store, web3t)->
         background: style.app.stats
     stats=
         background: style.app.stats
-    has-validator = store.staking.chosenAccount.validator isnt ""
+    has-validator = store.staking.chosenAccount.validator.toString!.trim! isnt ""
+    console.log "this account has #{(if has-validator then "" else "not")} validator!"
     validator = store.staking.pools |> find (-> it.address is store.staking.chosenAccount.validator)
     credits_observed = ( validator?credits_observed ? 0)
     active_stake = store.staking.chosenAccount.active_stake `div` (10^9)
@@ -877,11 +880,12 @@ staking-content = (store, web3t)->
                 .description.pug
                     .pug.buttons
                         if not has-validator
-                            button { store, on-click: delegate , type: \secondary , text: "Delegate" icon : \arrowRight }
-                            button { store, on-click: withdraw , type: \secondary , text: "Withdraw" icon : \arrowLeft }
+                            .pug
+                                button { store, on-click: delegate , type: \secondary , text: "Delegate" icon : \arrowRight }
+                                button { store, on-click: withdraw , type: \secondary , text: "Withdraw" icon : \arrowLeft }
                         else
                             button { store, on-click: undelegate , type: \secondary , text: "Undelegate" icon : \arrowLeft, classes: "action-undelegate" }
-                        button { store, on-click: split-account , type: \secondary , text: "Split" icon : \arrowLeft, classes: "action-split" }
+                        button { store, on-click: split-account , type: \secondary , text: "Split", classes: "action-split", no-icon: yes }
 account-details = ({ store, web3t })->
     lang = get-lang store
     { go-back } = history-funcs store, web3t
