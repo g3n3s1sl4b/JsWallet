@@ -136,7 +136,6 @@ staking-accounts-content = (store, web3t)->
         null
     build = (store, web3t)-> (item)->
         return null if not item? or not item.key?
-        console.log "acc item" item
         { account, address, balance, key, rent, seed, status, validator } = item
         index = store.staking.accounts.index-of(item) + 1
         $status =
