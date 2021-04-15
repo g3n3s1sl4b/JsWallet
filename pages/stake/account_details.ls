@@ -883,7 +883,7 @@ staking-content = (store, web3t)->
                             .pug
                                 button { store, on-click: delegate , type: \secondary , text: "Delegate" icon : \arrowRight }
                                 button { store, on-click: withdraw , type: \secondary , text: "Withdraw" icon : \arrowLeft }
-                        else
+                        else if store.staking.chosenAccount.status isnt \deactivating then
                             button { store, on-click: undelegate , type: \secondary , text: "Undelegate" icon : \arrowLeft, classes: "action-undelegate" }
                         button { store, on-click: split-account , type: \secondary , text: "Split", classes: "action-split", no-icon: yes }
 account-details = ({ store, web3t })->
