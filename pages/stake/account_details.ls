@@ -27,7 +27,7 @@ require! {
     \../../icons.ls
     \../placeholder.ls
     \../epoch.ls
-    \../confirmation.ls : { alert, notify, confirm }
+    \../confirmation.ls : { alert, notify, confirm, prompt }
     \../../components/button.ls
     \../../components/address-holder.ls
     \../alert-txn.ls
@@ -736,6 +736,34 @@ staking-content = (store, web3t)->
         return alert store, err.toString! if err?
         <- notify store, "FUNDS UNDELEGATED"
         navigate store, web3t, \validators
+    split-account = ->
+        cb = console.log 
+        /* Get next account seed */
+        err, seed <- as-callback web3t.velas.NativeStaking.getNextSeed()
+        return alert store, err.toString! if err?
+        console.log "next seed" seed
+        /*                      */
+        amount <- prompt store, "How much would you like to split?"
+        return if amount+"".trim!.length is 0
+        min_stake = web3t.velas.NativeStaking.min_stake
+        balance = store.staking.chosenAccount.balanceRaw
+        return alert store, "Balance is not enough to create staking account (#{(min_stake `plus` 0.00228288)} VLX)" if +(min_stake `times` 2 ) > +balance
+        return alert store, "Minimal stake must be #{min_stake} VLX" if +(min_stake) > +amount
+        #return alert store, "Balance is not enough to spend #{amount} VLX" if +main_balance < +amount
+        amount = amount * 10^9
+        /* Create new account */
+        fromPubkey$ = store.staking.chosenAccount.address
+        err, splitStakePubkey <- as-callback web3t.velas.NativeStaking.createNewStakeAccountWithSeed()
+        console.error "Result sending:" err if err?
+        return alert store, err.toString! if err?
+        /*                      */
+        /* Split account */
+        stakeAccount = store.staking.chosenAccount.address
+        err, result <- as-callback web3t.velas.NativeStaking.splitStakeAccount(stakeAccount, splitStakePubkey, amount)
+        console.error "Result sending:" err if err?
+        return alert store, err.toString! if err?
+        <- notify store, "ACCOUNT CREATED AND FUNDS SPLITED"
+        navigate store, web3t, "validators"
     icon-style =
         color: style.app.loader
         margin-top: "10px"
@@ -853,7 +881,7 @@ staking-content = (store, web3t)->
                             button { store, on-click: withdraw , type: \secondary , text: "Withdraw" icon : \arrowLeft }
                         else
                             button { store, on-click: undelegate , type: \secondary , text: "Undelegate" icon : \arrowLeft, classes: "action-undelegate" }
-                        button { store, on-click: delegate , type: \secondary , text: "Split" icon : \arrowLeft, classes: "action-split" }
+                        button { store, on-click: split-account , type: \secondary , text: "Split" icon : \arrowLeft, classes: "action-split" }
 account-details = ({ store, web3t })->
     lang = get-lang store
     { go-back } = history-funcs store, web3t
