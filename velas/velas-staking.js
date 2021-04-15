@@ -18,7 +18,7 @@ class VelasStaking {
         this.connection    = new Connection(options.NODE_HOST, 'singleGossip');
         this.authorization = {}
         this.sol           = 1000000000;
-        this.min_stake     = 10000;
+        this.min_stake     = 1;
         this.max_epoch     = '18446744073709551615';
         this.secretKey     = options.secretKey;
         this.accounts   = [];
