@@ -6,7 +6,7 @@ require! {
     \../../get-primary-info.ls
     \../../get-lang.ls
     \../../history-funcs.ls
-    \../../stake-funcs.ls : { query-accounts }
+    \../../staking-funcs.ls : { query-accounts, convert-accounts-to-view-model }
     \../icon.ls
     \prelude-ls : { map, split, filter, find, foldl, sort-by, unique, head, each }
     \../../math.ls : { div, times, plus, minus }
@@ -134,6 +134,22 @@ staking-accounts-content = (store, web3t)->
     vlx-token = "VLX"
     hide-stake-place = ->
         null
+    isSpinned = if ((store.staking.all-accounts-loaded is no or !store.staking.all-accounts-loaded?) and store.staking.accounts-are-loading is yes) then "spin disabled" else ""
+    refresh = ->
+        store.staking.all-accounts-loaded = no 
+        if ((store.staking.all-accounts-loaded is no or !store.staking.all-accounts-loaded?) and store.staking.accounts-are-loading is yes)
+            return no
+        store.staking.accounts-are-loading = yes
+        cb = console.log
+        store.staking.accounts = []
+        err, parsedProgramAccounts <- as-callback web3t.velas.NativeStaking.getParsedProgramAccounts()
+        parsedProgramAccounts = [] if err?
+        store.staking.parsedProgramAccounts = parsedProgramAccounts
+        on-progress = ->
+            store.staking.accounts = convert-accounts-to-view-model [...it]
+        err, result <- query-accounts store, web3t, on-progress
+        return cb err if err?
+        store.staking.accounts = convert-accounts-to-view-model result
     build = (store, web3t)-> (item)->
         return null if not item? or not item.key?
         { account, address, balance, key, rent, seed, status, validator } = item
@@ -194,13 +210,6 @@ staking-accounts-content = (store, web3t)->
     cancel = ->
         store.staking-accounts.chosen-lockup = null
         store.staking-accounts.add.add-validator-stake = 0
-    refresh = ->
-        store.staking.all-pools-loaded = no
-        if ((store.staking.all-pools-loaded is no or !store.staking.all-pools-loaded?) and store.staking.pools-are-loading is yes)
-            return no
-        store.staking.pools-are-loading = yes
-        cb = console.log
-        cb null, \done
     icon-style =
         color: style.app.loader
         margin-top: "10px"
@@ -238,6 +247,9 @@ staking-accounts-content = (store, web3t)->
                 .pug.section
                     .title.pug
                         h3.pug Your staking accounts
+                        .pug
+                            .loader.pug(on-click=refresh style=icon-style title="refresh" class="#{isSpinned}")
+                                icon \Sync, 25
                     .description.pug.table-scroll.lockup(on-mouse-leave=hide-stake-place)
                         table.pug
                             thead.pug
