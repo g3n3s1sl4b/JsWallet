@@ -1,5 +1,5 @@
 const velasSolanaWeb3 = require("../../web3t/providers/solana/index.cjs");
-let PublicKey, Connection, StakeProgram, Authorized, Lockup;
+let PublicKey, Connection, StakeProgram, Authorized, Lockup, STAKE_INSTRUCTION_LAYOUTS, TransactionInstruction;
 PublicKey = velasSolanaWeb3.PublicKey;
 Connection = velasSolanaWeb3.Connection;
 StakeProgram = velasSolanaWeb3.StakeProgram;
@@ -8,6 +8,8 @@ Lockup = velasSolanaWeb3.Lockup;
 SystemProgram = velasSolanaWeb3.SystemProgram;
 Transaction = velasSolanaWeb3.Transaction;
 Account = velasSolanaWeb3.Account;
+STAKE_INSTRUCTION_LAYOUTS = velasSolanaWeb3.STAKE_INSTRUCTION_LAYOUTS;
+TransactionInstruction = velasSolanaWeb3.TransactionInstruction;
 
 class VelasStaking {
 
@@ -61,11 +63,37 @@ class VelasStaking {
             return undefined;
         };
     };
+    
+    async splitStakeAccount(stakeAccount, splitStakePubkey, lamports){
+        let transaction = new Transaction();
+        const authorizedPubkey = this.getAccountPublicKey();
+        const stakePubkey = new PublicKey(stakeAccount);
+        const rent       = await this.connection.getMinimumBalanceForRentExemption(200);
+        let seed = await this.getNextSeed();
+        const params = {
+            stakePubkey,
+            authorizedPubkey,
+            splitStakePubkey,
+            lamports: lamports + rent,
+            seed,
+            base: authorizedPubkey
+        };
+        
+        console.log("[splitStakeAccount] params", params);
+        try {
+            transaction.add(StakeProgram.split(params));
+        } catch (e) {
+            return {
+                error: "split_stake_account_error",
+                description: e.message,
+            };    
+        }
+        console.log("split transaction", transaction) ;
+        return this.sendTransaction(transaction);
+    }
 
     async getStakingValidators() {
-        console.log("[getStakingValidators]")
         const voteAccounts = await this.connection.getVoteAccounts();
-        console.log("vote accoutns",voteAccounts)
 
         const validators = voteAccounts.current.concat(voteAccounts.delinquent);
 
@@ -79,18 +107,18 @@ class VelasStaking {
 
     async withdraw(account, amount = 10000002282880) {
 
-        let transaction;
+        const transaction = new Transaction();
 
         try {
             const authorizedPubkey = this.getAccountPublicKey();
             const stakePubkey = new PublicKey(account);
 
-            transaction = StakeProgram.withdraw({
+            transaction.add(StakeProgram.withdraw({
                 authorizedPubkey,
                 stakePubkey,
                 lamports: amount,
                 toPubkey: authorizedPubkey,
-            });
+            }));
         } catch(e) {
             return {
                 error: "prepare_transaction_error",
@@ -103,16 +131,16 @@ class VelasStaking {
 
     async undelegate(account) {
 
-        let transaction;
+        const transaction = new Transaction();
 
         try {
             const authorizedPubkey = this.getAccountPublicKey();
             const stakePubkey      = new PublicKey(account);
 
-            transaction = StakeProgram.deactivate({
+            transaction.add(StakeProgram.deactivate({
                 authorizedPubkey,
                 stakePubkey,
-            });
+            }));
         } catch(e) {
             return {
                 error: "prepare_transaction_error",
@@ -125,18 +153,18 @@ class VelasStaking {
 
     async delegate(account, validator) {
 
-        let transaction;
+        const transaction = new Transaction();
 
         try {
             const authorizedPubkey = this.getAccountPublicKey();
             const stakePubkey = new PublicKey(account);
             const votePubkey = new PublicKey(validator);
 
-            transaction = StakeProgram.delegate({
+            transaction.add(StakeProgram.delegate({
                 authorizedPubkey,
                 stakePubkey,
                 votePubkey,
-            });
+            }));
         } catch(e) {
             return {
                 error: "prepare_transaction_error",
@@ -162,12 +190,35 @@ class VelasStaking {
             };
         };
     };
+    
+    async createNewStakeAccountWithSeed(){
+
+        let stakeAccountWithSeed;
+
+        try {
+            const seed       = await this.getNextSeed();
+
+            stakeAccountWithSeed = await PublicKey.createWithSeed(
+                this.getAccountPublicKey(),
+                seed,
+                StakeProgram.programId,
+            );
+
+        } catch(e) {
+            return {
+                error: "prepare_transaction_error",
+                description: e.message,
+            };
+        };
+
+        return stakeAccountWithSeed;   
+    }
 
     async createAccount(amount_sol = (this.min_stake * this.sol)) {
 
         // check balance and amount
 
-        let transaction;
+        const transaction = new Transaction();
 
         try {
             const rent       = await this.connection.getMinimumBalanceForRentExemption(200);
@@ -183,8 +234,8 @@ class VelasStaking {
             );
 
             const lockup = new Lockup(0,0, fromPubkey);
-
-            transaction = StakeProgram.createAccountWithSeed({
+            
+            const config = {
                 authorized,
                 basePubkey: fromPubkey,
                 fromPubkey,
@@ -192,8 +243,9 @@ class VelasStaking {
                 lockup,
                 seed,
                 stakePubkey: stakeAccountWithSeed,
-            });
-            console.log("transaction", transaction);
+            };
+
+            transaction.add(StakeProgram.createAccountWithSeed(config));
         } catch(e) {
             return {
                 error: "prepare_transaction_error",
@@ -227,6 +279,27 @@ class VelasStaking {
             return false;
         });
         return accounts;
+    }
+
+    async getStakingAccountBySeed(seed) {
+        var  ref$, ref1$, ref2$, ref3$, ref4$, ref5$;
+        let owner = this.getAccountPublicKey();
+        let accounts = await this.getParsedProgramAccounts();
+        accounts = accounts.filter(item => {
+            if (deepEq$(typeof item != 'undefined' && item !== null ? (ref$ = item.account) != null ? (ref1$ = ref$.data) != null ? (ref2$ = ref1$.parsed) != null ? (ref3$ = ref2$.info) != null ? (ref4$ = ref3$.meta) != null ? (ref5$ = ref4$.authorized) != null ? ref5$.staker : void 8 : void 8 : void 8 : void 8 : void 8 : void 8 : void 8, owner.toBase58(), '===')) {
+                return true;
+            }
+            return false;
+        });
+        for (var i in accounts) {
+            accounts[i].seed    = await this.checkSeed(accounts[i].pubkey.toBase58());
+            accounts[i].address = accounts[i].pubkey.toBase58();
+            accounts[i].key     = accounts[i].address;
+            if(accounts[i].seed === "stake:"+seed){
+                return accounts[i]
+            }
+        }
+        return null;
     }
 
     async getStakingAccounts(accounts) {
@@ -346,12 +419,10 @@ class VelasStaking {
                 description: e.message,
             };
         };
-        let signature;
        
-        let tx = new Transaction({recentBlockhash: transaction.recentBlockhash}).add(transaction);
         const payAccount = new Account(this.secretKey);
         let result = await this.connection.sendTransaction(
-            tx,
+            transaction,
             [payAccount]
         );
         console.log("result !", result);
