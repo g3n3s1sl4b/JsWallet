@@ -133,10 +133,10 @@ module.exports = ({ store, wallet, type, on-click, item })->
     address = get-address(wallet, address-suffix)
     is-contract = contracts.is-contract(store, address)
     .address-holder.pug
-        identicon { store, address: address-title }
-        span.pug.inner-address-holder(style=input on-click=show-details)
+        identicon { store, address: address-title, on-click=show-details }
+        span.pug.inner-address-holder(style=input)
             a.browse.pug(target="_blank" href="#{address-link}")
                 img.pug(src="#{icons.browse-open}" style=icon1)
-            MiddleEllipsis.pug(key=address-title)
-                a.pug(target="_blank"  class="#{active}") #{address-display}
+            MiddleEllipsis.pug(key=address-title on-click=show-details)
+                a.pug(target="_blank"  class="#{active}" on-click=show-details) #{address-display}
         copy { store, text: address-title }
