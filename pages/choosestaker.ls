@@ -688,15 +688,31 @@ staking-content = (store, web3t)->
             td.pug #{item.stakers}
     cancel-pool = ->
         store.staking.chosen-pool = null
+    update-just-pools = (cb)->
+        return cb null if store.staking.accounts.length is 0
+        on-progress = ->
+            store.staking.pools = convert-pools-to-view-model [...it]
+        err, pools <- query-pools store, web3t, on-progress
+        return cb err if err?
+        #store.staking.pools = convert-pools-to-view-model pools
+    update-pools-and-accounts = (cb)->
+        return if store.staking.accounts.length > 0
+        store.staking.all-accounts-loaded = no
+        store.staking.accounts-are-loading = yes
+        store.staking.accounts = []
+        err <- validators.init { store, web3t }
+        return cb err if err?
+        cb null
     refresh = ->
         store.staking.all-pools-loaded = no
         if ((store.staking.all-pools-loaded is no or !store.staking.all-pools-loaded?) and store.staking.pools-are-loading is yes)
             return no
         store.staking.pools-are-loading = yes
         cb = console.log
-        #store.staking.accountIndex = "non-exists"
-        err <- staking.init { store, web3t }
-        return cb err if err?
+        store.staking.pools = []
+        store.staking.delegators = {}
+        <- update-just-pools!
+        <- update-pools-and-accounts!    
         cb null, \done
     icon-style =
         color: style.app.loader
@@ -797,6 +813,8 @@ validators.init = ({ store, web3t }, cb)!->
     store.staking.reward = null
     store.staking.all-pools-loaded = no
     store.staking.pools-are-loading = yes
+    store.staking.all-accounts-loaded = no
+    store.staking.accounts-are-loading = yes
     store.staking.chosen-pool = null
     store.staking.add.add-validator-stake = 0
     index-is-different = store.current.accountIndex isnt store.staking.accountIndex
