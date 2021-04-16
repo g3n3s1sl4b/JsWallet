@@ -6,7 +6,7 @@ require! {
     \../../get-primary-info.ls
     \../../get-lang.ls
     \../../history-funcs.ls
-    \../../staking-funcs.ls : { query-accounts, convert-accounts-to-view-model }
+    \../../staking-funcs.ls : { query-pools, query-accounts, convert-pools-to-view-model, convert-accounts-to-view-model }
     \../icon.ls
     \prelude-ls : { map, split, filter, find, foldl, sort-by, unique, head, each }
     \../../math.ls : { div, times, plus, minus }
@@ -104,20 +104,7 @@ staking-accounts-content = (store, web3t)->
         store.staking-accounts.add.add-validator-stake = Math.max (balance `minus` 0.1), 0
     isSpinned = if ((store.staking.all-accounts-loaded is no or !store.staking.all-accounts-loaded?) and store.staking.accounts-are-loading is yes) then "spin disabled" else ""
     refresh = ->
-        store.staking.all-accounts-loaded = no 
-        if ((store.staking.all-accounts-loaded is no or !store.staking.all-accounts-loaded?) and store.staking.accounts-are-loading is yes)
-            return no
-        store.staking.accounts-are-loading = yes
-        cb = console.log
-        store.staking.accounts = []
-        err, parsedProgramAccounts <- as-callback web3t.velas.NativeStaking.getParsedProgramAccounts()
-        parsedProgramAccounts = [] if err?
-        store.staking.parsedProgramAccounts = parsedProgramAccounts
-        on-progress = ->
-            store.staking.accounts = convert-accounts-to-view-model [...it]
-        err, result <- query-accounts store, web3t, on-progress
-        return cb err if err?
-        store.staking.accounts = convert-accounts-to-view-model result
+        navigate store, web3t, "validators"
     build = (store, web3t)-> (item)->
         return null if not item? or not item.key?
         { account, address, balance, key, rent, seed, status, validator } = item
