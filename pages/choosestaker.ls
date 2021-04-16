@@ -241,6 +241,7 @@ require! {
                             &.with-stake
                                 filter: saturate(6.5)
                         tr
+                            animation: appear .1s ease-in
                             &.activating, &.active
                                 color: var(--color-td)
                             &.inactive
