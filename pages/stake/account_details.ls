@@ -717,40 +717,38 @@ staking-content = (store, web3t)->
         return cb err if err?
         cb null, \done
     withdraw = ->
-        agree <- confirm store, "Are you sure you would to withdraw?"
+        agree <- confirm store, lang.areYouSureToWithdraw
         return if agree is no
         { balanceRaw, rent, address, account } = store.staking.chosenAccount
         amount = account.lamports `plus` rent
-        console.log "Try to withdraw #{amount} VLX"
         err, result <- as-callback web3t.velas.NativeStaking.withdraw(address, amount)
         console.error "Undelegate error: " err if err?
         return alert store, err.toString! if err?
-        <- notify store, "FUNDS WITHDRAWED!"
+        <- notify store, lang.fundsWithdrawn
         navigate store, web3t, \validators
     delegate = ->
         navigate store, web3t, \poolchoosing
     undelegate = ->
-        agree <- confirm store, "Are you sure you would to undelegate?"
+        agree <- confirm store, lang.areYouSureToUndelegate
         return if agree is no
         #
         err, result <- as-callback web3t.velas.NativeStaking.undelegate(store.staking.chosenAccount.address)
         console.error "Undelegate error: " err if err?
         return alert store, err.toString! if err?
-        <- notify store, "FUNDS UNDELEGATED"
+        <- notify store, lang.fundsUndelegated
         navigate store, web3t, \validators
     split-account = ->
         cb = console.log 
         /* Get next account seed */
         err, seed <- as-callback web3t.velas.NativeStaking.getNextSeed()
         return alert store, err.toString! if err?
-        console.log "next seed" seed
-        /*                      */
-        amount <- prompt store, "How much would you like to split?"
+        /**/
+        amount <- prompt store, lang.howMuchToSplit
         return if amount+"".trim!.length is 0
         min_stake = web3t.velas.NativeStaking.min_stake
         balance = store.staking.chosenAccount.balanceRaw
-        return alert store, "Balance is not enough to create staking account (#{(min_stake `plus` 0.00228288)} VLX)" if +(min_stake) > +balance
-        return alert store, "Minimal stake must be #{min_stake} VLX" if +(min_stake) > +amount
+        return alert store, lang.balanceIsNotEnoughToCreateStakingAccount + " (#{(min_stake `plus` 0.00228288)} VLX)" if +(min_stake) > +balance
+        return alert store, lang.minimalStakeMustBe + " #{min_stake} VLX" if +(min_stake) > +amount
         #return alert store, "Balance is not enough to spend #{amount} VLX" if +main_balance < +amount
         amount = amount * 10^9
         /* Create new account */
@@ -758,13 +756,13 @@ staking-content = (store, web3t)->
         err, splitStakePubkey <- as-callback web3t.velas.NativeStaking.createNewStakeAccountWithSeed()
         console.error "Result sending:" err if err?
         return alert store, err.toString! if err?
-        /*                      */
+        /**/
         /* Split account */
         stakeAccount = store.staking.chosenAccount.address
         err, result <- as-callback web3t.velas.NativeStaking.splitStakeAccount(stakeAccount, splitStakePubkey, amount)
         console.error "Result sending:" err if err?
         return alert store, err.toString! if err?
-        <- notify store, "ACCOUNT CREATED AND FUNDS SPLITED"
+        <- notify store, lang.accountCreatedAndFundsSplitted
         navigate store, web3t, "validators"
     icon-style =
         color: style.app.loader
@@ -776,7 +774,6 @@ staking-content = (store, web3t)->
     stats=
         background: style.app.stats
     has-validator = store.staking.chosenAccount.validator.toString!.trim! isnt ""
-    console.log "this account has #{(if has-validator then "" else "not")} validator!"
     validator = store.staking.pools |> find (-> it.address is store.staking.chosenAccount.validator)
     credits_observed = ( validator?credits_observed ? 0)
     active_stake = store.staking.chosenAccount.active_stake `div` (10^9)
@@ -793,10 +790,10 @@ staking-content = (store, web3t)->
         .pug.single-section.form-group(id="choosen-pull")
             .pug.section
                 .title.pug
-                    h2.pug Stake Account
+                    h2.pug #{lang.stakeAccount}
             .pug.section
                 .title.pug
-                    h3.pug Address
+                    h3.pug #{lang.address}
                 .description.pug
                     .pug.chosen-account(title="#{store.staking.chosenAccount.address}")
                         span.pug
@@ -804,13 +801,13 @@ staking-content = (store, web3t)->
                             img.pug.check(src="#{icons.img-check}")
             .pug.section
                 .title.pug
-                    h3.pug Seed
+                    h3.pug #{lang.seed}
                 .description.pug
                     span.pug(style=seed-style)
                         | #{store.staking.chosenAccount.seed}
             .pug.section
                 .title.pug
-                    h3.pug Rent exempt reserve
+                    h3.pug #{lang.rentExemptReserve}
                 .description.pug
                     span.pug
                         | #{store.staking.chosenAccount.rent} VLX
@@ -818,7 +815,7 @@ staking-content = (store, web3t)->
                         | $#{usd-rent}
             .pug.section
                 .title.pug
-                    h3.pug Balance
+                    h3.pug #{lang.balance}
                 .description.pug
                     span.pug
                         | #{store.staking.chosenAccount.balance} VLX
@@ -828,17 +825,17 @@ staking-content = (store, web3t)->
             .pug
             .pug.section
                 .title.pug
-                    h2.pug Stake Delegation
+                    h2.pug #{lang.stakeDelegation}
             .pug.section
                 .title.pug
-                    h3.pug Status
+                    h3.pug #{lang.status}
                 .description.pug
                     .pug.chosen-account(title="#{store.staking.chosenAccount.status}")
                         span.pug
                             | #{store.staking.chosenAccount.status}
             .pug.section
                 .title.pug
-                    h3.pug Validator
+                    h3.pug #{lang.validator}
                 .description.pug
                     span.pug.chosen-account
                         | #{validator}
@@ -846,13 +843,13 @@ staking-content = (store, web3t)->
                             img.pug.check(src="#{icons.img-check}")
             .pug.section
                 .title.pug
-                    h3.pug Credits observed
+                    h3.pug #{lang.creditsObserved}
                 .description.pug
                     span.pug
                         | #{credits_observed}
             .pug.section
                 .title.pug
-                    h3.pug Active stake
+                    h3.pug #{lang.activeStake}
                 .description.pug
                     span.pug
                         | #{round-human(active_stake)} VLX
@@ -860,7 +857,7 @@ staking-content = (store, web3t)->
                         | $#{usd-active_stake}
             .pug.section
                 .title.pug
-                    h3.pug Inactive stake
+                    h3.pug #{lang.inactiveStake}
                 .description.pug
                     span.pug
                         | #{round-human(inactive_stake)} VLX
@@ -868,7 +865,7 @@ staking-content = (store, web3t)->
                         | $#{usd-inactive_stake}
             .pug.section
                 .title.pug
-                    h3.pug Delegated Stake
+                    h3.pug #{lang.delegatedStake}
                 .description.pug
                     span.pug
                         | #{round-human(delegated_stake)} VLX
@@ -881,11 +878,11 @@ staking-content = (store, web3t)->
                     .pug.buttons
                         if not has-validator
                             .pug
-                                button { store, on-click: delegate , type: \secondary , text: "Delegate" icon : \arrowRight }
-                                button { store, on-click: withdraw , type: \secondary , text: "Withdraw" icon : \arrowLeft }
+                                button { store, on-click: delegate , type: \secondary , text: lang.to_delegate, icon : \arrowRight }
+                                button { store, on-click: withdraw , type: \secondary , text: lang.withdraw, icon : \arrowLeft }
                         else if store.staking.chosenAccount.status isnt \deactivating then
-                            button { store, on-click: undelegate , type: \secondary , text: "Undelegate" icon : \arrowLeft, classes: "action-undelegate" }
-                        button { store, on-click: split-account , type: \secondary , text: "Split", classes: "action-split", no-icon: yes }
+                            button { store, on-click: undelegate , type: \secondary , text: lang.to_undelegate, icon : \arrowLeft, classes: "action-undelegate" }
+                        button { store, on-click: split-account , type: \secondary , text: lang.to_split, classes: "action-split", no-icon: yes }
 account-details = ({ store, web3t })->
     lang = get-lang store
     { go-back } = history-funcs store, web3t

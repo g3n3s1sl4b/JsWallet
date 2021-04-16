@@ -31,7 +31,7 @@ require! {
     \./epoch.ls
     \./confirmation.ls : { alert, notify }
     \../components/button.ls
-    \../components/address-holder.ls
+    \../components/address-holder-popup.ls
     \./alert-txn.ls
     \../components/amount-field.ls
     \./move-stake.ls
@@ -779,7 +779,7 @@ staking-content = (store, web3t)->
             td.pug
                 span.pug.circle(class="#{item.status}") #{index}
             td.pug(datacolumn='Staker Address' title="#{item.address}")
-                address-holder { store, wallet }
+                address-holder-popup { store, wallet }
             td.pug #{stake}
             td.pug(class="#{mystake-class}")
                 my-stake |> map build-my-stake
@@ -823,7 +823,7 @@ staking-content = (store, web3t)->
                 alert-txn { store }
                 .pug.section
                     .title.pug
-                        h3.pug Please select a validator
+                        h3.pug #{lang.pleaseSelectValidator}
                         .pug
                             .loader.pug(on-click=refresh style=icon-style title="refresh" class="#{isSpinned}")
                                 icon \Sync, 25
@@ -832,23 +832,23 @@ staking-content = (store, web3t)->
                             thead.pug
                                 tr.pug
                                     td.pug(width="3%" style=stats) #
-                                    td.pug(width="10%" style=staker-pool-style) Validator
+                                    td.pug(width="10%" style=staker-pool-style)  #{lang.validator}
                                     td.pug(width="25%" style=stats) #{lang.total-stake}
                                     td.pug(width="25%" style=stats) #{lang.my-stake}
                                     td.pug(width="5%" style=stats) #{lang.stakers}
-                                    td.pug(width="4%" style=stats) Select
+                                    td.pug(width="4%" style=stats) #{lang.select}
                             tbody.pug
                                 store.staking.pools |> map build-staker store, web3t
         if store.staking.chosen-pool?
             .pug.single-section.form-group(id="choosen-pull")
                 .pug.section
                     .title.pug
-                        h3.pug #{lang.validator}
+                        h3.pug #{lang.becomeStaker}
                     .description.pug
                         .pug.left.float-left
-                            span.pug Delgate
+                            span.pug #{lang.to_delegate}
                             span.pug.color #{your-balance} VLX
-                            span.pug to
+                            span.pug #{lang.delegate_to}
                             .pug.chosen-pool(title="#{store.staking.chosen-pool.address}")
                                 span.pug
                                     | #{store.staking.chosen-pool.address}

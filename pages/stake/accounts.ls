@@ -76,25 +76,6 @@ staking-accounts-content = (store, web3t)->
         background-color: style.app.primary3-spare
     { go-back } = history-funcs store, web3t
     lang = get-lang store
-    pairs = store.staking.keystore
-    activate = (step)->
-        store.staking.accounts.stake.step = step
-    withdraw = ->
-        console.log "withdraw!"
-    topup-the-contract = ->
-        console.log "topup-the-contract!"
-    stake-to-contract = ->
-        console.log "stake-to-contract!"
-    change-address = ->
-        store.staking.add.add-validator = it.target.value
-    change-withdraw = ->
-        store.staking.withdrawAmount = it.target.value
-    change-stake = !->
-        try
-            value = new bignumber(it.target.value).toFixed!.to-string!
-            store.staking.add.add-validator-stake = value
-        catch err
-            console.log "[Change-stake]: #{err}"
     get-balance = ->
         wallet =
             store.current.account.wallets
@@ -121,19 +102,6 @@ staking-accounts-content = (store, web3t)->
         #return alert store, err, cb if err?
         balance = store.staking-accounts.chosen-lockup.locked-funds-raw `div` (10^18)
         store.staking-accounts.add.add-validator-stake = Math.max (balance `minus` 0.1), 0
-    vote-for-change = ->
-        err, can <- web3t.velas.ValidatorSet.emitInitiateChangeCallable
-        return alert store, err, cb if err?
-        return alert store, lang.actionProhibited, cb if can isnt yes
-        data = web3t.velas.ValidatorSet.emitInitiateChange.get-data!
-        #console.log { data }
-        to = web3t.velas.ValidatorSet.address
-        amount = 0
-        err <- web3t.vlx2.send-transaction { to, data, amount }
-        store.current.page = \staking
-    vlx-token = "VLX"
-    hide-stake-place = ->
-        null
     isSpinned = if ((store.staking.all-accounts-loaded is no or !store.staking.all-accounts-loaded?) and store.staking.accounts-are-loading is yes) then "spin disabled" else ""
     refresh = ->
         store.staking.all-accounts-loaded = no 
@@ -174,13 +142,13 @@ staking-accounts-content = (store, web3t)->
             #return alert store, err, cb if err?
             #err <- can-make-staking store, web3t
             #return alert store, err, cb if err?
-            agree <- confirm store, "Are you sure you would to undelegate?"
+            agree <- confirm store, lang.areYouSureToUndelegate
             return if agree is no 
             #
             err, result <- as-callback web3t.velas.NativeStaking.undelegate(item.address)
             console.error "Undelegate error: " err if err?
             return alert store, err.toString! if err?
-            <- notify store, "FUNDS UNDELEGATED"
+            <- notify store, lang.fundsUndelegated
             navigate store, web3t, \validators
         choose = ->
             store.staking.chosen-account = item
@@ -188,11 +156,9 @@ staking-accounts-content = (store, web3t)->
             cb null
         $button =
             | item.status is "inactive" =>
-                button { store, text: \Delegate, on-click: choose , type: \secondary , icon : \arrowRight } 
-            | _ => button { store, classes: "action-undelegate" text: \Undelegate, on-click: undelegate , type: \secondary , icon : \arrowLeft }  
-        show-stake-place = ->
-            null
-        tr.pug(class="#{item.status}" key="#{address}" on-mouse-enter=show-stake-place on-mouse-leave=hide-stake-place)
+                button { store, text: lang.to_delegate, on-click: choose , type: \secondary , icon : \arrowRight }
+            | _ => button { store, classes: "action-undelegate" text: lang.to_undelegate, on-click: undelegate , type: \secondary , icon : \arrowLeft }
+        tr.pug(class="#{item.status}" key="#{address}")
             td.pug
                 span.pug.circle(class="#{item.status}") #{index}
             td.pug(datacolumn='Staker Address' title="#{address}")
@@ -221,45 +187,45 @@ staking-accounts-content = (store, web3t)->
         background: style.app.stats
     create-staking-account = ->
         cb = console.log 
-        amount <- prompt store, "How much would you like to deposit?"
+        amount <- prompt store, lang.howMuchToDeposit
         return if amount+"".trim!.length is 0
         min_stake = web3t.velas.NativeStaking.min_stake
         main_balance = get-balance!
-        return alert store, "Balance is not enough to create staking account (#{min_stake} VLX)" if +min_stake > +main_balance
-        return alert store, "Minimal stake must be #{(min_stake)} VLX" if +min_stake  > +(amount)
-        return alert store, "Balance is not enough to spend #{(amount)} VLX" if +main_balance < +amount
+        return alert store, lang.balanceIsNotEnoughToCreateStakingAccount + " (#{min_stake} VLX)" if +min_stake > +main_balance
+        return alert store, lang.minimalStakeMustBe + " #{(min_stake)} VLX" if +min_stake  > +(amount)
+        return alert store, lang.balanceIsNotEnoughToSpend + " #{(amount)} VLX" if +main_balance < +amount
         amount = amount * 10^9
         err, result <- as-callback web3t.velas.NativeStaking.createAccount(amount)
         console.error "Result sending:" err if err?
         return alert store, err.toString! if err?
-        <- notify store, "ACCOUNT CREATED AND FUNDS DEPOSITED"
+        <- notify store, lang.accountCreatedAndFundsDeposited
         navigate store, web3t, "validators"
     .pug.staking-accounts-content
         .pug
             .form-group.pug(id="create-staking-account")
                 .pug.section.create-staking-account 
                     .title.pug
-                        h3.pug Create staking account    
+                        h3.pug #{lang.createStakingAccount}
                     .description.pug
-                        button {store, classes: "width-auto", text: "Create account", no-icon:yes, on-click: create-staking-account, style: {width: \auto}}               
+                        button {store, classes: "width-auto", text: lang.createAccount, no-icon:yes, on-click: create-staking-account, style: {width: \auto}}
         .pug
             .form-group.pug(id="staking-accounts")
                 .pug.section
                     .title.pug
-                        h3.pug Your staking accounts
+                        h3.pug #{lang.yourStakingAccounts}
                         .pug
                             .loader.pug(on-click=refresh style=icon-style title="refresh" class="#{isSpinned}")
                                 icon \Sync, 25
-                    .description.pug.table-scroll.lockup(on-mouse-leave=hide-stake-place)
+                    .description.pug.table-scroll.lockup
                         table.pug
                             thead.pug
                                 tr.pug
                                     td.pug(width="3%" style=stats) #
-                                    td.pug(width="40%" style=staker-pool-style) Account
-                                    td.pug(width="10%" style=stats) Balance
-                                    td.pug(width="30%" style=stats) Validator
-                                    td.pug(width="7%" style=stats) Seed
-                                    td.pug(width="10%" style=stats) Status
+                                    td.pug(width="40%" style=staker-pool-style) #{lang.account}
+                                    td.pug(width="10%" style=stats) #{lang.balance}
+                                    td.pug(width="30%" style=stats) #{lang.validator}
+                                    td.pug(width="7%" style=stats) #{lang.seed}
+                                    td.pug(width="10%" style=stats) #{lang.status}
                             tbody.pug
                                 store.staking.accounts |> map build store, web3t
 staking-accounts = ({ store, web3t })->
