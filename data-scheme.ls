@@ -215,6 +215,7 @@ store =
         applied: []
     releases: []
     current:
+        transactions-are-loading: no
         address-suffix: ''
         page-pin: null
         try-copy: null
