@@ -355,6 +355,7 @@ require! {
                     position: relative
                 .tx-middle
                     height: 60px
+                    animation: appear .1s ease-in
                 &:last-child
                     margin-bottom: 0px
             .cell
