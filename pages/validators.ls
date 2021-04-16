@@ -736,9 +736,6 @@ staking-content = (store, web3t)->
                 .pug.section
                     .title.pug
                         h3.pug #{lang.validators}
-                        .pug
-                            .loader.pug(on-click=refresh style=icon-style title="refresh" class="#{isSpinned}")
-                                icon \Sync, 25
                     .description.pug.table-scroll
                         table.pug
                             thead.pug
