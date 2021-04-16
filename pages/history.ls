@@ -13,6 +13,7 @@ require! {
     \../components/middle-ellipsis : MiddleEllipsis
     \../components/address-holder.ls
     \../round-number.ls
+    \../components/popups/loading.ls
 }
 .history
     @import scheme
@@ -852,6 +853,7 @@ module.exports = ({ store, web3t })->
         border-bottom: "1px solid #{style.app.border}"
     border-t =
         border-top: "1px solid #{style.app.border}"
+        position: "relative"
     filter-body =
         border: "1px solid #{style.app.border}"
         background: style.app.account-bg
@@ -925,6 +927,8 @@ module.exports = ({ store, web3t })->
                             button.pug(key="#{coin.token}" class="#{is-active(coin.token)}" style=filter-style on-click=switch-filter(coin.token))
                                 img.pug(src="#{coin.image}")
         .pug
+            .pug
+                loading { store }
             .pug.table(style=border-t)
                 store.transactions.applied |> take 30 |> map render-transaction store, web3t
             if length is 0
