@@ -727,7 +727,7 @@ staking-content = (store, web3t)->
         .pug.main-sections
             .pug.section
                 .title.pug
-                    h2.pug Balance
+                    h2.pug #{lang.balance}
                 .description.pug
                     span.pug #{your-balance} VLX
             stake-accounts {store, web3t}
@@ -735,7 +735,7 @@ staking-content = (store, web3t)->
                 alert-txn { store }
                 .pug.section
                     .title.pug
-                        h3.pug Validators
+                        h3.pug #{lang.validators}
                         .pug
                             .loader.pug(on-click=refresh style=icon-style title="refresh" class="#{isSpinned}")
                                 icon \Sync, 25
@@ -744,10 +744,10 @@ staking-content = (store, web3t)->
                             thead.pug
                                 tr.pug
                                     td.pug(width="3%" style=stats) #
-                                    td.pug(width="30%" style=staker-pool-style) Validator
+                                    td.pug(width="30%" style=staker-pool-style) #{lang.validator}
                                     td.pug(width="15%" style=stats) #{lang.total-stake}
-                                    td.pug(width="5%" style=stats) Fee
-                                    td.pug(width="10%" style=stats) Last Vote
+                                    td.pug(width="5%" style=stats) #{lang.comission}
+                                    td.pug(width="10%" style=stats) #{lang.lastVote}
                                     td.pug(width="10%" style=stats) #{lang.my-stake}
                                     td.pug(width="5%" style=stats) #{lang.stakers}
                             tbody.pug
