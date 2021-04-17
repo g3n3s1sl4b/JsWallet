@@ -6,7 +6,7 @@ require! {
 get-address-label = (wallet)->
     | wallet.coin.token in <[ xem eos ]> => \account
     | _ => \address
-get-address = (wallet, address-suffix="")->
+get-address = (wallet, address-suffix)->
     wallet["address#{address-suffix}"]
 export get-address-link = (wallet, address-suffix)->
     address = get-address(wallet, address-suffix)
@@ -30,6 +30,7 @@ export get-address-title = (wallet, address-suffix)->
     res
 export get-address-display = (store, wallet, address-suffix) ->
     address = get-address(wallet, address-suffix)
+    return "" if not address?    
     if not address.starts-with \V
         return address
     res = to-eth-address address
