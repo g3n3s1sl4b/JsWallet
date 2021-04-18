@@ -62,6 +62,9 @@ require! {
                     margin-right: 10px
         .table-row-menu
             text-align: left
+            &.disabled
+                opacity: 0.4
+                cursor: not-allowed
             &:hover
                 cursor: pointer
                 background: var(--bg-primary-light)
@@ -119,6 +122,9 @@ require! {
                 padding: 0
                 width: 100%
                 button
+                    &.disabled
+                        opacity: 0.4
+                        cursor: not-allowed
                     outline: none
                     cursor: pointer
                     border: 0
@@ -195,6 +201,7 @@ background = ->
 module.exports = (store, web3t)->
     { open-account, open-migration, current, account-name, refresh, lock } = menu-funcs store, web3t
     create-account = ->
+        return if store.current.refreshing is yes
         new-length = 1 + length
         store.current.account-index = new-length
         localStorage.set-item('Accounts', new-length)
@@ -265,8 +272,10 @@ module.exports = (store, web3t)->
         if store.menu.show then \show else \ ""
     show = ->
         store.menu.show = not store.menu.show
-    create-account-position = (index)->
+    disabled-class = if store.current.refreshing is yes then "disabled" else ""
+    create-account-position = (index)->        
         change-account = ->
+            return if store.current.refreshing is yes
             if store.current.account-index is index 
                 store.current.switch-account = no
                 return
@@ -279,7 +288,7 @@ module.exports = (store, web3t)->
         account-name = current-account-name!
         position-style =
             color: if store.current.account-index is index then '#3cd5af' else ''
-        .pug.table-row-menu(on-click=change-account key="account#{index}" style=position-style)
+        .pug.table-row-menu(on-click=change-account key="account#{index}" style=position-style class="#{disabled-class}")
             .col.folder-menu.pug
                 .pug #{account-name}
     .pug.your-account
@@ -316,7 +325,7 @@ module.exports = (store, web3t)->
                 .pug.middle(style=border-top)
                     .pug.table-row-menu
                         .col.buttons.folder-menu.pug(on-click=create-account)
-                            button.pug(style=button-primary2-style)
+                            button.pug(style=button-primary2-style class="#{disabled-class}")
                                 span.pug
                                     img.icon-svg.pug(src="#{icons.create-acc}")
                                     | #{lang.create-account}
