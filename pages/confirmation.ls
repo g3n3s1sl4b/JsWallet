@@ -5,6 +5,8 @@ require! {
     \./icon.ls
     \../icons.ls 
     \../components/text-field.ls   
+    \../round5edit.ls
+    \../components/amount-field.ls
 }
 .confirmation
     @-webkit-keyframes appear
@@ -67,7 +69,6 @@ require! {
             height: 36px
             width: 90px
             line-height: 36px
-            text-align: center
             font-size: 13px
             outline: none
         >.header
@@ -280,6 +281,58 @@ prompt-modal = (store)->
                     span.cancel.pug
                         img.icon-svg-cancel.pug(src="#{icons.close}")
                         | #{lang.cancel}
+prompt-modal2 = (store)->
+    return null if typeof! store.current.prompt2 isnt \String
+    confirm = ->
+        store.current.prompt2 = yes
+        callback = state.callback
+        state.callback = null
+        prompt-answer = store.current.prompt-answer
+        store.current.prompt-answer = ""
+        callback prompt-answer if typeof! callback is \Function
+    cancel = ->
+        store.current.prompt2 = no
+        callback = state.callback
+        state.callback = null
+        callback null if typeof! callback is \Function
+        store.current.prompt-answer = ""
+    amount-change = (e)->
+        store.current.prompt-answer = e.target.value
+    style = get-primary-info store
+    confirmation-style =
+        background: style.app.background
+        background-color: style.app.bgspare
+        color: style.app.text
+    input-style =
+        background: style.app.input
+        color: style.app.text
+        border: "0"
+    input-holder-style = 
+        max-width: '200px'
+        margin: 'auto'
+    button-style=
+        color: style.app.text
+    confirmation=
+        background: style.app.background
+        background-color: style.app.bgspare
+        color: style.app.text
+        border-bottom: "1px solid #{style.app.border}"
+    lang = get-lang store
+    .pug.confirmation
+        .pug.confirmation-body(style=confirmation)
+            .pug.header(style=style=confirmation-style)#{store.current.prompt2}
+            .pug.text(style=style=confirmation-style)
+            .pug(style=input-holder-style)
+                amount-field { store, value: "#{round5edit store.current.prompt-answer}", on-change: amount-change, placeholder="0", id="prompt-input" }
+            .pug.buttons
+                button.pug.button(on-click=confirm style=button-style id="prompt-confirm")
+                    span.apply.pug
+                        img.icon-svg-apply.pug(src="#{icons.apply}")
+                        | #{lang.confirm}
+                button.pug.button(on-click=cancel style=button-style id="prompt-close")
+                    span.cancel.pug
+                        img.icon-svg-cancel.pug(src="#{icons.close}")
+                        | #{lang.cancel}
 prompt-password-modal = (store)->
     return null if typeof! store.current.prompt-password isnt \String
     confirm = ->
@@ -338,6 +391,7 @@ export confirmation-control = (store)->
     return null if store.current.page-pin?
     .pug
         confirmation-modal store
+        prompt-modal2 store
         prompt-modal store
         prompt-password-modal store
         alert-modal store
@@ -352,6 +406,9 @@ export notify = (store, text, cb)->
     state.callback = cb
 export prompt = (store, text, cb)->
     store.current.prompt = text
+    state.callback = cb
+export prompt2 = (store, text, cb)->
+    store.current.prompt2 = text
     state.callback = cb
 export prompt-password = (store, text, cb)->
     store.current.prompt-password = text
