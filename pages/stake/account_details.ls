@@ -27,7 +27,7 @@ require! {
     \../../icons.ls
     \../placeholder.ls
     \../epoch.ls
-    \../confirmation.ls : { alert, notify, confirm, prompt }
+    \../confirmation.ls : { alert, notify, confirm, prompt2 }
     \../../components/button.ls
     \../../components/address-holder.ls
     \../alert-txn.ls
@@ -741,7 +741,7 @@ staking-content = (store, web3t)->
         err, seed <- as-callback web3t.velas.NativeStaking.getNextSeed()
         return alert store, err.toString! if err?
         /**/
-        amount <- prompt store, lang.howMuchToSplit
+        amount <- prompt2 store, lang.howMuchToSplit
         return if amount+"".trim!.length is 0
         min_stake = web3t.velas.NativeStaking.min_stake
         balance = store.staking.chosenAccount.balanceRaw
