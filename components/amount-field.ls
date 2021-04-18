@@ -28,6 +28,8 @@ require! {
         width: calc(100% - 70px) !important
         padding: 0 10px
         border-radius: $border 0 0 $border !important
+        border: none
+        text-align: left
         &:disabled
             opacity: .2
     >.suffix
