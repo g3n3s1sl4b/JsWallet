@@ -392,24 +392,9 @@ module.exports = (store, web3)->
                         label.pug #{lang.your-wallets}
             if store.preference.settings-visible is yes
                 if store.current.device is \mobile
-                    .menu-item.pug(on-click=open-submenu style=icon-style class="#{staking + ' ' + menu-staking + ' ' + info-active + ' ' + staking-active + ' ' + delegate-active}")
-                        .pug.plus
-                            icon \X, 20
-                        .pug.dash
-                            icon \Dash, 20
+                    .menu-item.pug(on-click=goto-choose-staker style=icon-style class="#{staking}")
                         img.pug(src="#{icons.staking}")
                         label.pug #{lang.staking}
-                        .menu.pug.arrow_box
-                            ul.pug
-                                li.pug(on-click=goto-staking style=icon-style class="#{staking-active}")
-                                    img.pug(src="#{icons.node}" style=icon-node)
-                                    | #{lang.install-node}
-                                li.pug(on-click=goto-choose-staker style=icon-style class="#{delegate-active}")
-                                    img.pug(src="#{icons.delegate}" style=icon-node)
-                                    | #{lang.delegate-stake}
-                                li.pug(on-click=goto-info style=icon-style class="#{info-active}")
-                                    img.pug(src="#{icons.info}" style=icon-node)
-                                    | #{lang.stats}
             if store.preference.settings-visible is yes
                 if store.current.device is \mobile
                     .menu-item.pug(on-click=goto-search style=icon-style class="#{search}")
