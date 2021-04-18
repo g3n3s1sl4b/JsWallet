@@ -30,7 +30,7 @@ require! {
     \../../components/amount-field.ls
     \../../seed.ls : seedmem
     \moment
-    \../confirmation.ls : { prompt, prompt-stake-account-amount, alert, confirm, notify }
+    \../confirmation.ls : { prompt2, prompt-stake-account-amount, alert, confirm, notify }
 }
 as-callback = (p, cb)->
     p.catch (err) -> cb err
@@ -174,7 +174,7 @@ staking-accounts-content = (store, web3t)->
         background: style.app.stats
     create-staking-account = ->
         cb = console.log 
-        amount <- prompt store, lang.howMuchToDeposit
+        amount <- prompt2 store, lang.howMuchToDeposit
         return if amount+"".trim!.length is 0
         min_stake = web3t.velas.NativeStaking.min_stake
         main_balance = get-balance!
