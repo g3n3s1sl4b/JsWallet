@@ -187,6 +187,8 @@ staking-accounts-content = (store, web3t)->
         amount = amount * 10^9
         err, result <- as-callback web3t.velas.NativeStaking.createAccount(amount)
         console.error "Result sending:" err if err?
+        if err?
+            err = lang.balanceIsNotEnoughToCreateStakingAccount if ((err.toString! ? "").index-of("custom program error: 0x1")) > -1
         return alert store, err.toString! if err?
         <- notify store, lang.accountCreatedAndFundsDeposited
         navigate store, web3t, "validators"
