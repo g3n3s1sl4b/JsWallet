@@ -163,8 +163,6 @@ require! {
                     padding: 20px
                 &:last-child
                     border: 0
-                    @media (max-width: 800px)
-                        padding-bottom: $ios-m-b
                 &.reward
                     background-image: $reward
                     background-repeat: no-repeat
@@ -186,7 +184,7 @@ require! {
                     @media (max-width: 800px)
                         width: 100%
                         margin-bottom: 20px
-                        text-align: center
+                        text-align: left
                     .less
                         font-size: 10px
                         opacity: 0.9
@@ -313,7 +311,7 @@ require! {
                                 cursor: pointer
                     @media (max-width: 800px)
                         width: 100%
-                        text-align: center
+                        text-align: right
                     .important
                         color: orange
                     .left-node
