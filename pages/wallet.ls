@@ -268,7 +268,7 @@ module.exports = (store, web3t, wallets, wallet)-->
     #    #store.current.token-migration = "V123"
     receive-click = receive(wallet)
     send-click = send(wallet)
-    swap-click = swap(wallet)
+    swap-click = swap(store, wallet)
     token = wallet.coin.token
     token-display = (wallet.coin.nickname ? "").to-upper-case!
     makeDisabled = store.current.refreshing
@@ -307,7 +307,7 @@ module.exports = (store, web3t, wallets, wallet)-->
                             .pug expand
                 button { store, on-click=send-click, text: \send , icon: \send , type: \secondary }
                 button { store, on-click=receive-click, text: \receive , icon: \get  , type : \primary }
-                if token in <[ vlx, sol, vlx2, vlx_erc20 ]> then
+                if token in <[ vlx vlx_native vlx2 vlx_evm vlx_erc20 ]> then
                     button {    store, on-click=swap-click, text: \swap , icon: \swap  , id: "wallet-swap", makeDisabled=no, classes="wallet-swap" }
         .wallet-middle.pug(style=border)
             address-holder { store, wallet, type: \bg }
