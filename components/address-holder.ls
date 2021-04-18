@@ -118,7 +118,7 @@ module.exports = ({ store, wallet, type })->
         store.current.hovered-address.address = wallet.address
     hide-details = ->
         store.current.hovered-address.address = null
-    active = if wallet.address is store.current.hovered-address.address then 'active' else ''
+    active = if wallet.address is store.current.hovered-address.address then '' else ''
     rotate-address-suffix = ->
         store.current.address-suffix =
             | store.current.address-suffix is '' and wallet.address2  => "2"
@@ -128,7 +128,7 @@ module.exports = ({ store, wallet, type })->
         wallet["address#{address-suffix}"]
     address = get-address(wallet, address-suffix)
     is-contract = contracts.is-contract(store, address)
-    .address-holder.pug(on-mouse-enter=show-details on-mouse-leave=hide-details)
+    .address-holder.pug
         identicon { store, address: address-title }
         span.pug.inner-address-holder(style=input)
             if store.url-params.internal?
