@@ -266,8 +266,10 @@ module.exports = (store, web3t)->
     show = ->
         store.menu.show = not store.menu.show
     create-account-position = (index)->
-        #ref = react.create-ref!
         change-account = ->
+            if store.current.account-index is index 
+                store.current.switch-account = no
+                return
             store.current.account-index = index
             store.current.switch-account = no
             <- web3t.refresh
