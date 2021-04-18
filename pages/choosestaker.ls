@@ -215,7 +215,7 @@ require! {
                             max-width: 50px
                     &.table-scroll
                         overflow-x: scroll
-                        background: linear-gradient(var(--color1) 30%, rgba(50,18,96, 0)), linear-gradient(rgba(50,18,96, 0), var(--color1) 70%) 0 100%, radial-gradient(farthest-side at 50% 0, var(--color2), rgba(0,0,0,0)), radial-gradient(farthest-side at 50% 100%, var(--color2), rgba(0,0,0,0)) 0 100%
+                        background: linear-gradient(var(--color1) 30%, rgba(50,18,96, 0)), linear-gradient(rgba(50,18,96, 0), var(--color1) 70%) 0 100%, radial-gradient(farthest-side at 50% 0, var(--color2), rgba(0,0,0,0)), radial-gradient(farthest-side at 50% 100%, rgba(77,78,88,0), rgba(0,0,0,0)) 0 100%
                         background-repeat: no-repeat
                         background-attachment: local, local, scroll, scroll
                         background-size: 100% 30px, 100% 30px, 100% 15px, 100% 15px
