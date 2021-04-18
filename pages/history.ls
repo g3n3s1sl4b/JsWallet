@@ -932,7 +932,7 @@ module.exports = ({ store, web3t })->
                 loading { store }
             .pug.table(style=border-t)
                 store.transactions.applied |> take 30 |> map render-transaction store, web3t
-            if length is 0
+            if length is 0 and store.current.transactions-are-loading isnt yes
                 .pug.nothin-to-show(style=menu-style)
                     img.pug(style=nothing-icon src="#{icons.search-history}"
                     .pug.head #{lang.nothing-to-show}
