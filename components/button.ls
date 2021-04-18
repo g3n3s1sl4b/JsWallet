@@ -90,7 +90,7 @@ button-active = ({ store, classes, text, loading, on-click, icon, type, mstyle, 
     custom-style = mstyle ? {}
     button.pug.btn(class="#{classes}" on-click=on-click style=button-style id=id disabled=disabled)
         if (no-icon? and no-icon is no) or !no-icon? then
-            if store.current.device is \mobile
+            if no and store.current.device is \mobile
                 img.icon-svg.pug(src="#{applied-icon}" title="#{applied-text}" style=icon-style)
             else
                 span.pug
