@@ -9,7 +9,7 @@ addresses =
         Upgrade             : "0x4000000000000000000000000000000000000001"
         ResolverAuRa        : "0x80c56f0660A2f4dA65A0b09877c4c85B51e3d723"
         Development         : "0xd89fCa43728eAa5c306c3148DA32dE8A3Ef2963f"
-        EvmToNative         : ""
+        EvmToNative         : "0x56454c41532d434841494e000000000053574150"
     testnet:
         Staking             : "0x1100000000000000000000000000000000000001"
         ValidatorSet        : "0x1000000000000000000000000000000000000001"
