@@ -822,6 +822,10 @@ validators.init = ({ store, web3t }, cb)!->
     else
         store.staking.pools-network = store.current.network
     store.staking.pools = []
+    err, rent <- as-callback web3t.velas.NativeStaking.connection.getMinimumBalanceForRentExemption(200)
+    rent = 2282880 if err?
+    rent = rent `div` (10^9)
+    store.staking.rent = rent   
     err, epoch <- web3t.velas.Staking.stakingEpoch
     store.staking.epoch = epoch.to-fixed!
     wallet = store.current.account.wallets |> find (-> it.coin.token is \vlx_native)

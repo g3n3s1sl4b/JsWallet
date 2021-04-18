@@ -139,6 +139,7 @@ store =
     staking:
         accounts: []
         reward-info: []
+        rent: 0    
         exit-tab: ''
         maxWithdrawOrderAllowed: 0
         withdrawAmount: 0
