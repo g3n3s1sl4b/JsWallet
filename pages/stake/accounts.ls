@@ -178,6 +178,9 @@ staking-accounts-content = (store, web3t)->
         return if amount+"".trim!.length is 0
         min_stake = web3t.velas.NativeStaking.min_stake
         main_balance = get-balance!
+        tx-fee = 5000 `div` (10^9)
+        rest = 0.1
+        amount = amount `minus` (store.staking.rent `plus` tx-fee `plus` rest) if +(main_balance `minus` amount) <= 0
         return alert store, lang.balanceIsNotEnoughToCreateStakingAccount + " (#{min_stake} VLX)" if +min_stake > +main_balance
         return alert store, lang.minimalStakeMustBe + " #{(min_stake)} VLX" if +min_stake  > +(amount)
         return alert store, lang.balanceIsNotEnoughToSpend + " #{(amount)} VLX" if +main_balance < +amount
