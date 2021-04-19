@@ -190,6 +190,7 @@ staking-accounts-content = (store, web3t)->
         if err?
             err = lang.balanceIsNotEnoughToCreateStakingAccount if ((err.toString! ? "").index-of("custom program error: 0x1")) > -1
         return alert store, err.toString! if err?
+        <- set-timeout _, 500
         <- notify store, lang.accountCreatedAndFundsDeposited
         navigate store, web3t, "validators"
     .pug.staking-accounts-content
