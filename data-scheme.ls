@@ -138,6 +138,7 @@ store =
             add-validator-topup: "" 
     staking:
         accounts: []
+        myStakeMaxPart: null 
         reward-info: []
         rent: 0    
         exit-tab: ''
