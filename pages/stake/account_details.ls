@@ -722,6 +722,7 @@ staking-content = (store, web3t)->
         err, result <- as-callback web3t.velas.NativeStaking.withdraw(address, amount)
         console.error "Undelegate error: " err if err?
         return alert store, err.toString! if err?
+        <- set-timeout _, 500
         <- notify store, lang.fundsWithdrawn
         navigate store, web3t, \validators
     delegate = ->
@@ -733,7 +734,8 @@ staking-content = (store, web3t)->
         err, result <- as-callback web3t.velas.NativeStaking.undelegate(store.staking.chosenAccount.address)
         console.error "Undelegate error: " err if err?
         return alert store, err.toString! if err?
-        <- notify store, lang.fundsUndelegated
+        <- set-timeout _, 500
+        <- notify store, lang.fundsUndelegated  
         navigate store, web3t, \validators
     split-account = ->
         cb = console.log 
@@ -761,6 +763,7 @@ staking-content = (store, web3t)->
         err, result <- as-callback web3t.velas.NativeStaking.splitStakeAccount(stakeAccount, splitStakePubkey, amount)
         console.error "Result sending:" err if err?
         return alert store, err.toString! if err?
+        <- set-timeout _, 500
         <- notify store, lang.accountCreatedAndFundsSplitted
         navigate store, web3t, "validators"
     icon-style =
