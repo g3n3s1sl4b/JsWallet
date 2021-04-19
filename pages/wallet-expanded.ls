@@ -187,9 +187,7 @@ module.exports = (store, web3t, wallets, wallet)-->
         transactions = ^^store.transactions.applied
         transactions
             |> filter (it)-> it.type is type and (not it.pending? or it.pending isnt yes)
-            |> map (it)->
-                return it.amount if it.from isnt it.to
-                (-+it.fee) + ''
+            |> map (it)-> it.amount
             |> foldl plus, \0
             |> round-human
     total-sent = get-total \OUT, wallet.address
