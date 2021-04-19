@@ -77,11 +77,6 @@ as-callback = (p, cb)->
             .tooltip
                 visibility: visible
     .form-group
-        .section.create-staking-account
-            display: block
-            .title,.description
-                width: auto
-                text-align: center
         .subtitle
             margin: 20px 0 10px
         .settings
@@ -286,9 +281,9 @@ staking-accounts-content = (store, web3t)->
                                     td.pug(width="40%" style=staker-pool-style title="Your Staking Account") #{lang.account} (?)
                                     td.pug(width="10%" style=stats title="Your Deposited Balance") #{lang.balance} (?)
                                     td.pug(width="30%" style=stats title="Where you staked") #{lang.validator} (?)
-                                    td.pug(width="7%" style=stats title="The ID of your stake. This is made to simply the search of your stake in validator list") #{lang.seed} (?)
+                                    td.pug(width="7%" style=stats title="The ID of your stake. This is made to simplify the search of your stake in validator list") #{lang.seed} (?)
                                     td.pug(width="10%" style=stats title="Current staking status. Please notice that you cannot stake / unstake immediately. You need to go through the waiting period. This is made to reduce attacks by stacking and unstacking spam.") #{lang.status} (?)
-                                    td.pug(width="10%" style=stats) #{lang.action}
+                                    td.pug(width="10%" style=stats) #{(lang.action ? "Action")}
                             tbody.pug
                                 store.staking.accounts |> map build store, web3t
 staking-accounts = ({ store, web3t })->
