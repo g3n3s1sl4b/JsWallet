@@ -8,7 +8,8 @@ zec = require \../web3t/plugins/zec-coin.ls
 common = (store)->
     vlx2 = require \../web3t/plugins/vlx2-coin.ls
     btc  = require \../web3t/plugins/btc-coin.ls
-    coins = [vlx2, btc]
+    sol  = require \../web3t/plugins/sol-coin.ls
+    coins = [vlx2, sol, btc]
     #if store.url-params.segwit?
     #    coins.push btc_sw
     if store.url-params.gbx?
