@@ -204,12 +204,11 @@ module.exports = (store, config)->
         err <- refresh-balances
         return cb err if err?
         refresh-page cb
-    set-theme = (it, cb)->
+    set-theme = (it)!->
         return cb "support only dark an light" if it not in supported-themes
         store.theme = it
         localStorage.set-item \theme, it
         set-page-theme store, it
-        cb null
     set-lang = (it, cb)->
         return cb "support only en, ru" if it not in <[ en ru uk ]>
         store.lang = it
