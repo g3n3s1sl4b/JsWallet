@@ -46,7 +46,6 @@ class VelasStaking {
     }
 
     async getStakeActivation(address) {
-        console.log("getStakeActivation");
         try {
             const publicKey  = new PublicKey(address);
             const activation = await this.connection.getStakeActivation(publicKey);
@@ -338,6 +337,8 @@ class VelasStaking {
                 };
             };
         };
+        
+        this.accounts = accounts;
 
         return accounts;
     };
