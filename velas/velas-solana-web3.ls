@@ -7,7 +7,6 @@ networks =
     mainnet: \https://explorer.velas.com/rpc
     testnet: \https://testnet.velas.com/rpc
 module.exports = (store)->
-    console.log "url" networks[store.current.network]
     network = networks[store.current.network]
     new solanaWeb3.Connection(network)
     #balance <- web3.getBalance("BfWa6h1X1ePv8MqfkTFapPx3E4dFc8x4bRSah9SQi2E9").then
