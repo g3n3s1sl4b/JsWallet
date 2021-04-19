@@ -831,8 +831,6 @@ validators.init = ({ store, web3t }, cb)!->
     rent = 2282880 if err?
     rent = rent `div` (10^9)
     store.staking.rent = rent   
-    err, epoch <- web3t.velas.Staking.stakingEpoch
-    store.staking.epoch = epoch.to-fixed!
     wallet = store.current.account.wallets |> find (-> it.coin.token is \vlx_native)
     return cb null if not wallet?
     web3t.velas.NativeStaking.setAccountPublicKey(wallet.publicKey)
@@ -852,8 +850,6 @@ validators.init = ({ store, web3t }, cb)!->
     store.staking.pools = convert-pools-to-view-model pools
     # end validators array
     #store.staking.accounts = accounts
-    err, res <- as-callback web3t.velas.NativeStaking.getInfo()
-    console.log ".getInfo" res
     ###
     ###
 #    on-progress = ->
