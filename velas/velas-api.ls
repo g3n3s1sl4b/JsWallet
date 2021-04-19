@@ -30,7 +30,7 @@ module.exports = (store)->
     EvmToNativeBridgeAddress = addresses[network].EvmToNative
     web3Solana = velas-solana-web3 store
     networks =
-        mainnet: \https://explorer.velas.com/rpc
+        mainnet: \https://api.velas.com
         testnet: \https://explorer.testnet.velas.com/rpc
     api =
         Staking      : web3.eth.contract(abis.Staking).at(staking-address)

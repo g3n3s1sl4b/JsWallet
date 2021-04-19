@@ -233,6 +233,8 @@ staking-accounts-content = (store, web3t)->
         display: "block"
     create-staking-account = ->
         cb = console.log 
+        err <- as-callback web3t.velas.NativeStaking.getStakingAccounts(store.staking.parsedProgramAccounts)
+        console.error err if err?
         amount <- prompt2 store, lang.howMuchToDeposit
         return if amount+"".trim!.length is 0
         min_stake = web3t.velas.NativeStaking.min_stake
@@ -261,6 +263,8 @@ staking-accounts-content = (store, web3t)->
                     .description.pug
                         if store.staking.accounts.length is 0
                             span.pug(style=notification-border) Please create a staking account before you stake
+                        else 
+                            span.pug(style=notification-border) You can stake more by creating new accounts
                         .pug(style=block-style)
                             button {store, classes: "width-auto", text: lang.createAccount, no-icon:yes, on-click: create-staking-account, style: {width: \auto, display: \block}}
         .pug
