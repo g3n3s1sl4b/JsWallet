@@ -232,6 +232,10 @@ require! {
                             .browse
                                 right: 30px !important
                         thead
+                            td
+                                cursor: pointer
+                                &:hover
+                                    color: #dde6ff
                             th
                                 @media(min-width:800px) and (max-width: 900px)
                                     font-size: 11px !important
@@ -287,10 +291,11 @@ require! {
                     td, th
                         padding: 8px
                         max-width: 200px
-                        border: 1px solid rgba(240, 237, 237, 0.16)
+                        border: none
                         white-space: nowrap
                         font-size: 13px
                         overflow: scroll
+                        text-align: center
                         @media(max-width:800px)
                             text-align: left
                     .left
