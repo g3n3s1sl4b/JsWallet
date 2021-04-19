@@ -36,7 +36,7 @@ as-callback = (p, cb)->
     p.catch (err) -> cb err
     p.then (data)->
         cb null, data
-.staking-content
+.staking-accounts-content
     .create-staking-account
         .btn
             display: block
@@ -98,7 +98,21 @@ as-callback = (p, cb)->
                 margin: 5px 0
         .table-scroll.lockup
             table
+                thead
+                    td
+                        cursor: pointer
+                        &:hover
+                            color: #dde6ff
                 td
+                    &.account-status
+                        &.deactivating
+                            color: #ff5555
+                        &.activating
+                            color: orange
+                        &.active
+                            color: green
+                        &.inactive
+                            color: gray
                     &.validator-address
                         text-align: center
                     border: none
@@ -198,7 +212,7 @@ staking-accounts-content = (store, web3t)->
                 else
                     "---"
             td.pug #{seed}
-            td.pug #{$status}
+            td.pug(class="account-status #{status}") #{$status}
             td.pug
                 $button
     cancel = ->
