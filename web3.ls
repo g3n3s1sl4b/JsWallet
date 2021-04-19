@@ -205,7 +205,7 @@ module.exports = (store, config)->
         return cb err if err?
         refresh-page cb
     set-theme = (it)!->
-        return cb "support only dark an light" if it not in supported-themes
+        return if it not in supported-themes
         store.theme = it
         localStorage.set-item \theme, it
         set-page-theme store, it
