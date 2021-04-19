@@ -272,7 +272,7 @@ store =
         notification: null    
         alert: null
         demo: location.href.index-of('web3.space/wallet') > -1
-        network: \testnet
+        network: \mainnet
         pin: ""
         last-tx-url: ""
         try-edit-seed: no
