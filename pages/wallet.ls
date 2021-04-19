@@ -268,7 +268,7 @@ module.exports = (store, web3t, wallets, wallet)-->
     #    #store.current.token-migration = "V123"
     receive-click = receive(wallet)
     send-click = send(wallet)
-    swap-click = swap(store, wallet)
+    swap-click = swap(wallet)
     token = wallet.coin.token
     token-display = (wallet.coin.nickname ? "").to-upper-case!
     makeDisabled = store.current.refreshing
@@ -311,7 +311,7 @@ module.exports = (store, web3t, wallets, wallet)-->
                     button {    store, on-click=swap-click, text: \swap , icon: \swap  , id: "wallet-swap", makeDisabled=no, classes="wallet-swap" }
         .wallet-middle.pug(style=border)
             address-holder { store, wallet, type: \bg }
-            if token not in <[ btc vlx2 ]>
+            if token not in <[ btc vlx vlx_native vlx2 ]>
                 .pug.uninstall(on-click=uninstall style=wallet-style) #{label-uninstall}
         .wallet-middle.title-balance.pug(style=border)
             .name.pug(class="#{placeholder}" title="#{usd-rate}") $#{ round-human(usd-rate)}
