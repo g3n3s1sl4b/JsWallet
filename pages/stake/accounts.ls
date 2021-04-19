@@ -100,6 +100,7 @@ as-callback = (p, cb)->
                             color: #dde6ff
                 td
                     &.account-status
+                        text-transform: capitalize
                         &.deactivating
                             color: #ff5555
                         &.activating
@@ -251,9 +252,6 @@ staking-accounts-content = (store, web3t)->
         <- set-timeout _, 500
         <- notify store, lang.accountCreatedAndFundsDeposited
         navigate store, web3t, "validators"
-    #build-hint = (item)->
-        #.pug.hint(id="item" key="#{item}")
-            #.pug.tooltip \HINT
     .pug.staking-accounts-content
         .pug
             .form-group.pug(id="create-staking-account")
