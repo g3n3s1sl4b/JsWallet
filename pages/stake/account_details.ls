@@ -7,7 +7,7 @@ require! {
     \bignumber.js
     \../../get-lang.ls
     \../../history-funcs.ls
-    \../../staking/funcs.ls : { query-pools }
+    \../../staking-funcs.ls : { get-all-active-stake }
     \../icon.ls
     \prelude-ls : { map, split, filter, find, foldl, sort-by, unique, head, each }
     \../../math.ls : { div, times, plus, minus }
@@ -70,6 +70,9 @@ require! {
             animation-timing-function: linear
         &.disabled
             opacity: 0.3
+    .myStakeMaxPart
+        margin-left: 20px
+        opacity: 0.3
     .icon-right
         height: 12px
         top: 2px
@@ -739,6 +742,8 @@ staking-content = (store, web3t)->
         navigate store, web3t, \validators
     split-account = ->
         cb = console.log 
+        err <- as-callback web3t.velas.NativeStaking.getStakingAccounts(store.staking.parsedProgramAccounts)
+        console.error err if err?
         /* Get next account seed */
         err, seed <- as-callback web3t.velas.NativeStaking.getNextSeed()
         return alert store, err.toString! if err?
@@ -788,6 +793,11 @@ staking-content = (store, web3t)->
     usd-inactive_stake = round-number(inactive_stake `times` usd-rate, {decimals:2})
     usd-delegated_stake = round-number(delegated_stake `times` usd-rate, {decimals:2})
     validator = if store.staking.chosenAccount.validator is "" then "---" else store.staking.chosenAccount.validator
+    myStakeMaxPart = 
+        | store.staking.myStakeMaxPart? =>
+            myStakeMaxPartVLX = parse-float(store.staking.myStakeMaxPart) `div` (10^9)
+            myStakeMaxPartVLX + " VLX"
+        | _ => ""
     .pug.staking-content.delegate
         .pug.single-section.form-group(id="choosen-pull")
             .pug.section
@@ -857,6 +867,13 @@ staking-content = (store, web3t)->
                         | #{round-human(active_stake)} VLX
                     span.pug.usd-amount
                         | $#{usd-active_stake}
+                    if store.staking.myStakeMaxPart? and no
+                        span.pug.myStakeMaxPart
+                            .pug.animation
+                                .pug.anim-item -
+                                .pug.anim-item -
+                                .pug.anim-item >
+                            | #{myStakeMaxPart}
             .pug.section
                 .title.pug
                     h3.pug #{lang.inactiveStake}
@@ -924,6 +941,20 @@ account-details = ({ store, web3t })->
             epoch store, web3t
             switch-account store, web3t
         staking-content store, web3t
+account-details.init = ({ store, web3t }, cb)!->
+    console.log "account-details.init"
+    stake-accounts = store.staking.parsedProgramAccounts
+    if true
+        err, all-stakes <- get-all-active-stake(stake-accounts)
+        console.log "all-active-stake" all-stakes
+        store.staking.all-active-stake = (all-stakes ? 0)
+        my-stake = store.staking.chosenAccount.balanceRaw `times` (10^9)
+        my-weight = my-stake `div` all-stakes.inactive-stake
+        activateMaxInSystem = all-stakes.active-stake `times` 0.25
+        yourMaxPart = my-weight `times` activateMaxInSystem
+        console.log "yourMaxPart" yourMaxPart
+        store.staking.myStakeMaxPart = yourMaxPart
+    cb null
 stringify = (value) ->
     if value? then
         round-human(parse-float value `div` (10^18))
