@@ -272,7 +272,7 @@ module.exports = (store, web3t)->
         next-block = slotsInEpoch
         err, start-block <- web3t.velas.Staking.stakingEpochStartBlock
         console.error err if err?
-        rreturn cb null if err?
+        return cb null if err?
         current-block = blockHeight
         seconds-per-block = 0.8
         seconds = (epochInfo.slotsInEpoch `minus` epochInfo.slotIndex) `times` seconds-per-block
