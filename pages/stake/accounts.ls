@@ -37,6 +37,45 @@ as-callback = (p, cb)->
     p.then (data)->
         cb null, data
 .staking-content
+    .create-staking-account
+        .btn
+            display: block
+    .hint
+        .tooltip
+            position: absolute
+            text-transform: uppercase
+            left: 25px
+            top: -8px
+            z-index: 1
+            line-height: 14px
+            font-size: 9px
+            font-weight: 600
+            color: #fff
+            padding: 5px
+            background: #000
+            visibility: hidden
+            &:after, &:before
+                right: 100%
+                top: 21%
+                border: solid transparent
+                content: " "
+                height: 0
+                width: 0
+                position: absolute
+                pointer-events: none
+            &:after
+                border-color: rgba(136, 183, 213, 0)
+                border-right-color: #000
+                border-width: 6px
+                margin-top: 2px
+            &:before
+                border-color: rgba(194, 225, 245, 0)
+                border-width: 8px
+                margin-top: 0px
+    .hint
+        &:hover
+            .tooltip
+                visibility: visible
     .form-group
         .section.create-staking-account
             display: block
@@ -144,7 +183,9 @@ staking-accounts-content = (store, web3t)->
         $button =
             | item.status is "inactive" =>
                 button { store, text: lang.to_delegate, on-click: choose , type: \secondary , icon : \arrowRight }
-            | _ => button { store, classes: "action-undelegate" text: lang.to_undelegate, on-click: undelegate , type: \secondary , icon : \arrowLeft }
+            | _ => 
+                disabled = item.status is \deactivating
+                button { store, classes: "action-undelegate" text: lang.to_undelegate, on-click: undelegate , type: \secondary , icon : \arrowLeft, makeDisabled: disabled }
         tr.pug(class="#{item.status}" key="#{address}")
             td.pug
                 span.pug.circle(class="#{item.status}") #{index}
@@ -172,6 +213,14 @@ staking-accounts-content = (store, web3t)->
         background: style.app.stats
     stats=
         background: style.app.stats
+    notification-border =
+        display: "inline-block"
+        border: "1px solid orange"
+        padding: 5px
+        border-radius: 5px
+        width: "auto"
+    block-style = 
+        display: "block"
     create-staking-account = ->
         cb = console.log 
         amount <- prompt2 store, lang.howMuchToDeposit
@@ -193,6 +242,9 @@ staking-accounts-content = (store, web3t)->
         <- set-timeout _, 500
         <- notify store, lang.accountCreatedAndFundsDeposited
         navigate store, web3t, "validators"
+    #build-hint = (item)->
+        #.pug.hint(id="item" key="#{item}")
+            #.pug.tooltip \HINT
     .pug.staking-accounts-content
         .pug
             .form-group.pug(id="create-staking-account")
@@ -200,7 +252,10 @@ staking-accounts-content = (store, web3t)->
                     .title.pug
                         h3.pug #{lang.createStakingAccount}
                     .description.pug
-                        button {store, classes: "width-auto", text: lang.createAccount, no-icon:yes, on-click: create-staking-account, style: {width: \auto}}
+                        if store.staking.accounts.length is 0
+                            span.pug(style=notification-border) Please create a staking account before you stake
+                        .pug(style=block-style)
+                            button {store, classes: "width-auto", text: lang.createAccount, no-icon:yes, on-click: create-staking-account, style: {width: \auto, display: \block}}
         .pug
             .form-group.pug(id="staking-accounts")
                 .pug.section
@@ -219,6 +274,7 @@ staking-accounts-content = (store, web3t)->
                                     td.pug(width="30%" style=stats) #{lang.validator}
                                     td.pug(width="7%" style=stats) #{lang.seed}
                                     td.pug(width="10%" style=stats) #{lang.status}
+                                    td.pug(width="10%" style=stats) #{lang.action}
                             tbody.pug
                                 store.staking.accounts |> map build store, web3t
 staking-accounts = ({ store, web3t })->
