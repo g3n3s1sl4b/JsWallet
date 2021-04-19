@@ -23,10 +23,12 @@ module.exports = ({ web3t, wallet, store, id })->
     return null if not wallet.network.networks?
     return null if not (store.current.send.isSwap? and store.current.send.isSwap is yes)
     return null if not wallet.network.networks? or Object.keys(wallet.network.networks).length is 0
+    wallets = store.current.account.wallets |> map (-> [it.coin.token, it]) |> pairs-to-obj 
     available-networks = 
         wallet.network.networks 
             |> obj-to-pairs
-            |> filter (-> (not it[1].disabled?) or it[1].disabled is no)
+            |> filter (it)-> 
+                wallets[it[1].referTo]? and ((not it[1].disabled?) or it[1].disabled is no)
             |> pairs-to-obj
     network-labels = Object.keys(available-networks)
     getNetworkById = (id)->
