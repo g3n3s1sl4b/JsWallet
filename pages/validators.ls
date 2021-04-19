@@ -742,12 +742,12 @@ staking-content = (store, web3t)->
                             thead.pug
                                 tr.pug
                                     td.pug(width="3%" style=stats) #
-                                    td.pug(width="30%" style=staker-pool-style title="Validator Staking Address. Permanent") #{lang.validator}
-                                    td.pug(width="15%" style=stats title="Sum of all stakings") #{lang.total-stake}
-                                    td.pug(width="5%" style=stats title="Validator Interest. (100% - Validator Interest = Delegator Staking Reward)") #{lang.comission}
-                                    td.pug(width="10%" style=stats title="Last Staking Amount") #{lang.lastVote}
-                                    td.pug(width="10%" style=stats title="Find you staking by Seed") #{lang.my-stake}
-                                    td.pug(width="5%" style=stats title="How many stakers in a pool") #{lang.stakers}
+                                    td.pug(width="30%" style=staker-pool-style title="Validator Staking Address. Permanent") #{lang.validator} (?) 
+                                    td.pug(width="15%" style=stats title="Sum of all stakings") #{lang.total-stake} (?)
+                                    td.pug(width="5%" style=stats title="Validator Interest. (100% - Validator Interest = Delegator Staking Reward)") #{lang.comission} (?)
+                                    td.pug(width="10%" style=stats title="Last Staking Amount") #{lang.lastVote} (?)
+                                    td.pug(width="10%" style=stats title="Find you staking by Seed") #{lang.my-stake} (?)
+                                    td.pug(width="5%" style=stats title="How many stakers in a pool") #{lang.stakers} (?)
                             tbody.pug
                                 store.staking.pools |> map build-staker store, web3t
 validators = ({ store, web3t })->
