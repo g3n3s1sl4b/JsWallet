@@ -944,16 +944,15 @@ account-details = ({ store, web3t })->
 account-details.init = ({ store, web3t }, cb)!->
     console.log "account-details.init"
     stake-accounts = store.staking.parsedProgramAccounts
-    if true
-        err, all-stakes <- get-all-active-stake(stake-accounts)
-        console.log "all-active-stake" all-stakes
-        store.staking.all-active-stake = (all-stakes ? 0)
-        my-stake = store.staking.chosenAccount.balanceRaw `times` (10^9)
-        my-weight = my-stake `div` all-stakes.inactive-stake
-        activateMaxInSystem = all-stakes.active-stake `times` 0.25
-        yourMaxPart = my-weight `times` activateMaxInSystem
-        console.log "yourMaxPart" yourMaxPart
-        store.staking.myStakeMaxPart = yourMaxPart
+    #if true
+        #err, all-stakes <- get-all-active-stake(stake-accounts)
+        #console.log "all-active-stake" all-stakes
+        #store.staking.all-active-stake = (all-stakes ? 0)
+        #my-stake = store.staking.chosenAccount.balanceRaw `times` (10^9)
+        #my-weight = my-stake `div` all-stakes.inactive-stake
+        #activateMaxInSystem = all-stakes.active-stake `times` 0.25
+        #yourMaxPart = my-weight `times` activateMaxInSystem
+        #store.staking.myStakeMaxPart = yourMaxPart
     cb null
 stringify = (value) ->
     if value? then
