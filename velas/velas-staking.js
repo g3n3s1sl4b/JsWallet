@@ -78,7 +78,6 @@ class VelasStaking {
             base: authorizedPubkey
         };
         
-        console.log("[splitStakeAccount] params", params);
         try {
             transaction.add(StakeProgram.split(params));
         } catch (e) {
@@ -87,7 +86,6 @@ class VelasStaking {
                 description: e.message,
             };    
         }
-        console.log("split transaction", transaction) ;
         return this.sendTransaction(transaction);
     }
 
