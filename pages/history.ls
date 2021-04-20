@@ -766,7 +766,10 @@ render-transaction = (store, web3t, tran)-->
                 .pug.cell.details-from
                     .pug.gray(style=lightText)
                         span.action.pug
-                            address-holder { store, wallet: wallet-from }
+                            if tran.tx-type? then
+                                address-holder { store, wallet: wallet-from, text: tran.tx-type  }
+                            else
+                                address-holder { store, wallet: wallet-from }
                         if no
                             span.from-to.pug
                                 span.pug.smart-contract
@@ -777,7 +780,10 @@ render-transaction = (store, web3t, tran)-->
                 .pug.cell.details-to
                     .pug.gray(style=lightText)
                         span.action.pug
-                            address-holder { store, wallet: wallet-to }
+                            if tran.tx-type? then
+                                address-holder { store, wallet: wallet-to, text: tran.tx-type  }
+                            else
+                                address-holder { store, wallet: wallet-to }
                         if no
                             span.from-to.pug
                                 span.pug.smart-contract

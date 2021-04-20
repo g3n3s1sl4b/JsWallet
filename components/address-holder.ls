@@ -90,7 +90,7 @@ require! {
             user-select: text !important
             &.active
                 color: orange
-module.exports = ({ store, wallet, type })->
+module.exports = ({ store, wallet, type, text })->
     style = get-primary-info store
     address-suffix = store.current.address-suffix
     address-input=
@@ -137,9 +137,11 @@ module.exports = ({ store, wallet, type })->
             else
                 a.browse.pug(target="_blank" href="#{address-link}")
                     img.pug(src="#{icons.browse-open}" style=icon1)
-            if is-contract
+            if is-contract and no
                 address-display = contracts.get-contract-name(store, address)
                 a.pug(target="_blank" href="#{address-link}" class="#{active}") #{address-display}     
+            else if text?
+                a.pug(target="_blank" href="#{address-link}" class="#{active}") #{text}
             else
                 MiddleEllipsis.pug(key=address-title)
                     a.pug(target="_blank" href="#{address-link}" class="#{active}") #{address-display}
