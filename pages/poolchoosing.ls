@@ -731,6 +731,7 @@ staking-content = (store, web3t)->
         my-stake =
             | +item.my-stake.length is 0 => []
             | _ => item.my-stake
+        fee = item.commission
         build-my-stake = (stake)->
             show-details = ->
                 account = store.staking.accounts |> find (-> it.seed is stake.seed)
@@ -781,6 +782,7 @@ staking-content = (store, web3t)->
             td.pug(datacolumn='Staker Address' title="#{item.address}")
                 address-holder-popup { store, wallet }
             td.pug #{stake}
+            td.pug #{fee}%
             td.pug(class="#{mystake-class}")
                 my-stake |> map build-my-stake
             td.pug #{item.stakers}
@@ -832,10 +834,11 @@ staking-content = (store, web3t)->
                             thead.pug
                                 tr.pug
                                     td.pug(width="3%" style=stats) #
-                                    td.pug(width="10%" style=staker-pool-style)  #{lang.validator}
-                                    td.pug(width="25%" style=stats) #{lang.total-stake}
-                                    td.pug(width="25%" style=stats) #{lang.my-stake}
-                                    td.pug(width="5%" style=stats) #{lang.stakers}
+                                    td.pug(width="30%" style=staker-pool-style title="Validator Staking Address. Permanent") #{lang.validator} (?)
+                                    td.pug(width="15%" style=stats title="Sum of all stakings") #{lang.total-stake} (?)
+                                    td.pug(width="5%" style=stats title="Validator Interest. (100% - Validator Interest = Pool Staking Reward)") #{lang.comission} (?)
+                                    td.pug(width="10%" style=stats title="Find you staking by Seed") #{lang.my-stake} (?)
+                                    td.pug(width="5%" style=stats title="How many stakers in a pool") #{lang.stakers} (?)
                                     td.pug(width="4%" style=stats) #{lang.select}
                             tbody.pug
                                 store.staking.pools |> map build-staker store, web3t
