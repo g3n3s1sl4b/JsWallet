@@ -68,8 +68,8 @@ change-amount-generic = (field)-> (store, amount-send, fast, cb)->
     calc-fee-fun = if fast then calc-fee else calc-fee-proxy
     send-to = store.current.send.wallet.address
     err, calced-fee <- calc-fee-fun { store, token, to: send-to, send.data, send.network, amount: result-amount-send, fee-type, tx-type, account }
-    send.error = "Calc Fee Error: #{err.message ? err}" if err?
-    return cb "Calc Fee Error: #{err.message ? err}" if err?
+    send.error = "#{err.message ? err}" if err?
+    return cb "#{err.message ? err}" if err?
     tx-fee =
         | fee-type is \custom => send.amount-send-fee
         | calced-fee? => calced-fee
@@ -124,8 +124,8 @@ export change-amount-send = (store, amount-send, fast, cb)->
     calc-fee-fun = if fast then calc-fee else calc-fee-proxy
     send-to = store.current.send.wallet.address
     err, calced-fee <- calc-fee-fun { token, to: send-to, send.data, send.network, amount: result-amount-send, fee-type, tx-type, account }
-    send.error = "Calc Fee Error: #{err.message ? err}" if err?
-    return cb "Calc Fee Error: #{err.message ? err}" if err?
+    send.error = "#{err.message ? err}" if err?
+    return cb "#{err.message ? err}" if err?
     tx-fee =
         | fee-type is \custom => send.amount-send-fee
         | calced-fee? => calced-fee
@@ -180,8 +180,8 @@ export change-amount-calc-fiat = (store, amount-send, fast, cb)->
     calc-fee-fun = if fast then calc-fee else calc-fee-proxy
     send-to = store.current.send.wallet.address
     err, calced-fee <- calc-fee-fun { token, to: send-to, send.data, send.network, amount: result-amount-send, fee-type, tx-type, account }
-    send.error = "Calc Fee Error: #{err.message ? err}" if err?
-    return cb "Calc Fee Error: #{err.message ? err}" if err?
+    send.error = "#{err.message ? err}" if err?
+    return cb "#{err.message ? err}" if err?
     tx-fee =
         | fee-type is \custom => send.amount-send-fee
         | calced-fee? => calced-fee
