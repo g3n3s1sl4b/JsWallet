@@ -467,10 +467,9 @@ send = ({ store, web3t })->
     token-display = (wallet.coin.nickname ? "").to-upper-case!
     fee-token-display = 
         | fee-token in <[ VLX2 VLX_EVM VLX_NATIVE ]> => \VLX
-        | _ => fee-token
-    fee-token-display = 
         | bridge-fee-token? => bridge-fee-token
-        | _ =>  fee-token-display
+        | wallet.network.tx-fee-in? => wallet.network.tx-fee-in
+        | _ => fee-token
     fee-token-display = fee-token-display.to-upper-case!
     fee-coin-image = 
         | send.fee-coin-image? => send.fee-coin-image
@@ -621,7 +620,14 @@ module.exports.init = ({ store, web3t }, cb)->
     err, fee <- contracts.get-home-network-fee({store, web3t}, store.current.send.to)
     store.current.send.foreign-network-fee = fee
     { wallet } = send-funcs store, web3t
-    store.current.send.fee-coin-image = wallet.coin.image   
+    store.current.send.fee-coin-image = 
+        | wallet.network.tx-fee-in? =>
+            console.log "wallet.network.tx-fee-in" wallet.network.tx-fee-in
+            tx-fee-in-wallet = wallets |> find (-> it.coin.token is wallet.network.tx-fee-in)
+            if not tx-fee-in-wallet then
+                store.current.send.error = "Please add #{((wallet.network.tx-fee-in ? "").to-upper-case!)} wallet in order to calculate transaction fee"
+            tx-fee-in-wallet?coin?image ? ""   
+        | _ => wallet.coin.image   
     if wallet.network.txBridgeFeeIn? and (wallet.coin.token isnt wallet.network.txBridgeFeeIn) then
         bridge-fee-token = wallet.network.txBridgeFeeIn
         second-wallet = wallets |> find (-> it.coin.token is bridge-fee-token)

@@ -178,7 +178,7 @@ require! {
                     @media(max-width: 540px)
                         background-image: none
                 .title
-                    padding: 0px
+                    padding: 0px 10px 0 0
                     width: 17%
                     min-width: 150px
                     text-align: left
@@ -644,7 +644,8 @@ staking-content = (store, web3t)->
     isSpinned = if ((store.staking.all-pools-loaded is no or !store.staking.all-pools-loaded?) and store.staking.pools-are-loading is yes) then "spin disabled" else ""
     build-staker = (store, web3t)-> (item)->
         checked = item.checked
-        stake = item.stake
+        stake = item.stakeInitial
+        $stake = round-human(stake, {decimals:2})
         my-stake =
             | +item.my-stake.length is 0 => []
             | _ => item.my-stake
@@ -686,7 +687,7 @@ staking-content = (store, web3t)->
                 span.pug.circle(class="#{item.status}") #{index}
             td.pug(datacolumn='Staker Address' title="#{item.address}")
                 address-holder-popup { store, wallet }
-            td.pug #{stake}
+            td.pug #{$stake}
             td.pug #{fee}%
             td.pug #{lastVote}
             td.pug(class="#{mystake-class}")
