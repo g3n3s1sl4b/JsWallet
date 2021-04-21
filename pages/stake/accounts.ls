@@ -287,7 +287,9 @@ staking-accounts-content = (store, web3t)->
                                     td.pug(width="10%" style=stats title="Current staking status. Please notice that you cannot stake / unstake immediately. You need to go through the waiting period. This is made to reduce attacks by stacking and unstacking spam.") #{lang.status} (?)
                                     td.pug(width="10%" style=stats) #{(lang.action ? "Action")}
                             tbody.pug
-                                store.staking.accounts |> map build store, web3t
+                                store.staking.accounts 
+                                    |> sort-by (.seed)
+                                    |> map build store, web3t
 staking-accounts = ({ store, web3t })->
     .pug.staking-accounts-content
         staking-accounts-content store, web3t
