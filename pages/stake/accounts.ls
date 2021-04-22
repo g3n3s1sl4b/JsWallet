@@ -156,10 +156,16 @@ staking-accounts-content = (store, web3t)->
         navigate store, web3t, "validators"
     build = (store, web3t)-> (item)->
         return null if not item? or not item.key?
-        { account, address, balance, key, rent, seed, status, validator } = item
+        { account, address, balance, balanceRaw, key, rent, seed, status, validator, active_stake, inactive_stake } = item
+        {activationEpoch, deactivationEpoch} = account?data?parsed?info?stake?delegation
         index = store.staking.accounts.index-of(item) + 1
+        activeBalanceIsZero =  +(balanceRaw `times` (10^9)) is +inactive_stake
+        max-epoch = web3t.velas.NativeStaking.max_epoch
         $status =
             | validator is "" => "Not Delegated"
+            | activeBalanceIsZero and +activationEpoch <= deactivationEpoch and  (deactivationEpoch isnt max-epoch) => "Not Delegated"
+            | (+active_stake isnt (+balanceRaw `times` (10^9))) and (deactivationEpoch is max-epoch) => "activating"
+            | (activeBalanceIsZero is no) and (deactivationEpoch isnt max-epoch) => "deactivating"
             | _ => status
         vlx =
             store.current.account.wallets |> find (.coin.token is \vlx_native)
@@ -191,8 +197,8 @@ staking-accounts-content = (store, web3t)->
             navigate store, web3t, \poolchoosing
             cb null
         $button =
-            | validator is ""  =>
-                button { store, text: lang.to_delegate, on-click: choose , type: \secondary , icon : \arrowRight }
+            | validator is "" or (activeBalanceIsZero and +activationEpoch <= deactivationEpoch and  (deactivationEpoch isnt max-epoch))   =>
+                button { store, text: lang.to_delegate, on-click: choose, type: \secondary , icon : \arrowRight }
             | _ => 
                 disabled = item.status in <[ deactivating ]>
                 button { store, classes: "action-undelegate" text: lang.to_undelegate, on-click: undelegate , type: \secondary , icon : \arrowLeft, makeDisabled: disabled }
@@ -288,7 +294,7 @@ staking-accounts-content = (store, web3t)->
                                     td.pug(width="10%" style=stats) #{(lang.action ? "Action")}
                             tbody.pug
                                 store.staking.accounts 
-                                    |> sort-by (.seed)
+                                    |> sort-by (.seed-index)
                                     |> map build store, web3t
 staking-accounts = ({ store, web3t })->
     .pug.staking-accounts-content
