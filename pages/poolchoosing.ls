@@ -638,7 +638,7 @@ staking-content = (store, web3t)->
         err, result <- as-callback web3t.velas.NativeStaking.delegate(pay-account.address, pool.address)
         console.error "Result sending:" err if err?
         alert store, err.toString! if err?
-        <- notify store, "FUNDS DELEGATED"
+        <- notify store, "Funds delegated to\n #{store.staking.chosenPool.address}" 
         navigate store, web3t, \validators
     change-address = ->
         store.staking.add.add-validator = it.target.value
