@@ -900,7 +900,7 @@ staking-content = (store, web3t)->
                     h2.pug Actions
                 .description.pug
                     .pug.buttons
-                        if delegate is yes
+                        if store.staking.chosenAccount.status is "inactive"
                             .pug
                                 button { store, on-click: delegate , type: \secondary , text: lang.to_delegate, icon : \arrowRight }
                                 button { store, on-click: withdraw , type: \secondary , text: lang.withdraw, icon : \arrowLeft }
