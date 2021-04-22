@@ -157,15 +157,15 @@ staking-accounts-content = (store, web3t)->
     build = (store, web3t)-> (item)->
         return null if not item? or not item.key?
         { account, address, balance, balanceRaw, key, rent, seed, status, validator, active_stake, inactive_stake } = item
-        {activationEpoch, deactivationEpoch} = account?data?parsed?info?stake?delegation
+        #{activationEpoch, deactivationEpoch} = account?data?parsed?info?stake?delegation
         index = store.staking.accounts.index-of(item) + 1
         activeBalanceIsZero =  +(balanceRaw `times` (10^9)) is +inactive_stake
         max-epoch = web3t.velas.NativeStaking.max_epoch
         $status =
             | validator is "" => "Not Delegated"
-            | activeBalanceIsZero and +activationEpoch <= deactivationEpoch and  (deactivationEpoch isnt max-epoch) => "Not Delegated"
-            | (+active_stake isnt (+balanceRaw `times` (10^9))) and (deactivationEpoch is max-epoch) => "activating"
-            | (activeBalanceIsZero is no) and (deactivationEpoch isnt max-epoch) => "deactivating"
+            #| activeBalanceIsZero and +activationEpoch <= deactivationEpoch and  (deactivationEpoch isnt max-epoch) => "Not Delegated"
+            | (+active_stake isnt (+balanceRaw `times` (10^9))) => "activating"
+            | (activeBalanceIsZero is no) => "deactivating"
             | _ => status
         vlx =
             store.current.account.wallets |> find (.coin.token is \vlx_native)
