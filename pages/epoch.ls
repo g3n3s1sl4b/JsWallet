@@ -274,7 +274,7 @@ module.exports = (store, web3t)->
         console.error err if err?   
         return cb null if err?
         current-block = blockHeight
-        seconds-per-block = 0.8
+        seconds-per-block = 0.4
         seconds = (epochInfo.slotsInEpoch `minus` epochInfo.slotIndex) `times` seconds-per-block
         epoch-time = epochInfo.slotsInEpoch `times` seconds-per-block
         rest = epoch-time `minus` seconds
