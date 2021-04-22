@@ -793,6 +793,10 @@ staking-content = (store, web3t)->
     usd-inactive_stake = round-number(inactive_stake `times` usd-rate, {decimals:2})
     usd-delegated_stake = round-number(delegated_stake `times` usd-rate, {decimals:2})
     validator = if store.staking.chosenAccount.validator is "" then "---" else store.staking.chosenAccount.validator
+    {activationEpoch, deactivationEpoch} = store.staking.chosenAccount?account?data?parsed?info?stake?delegation
+    activeBalanceIsZero =  +(store.staking.chosenAccount.balanceRaw `times` (10^9)) is +store.staking.chosenAccount.inactive_stake
+    max-epoch = web3t.velas.NativeStaking.max_epoch
+    stakeIsUndelegated =  (validator is "") or (activeBalanceIsZero and +activationEpoch <= deactivationEpoch and  (deactivationEpoch isnt max-epoch))
     myStakeMaxPart = 
         | store.staking.myStakeMaxPart? =>
             myStakeMaxPartVLX = parse-float(store.staking.myStakeMaxPart) `div` (10^9)
@@ -895,7 +899,7 @@ staking-content = (store, web3t)->
                     h2.pug Actions
                 .description.pug
                     .pug.buttons
-                        if not has-validator
+                        if stakeIsUndelegated is yes
                             .pug
                                 button { store, on-click: delegate , type: \secondary , text: lang.to_delegate, icon : \arrowRight }
                                 button { store, on-click: withdraw , type: \secondary , text: lang.withdraw, icon : \arrowLeft }
