@@ -100,6 +100,7 @@ fill-accounts = ({ store, web3t, on-progress, on-finish }, [item, ...rest]) ->
     rent = item.account?data?parsed?info?meta?rentExemptReserve
     err, seed <- as-callback web3t.velas.NativeStaking.checkSeed(item.pubkey.toBase58())
     item.seed    = seed ? ".."
+    item.seed-index  = +((item.seed + "").split(":").1 )
     item.address = item.pubkey.toBase58()
     item.key     = item.address
     item.rentRaw = rent
@@ -143,6 +144,7 @@ convert-accounts-to-view-model = (accounts) ->
             status: it.status ? "inactive"
             active_stake = it?active_stake ? 0
             inactive_stake = it?inactive_stake ? 0
+            seed-index =  it.seed-index
         }
 ##################
 convert-pools-to-view-model = (pools) ->
