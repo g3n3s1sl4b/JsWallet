@@ -166,12 +166,7 @@ staking-accounts-content = (store, web3t)->
         max-epoch = web3t.velas.NativeStaking.max_epoch
         is-activating = activeBalanceIsZero and validator isnt ""
         $status =
-            | validator is "" => "Not Delegated"
-            | is-activating is yes => "activating"
-            | activeBalanceIsZero => "Not Delegated"
-            | (activationEpoch? and deactivationEpoch?) and activeBalanceIsZero and +activationEpoch <= deactivationEpoch and  (deactivationEpoch isnt max-epoch) => "Not Delegated"
-            | deactivationEpoch? and (+active_stake isnt (+balanceRaw `times` (10^9))) and (deactivationEpoch is max-epoch) => "activating"
-            | deactivationEpoch? and (activeBalanceIsZero is no) and (deactivationEpoch isnt max-epoch) => "deactivating"
+            | item.status is "inactive" => "Not Delegated"
             | _ => status
         vlx =
             store.current.account.wallets |> find (.coin.token is \vlx_native)
@@ -190,7 +185,8 @@ staking-accounts-content = (store, web3t)->
             #return alert store, err, cb if err?
             #err <- can-make-staking store, web3t
             #return alert store, err, cb if err?
-            agree <- confirm store, lang.areYouSureToUndelegate
+            undelegate-amount = item.balance
+            agree <- confirm store, lang.areYouSureToUndelegate + " #{undelegate-amount} VLX \nfrom #{item.validator} ?"
             return if agree is no 
             #
             err, result <- as-callback web3t.velas.NativeStaking.undelegate(item.address)
@@ -203,7 +199,7 @@ staking-accounts-content = (store, web3t)->
             navigate store, web3t, \poolchoosing
             cb null
         $button =
-            | (item.validator is "" and activeBalanceIsZero) or ( (activationEpoch? and deactivationEpoch?) and (activeBalanceIsZero) and (+activationEpoch <= deactivationEpoch) and  (deactivationEpoch isnt max-epoch))   =>
+            | item.status is \inactive   =>
                 button { store, text: lang.to_delegate, on-click: choose, type: \secondary , icon : \arrowRight }
             | _ => 
                 disabled = item.status in <[ deactivating ]>
