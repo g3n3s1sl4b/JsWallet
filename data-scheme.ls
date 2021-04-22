@@ -175,7 +175,9 @@ store =
         delegators: 0
         reward-loading: no
         wait-for-epoch-change: no
-        lockups: []    
+        lockups: [] 
+        curr-validators-page: 1
+        validators-per-page: 10   
     filestore:
         menu-open: no
         file-tree: no
