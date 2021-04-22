@@ -222,6 +222,8 @@ require! {
                         animation: breathe 3s ease-in infinite
                         -moz-transition: breathe 3s ease-in infinite
                         -web-kit-transition: breathe 3s ease-in infinite
+                        position: relative
+                        max-height: 80vh
                         .stake-pointer
                             background: rgb(37, 87, 127)
                         &.lockup
@@ -236,7 +238,12 @@ require! {
                                 cursor: pointer
                                 &:hover
                                     color: #dde6ff
-                            th
+                            th,td
+                                position: sticky
+                                top: 0
+                                z-index: 1
+                                &:hover
+                                    color: #dde6ff
                                 @media(min-width:800px) and (max-width: 900px)
                                     font-size: 11px !important
                         td
@@ -564,7 +571,7 @@ require! {
     >.title
         position: sticky
         position: -webkit-sticky
-        z-index: 1
+        z-index: 2
         background: var(--background)
         box-sizing: border-box
         top: 0
@@ -730,6 +737,12 @@ staking-content = (store, web3t)->
         background: style.app.stats
     stats=
         background: style.app.stats
+    curr-validators-page = store.staking.curr-validators-page
+    all-v-length = store.staking.pools.length
+    prev-button-disabled = store.staking.curr-validators-page <= 1
+    next-button-disabled = Math.round(all-v-length `div` store.staking.validators-per-page) >= store.staking.curr-validators-page  
+    validators-go-back = (cb)->
+        cb null
     .pug.staking-content.delegate
         .pug.main-sections
             .pug.section
@@ -756,6 +769,15 @@ staking-content = (store, web3t)->
                                     td.pug(width="5%" style=stats title="How many stakers in a pool") #{lang.stakers} (?)
                             tbody.pug
                                 store.staking.pools |> map build-staker store, web3t
+                    if no 
+                        .pug.table-pagination
+                            button {store, classes: "width-auto", text: "<", no-icon:yes, on-click: validators-go-back, style: {width: \auto, display: \block}, disabled: prev-button-disabled}
+                            .span.pug.curren-page 
+                                span.pug Page 
+                                    | #{curr-validators-page} 
+                                    | / 
+                                    | #{all-v-length}
+                            button {store, classes: "width-auto", text: ">", no-icon:yes, on-click: validators-go-back, style: {width: \auto, display: \block}, disabled: next-button-disabled}
 validators = ({ store, web3t })->
     lang = get-lang store
     { go-back } = history-funcs store, web3t
@@ -809,6 +831,7 @@ validators.init = ({ store, web3t }, cb)!->
     random = ->
         Math.random!
     store.current.page = "validators"
+    store.staking.curr-validators-page = 1    
     store.staking.pools = []
     store.staking.accounts = []
     store.staking.delegators = {}
