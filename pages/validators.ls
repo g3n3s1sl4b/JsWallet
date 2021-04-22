@@ -690,8 +690,6 @@ staking-content = (store, web3t)->
             | _ => "..."
         mystake-class = if my-stake isnt 0 then "with-stake" else ""
         tr.pug(class="#{item.status}")
-            td.pug
-                span.pug.circle(class="#{item.status}") #{index}
             td.pug(datacolumn='Staker Address' title="#{item.address}")
                 address-holder-popup { store, wallet }
             td.pug #{$stake}
@@ -760,7 +758,6 @@ staking-content = (store, web3t)->
                         table.pug
                             thead.pug
                                 tr.pug
-                                    td.pug(width="3%" style=stats) #
                                     td.pug(width="30%" style=staker-pool-style title="Validator Staking Address. Permanent") #{lang.validator} (?) 
                                     td.pug(width="15%" style=stats title="Sum of all stakings") #{lang.total-stake} (?)
                                     td.pug(width="5%" style=stats title="Validator Interest. (100% - Validator Interest = Pool Staking Reward)") #{lang.comission} (?)
@@ -850,6 +847,7 @@ validators.init = ({ store, web3t }, cb)!->
             return cb null
     else
         store.staking.pools-network = store.current.network
+    #<- web3t.refresh
     store.staking.pools = []
     err, rent <- as-callback web3t.velas.NativeStaking.connection.getMinimumBalanceForRentExemption(200)
     rent = 2282880 if err?
