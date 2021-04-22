@@ -159,7 +159,7 @@ staking-accounts-content = (store, web3t)->
         { account, address, balance, key, rent, seed, status, validator } = item
         index = store.staking.accounts.index-of(item) + 1
         $status =
-            | status is 'inactive' => "Not Delegated"
+            | validator is "" => "Not Delegated"
             | _ => status
         vlx =
             store.current.account.wallets |> find (.coin.token is \vlx_native)
@@ -191,10 +191,10 @@ staking-accounts-content = (store, web3t)->
             navigate store, web3t, \poolchoosing
             cb null
         $button =
-            | item.status is "inactive" =>
+            | validator is ""  =>
                 button { store, text: lang.to_delegate, on-click: choose , type: \secondary , icon : \arrowRight }
             | _ => 
-                disabled = item.status is \deactivating
+                disabled = item.status in <[ deactivating ]>
                 button { store, classes: "action-undelegate" text: lang.to_undelegate, on-click: undelegate , type: \secondary , icon : \arrowLeft, makeDisabled: disabled }
         tr.pug(class="#{item.status}" key="#{address}")
             td.pug
