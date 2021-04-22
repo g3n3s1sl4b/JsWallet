@@ -781,8 +781,7 @@ staking-content = (store, web3t)->
     stats=
         background: style.app.stats
     has-validator = store.staking.chosenAccount.validator.toString!.trim! isnt ""
-    validator = store.staking.pools |> find (-> it.address is store.staking.chosenAccount.validator)
-    credits_observed = ( validator?credits_observed ? 0)
+    credits_observed = store.staking.chosenAccount?credits_observed ? 0
     active_stake = store.staking.chosenAccount.active_stake `div` (10^9)
     inactive_stake = store.staking.chosenAccount.inactive_stake `div` (10^9)
     delegated_stake = active_stake `plus` inactive_stake 
@@ -792,11 +791,12 @@ staking-content = (store, web3t)->
     usd-active_stake = round-number(active_stake `times` usd-rate, {decimals:2})
     usd-inactive_stake = round-number(inactive_stake `times` usd-rate, {decimals:2})
     usd-delegated_stake = round-number(delegated_stake `times` usd-rate, {decimals:2})
-    validator = if store.staking.chosenAccount.validator is "" then "---" else store.staking.chosenAccount.validator
-    #{activationEpoch, deactivationEpoch} = store.staking.chosenAccount?account?data?parsed?info?stake?delegation
-    activeBalanceIsZero =  +(store.staking.chosenAccount.balanceRaw `times` (10^9)) is +inactive_stake
+    $validator = if store.staking.chosenAccount.validator is "" then "---" else store.staking.chosenAccount.validator
+    activationEpoch = account?data?parsed?info?stake?delegation?activationEpoch
+    deactivationEpoch = account?data?parsed?info?stake?delegation?deactivationEpoch
+    activeBalanceIsZero =  +(store.staking.chosenAccount.balanceRaw `times` (10^9)) is +store.staking.chosenAccount.inactive_stake
     max-epoch = web3t.velas.NativeStaking.max_epoch
-    stakeIsUndelegated =  (validator is "") 
+    stakeIsUndelegated = (store.staking.chosenAccount.validator is "") or ( (activationEpoch? and deactivationEpoch?) and (activeBalanceIsZero) and (+activationEpoch <= deactivationEpoch) and (deactivationEpoch isnt max-epoch))
     myStakeMaxPart = 
         | store.staking.myStakeMaxPart? =>
             myStakeMaxPartVLX = parse-float(store.staking.myStakeMaxPart) `div` (10^9)
@@ -855,7 +855,7 @@ staking-content = (store, web3t)->
                     h3.pug #{lang.validator}
                 .description.pug
                     span.pug.chosen-account
-                        | #{validator}
+                        | #{$validator}
                         if store.staking.chosenAccount.validator isnt ""
                             img.pug.check(src="#{icons.img-check}")
             .pug.section

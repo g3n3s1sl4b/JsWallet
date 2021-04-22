@@ -154,18 +154,21 @@ staking-accounts-content = (store, web3t)->
     isSpinned = if ((store.staking.all-accounts-loaded is no or !store.staking.all-accounts-loaded?) and store.staking.accounts-are-loading is yes) then "spin disabled" else ""
     refresh = ->
         navigate store, web3t, "validators"
+    index = 0
     build = (store, web3t)-> (item)->
+        index++
         return null if not item? or not item.key?
         { account, address, balance, balanceRaw, key, rent, seed, status, validator, active_stake, inactive_stake } = item
-        #{activationEpoch, deactivationEpoch} = account?data?parsed?info?stake?delegation
-        index = store.staking.accounts.index-of(item) + 1
+        activationEpoch = account?data?parsed?info?stake?delegation?activationEpoch
+        deactivationEpoch = account?data?parsed?info?stake?delegation?deactivationEpoch
+        #index = store.staking.accounts.index-of(item) + 1
         activeBalanceIsZero =  +(balanceRaw `times` (10^9)) is +inactive_stake
         max-epoch = web3t.velas.NativeStaking.max_epoch
         $status =
             | validator is "" => "Not Delegated"
-            #| activeBalanceIsZero and +activationEpoch <= deactivationEpoch and  (deactivationEpoch isnt max-epoch) => "Not Delegated"
-            | (+active_stake isnt (+balanceRaw `times` (10^9))) => "activating"
-            | (activeBalanceIsZero is no) => "deactivating"
+            | (activationEpoch? and deactivationEpoch?) and activeBalanceIsZero and +activationEpoch <= deactivationEpoch and  (deactivationEpoch isnt max-epoch) => "Not Delegated"
+            | deactivationEpoch? and (+active_stake isnt (+balanceRaw `times` (10^9))) and (deactivationEpoch is max-epoch) => "activating"
+            | deactivationEpoch? and (activeBalanceIsZero is no) and (deactivationEpoch isnt max-epoch) => "deactivating"
             | _ => status
         vlx =
             store.current.account.wallets |> find (.coin.token is \vlx_native)
@@ -197,7 +200,7 @@ staking-accounts-content = (store, web3t)->
             navigate store, web3t, \poolchoosing
             cb null
         $button =
-            | validator is ""   =>
+            | (item.validator is "") or ( (activationEpoch? and deactivationEpoch?) and (activeBalanceIsZero) and (+activationEpoch <= deactivationEpoch) and  (deactivationEpoch isnt max-epoch))   =>
                 button { store, text: lang.to_delegate, on-click: choose, type: \secondary , icon : \arrowRight }
             | _ => 
                 disabled = item.status in <[ deactivating ]>
