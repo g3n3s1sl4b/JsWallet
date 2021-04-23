@@ -796,7 +796,6 @@ staking-content = (store, web3t)->
     deactivationEpoch = account?data?parsed?info?stake?delegation?deactivationEpoch
     activeBalanceIsZero =  +store.staking.chosenAccount.active_stake is 0
     max-epoch = web3t.velas.NativeStaking.max_epoch
-    delegate = (activeBalanceIsZero and store.staking.chosenAccount.validator is "") or ( (activationEpoch? and deactivationEpoch?) and (activeBalanceIsZero) and (+activationEpoch <= deactivationEpoch) and (deactivationEpoch isnt max-epoch))
     myStakeMaxPart = 
         | store.staking.myStakeMaxPart? =>
             myStakeMaxPartVLX = parse-float(store.staking.myStakeMaxPart) `div` (10^9)
