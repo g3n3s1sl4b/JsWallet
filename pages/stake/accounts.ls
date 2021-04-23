@@ -165,8 +165,10 @@ staking-accounts-content = (store, web3t)->
         activeBalanceIsZero =  +active_stake is 0
         max-epoch = web3t.velas.NativeStaking.max_epoch
         is-activating = activeBalanceIsZero and validator isnt ""
+        has-validator = item.validator.toString!.trim! isnt ""
         $status =
-            | item.status is "inactive" => "Not Delegated"
+            | item.status is "inactive" and (not has-validator) => "Not Delegated"
+            | item.status is "inactive" and has-validator => "Delegated (Inactive)"
             | _ => status
         vlx =
             store.current.account.wallets |> find (.coin.token is \vlx_native)
@@ -199,7 +201,7 @@ staking-accounts-content = (store, web3t)->
             navigate store, web3t, \poolchoosing
             cb null
         $button =
-            | item.status is \inactive   =>
+            | item.status is \inactive and not has-validator  =>
                 button { store, text: lang.to_delegate, on-click: choose, type: \secondary , icon : \arrowRight }
             | _ => 
                 disabled = item.status in <[ deactivating ]>

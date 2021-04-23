@@ -803,6 +803,10 @@ staking-content = (store, web3t)->
             myStakeMaxPartVLX + 
             " VLX"
         | _ => ""
+    $status =
+        | store.staking.chosenAccount.status is "inactive" and (not has-validator) => "Not Delegated"
+        | store.staking.chosenAccount.status is "inactive" and has-validator => "Delegated (Inactive)"
+        | _ => store.staking.chosenAccount.status
     .pug.staking-content.delegate
         .pug.single-section.form-group(id="choosen-pull")
             .pug.section
@@ -849,7 +853,7 @@ staking-content = (store, web3t)->
                 .description.pug
                     .pug.chosen-account(title="#{store.staking.chosenAccount.status}")
                         span.pug
-                            | #{store.staking.chosenAccount.status}
+                            | #{$status}
             .pug.section
                 .title.pug
                     h3.pug #{lang.validator}
@@ -900,7 +904,7 @@ staking-content = (store, web3t)->
                     h2.pug Actions
                 .description.pug
                     .pug.buttons
-                        if store.staking.chosenAccount.status is "inactive"
+                        if (store.staking.chosenAccount.status is "inactive" and not has-validator) 
                             .pug
                                 button { store, on-click: delegate , type: \secondary , text: lang.to_delegate, icon : \arrowRight }
                                 button { store, on-click: withdraw , type: \secondary , text: lang.withdraw, icon : \arrowLeft }
