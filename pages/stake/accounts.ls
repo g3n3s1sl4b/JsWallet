@@ -201,7 +201,7 @@ staking-accounts-content = (store, web3t)->
             navigate store, web3t, \poolchoosing
             cb null
         $button =
-            | item.status is \inactive and not has-validator  =>
+            | item.status is \inactive =>
                 button { store, text: lang.to_delegate, on-click: choose, type: \secondary , icon : \arrowRight }
             | _ => 
                 disabled = item.status in <[ deactivating ]>
