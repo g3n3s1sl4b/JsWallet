@@ -146,7 +146,11 @@ store =
         withdrawAmount: 0
         maxWithdrawAllowed: 0
         orderedWithdrawAmount: 0
-        poolsAreLoading: no   
+        poolsAreLoading: no
+        loadingAccountIndex: 0
+        totalOwnStakingAccounts: 0
+        totalValidators: 0
+        loadingValidatorIndex: 0
         add:
             add-validator: ""
             add-validator-stake: ""

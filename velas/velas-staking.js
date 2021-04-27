@@ -89,6 +89,12 @@ class VelasStaking {
         return this.sendTransaction(transaction);
     }
 
+    async getVoteAccounts() {
+        const voteAccounts = await this.connection.getVoteAccounts();
+        const validators = voteAccounts.current.concat(voteAccounts.delinquent);
+        return validators;
+    };
+
     async getStakingValidators() {
         const voteAccounts = await this.connection.getVoteAccounts();
 

@@ -32,6 +32,8 @@ fill-pools = ({ store, web3t, on-progress, on-finish }, [item, ...rest]) ->
         return on-finish null, []
     ###############
     ###############
+    store.staking.loadingValidatorIndex = store.staking.loadingValidatorIndex + 1
+    console.log "loading validator number" store.staking.loadingValidatorIndex
     item.activatedStake = item.activatedStake
     item.balanceRaw = item.activatedStake
     item.address = item.key
@@ -56,8 +58,11 @@ fill-pools = ({ store, web3t, on-progress, on-finish }, [item, ...rest]) ->
 query-pools-web3t = (store, web3t, on-progress, on-finish) ->       
     err, validators <- as-callback web3t.velas.NativeStaking.getStakingValidators()
     return on-finish err if err?
-    console.log "Got validators" validators
+    validators = [] if err?
+    #store.staking.totalValidators = validators.length
+    console.log "Got validators" validators.length
     store.staking.pools-are-loading = yes
+    validators = validators ++ validators ++ validators
     fill-pools { store, web3t, on-progress, on-finish }, validators
 query-pools = (store, web3t, on-progress, on-finish) ->
     err <- fill-delegators store, web3t      
@@ -83,7 +88,8 @@ query-accounts = (store, web3t, on-progress, on-finish) ->
 query-accounts-web3t = (store, web3t, on-progress, on-finish) ->
     parsedProgramAccounts = store.staking.parsedProgramAccounts
     err, accs <- as-callback web3t.velas.NativeStaking.getOwnStakingAccounts(parsedProgramAccounts) 
-    accs = [] if err?  
+    accs = [] if err?
+    store.staking.totalOwnStakingAccounts = accs.length
     console.log "accs" accs 
     return on-finish err if err?
     store.staking.accounts-are-loading = yes
@@ -97,6 +103,7 @@ fill-accounts = ({ store, web3t, on-progress, on-finish }, [item, ...rest]) ->
         store.staking.all-accounts-loaded = no
         store.staking.accounts-are-loading = no
         return on-finish null, []
+    store.staking.loadingAccountIndex += 1
     rent = item.account?data?parsed?info?meta?rentExemptReserve
     err, seed <- as-callback web3t.velas.NativeStaking.checkSeed(item.pubkey.toBase58())
     item.seed    = seed ? ".."
