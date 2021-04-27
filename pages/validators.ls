@@ -775,10 +775,11 @@ staking-content = (store, web3t)->
                         else
                             span.pug.entities-loader
                                 span.pug.inner-section
-                                    h3.pug.item.blink Loaded
-                                        span.pug.item  #{store.staking.loadingValidatorIndex}
-                                        span.pug.item of
-                                        span.pug.item  #{totalValidators}
+                                    h3.pug.item.blink Loading
+                                        if no
+                                            span.pug.item  #{store.staking.loadingValidatorIndex}
+                                            span.pug.item of
+                                            span.pug.item  #{totalValidators}
                     if no 
                         .pug.table-pagination
                             button {store, classes: "width-auto", text: "<", no-icon:yes, on-click: validators-go-back, style: {width: \auto, display: \block}, disabled: prev-button-disabled}
@@ -863,11 +864,11 @@ validators.init = ({ store, web3t }, cb)!->
     else
         store.staking.pools-network = store.current.network
     #<- web3t.refresh
-    err, voteAccounts <- as-callback web3t.velas.NativeStaking.getVoteAccounts()
-    console.log "Vote accounts" err, voteAccounts
-    voteAccounts = [] if err?
-    store.staking.totalValidators = voteAccounts.length
-    console.log "acc length must be more then 0" voteAccounts.length
+    #err, voteAccounts <- as-callback web3t.velas.NativeStaking.getVoteAccounts()
+    #console.log "Vote accounts" err, voteAccounts
+    #voteAccounts = [] if err?
+    #store.staking.totalValidators = voteAccounts.length
+    #console.log "acc length must be more then 0" voteAccounts.length
     store.staking.pools = []
     err, rent <- as-callback web3t.velas.NativeStaking.connection.getMinimumBalanceForRentExemption(200)
     rent = 2282880 if err?
@@ -887,7 +888,7 @@ validators.init = ({ store, web3t }, cb)!->
     return cb err if err?
     on-progress = ->
         store.staking.pools = convert-pools-to-view-model [...it]
-    err, pools <- query-pools store, web3t, on-progress
+    err, pools <- query-pools {store, web3t, on-progress}
     return cb err if err?
     store.staking.pools = convert-pools-to-view-model pools
     store.staking.accounts = convert-accounts-to-view-model result
