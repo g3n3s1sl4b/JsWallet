@@ -241,7 +241,7 @@ module.exports = (store, web3t)->
     filestorage = if store.current.page is \filestorage then \active else \not-active
     staking = if store.current.page is \staking then \active else \not-active
     staking-active = if store.current.page is \staking then \active else \not-active
-    delegate-active = if store.current.page is \choosestaker then \active else \not-active
+    delegate-active = if store.current.page is \validators then \active else \not-active
     info-active = if store.current.page is \info then \active else \not-active
     resources = if store.current.page is \resources then \active else \not-active
     faq = if store.current.page is \faq then \active else \not-active
@@ -306,7 +306,7 @@ module.exports = (store, web3t)->
     goto-resources = ->
         navigate store, web3t, \resources
     goto-choose-staker = ->
-        navigate store, web3t, \choosestaker
+        navigate store, web3t, \validators
     goto-info = ->
         navigate store, web3t, \info
     goto-faq = ->

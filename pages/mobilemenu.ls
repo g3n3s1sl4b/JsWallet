@@ -359,7 +359,7 @@ module.exports = (store, web3)->
         navigate store, web3t, \staking
         store.menu.show = no
     goto-choose-staker = ->
-        navigate store, web3t, \choosestaker
+        navigate store, web3t, \validators
         store.menu.show = no
     goto-info = ->
         navigate store, web3t, \info
