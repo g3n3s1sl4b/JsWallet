@@ -6,7 +6,6 @@ require! {
     \../../get-primary-info.ls
     \../../get-lang.ls
     \../../history-funcs.ls
-    \../../staking-funcs.ls : { query-pools, query-accounts, convert-pools-to-view-model, convert-accounts-to-view-model }
     \../icon.ls
     \prelude-ls : { map, split, filter, find, foldl, sort-by, unique, head, each }
     \../../math.ls : { div, times, plus, minus }
@@ -40,9 +39,6 @@ as-callback = (p, cb)->
     .blink
         animation: 1s linear blink-animation  infinite
         -webkit-animation: 1s linear blink-animation  infinite
-    .create-staking-account
-        .btn
-            display: block
     .entities-loader
         display: block
         padding: 40px
@@ -246,11 +242,11 @@ staking-accounts-content = (store, web3t)->
     stats=
         background: style.app.stats
     notification-border =
-        display: "inline-block"
         border: "1px solid orange"
         padding: 5px
         border-radius: 5px
         width: "auto"
+        margin: "10px 20px 0"
     block-style = 
         display: "block"
     create-staking-account = ->
@@ -258,6 +254,7 @@ staking-accounts-content = (store, web3t)->
         err <- as-callback web3t.velas.NativeStaking.getStakingAccounts(store.staking.parsedProgramAccounts)
         console.error err if err?
         amount <- prompt2 store, lang.howMuchToDeposit
+        return if not amount?
         return if amount+"".trim!.length is 0
         min_stake = web3t.velas.NativeStaking.min_stake
         main_balance = get-balance!
@@ -285,12 +282,12 @@ staking-accounts-content = (store, web3t)->
                     .title.pug
                         h3.pug #{lang.createStakingAccount}
                     .description.pug
+                        span.pug
+                            button {store, classes: "width-auto", text: lang.createAccount, no-icon:yes, on-click: create-staking-account, style: {width: \auto, display: \block}}
                         if store.staking.accounts.length is 0
                             span.pug(style=notification-border) Please create a staking account before you stake
                         else 
                             span.pug(style=notification-border) You can stake more by creating new accounts
-                        .pug(style=block-style)
-                            button {store, classes: "width-auto", text: lang.createAccount, no-icon:yes, on-click: create-staking-account, style: {width: \auto, display: \block}}
         .pug
             .form-group.pug(id="staking-accounts")
                 .pug.section
@@ -318,7 +315,7 @@ staking-accounts-content = (store, web3t)->
                         else
                             span.pug.entities-loader
                                 span.pug.inner-section
-                                    h3.pug.item.blink Loaded
+                                    h3.pug.item.blink Loading...
                                         span.pug.item  #{loadingAccountIndex}
                                         span.pug.item of
                                         span.pug.item  #{totalOwnStakingAccounts}

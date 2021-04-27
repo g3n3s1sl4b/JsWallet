@@ -775,7 +775,7 @@ staking-content = (store, web3t)->
                         else
                             span.pug.entities-loader
                                 span.pug.inner-section
-                                    h3.pug.item.blink Loading
+                                    h3.pug.item.blink Loading...
                                         if no
                                             span.pug.item  #{store.staking.loadingValidatorIndex}
                                             span.pug.item of
