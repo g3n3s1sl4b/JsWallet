@@ -7,12 +7,10 @@ require! {
     \bignumber.js
     \../get-lang.ls
     \../history-funcs.ls
-    #\../staking/funcs.ls : { query-pools }
     \../staking-funcs.ls : { query-pools, query-accounts, convert-pools-to-view-model, convert-accounts-to-view-model }
     \./icon.ls
     \prelude-ls : { map, split, filter, find, foldl, sort-by, unique, head, each, obj-to-pairs }
     \../math.ls : { div, times, plus, minus }
-    \../velas/velas-node-template.ls
     \../../web3t/providers/deps.js : { hdkey, bip39 }
     \md5
     \../menu-funcs.ls
@@ -21,14 +19,11 @@ require! {
     \../copied-inform.ls
     \../copy.ls
     \../round5.ls
-    \../../web3t/addresses.js : { ethToVlx, vlxToEth }
     \./switch-account.ls
     \../round-human.ls
-    \./exit-stake.ls
     \../icons.ls
     \./placeholder.ls
     \./claim-stake.ls
-    \../staking/can-make-staking.ls
     \./epoch.ls
     \./confirmation.ls : { alert }
     \../components/button.ls
@@ -36,7 +31,6 @@ require! {
     \../components/address-holder-popup.ls
     \./alert-txn.ls
     \../components/amount-field.ls
-    \./move-stake.ls
     \../seed.ls : seedmem
     \../components/burger.ls
     \./stake/accounts.ls : \stake-accounts
@@ -54,6 +48,23 @@ require! {
     box-sizing: border-box
     padding: 0px
     background: transparent
+    @keyframes blink-animation
+        50%
+            opacity: 0.3
+    @-webkit-keyframes blink-animation
+        50%
+            opacity: 0.3
+    .blink
+        animation: 1s linear blink-animation  infinite
+        -webkit-animation: 1s linear blink-animation  infinite
+    .entities-loader
+        display: block
+        padding: 40px
+        text-align: center
+        .inner-section
+            padding: 40px
+            .item
+                display: inline
     .stake-item
         background: #628881
         color: white
@@ -700,13 +711,6 @@ staking-content = (store, web3t)->
             td.pug #{item.stakers}
     cancel-pool = ->
         store.staking.chosen-pool = null
-    update-just-pools = (cb)->
-        return cb null if store.staking.accounts.length is 0
-        on-progress = ->
-            store.staking.pools = convert-pools-to-view-model [...it]
-        err, pools <- query-pools store, web3t, on-progress
-        return cb err if err?
-        #store.staking.pools = convert-pools-to-view-model pools
     update-pools-and-accounts = (cb)->
         return if store.staking.accounts.length > 0
         store.staking.all-accounts-loaded = no
@@ -723,8 +727,7 @@ staking-content = (store, web3t)->
         cb = console.log
         store.staking.pools = []
         store.staking.delegators = {}
-        <- update-just-pools!
-        <- update-pools-and-accounts!    
+        <- update-pools-and-accounts!
         cb null, \done
     icon-style =
         color: style.app.loader
@@ -741,6 +744,8 @@ staking-content = (store, web3t)->
     next-button-disabled = Math.round(all-v-length `div` store.staking.validators-per-page) >= store.staking.curr-validators-page  
     validators-go-back = (cb)->
         cb null
+    totalValidators = store.staking.totalValidators
+    loadingValidatorIndex = store.staking.loadingValidatorIndex
     .pug.staking-content.delegate
         .pug.main-sections
             .pug.section
@@ -755,17 +760,26 @@ staking-content = (store, web3t)->
                     .title.pug
                         h3.pug #{lang.validators}
                     .description.pug.table-scroll
-                        table.pug
-                            thead.pug
-                                tr.pug
-                                    td.pug(width="30%" style=staker-pool-style title="Validator Staking Address. Permanent") #{lang.validator} (?) 
-                                    td.pug(width="15%" style=stats title="Sum of all stakings") #{lang.total-stake} (?)
-                                    td.pug(width="5%" style=stats title="Validator Interest. (100% - Validator Interest = Pool Staking Reward)") #{lang.comission} (?)
-                                    td.pug(width="10%" style=stats title="Last Staking Amount") #{lang.lastVote} (?)
-                                    td.pug(width="10%" style=stats title="Find you staking by Seed") #{lang.my-stake} (?)
-                                    td.pug(width="5%" style=stats title="How many stakers in a pool") #{lang.stakers} (?)
-                            tbody.pug
-                                store.staking.pools |> map build-staker store, web3t
+                        if store.staking.pools-are-loading is no then
+                            table.pug
+                                thead.pug
+                                    tr.pug
+                                        td.pug(width="30%" style=staker-pool-style title="Validator Staking Address. Permanent") #{lang.validator} (?)
+                                        td.pug(width="15%" style=stats title="Sum of all stakings") #{lang.total-stake} (?)
+                                        td.pug(width="5%" style=stats title="Validator Interest. (100% - Validator Interest = Pool Staking Reward)") #{lang.comission} (?)
+                                        td.pug(width="10%" style=stats title="Last Staking Amount") #{lang.lastVote} (?)
+                                        td.pug(width="10%" style=stats title="Find you staking by Seed") #{lang.my-stake} (?)
+                                        td.pug(width="5%" style=stats title="How many stakers in a pool") #{lang.stakers} (?)
+                                tbody.pug
+                                    store.staking.pools |> map build-staker store, web3t
+                        else
+                            span.pug.entities-loader
+                                span.pug.inner-section
+                                    h3.pug.item.blink Loading...
+                                        if no
+                                            span.pug.item  #{store.staking.loadingValidatorIndex}
+                                            span.pug.item of
+                                            span.pug.item  #{totalValidators}
                     if no 
                         .pug.table-pagination
                             button {store, classes: "width-auto", text: "<", no-icon:yes, on-click: validators-go-back, style: {width: \auto, display: \block}, disabled: prev-button-disabled}
@@ -841,6 +855,8 @@ validators.init = ({ store, web3t }, cb)!->
     store.staking.accounts-are-loading = yes
     store.staking.chosen-pool = null
     store.staking.add.add-validator-stake = 0
+    store.staking.loadingAccountIndex = 0
+    store.staking.loadingValidatorIndex = 0
     index-is-different = store.current.accountIndex isnt store.staking.accountIndex
     if store.staking.pools-network is store.current.network then
         if (store.staking.all-pools-loaded? and store.staking.all-pools-loaded is yes and not index-is-different)
@@ -848,6 +864,11 @@ validators.init = ({ store, web3t }, cb)!->
     else
         store.staking.pools-network = store.current.network
     #<- web3t.refresh
+    #err, voteAccounts <- as-callback web3t.velas.NativeStaking.getVoteAccounts()
+    #console.log "Vote accounts" err, voteAccounts
+    #voteAccounts = [] if err?
+    #store.staking.totalValidators = voteAccounts.length
+    #console.log "acc length must be more then 0" voteAccounts.length
     store.staking.pools = []
     err, rent <- as-callback web3t.velas.NativeStaking.connection.getMinimumBalanceForRentExemption(200)
     rent = 2282880 if err?
@@ -867,16 +888,8 @@ validators.init = ({ store, web3t }, cb)!->
     return cb err if err?
     on-progress = ->
         store.staking.pools = convert-pools-to-view-model [...it]
-    err, pools <- query-pools store, web3t, on-progress
+    err, pools <- query-pools {store, web3t, on-progress}
     return cb err if err?
     store.staking.pools = convert-pools-to-view-model pools
-    # end validators array
-    #store.staking.accounts = accounts
-    ###
-    ###
-#    on-progress = ->
-#        store.staking.accounts = convert-accounts-to-view-model [...it]
-#    err, result <- query-accounts store, web3t, on-progress
-#    return cb err if err?
     store.staking.accounts = convert-accounts-to-view-model result
 module.exports = validators

@@ -7,6 +7,8 @@ require! {
     \../components/text-field.ls   
     \../round5edit.ls
     \../components/amount-field.ls
+    \prelude-ls : { find }
+    \../math.ls : { minus }
 }
 .confirmation
     @-webkit-keyframes appear
@@ -283,7 +285,9 @@ prompt-modal = (store)->
                         | #{lang.cancel}
 prompt-modal2 = (store)->
     return null if typeof! store.current.prompt2 isnt \String
+    wallet = store.current.account.wallets |> find (-> it.coin.token is \vlx_native)
     confirm = ->
+        return if not store.current.prompt-answer? or store.current.prompt-answer is 0 or store.current.prompt-answer is ""
         store.current.prompt2 = yes
         callback = state.callback
         state.callback = null
@@ -297,7 +301,12 @@ prompt-modal2 = (store)->
         callback null if typeof! callback is \Function
         store.current.prompt-answer = ""
     amount-change = (e)->
-        store.current.prompt-answer = e.target.value
+        balance = (wallet?balance ? 1)
+        max-amount = Math.floor(balance `minus` 1)
+        amount =
+            | e.target.value > max-amount => max-amount
+            | _ => e.target.value
+        store.current.prompt-answer = amount
     style = get-primary-info store
     confirmation-style =
         background: style.app.background
@@ -308,7 +317,7 @@ prompt-modal2 = (store)->
         color: style.app.text
         border: "0"
     input-holder-style = 
-        max-width: '200px'
+        max-width: '250px'
         margin: 'auto'
     button-style=
         color: style.app.text
@@ -318,12 +327,26 @@ prompt-modal2 = (store)->
         color: style.app.text
         border-bottom: "1px solid #{style.app.border}"
     lang = get-lang store
+    button-primary3-style=
+        border: "0"
+        color: style.app.text2
+        background: style.app.primary3
+        background-color: style.app.primary3-spare
+        cursor: "pointer"
+    max-amount-container =
+        text-align: "left"
+    use-max-amount = !->
+        store.current.prompt-answer = 
+            | not wallet? => 0
+            | _ => Math.floor(wallet.balance `minus` 1)
     .pug.confirmation
         .pug.confirmation-body(style=confirmation)
             .pug.header(style=style=confirmation-style)#{store.current.prompt2}
             .pug.text(style=style=confirmation-style)
             .pug(style=input-holder-style)
                 amount-field { store, value: "#{round5edit store.current.prompt-answer}", on-change: amount-change, placeholder="0", id="prompt-input" }
+                .pug.max-amount(style=max-amount-container)
+                    button.pug.send-all(on-click=use-max-amount style=button-primary3-style type="button" id="send-max") #{lang.use-max}
             .pug.buttons
                 button.pug.button(on-click=confirm style=button-style id="prompt-confirm")
                     span.apply.pug

@@ -6,19 +6,12 @@ require! {
     \../../get-primary-info.ls
     \../../get-lang.ls
     \../../history-funcs.ls
-    \../../staking-funcs.ls : { query-pools, query-accounts, convert-pools-to-view-model, convert-accounts-to-view-model }
     \../icon.ls
     \prelude-ls : { map, split, filter, find, foldl, sort-by, unique, head, each }
     \../../math.ls : { div, times, plus, minus }
-    \../../../web3t/providers/deps.js : { hdkey, bip39 }
-    \md5
     \safe-buffer : { Buffer }
     \../../../web3t/addresses.js : { ethToVlx }
     \../../round-human.ls
-    #\../../request-stake.ls
-    #\../../request-unstake.ls
-    #\../../txs-history.ls
-    #\../pools-list.ls
     \../../components/checkbox.ls
     \../../icons.ls
     \../placeholder.ls
@@ -37,9 +30,23 @@ as-callback = (p, cb)->
     p.then (data)->
         cb null, data
 .staking-accounts-content
-    .create-staking-account
-        .btn
-            display: block
+    @keyframes blink-animation
+        50%
+            opacity: 0.3
+    @-webkit-keyframes blink-animation
+        50%
+            opacity: 0.3
+    .blink
+        animation: 1s linear blink-animation  infinite
+        -webkit-animation: 1s linear blink-animation  infinite
+    .entities-loader
+        display: block
+        padding: 40px
+        text-align: center
+        .inner-section
+            padding: 40px
+            .item
+                display: inline
     .hint
         .tooltip
             position: absolute
@@ -92,6 +99,7 @@ as-callback = (p, cb)->
             & + label
                 margin: 5px 0
         .table-scroll.lockup
+            transition: max-height .5s
             table
                 thead
                     td
@@ -234,11 +242,11 @@ staking-accounts-content = (store, web3t)->
     stats=
         background: style.app.stats
     notification-border =
-        display: "inline-block"
         border: "1px solid orange"
         padding: 5px
         border-radius: 5px
         width: "auto"
+        margin: "10px 20px 0"
     block-style = 
         display: "block"
     create-staking-account = ->
@@ -246,6 +254,7 @@ staking-accounts-content = (store, web3t)->
         err <- as-callback web3t.velas.NativeStaking.getStakingAccounts(store.staking.parsedProgramAccounts)
         console.error err if err?
         amount <- prompt2 store, lang.howMuchToDeposit
+        return if not amount?
         return if amount+"".trim!.length is 0
         min_stake = web3t.velas.NativeStaking.min_stake
         main_balance = get-balance!
@@ -264,6 +273,8 @@ staking-accounts-content = (store, web3t)->
         <- set-timeout _, 500
         <- notify store, lang.accountCreatedAndFundsDeposited
         navigate store, web3t, "validators"
+    totalOwnStakingAccounts = store.staking.totalOwnStakingAccounts
+    loadingAccountIndex = store.staking.loadingAccountIndex
     .pug.staking-accounts-content
         .pug
             .form-group.pug(id="create-staking-account")
@@ -271,12 +282,12 @@ staking-accounts-content = (store, web3t)->
                     .title.pug
                         h3.pug #{lang.createStakingAccount}
                     .description.pug
+                        span.pug
+                            button {store, classes: "width-auto", text: lang.createAccount, no-icon:yes, on-click: create-staking-account, style: {width: \auto, display: \block}}
                         if store.staking.accounts.length is 0
                             span.pug(style=notification-border) Please create a staking account before you stake
                         else 
                             span.pug(style=notification-border) You can stake more by creating new accounts
-                        .pug(style=block-style)
-                            button {store, classes: "width-auto", text: lang.createAccount, no-icon:yes, on-click: create-staking-account, style: {width: \auto, display: \block}}
         .pug
             .form-group.pug(id="staking-accounts")
                 .pug.section
@@ -286,20 +297,28 @@ staking-accounts-content = (store, web3t)->
                             .loader.pug(on-click=refresh style=icon-style title="refresh" class="#{isSpinned}")
                                 icon \Sync, 25
                     .description.pug.table-scroll.lockup
-                        table.pug
-                            thead.pug
-                                tr.pug
-                                    td.pug(width="3%" style=stats) #
-                                    td.pug(width="40%" style=staker-pool-style title="Your Staking Account") #{lang.account} (?)
-                                    td.pug(width="10%" style=stats title="Your Deposited Balance") #{lang.balance} (?)
-                                    td.pug(width="30%" style=stats title="Where you staked") #{lang.validator} (?)
-                                    td.pug(width="7%" style=stats title="The ID of your stake. This is made to simplify the search of your stake in validator list") #{lang.seed} (?)
-                                    td.pug(width="10%" style=stats title="Current staking status. Please notice that you cannot stake / unstake immediately. You need to go through the waiting period. This is made to reduce attacks by stacking and unstacking spam.") #{lang.status} (?)
-                                    td.pug(width="10%" style=stats) #{(lang.action ? "Action")}
-                            tbody.pug
-                                store.staking.accounts 
-                                    |> sort-by (.seed-index)
-                                    |> map build store, web3t
+                        if store.staking.accounts-are-loading is no then
+                            table.pug
+                                thead.pug
+                                    tr.pug
+                                        td.pug(width="3%" style=stats) #
+                                        td.pug(width="40%" style=staker-pool-style title="Your Staking Account") #{lang.account} (?)
+                                        td.pug(width="10%" style=stats title="Your Deposited Balance") #{lang.balance} (?)
+                                        td.pug(width="30%" style=stats title="Where you staked") #{lang.validator} (?)
+                                        td.pug(width="7%" style=stats title="The ID of your stake. This is made to simplify the search of your stake in validator list") #{lang.seed} (?)
+                                        td.pug(width="10%" style=stats title="Current staking status. Please notice that you cannot stake / unstake immediately. You need to go through the waiting period. This is made to reduce attacks by stacking and unstacking spam.") #{lang.status} (?)
+                                        td.pug(width="10%" style=stats) #{(lang.action ? "Action")}
+                                tbody.pug
+                                    store.staking.accounts
+                                        |> sort-by (.seed-index)
+                                        |> map build store, web3t
+                        else
+                            span.pug.entities-loader
+                                span.pug.inner-section
+                                    h3.pug.item.blink Loading...
+                                        span.pug.item  #{loadingAccountIndex}
+                                        span.pug.item of
+                                        span.pug.item  #{totalOwnStakingAccounts}
 staking-accounts = ({ store, web3t })->
     .pug.staking-accounts-content
         staking-accounts-content store, web3t

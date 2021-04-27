@@ -228,7 +228,7 @@ require! {
                         -moz-transition: breathe 3s ease-in infinite
                         -web-kit-transition: breathe 3s ease-in infinite
                         height: auto
-                        max-height: 400px
+                        min-height: 90vh
                         .stake-pointer
                             background: rgb(37, 87, 127)
                         &.lockup
@@ -827,8 +827,9 @@ staking-content = (store, web3t)->
                     .title.pug
                         h3.pug #{lang.pleaseSelectValidator}
                         .pug
-                            .loader.pug(on-click=refresh style=icon-style title="refresh" class="#{isSpinned}")
-                                icon \Sync, 25
+                            if no
+                                .loader.pug(on-click=refresh style=icon-style title="refresh" class="#{isSpinned}")
+                                    icon \Sync, 25
                     .description.pug.table-scroll
                         table.pug
                             thead.pug

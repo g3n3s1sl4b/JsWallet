@@ -10,6 +10,7 @@ require! {
     \./switch-account.ls
     \../icons.ls
     \./choosestaker.ls
+    \./validators.ls
     \./staker-stats.ls
     \./staker-stats2.ls
     \./staker-stats3.ls
@@ -293,10 +294,10 @@ feel-rewards = ({ store, web3t }, [epoch, ...epochs], cb)->
     cb null, all
 module.exports.init = ({ store, web3t }, cb)->
     return cb null if store.staking.pools-are-loading is yes
-    err, data <- choosestaker.init { store, web3t }
+    err, data <- validators.init { store, web3t }
     cb null
 module.exports.focus = ({ store, web3t}, cb)->
-    err <- choosestaker.focus { store, web3t }
+    err <- validators.focus { store, web3t }
     return cb err if err?
     #err, epoch <- web3t.velas.Staking.stakingEpoch
     #return cb err if err?
