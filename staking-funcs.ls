@@ -93,14 +93,15 @@ fill-delegator = (store, web3t, [acc, ...accounts])!->
     fill-delegator(store, web3t, accounts)
 # Accounts
 query-accounts = (store, web3t, on-progress, on-finish) ->
-    if (store.staking.getAccountsFromCashe is yes) and store.staking.accountsCashed? and store.staking.accountsCashed.length > 0
+    accountIndex = store.current.accountIndex
+    if (store.staking.getAccountsFromCashe is yes) and store.staking.accountsCached[accountIndex]? and store.staking.accountsCached[accountIndex].length > 0
         console.log "get accounts from cache"
         store.staking.all-accounts-loaded = yes
         store.staking.accounts-are-loading = no
-        return on-finish null, store.staking.accountsCashed
+        return on-finish null, store.staking.accountsCached[accountIndex]
     err, accounts <- query-accounts-web3t store, web3t, on-progress
     return on-finish err if err?
-    store.staking.accountsCashed = accounts
+    store.staking.accountsCached[accountIndex] = accounts
     on-finish err, accounts
 query-accounts-web3t = (store, web3t, on-progress, on-finish) ->
     err, parsedProgramAccounts <- as-callback web3t.velas.NativeStaking.getParsedProgramAccounts()

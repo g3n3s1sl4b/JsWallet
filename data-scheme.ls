@@ -156,6 +156,7 @@ store =
         cachedValidators: null
         getAccountsFromCashe: yes
         parsedProgramAccounts: []
+        accountsCached: {}
         add:
             add-validator: ""
             add-validator-stake: ""
