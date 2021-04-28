@@ -44,7 +44,7 @@ module.exports = (store, web3t, wallets, wallet)->
         err <- send-transaction config  
         store.current.send.error = err if err?
         return cb err if err?
-    usd-rate = wallet?usd-rate ? 0
+    usd-rate = wallet?usd-rate ? ".."
     uninstall = (e)->
         e.stop-propagation!
         wallet-index = 
@@ -56,7 +56,7 @@ module.exports = (store, web3t, wallets, wallet)->
         store.current.wallet-index = 0
     expand = (e)->
         e.stop-propagation!
-        wallet-is-disabled = isNaN(wallet.balance) or isNaN(wallet.balanceUsd)
+        wallet-is-disabled = isNaN(wallet.balance)
         is-loading = store.current.refreshing is yes
         return if wallet-is-disabled or is-loading 
         return send(wallet, {}) if store.current.wallet-index is index
