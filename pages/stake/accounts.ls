@@ -161,6 +161,8 @@ staking-accounts-content = (store, web3t)->
         store.staking-accounts.add.add-validator-stake = Math.max (balance `minus` 0.1), 0
     isSpinned = if ((store.staking.all-accounts-loaded is no or !store.staking.all-accounts-loaded?) and store.staking.accounts-are-loading is yes) then "spin disabled" else ""
     refresh = ->
+        return if store.staking.all-accounts-loaded isnt yes
+        store.staking.getAccountsFromCashe = no
         navigate store, web3t, "validators"
     index = 0
     build = (store, web3t)-> (item)->
@@ -202,6 +204,7 @@ staking-accounts-content = (store, web3t)->
             console.error "Undelegate error: " err if err?
             return alert store, err.toString! if err?
             <- notify store, lang.fundsUndelegated
+            store.staking.getAccountsFromCashe = no
             navigate store, web3t, \validators
         choose = ->
             store.staking.chosen-account = item
@@ -270,7 +273,9 @@ staking-accounts-content = (store, web3t)->
         if err?
             err = lang.balanceIsNotEnoughToCreateStakingAccount if ((err.toString! ? "").index-of("custom program error: 0x1")) > -1
         return alert store, err.toString! if err?
-        <- set-timeout _, 500
+        store.staking.getAccountsFromCashe = no
+        #checkAccountWasCreated
+        <- set-timeout _, 1000
         <- notify store, lang.accountCreatedAndFundsDeposited
         navigate store, web3t, "validators"
     totalOwnStakingAccounts = store.staking.totalOwnStakingAccounts

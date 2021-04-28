@@ -709,6 +709,7 @@ staking-content = (store, web3t)->
         store.staking.chosenAccount = null
     refresh = ->
         store.staking.all-pools-loaded = no
+        store.staking.getAccountsFromCashe = no
         if ((store.staking.all-pools-loaded is no or !store.staking.all-pools-loaded?) and store.staking.pools-are-loading is yes)
             return no
         store.staking.pools-are-loading = yes
@@ -725,8 +726,9 @@ staking-content = (store, web3t)->
         err, result <- as-callback web3t.velas.NativeStaking.withdraw(address, amount)
         console.error "Undelegate error: " err if err?
         return alert store, err.toString! if err?
-        <- set-timeout _, 500
+        <- set-timeout _, 1000
         <- notify store, lang.fundsWithdrawn
+        store.staking.getAccountsFromCashe = no
         navigate store, web3t, \validators
     delegate = ->
         navigate store, web3t, \poolchoosing
@@ -737,8 +739,9 @@ staking-content = (store, web3t)->
         err, result <- as-callback web3t.velas.NativeStaking.undelegate(store.staking.chosenAccount.address)
         console.error "Undelegate error: " err if err?
         return alert store, err.toString! if err?
-        <- set-timeout _, 500
-        <- notify store, lang.fundsUndelegated  
+        <- set-timeout _, 1000
+        <- notify store, lang.fundsUndelegated
+        store.staking.getAccountsFromCashe = no
         navigate store, web3t, \validators
     split-account = ->
         cb = console.log 
@@ -770,6 +773,7 @@ staking-content = (store, web3t)->
         return alert store, err.toString! if err?
         <- set-timeout _, 500
         <- notify store, lang.accountCreatedAndFundsSplitted
+        store.staking.getAccountsFromCashe = no
         navigate store, web3t, "validators"
     icon-style =
         color: style.app.loader

@@ -151,6 +151,11 @@ store =
         totalOwnStakingAccounts: 0
         totalValidators: 0
         loadingValidatorIndex: 0
+        get-accounts-last-time: null
+        cachedAccounts: null
+        cachedValidators: null
+        getAccountsFromCashe: yes
+        parsedProgramAccounts: []
         add:
             add-validator: ""
             add-validator-stake: ""
