@@ -9,8 +9,6 @@ RUN apk add --no-cache --update \
 WORKDIR /app
 
 RUN git clone https://github.com/velas/web3t.git web3t
-RUN mkdir -p .compiled-ssr
-RUN cp -pr web3t .compiled-ssr/web3t
 RUN cd web3t
 
 COPY . wallet
@@ -18,7 +16,11 @@ COPY . wallet
 WORKDIR /app/web3t
 RUN npm install
 
+
 WORKDIR /app/wallet
+RUN mkdir -p .compiled-ssr
+RUN cp -pr /app/web3t .compiled-ssr/web3t
+
 RUN mkdir -p /app/wallet/.compiled-ssr/web3t/providers /app/wallet/.compiled-ssr/web3t/node_modules_embed/ethereumjs-tx
 RUN npm install --ignore-scripts
 RUN npm install -g --unsafe-perm node-sass lsxc livescript
