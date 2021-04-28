@@ -805,6 +805,7 @@ staking-content = (store, web3t)->
     $status =
         | store.staking.chosenAccount.status is "inactive" and (not has-validator) => "Not Delegated"
         | store.staking.chosenAccount.status is "inactive" and has-validator => "Delegated (Inactive)"
+        | store.staking.chosenAccount.status is "activating" => ""
         | _ => store.staking.chosenAccount.status
     .pug.staking-content.delegate
         .pug.single-section.form-group(id="choosen-pull")
