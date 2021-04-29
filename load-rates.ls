@@ -28,8 +28,8 @@ create-task = ([url, items])->
         cb { err, data, items }
     [url, exec]
 extract-val = (data, [head, ...tail])->
-    return data if not head? and data?
-    return ".." if not head? and not data?    
+    return data if data? and not head? and (tail.length is 0 or not tail?) 
+    return ".." if not data? and (tail.length is 0 or not tail?)  
     extract-val data[head], tail
 modify-item = (data, item)-->
     res = 
