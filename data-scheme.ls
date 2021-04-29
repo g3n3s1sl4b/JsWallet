@@ -186,8 +186,10 @@ store =
         reward-loading: no
         wait-for-epoch-change: no
         lockups: [] 
-        curr-validators-page: 1
-        validators-per-page: 10   
+        current_validators_page: 1
+        validators-per-page: 5  
+        accounts-per-page: 3 
+        current_accounts_page: 1   
     filestore:
         menu-open: no
         file-tree: no
