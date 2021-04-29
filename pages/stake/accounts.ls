@@ -24,6 +24,7 @@ require! {
     \../../seed.ls : seedmem
     \moment
     \../confirmation.ls : { prompt2, prompt-stake-account-amount, alert, confirm, notify }
+    \../../components/pagination.ls
 }
 as-callback = (p, cb)->
     p.catch (err) -> cb err
@@ -47,6 +48,10 @@ as-callback = (p, cb)->
             padding: 40px
             .item
                 display: inline
+    .notification-entity
+        @media(max-width: 540px)
+            display: block
+            margin-top: 20px !important 
     .hint
         .tooltip
             position: absolute
@@ -98,7 +103,7 @@ as-callback = (p, cb)->
             margin: 0 15px 0 0
             & + label
                 margin: 5px 0
-        .table-scroll.lockup
+        .table-scroll
             transition: max-height .5s
             table
                 thead
@@ -123,6 +128,9 @@ as-callback = (p, cb)->
 cb = console.log
 show-validator = (store, web3t)-> (validator)->
     li.pug #{validator}
+export paginate = (array, per-page, page)->
+    page = page - 1
+    array.slice page * per-page, (page + 1) * per-page
 staking-accounts-content = (store, web3t)->
     style = get-primary-info store
     lang = get-lang store
@@ -164,9 +172,8 @@ staking-accounts-content = (store, web3t)->
         return if store.staking.all-accounts-loaded isnt yes
         store.staking.getAccountsFromCashe = no
         navigate store, web3t, "validators"
-    index = 0
     build = (store, web3t)-> (item)->
-        index++
+        index = item.seed-index + 1
         return null if not item? or not item.key?
         { account, address, balance, balanceRaw, key, rent, seed, status, validator, active_stake, inactive_stake } = item
         activationEpoch = account?data?parsed?info?stake?delegation?activationEpoch
@@ -280,6 +287,8 @@ staking-accounts-content = (store, web3t)->
         navigate store, web3t, "validators"
     totalOwnStakingAccounts = store.staking.totalOwnStakingAccounts
     loadingAccountIndex = store.staking.loadingAccountIndex
+    perPage =  store.staking.accounts-per-page
+    page = store.staking.current_accounts_page
     .pug.staking-accounts-content
         .pug
             .form-group.pug(id="create-staking-account")
@@ -290,9 +299,9 @@ staking-accounts-content = (store, web3t)->
                         span.pug
                             button {store, classes: "width-auto", text: lang.createAccount, no-icon:yes, on-click: create-staking-account, style: {width: \auto, display: \block}}
                         if store.staking.accounts.length is 0
-                            span.pug(style=notification-border) Please create a staking account before you stake
+                            span.pug.notification-entity(style=notification-border) Please create a staking account before you stake
                         else 
-                            span.pug(style=notification-border) You can stake more by creating new accounts
+                            span.pug.notification-entity(style=notification-border) You can stake more by creating new accounts
         .pug
             .form-group.pug(id="staking-accounts")
                 .pug.section
@@ -301,30 +310,32 @@ staking-accounts-content = (store, web3t)->
                         .pug
                             .loader.pug(on-click=refresh style=icon-style title="refresh" class="#{isSpinned}")
                                 icon \Sync, 25
-                    .description.pug.table-scroll.lockup
+                    .description.pug
                         if store.staking.accounts-are-loading is no then
-                            table.pug
-                                thead.pug
-                                    tr.pug
-                                        td.pug(width="3%" style=stats) #
-                                        td.pug(width="40%" style=staker-pool-style title="Your Staking Account") #{lang.account} (?)
-                                        td.pug(width="10%" style=stats title="Your Deposited Balance") #{lang.balance} (?)
-                                        td.pug(width="30%" style=stats title="Where you staked") #{lang.validator} (?)
-                                        td.pug(width="7%" style=stats title="The ID of your stake. This is made to simplify the search of your stake in validator list") #{lang.seed} (?)
-                                        if no
-                                            td.pug(width="10%" style=stats title="Current staking status. Please notice that you cannot stake / unstake immediately. You need to go through the waiting period. This is made to reduce attacks by stacking and unstacking spam.") #{lang.status} (?)
-                                        td.pug(width="10%" style=stats) #{(lang.action ? "Action")}
-                                tbody.pug
-                                    store.staking.accounts
-                                        |> sort-by (.seed-index)
-                                        |> map build store, web3t
+                            .pug.table-scroll
+                                table.pug
+                                    thead.pug
+                                        tr.pug
+                                            td.pug(width="3%" style=stats) #
+                                            td.pug(width="40%" style=staker-pool-style title="Your Staking Account") #{lang.account} (?)
+                                            td.pug(width="10%" style=stats title="Your Deposited Balance") #{lang.balance} (?)
+                                            td.pug(width="30%" style=stats title="Where you staked") #{lang.validator} (?)
+                                            td.pug(width="7%" style=stats title="The ID of your stake. This is made to simplify the search of your stake in validator list") #{lang.seed} (?)
+                                            if no
+                                                td.pug(width="10%" style=stats title="Current staking status. Please notice that you cannot stake / unstake immediately. You need to go through the waiting period. This is made to reduce attacks by stacking and unstacking spam.") #{lang.status} (?)
+                                            td.pug(width="10%" style=stats) #{(lang.action ? "Action")}
+                                    tbody.pug
+                                        paginate( (store.staking.accounts |> sort-by (.seed-index)), perPage, page)
+                                            |> map build store, web3t
                         else
-                            span.pug.entities-loader
-                                span.pug.inner-section
-                                    h3.pug.item.blink Loading...
-                                        span.pug.item  #{loadingAccountIndex}
-                                        span.pug.item of
-                                        span.pug.item  #{totalOwnStakingAccounts}
+                            .pug.table-scroll
+                                span.pug.entities-loader
+                                    span.pug.inner-section
+                                        h3.pug.item.blink Loading...
+                                            span.pug.item  #{loadingAccountIndex}
+                                            span.pug.item of
+                                            span.pug.item  #{totalOwnStakingAccounts}
+                        pagination {store, type: \accounts, config: {array: store.staking.accounts, per-page: store.staking.accounts-per-page }}
 staking-accounts = ({ store, web3t })->
     .pug.staking-accounts-content
         staking-accounts-content store, web3t

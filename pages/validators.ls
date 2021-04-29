@@ -9,7 +9,7 @@ require! {
     \../history-funcs.ls
     \../staking-funcs.ls : { query-pools, query-accounts, convert-pools-to-view-model, convert-accounts-to-view-model }
     \./icon.ls
-    \prelude-ls : { map, split, filter, find, foldl, sort-by, unique, head, each, obj-to-pairs }
+    \prelude-ls : { map, split, filter, find, foldl, sort-by, unique, head, each, obj-to-pairs, take }
     \../math.ls : { div, times, plus, minus }
     \../../web3t/providers/deps.js : { hdkey, bip39 }
     \md5
@@ -29,6 +29,7 @@ require! {
     \../components/button.ls
     \../components/address-holder.ls
     \../components/address-holder-popup.ls
+    \../components/pagination.ls
     \./alert-txn.ls
     \../components/amount-field.ls
     \../seed.ls : seedmem
@@ -177,7 +178,7 @@ require! {
                 &:last-child
                     border: 0
                     @media (max-width: 800px)
-                        padding-bottom: $ios-m-b
+                        padding-bottom: 20px
                 &.reward
                     background-image: $reward
                     background-repeat: no-repeat
@@ -224,7 +225,7 @@ require! {
                                 padding: 0 3px
                         .choose-pool
                             max-width: 50px
-                    &.table-scroll
+                    .table-scroll
                         overflow-x: scroll
                         background: linear-gradient(var(--color1) 30%, rgba(50,18,96, 0)), linear-gradient(rgba(50,18,96, 0), var(--color1) 70%) 0 100%, radial-gradient(farthest-side at 50% 0, var(--color2), rgba(0,0,0,0)), radial-gradient(farthest-side at 50% 100%, rgba(77,78,88,0), rgba(0,0,0,0)) 0 100%
                         background-repeat: no-repeat
@@ -600,6 +601,9 @@ require! {
             background-color: #3cd5af
             border-color: #3cd5af
             color: #fff
+export paginate = (array, per-page, page)->
+    page = page - 1
+    array.slice page * per-page, (page + 1) * per-page
 cb = console.log
 as-callback = (p, cb)->
     p.catch (err) -> cb err
@@ -739,14 +743,11 @@ staking-content = (store, web3t)->
         background: style.app.stats
     stats=
         background: style.app.stats
-    curr-validators-page = store.staking.curr-validators-page
-    all-v-length = store.staking.pools.length
-    prev-button-disabled = store.staking.curr-validators-page <= 1
-    next-button-disabled = Math.round(all-v-length `div` store.staking.validators-per-page) >= store.staking.curr-validators-page  
-    validators-go-back = (cb)->
-        cb null
-    totalValidators = store.staking.totalValidators
+    totalValidators = (store.staking.totalValidators ? 0)    
+    allPages = Math.ceil(totalValidators `div` store.staking.validators-per-page)
     loadingValidatorIndex = store.staking.loadingValidatorIndex
+    per-page = store.staking.validators-per-page
+    page = store.staking.current_validators_page
     .pug.staking-content.delegate
         .pug.main-sections
             .pug.section
@@ -760,36 +761,31 @@ staking-content = (store, web3t)->
                 .pug.section
                     .title.pug
                         h3.pug #{lang.validators}
-                    .description.pug.table-scroll
+                    .description.pug
                         if store.staking.pools-are-loading is no then
-                            table.pug
-                                thead.pug
-                                    tr.pug
-                                        td.pug(width="30%" style=staker-pool-style title="Validator Staking Address. Permanent") #{lang.validator} (?)
-                                        td.pug(width="15%" style=stats title="Sum of all stakings") #{lang.total-stake} (?)
-                                        td.pug(width="5%" style=stats title="Validator Interest. (100% - Validator Interest = Pool Staking Reward)") #{lang.comission} (?)
-                                        td.pug(width="10%" style=stats title="Last Staking Amount") #{lang.lastVote} (?)
-                                        td.pug(width="10%" style=stats title="Find you staking by Seed") #{lang.my-stake} (?)
-                                        td.pug(width="5%" style=stats title="How many stakers in a pool") #{lang.stakers} (?)
-                                tbody.pug
-                                    store.staking.pools |> map build-staker store, web3t
+                            .pug.table-scroll
+                                table.pug
+                                    thead.pug
+                                        tr.pug
+                                            td.pug(width="30%" style=staker-pool-style title="Validator Staking Address. Permanent") #{lang.validator} (?)
+                                            td.pug(width="15%" style=stats title="Sum of all stakings") #{lang.total-stake} (?)
+                                            td.pug(width="5%" style=stats title="Validator Interest. (100% - Validator Interest = Pool Staking Reward)") #{lang.comission} (?)
+                                            td.pug(width="10%" style=stats title="Last Staking Amount") #{lang.lastVote} (?)
+                                            td.pug(width="10%" style=stats title="Find you staking by Seed") #{lang.my-stake} (?)
+                                            td.pug(width="5%" style=stats title="How many stakers in a pool") #{lang.stakers} (?)
+                                    tbody.pug
+                                        paginate(store.staking.pools, per-page, store.staking.current_validators_page) 
+                                            |> map build-staker store, web3t
                         else
-                            span.pug.entities-loader
-                                span.pug.inner-section
-                                    h3.pug.item.blink Loading...
-                                        if no
-                                            span.pug.item  #{store.staking.loadingValidatorIndex}
-                                            span.pug.item of
-                                            span.pug.item  #{totalValidators}
-                    if no 
-                        .pug.table-pagination
-                            button {store, classes: "width-auto", text: "<", no-icon:yes, on-click: validators-go-back, style: {width: \auto, display: \block}, disabled: prev-button-disabled}
-                            .span.pug.curren-page 
-                                span.pug Page 
-                                    | #{curr-validators-page} 
-                                    | / 
-                                    | #{all-v-length}
-                            button {store, classes: "width-auto", text: ">", no-icon:yes, on-click: validators-go-back, style: {width: \auto, display: \block}, disabled: next-button-disabled}
+                            .pug.table-scroll
+                                span.pug.entities-loader
+                                    span.pug.inner-section
+                                        h3.pug.item.blink Loading...
+                                            if no
+                                                span.pug.item  #{store.staking.loadingValidatorIndex}
+                                                span.pug.item of
+                                                span.pug.item  #{totalValidators}
+                        pagination {store, type: \validators, config: {array: store.staking.pools, per-page: store.staking.validators-per-page }}
 validators = ({ store, web3t })->
     lang = get-lang store
     { go-back } = history-funcs store, web3t
@@ -843,8 +839,9 @@ validators.init = ({ store, web3t }, cb)!->
     random = ->
         Math.random!
     store.current.page = "validators"
-    store.staking.curr-validators-page = 1    
+    store.staking.current_validators_page = 1    
     store.staking.pools = []
+    store.staking.poolsFiltered = []
     store.staking.accounts = []
     store.staking.delegators = {}
     store.staking.withdraw-amount = 0
@@ -893,5 +890,6 @@ validators.init = ({ store, web3t }, cb)!->
     err, pools <- query-pools {store, web3t, on-progress}
     return cb err if err?
     store.staking.pools = convert-pools-to-view-model pools
+    store.staking.poolsFiltered = store.staking.pools
     store.staking.getAccountsFromCashe = yes
 module.exports = validators
