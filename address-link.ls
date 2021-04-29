@@ -31,14 +31,4 @@ export get-address-title = (wallet, address-suffix)->
 export get-address-display = (store, wallet, address-suffix) ->
     address = get-address(wallet, address-suffix)
     return "" if not address?    
-    if not address.starts-with \V
-        return address
-    res = to-eth-address address
-    if addressSuffix is ""
-        res =
-            addresses
-                |> obj-to-pairs
-                |> filter -> it.1 is res
-                |> map -> it.0
-                |> -> if it.length is 0 then address else it.0
-    res
+    address    
