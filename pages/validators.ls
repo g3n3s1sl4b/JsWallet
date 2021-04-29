@@ -720,6 +720,7 @@ staking-content = (store, web3t)->
         return cb err if err?
         cb null
     refresh = ->
+        store.staking.getAccountsFromCashe = no
         store.staking.all-pools-loaded = no
         if ((store.staking.all-pools-loaded is no or !store.staking.all-pools-loaded?) and store.staking.pools-are-loading is yes)
             return no
@@ -878,18 +879,19 @@ validators.init = ({ store, web3t }, cb)!->
     return cb null if not wallet?
     web3t.velas.NativeStaking.setAccountPublicKey(wallet.publicKey)
     web3t.velas.NativeStaking.setAccountSecretKey(wallet.secretKey)
-    err, parsedProgramAccounts <- as-callback web3t.velas.NativeStaking.getParsedProgramAccounts()
-    parsedProgramAccounts = [] if err?
-    store.staking.parsedProgramAccounts = parsedProgramAccounts 
+    #err, parsedProgramAccounts <- as-callback web3t.velas.NativeStaking.getParsedProgramAccounts()
+    #parsedProgramAccounts = [] if err?
+    #store.staking.parsedProgramAccounts = parsedProgramAccounts
     # get validators array
     on-progress = ->
         store.staking.accounts = convert-accounts-to-view-model [...it]
     err, result <- query-accounts store, web3t, on-progress
     return cb err if err?
+    store.staking.accounts = convert-accounts-to-view-model result
     on-progress = ->
         store.staking.pools = convert-pools-to-view-model [...it]
     err, pools <- query-pools {store, web3t, on-progress}
     return cb err if err?
     store.staking.pools = convert-pools-to-view-model pools
-    store.staking.accounts = convert-accounts-to-view-model result
+    store.staking.getAccountsFromCashe = yes
 module.exports = validators

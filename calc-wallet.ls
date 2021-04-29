@@ -26,7 +26,7 @@ calc-wallet = (store, cb)->
         #return cb "Coin Not Found" if not coin?
         #coin.wallet = wallet
         wallet.usd-rate =
-            | usd-rate is \.. => 0
+            | usd-rate is \.. => \..
             | _ => round5 usd-rate
         eur-rate = \0.893191
         btc-rate = \0

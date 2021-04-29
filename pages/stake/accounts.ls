@@ -161,6 +161,8 @@ staking-accounts-content = (store, web3t)->
         store.staking-accounts.add.add-validator-stake = Math.max (balance `minus` 0.1), 0
     isSpinned = if ((store.staking.all-accounts-loaded is no or !store.staking.all-accounts-loaded?) and store.staking.accounts-are-loading is yes) then "spin disabled" else ""
     refresh = ->
+        return if store.staking.all-accounts-loaded isnt yes
+        store.staking.getAccountsFromCashe = no
         navigate store, web3t, "validators"
     index = 0
     build = (store, web3t)-> (item)->
@@ -169,7 +171,6 @@ staking-accounts-content = (store, web3t)->
         { account, address, balance, balanceRaw, key, rent, seed, status, validator, active_stake, inactive_stake } = item
         activationEpoch = account?data?parsed?info?stake?delegation?activationEpoch
         deactivationEpoch = account?data?parsed?info?stake?delegation?deactivationEpoch
-        #index = store.staking.accounts.index-of(item) + 1
         activeBalanceIsZero =  +active_stake is 0
         max-epoch = web3t.velas.NativeStaking.max_epoch
         is-activating = activeBalanceIsZero and validator isnt ""
@@ -203,6 +204,7 @@ staking-accounts-content = (store, web3t)->
             console.error "Undelegate error: " err if err?
             return alert store, err.toString! if err?
             <- notify store, lang.fundsUndelegated
+            store.staking.getAccountsFromCashe = no
             navigate store, web3t, \validators
         choose = ->
             store.staking.chosen-account = item
@@ -226,7 +228,8 @@ staking-accounts-content = (store, web3t)->
                 else
                     "---"
             td.pug #{seed}
-            td.pug(class="account-status #{status}") #{$status}
+            if no
+                td.pug(class="account-status #{status}") #{$status}
             td.pug
                 $button
     cancel = ->
@@ -270,7 +273,9 @@ staking-accounts-content = (store, web3t)->
         if err?
             err = lang.balanceIsNotEnoughToCreateStakingAccount if ((err.toString! ? "").index-of("custom program error: 0x1")) > -1
         return alert store, err.toString! if err?
-        <- set-timeout _, 500
+        store.staking.getAccountsFromCashe = no
+        #checkAccountWasCreated
+        <- set-timeout _, 1000
         <- notify store, lang.accountCreatedAndFundsDeposited
         navigate store, web3t, "validators"
     totalOwnStakingAccounts = store.staking.totalOwnStakingAccounts
@@ -306,7 +311,8 @@ staking-accounts-content = (store, web3t)->
                                         td.pug(width="10%" style=stats title="Your Deposited Balance") #{lang.balance} (?)
                                         td.pug(width="30%" style=stats title="Where you staked") #{lang.validator} (?)
                                         td.pug(width="7%" style=stats title="The ID of your stake. This is made to simplify the search of your stake in validator list") #{lang.seed} (?)
-                                        td.pug(width="10%" style=stats title="Current staking status. Please notice that you cannot stake / unstake immediately. You need to go through the waiting period. This is made to reduce attacks by stacking and unstacking spam.") #{lang.status} (?)
+                                        if no
+                                            td.pug(width="10%" style=stats title="Current staking status. Please notice that you cannot stake / unstake immediately. You need to go through the waiting period. This is made to reduce attacks by stacking and unstacking spam.") #{lang.status} (?)
                                         td.pug(width="10%" style=stats) #{(lang.action ? "Action")}
                                 tbody.pug
                                     store.staking.accounts

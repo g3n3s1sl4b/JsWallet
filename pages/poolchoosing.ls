@@ -228,7 +228,7 @@ require! {
                         -moz-transition: breathe 3s ease-in infinite
                         -web-kit-transition: breathe 3s ease-in infinite
                         height: auto
-                        min-height: 90vh
+                        max-height: 70vh
                         .stake-pointer
                             background: rgb(37, 87, 127)
                         &.lockup
@@ -637,7 +637,8 @@ staking-content = (store, web3t)->
         return cb null if not pay-account
         err, result <- as-callback web3t.velas.NativeStaking.delegate(pay-account.address, pool.address)
         console.error "Result sending:" err if err?
-        alert store, err.toString! if err?
+        retun alert store, err.toString! if err?
+        store.staking.getAccountsFromCashe = no
         <- notify store, "Funds delegated to\n #{store.staking.chosenPool.address}" 
         navigate store, web3t, \validators
     change-address = ->

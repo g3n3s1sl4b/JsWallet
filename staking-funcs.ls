@@ -52,11 +52,12 @@ fill-pools = ({ store, web3t, on-progress}, on-finish, [item, ...rest]) ->
     on-progress-local = (pools) ->
         on-progress [item, ...pools]
     fill-pools { store, web3t, on-progress: on-progress-local}, on-finish-local, rest
-load-validators-from-cache = ({store}, cb)->    
+load-validators-from-cache = ({store}, cb)->
+    DEADLINE = 60000 # 1 minute
     last-time = store.staking.last-time ? new Date().getTime()
     now = new Date().getTime()
-    if now `minus` last-time <= 10000 and store.staking.cachedValidators? and store.staking.cachedValidators.length 
-        console.log "get data from cache!"    
+    if now `minus` last-time <= DEADLINE and store.staking.cachedValidators? and store.staking.cachedValidators.length
+        console.log "get validators from cache"
         cache-result = store.staking.cachedValidators  
         return cb null, cache-result  
     err, validators <- as-callback web3t.velas.NativeStaking.getStakingValidators()
@@ -92,11 +93,20 @@ fill-delegator = (store, web3t, [acc, ...accounts])!->
     fill-delegator(store, web3t, accounts)
 # Accounts
 query-accounts = (store, web3t, on-progress, on-finish) ->
+    accountIndex = store.current.accountIndex
+    if (store.staking.getAccountsFromCashe is yes) and store.staking.accountsCached[accountIndex]? and store.staking.accountsCached[accountIndex].length > 0
+        console.log "get accounts from cache"
+        store.staking.all-accounts-loaded = yes
+        store.staking.accounts-are-loading = no
+        return on-finish null, store.staking.accountsCached[accountIndex]
     err, accounts <- query-accounts-web3t store, web3t, on-progress
     return on-finish err if err?
+    store.staking.accountsCached[accountIndex] = accounts
     on-finish err, accounts
 query-accounts-web3t = (store, web3t, on-progress, on-finish) ->
-    parsedProgramAccounts = store.staking.parsedProgramAccounts
+    err, parsedProgramAccounts <- as-callback web3t.velas.NativeStaking.getParsedProgramAccounts()
+    parsedProgramAccounts = [] if err?
+    store.staking.parsedProgramAccounts = parsedProgramAccounts
     err, accs <- as-callback web3t.velas.NativeStaking.getOwnStakingAccounts(parsedProgramAccounts) 
     accs = [] if err?
     store.staking.totalOwnStakingAccounts = accs.length
