@@ -887,11 +887,11 @@ validators.init = ({ store, web3t }, cb)!->
         store.staking.accounts = convert-accounts-to-view-model [...it]
     err, result <- query-accounts store, web3t, on-progress
     return cb err if err?
+    store.staking.accounts = convert-accounts-to-view-model result
     on-progress = ->
         store.staking.pools = convert-pools-to-view-model [...it]
     err, pools <- query-pools {store, web3t, on-progress}
     return cb err if err?
     store.staking.pools = convert-pools-to-view-model pools
-    store.staking.accounts = convert-accounts-to-view-model result
     store.staking.getAccountsFromCashe = yes
 module.exports = validators
