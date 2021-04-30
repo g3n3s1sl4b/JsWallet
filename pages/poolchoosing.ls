@@ -32,6 +32,7 @@ require! {
     \./confirmation.ls : { alert, notify }
     \../components/button.ls
     \../components/address-holder-popup.ls
+    \../components/pagination.ls
     \./alert-txn.ls
     \../components/amount-field.ls
     \./move-stake.ls
@@ -96,7 +97,6 @@ require! {
         color: #cc8b1a
         font-weight: bold
     .staking-content
-        overflow: hidden
         background: transparent
         width: 100%
         border-radius: 0px
@@ -218,7 +218,7 @@ require! {
                                 padding: 0 3px
                         .choose-pool
                             max-width: 50px
-                    &.table-scroll
+                    .table-scroll
                         overflow-x: scroll
                         background: linear-gradient(var(--color1) 30%, rgba(50,18,96, 0)), linear-gradient(rgba(50,18,96, 0), var(--color1) 70%) 0 100%, radial-gradient(farthest-side at 50% 0, var(--color2), rgba(0,0,0,0)), radial-gradient(farthest-side at 50% 100%, var(--color2), rgba(0,0,0,0)) 0 100%
                         background-repeat: no-repeat
@@ -589,6 +589,9 @@ as-callback = (p, cb)->
     p.catch (err) -> cb err
     p.then (data)->
         cb null, data
+export paginate = (array, per-page, page)->
+    page = page - 1
+    array.slice page * per-page, (page + 1) * per-page
 to-keystore = (store, with-keystore)->
     mnemonic = seedmem.mnemonic
     seed = bip39.mnemonic-to-seed(mnemonic)
@@ -778,8 +781,6 @@ staking-content = (store, web3t)->
         mystake-class = if +my-stake > 0 then "with-stake" else ""
         chosen = if store.staking.chosen-pool? and store.staking.chosen-pool.address is item.address then "chosen" else ""
         tr.pug(class="#{item.status} #{chosen}")
-            td.pug
-                span.pug.circle(class="#{item.status}") #{index}
             td.pug(datacolumn='Staker Address' title="#{item.address}")
                 address-holder-popup { store, wallet }
             td.pug #{stake}
@@ -820,6 +821,12 @@ staking-content = (store, web3t)->
         background: style.app.stats
     stats=
         background: style.app.stats
+    totalValidators = (store.staking.totalValidators ? 0)
+    allPages = Math.ceil(totalValidators `div` store.staking.validators_per_page)
+    loadingValidatorIndex = store.staking.loadingValidatorIndex
+    per-page = store.staking.validators_per_page
+    page = store.staking.current_validators_page
+    pagination-disabled = store.staking.pools-are-loading is yes
     .pug.staking-content.delegate
         .pug.main-sections
             .form-group.pug(id="pools")
@@ -831,19 +838,21 @@ staking-content = (store, web3t)->
                             if no
                                 .loader.pug(on-click=refresh style=icon-style title="refresh" class="#{isSpinned}")
                                     icon \Sync, 25
-                    .description.pug.table-scroll
-                        table.pug
-                            thead.pug
-                                tr.pug
-                                    td.pug(width="3%" style=stats) #
-                                    td.pug(width="30%" style=staker-pool-style title="Validator Staking Address. Permanent") #{lang.validator} (?)
-                                    td.pug(width="15%" style=stats title="Sum of all stakings") #{lang.total-stake} (?)
-                                    td.pug(width="5%" style=stats title="Validator Interest. (100% - Validator Interest = Pool Staking Reward)") #{lang.comission} (?)
-                                    td.pug(width="10%" style=stats title="Find you staking by Seed") #{lang.my-stake} (?)
-                                    td.pug(width="5%" style=stats title="How many stakers in a pool") #{lang.stakers} (?)
-                                    td.pug(width="4%" style=stats) #{lang.select}
-                            tbody.pug
-                                store.staking.pools |> map build-staker store, web3t
+                    .description.pug
+                        .pug.table-scroll
+                            table.pug
+                                thead.pug
+                                    tr.pug
+                                        td.pug(width="30%" style=staker-pool-style title="Validator Staking Address. Permanent") #{lang.validator} (?)
+                                        td.pug(width="15%" style=stats title="Sum of all stakings") #{lang.total-stake} (?)
+                                        td.pug(width="5%" style=stats title="Validator Interest. (100% - Validator Interest = Pool Staking Reward)") #{lang.comission} (?)
+                                        td.pug(width="10%" style=stats title="Find you staking by Seed") #{lang.my-stake} (?)
+                                        td.pug(width="5%" style=stats title="How many stakers in a pool") #{lang.stakers} (?)
+                                        td.pug(width="4%" style=stats) #{lang.select}
+                                tbody.pug
+                                    paginate(store.staking.pools, per-page, store.staking.current_validators_page)
+                                        |> map build-staker store, web3t
+                        pagination {store, type: \validators, disabled: pagination-disabled, config: {array: store.staking.pools }}
         if store.staking.chosen-pool?
             .pug.single-section.form-group(id="choosen-pull")
                 .pug.section
