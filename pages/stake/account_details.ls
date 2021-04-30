@@ -957,6 +957,15 @@ account-details = ({ store, web3t })->
 account-details.init = ({ store, web3t }, cb)!->
     console.log "account-details.init"
     stake-accounts = store.staking.parsedProgramAccounts
+    err, stakeActivation <- as-callback web3t.velas.NativeStaking.getStakeActivation(store.staking.chosenAccount.address)
+    if not err? and stakeActivation?
+        item.status = stakeActivation.state
+        item.active_stake = stakeActivation.active
+        item.inactive_stake = stakeActivation.inactive
+    return alert store, err, cb if err?
+    store.staking.chosenAccount.status = state
+    store.staking.chosenAccount.active_stake = active
+    store.staking.chosenAccount.inactive_stake = inactive
     #if true
         #err, all-stakes <- get-all-active-stake(stake-accounts)
         #console.log "all-active-stake" all-stakes
