@@ -78,7 +78,8 @@ module.exports = ({ store, type, disabled, config })->
     normalize-current-page = ->
         allPages = Math.ceil(config.array.length `div` store.staking["#{type}_per_page"])
         store.staking["current_#{type}_page"] =
-            | +page > +allPages => allPages
+            | (+page > +allPages) and +allPages > 0 => allPages
+            | +allPages < 1 => 1
             | _ => store.staking["current_#{type}_page"]
         store.staking["visible_per_page_#{type}_selector"] = no
         window.scroll-to 0, 0
