@@ -145,6 +145,8 @@ require! {
                 margin: 5px 0
                 outline: none
             .section
+                &:last-of-type
+                    margin-bottom: 50px
                 border-bottom: 1px solid rgba(240, 237, 237, 0.16)
                 padding: 30px 20px
                 display: flex
@@ -744,10 +746,11 @@ staking-content = (store, web3t)->
     stats=
         background: style.app.stats
     totalValidators = (store.staking.totalValidators ? 0)    
-    allPages = Math.ceil(totalValidators `div` store.staking.validators-per-page)
+    allPages = Math.ceil(totalValidators `div` store.staking.validators_per_page)
     loadingValidatorIndex = store.staking.loadingValidatorIndex
-    per-page = store.staking.validators-per-page
+    per-page = store.staking.validators_per_page
     page = store.staking.current_validators_page
+    pagination-disabled = store.staking.pools-are-loading is yes
     .pug.staking-content.delegate
         .pug.main-sections
             .pug.section
@@ -785,7 +788,7 @@ staking-content = (store, web3t)->
                                                 span.pug.item  #{store.staking.loadingValidatorIndex}
                                                 span.pug.item of
                                                 span.pug.item  #{totalValidators}
-                        pagination {store, type: \validators, config: {array: store.staking.pools, per-page: store.staking.validators-per-page }}
+                        pagination {store, type: \validators, disabled: pagination-disabled, config: {array: store.staking.pools }}
 validators = ({ store, web3t })->
     lang = get-lang store
     { go-back } = history-funcs store, web3t

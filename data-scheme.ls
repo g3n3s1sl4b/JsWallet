@@ -157,6 +157,10 @@ store =
         getAccountsFromCashe: yes
         parsedProgramAccounts: []
         accountsCached: {}
+        validators_per_page: 5
+        accounts_per_page: 5
+        visible_per_page_accounts_selector: no
+        visible_per_page_validators_selector: no
         add:
             add-validator: ""
             add-validator-stake: ""

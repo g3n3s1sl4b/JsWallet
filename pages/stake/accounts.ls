@@ -285,10 +285,11 @@ staking-accounts-content = (store, web3t)->
         <- set-timeout _, 1000
         <- notify store, lang.accountCreatedAndFundsDeposited
         navigate store, web3t, "validators"
-    totalOwnStakingAccounts = store.staking.totalOwnStakingAccounts
-    loadingAccountIndex = store.staking.loadingAccountIndex
-    perPage =  store.staking.accounts-per-page
+    totalOwnStakingAccounts = store.staking.totalOwnStakingAccounts ? 0
+    loadingAccountIndex = Math.min(totalOwnStakingAccounts, store.staking.loadingAccountIndex)
+    perPage =  store.staking.accounts_per_page
     page = store.staking.current_accounts_page
+    pagination-disabled = store.staking.accounts-are-loading is yes
     .pug.staking-accounts-content
         .pug
             .form-group.pug(id="create-staking-account")
@@ -335,7 +336,7 @@ staking-accounts-content = (store, web3t)->
                                             span.pug.item  #{loadingAccountIndex}
                                             span.pug.item of
                                             span.pug.item  #{totalOwnStakingAccounts}
-                        pagination {store, type: \accounts, config: {array: store.staking.accounts, per-page: store.staking.accounts-per-page }}
+                        pagination {store, type: \accounts, disabled: pagination-disabled, config: {array: store.staking.accounts }}
 staking-accounts = ({ store, web3t })->
     .pug.staking-accounts-content
         staking-accounts-content store, web3t
