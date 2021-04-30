@@ -21,6 +21,7 @@ require! {
             flex: 2
         button                      
             margin: 0 20px 0 !important
+            min-width: 50px
             &:first-of-type
                 @media screen and (max-width: 540px)
                     margin-left: 0 !important
