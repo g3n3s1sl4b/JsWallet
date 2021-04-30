@@ -54,7 +54,7 @@ module.exports = ({ store, type, disabled, config })->
     { array } = config
     new-array = ^^array
     page = store.staking["current_#{type}_page"] ? 1
-    store.staking["#{type}_per_page"] = 5 if not store.staking?["#{type}_per_page"]
+    store.staking["#{type}_per_page"] = 10 if not store.staking?["#{type}_per_page"]
     per-page = store.staking["#{type}_per_page"]
     allPages = Math.ceil(array.length `div` perPage)
     style = get-primary-info store
@@ -101,10 +101,12 @@ module.exports = ({ store, type, disabled, config })->
                         .span.pug.per-page-option(on-click=set-per-page(5)) 5
                         .span.pug.per-page-option(on-click=set-per-page(10)) 10
                         .span.pug.per-page-option(on-click=set-per-page(20)) 20
-            button {store, classes: "width-auto", text: "<", no-icon:yes, on-click: go-back, style: {width: \auto, display: \block}, makeDisabled: prev-button-disabled}
-            span.pug.current-page
-                span.pug Page 
-                    | #{page} 
-                    | / 
-                    | #{allPages}
-            button {store, classes: "width-auto", text: ">", no-icon:yes, on-click: go-forward, style: {width: \auto, display: \block}, makeDisabled: next-button-disabled}
+            if +entities > +store.staking["#{type}_per_page"]
+                .pug
+                    button {store, classes: "width-auto", text: "<", no-icon:yes, on-click: go-back, style: {width: \auto, display: \block}, makeDisabled: prev-button-disabled}
+                    span.pug.current-page
+                        span.pug Page
+                            | #{page}
+                            | /
+                            | #{allPages}
+                    button {store, classes: "width-auto", text: ">", no-icon:yes, on-click: go-forward, style: {width: \auto, display: \block}, makeDisabled: next-button-disabled}
