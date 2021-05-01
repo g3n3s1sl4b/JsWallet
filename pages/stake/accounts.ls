@@ -323,7 +323,7 @@ staking-accounts-content = (store, web3t)->
                                             td.pug(width="30%" style=stats title="Where you staked") #{lang.validator} (?)
                                             td.pug(width="7%" style=stats title="The ID of your stake. This is made to simplify the search of your stake in validator list") #{lang.seed} (?)
                                             if no
-                                                td.pug(width="10%" style=stats title="Current staking status. Please notice that you cannot stake / unstake immediately. You need to go through the waiting period. This is made to reduce attacks by stacking and unstacking spam.") #{lang.status} (?)
+                                                td.pug(width="10%" style=stats title="Current staking status. Please notice that you cannot stake / unstake immediately. You need to go through the waiting period. This is made to reduce attacks by staking and unstaking spam.") #{lang.status} (?)
                                             td.pug(width="10%" style=stats) #{(lang.action ? "Action")}
                                     tbody.pug
                                         paginate( (store.staking.accounts |> sort-by (.seed-index)), perPage, page)
