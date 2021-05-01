@@ -888,6 +888,12 @@ validators.init = ({ store, web3t }, cb)!->
     err, result <- query-accounts store, web3t, on-progress
     return cb err if err?
     store.staking.accounts = convert-accounts-to-view-model result
+    # Normalize currrent page for accounts in pagination
+    type = "accounts"
+    page = store.staking["current_#{type}_page"] ? 1
+    per-page = store.staking["#{type}_per_page"]
+    if +(page `times` per-page) >= store.staking.accounts.length
+        store.staking["current_#{type}_page"] = 1    
     on-progress = ->
         store.staking.pools = convert-pools-to-view-model [...it]
     err, pools <- query-pools {store, web3t, on-progress}

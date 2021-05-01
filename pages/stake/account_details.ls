@@ -27,7 +27,7 @@ require! {
     \../../icons.ls
     \../placeholder.ls
     \../epoch.ls
-    \../confirmation.ls : { alert, notify, confirm, prompt2 }
+    \../confirmation.ls : { alert, notify, confirm, prompt2, prompt3 }
     \../../components/button.ls
     \../../components/address-holder.ls
     \../alert-txn.ls
@@ -700,10 +700,7 @@ staking-content = (store, web3t)->
         #err, options <- get-options
         #return alert store, err, cb if err?
         store.staking.add.add-validator-stake = Math.max (get-balance! `minus` 0.1), 0
-    your-balance = " #{store.staking.chosenAccount.balance} "
-    your-staking-amount = store.staking.stakeAmountTotal `div` (10^18)
-    your-staking = " #{round-human your-staking-amount}"
-    vlx-token = "VLX"
+    your-balance = store.staking.chosenAccount.balanceRaw `div` (10^9) `plus` store.staking.chosenAccount.rent 
     isSpinned = if ((store.staking.all-pools-loaded is no or !store.staking.all-pools-loaded?) and store.staking.pools-are-loading is yes) then "spin disabled" else ""
     cancel-pool = ->
         store.staking.chosenAccount = null
@@ -751,7 +748,7 @@ staking-content = (store, web3t)->
         err, seed <- as-callback web3t.velas.NativeStaking.getNextSeed()
         return alert store, err.toString! if err?
         /**/
-        amount <- prompt2 store, lang.howMuchToSplit
+        amount <- prompt3 store, lang.howMuchToSplit
         return if amount+"".trim!.length is 0
         min_stake = web3t.velas.NativeStaking.min_stake
         balance = store.staking.chosenAccount.balanceRaw
@@ -790,7 +787,7 @@ staking-content = (store, web3t)->
     inactive_stake = store.staking.chosenAccount.inactive_stake `div` (10^9)
     delegated_stake = active_stake `plus` inactive_stake 
     usd-rate = wallet?usdRate ? 0
-    usd-balance = round-number(store.staking.chosenAccount.balanceRaw `times` usd-rate, {decimals:2})
+    usd-balance = round-number(your-balance `times` usd-rate, {decimals:2})
     usd-rent = round-number(store.staking.chosenAccount.rent `times` usd-rate,{decimals:2})
     usd-active_stake = round-number(active_stake `times` usd-rate, {decimals:2})
     usd-inactive_stake = round-number(inactive_stake `times` usd-rate, {decimals:2})
@@ -843,7 +840,7 @@ staking-content = (store, web3t)->
                     h3.pug #{lang.balance}
                 .description.pug
                     span.pug
-                        | #{store.staking.chosenAccount.balance} VLX
+                        | #{your-balance} VLX
                     span.pug.usd-amount
                         | $#{usd-balance}
             .pug

@@ -252,6 +252,7 @@ store =
         prompt-answer: ""
         prompt: no
         prompt2: no 
+        prompt3: no  
         prompt-password: no 
         prompt-password-answer: ""
         step: "first"
