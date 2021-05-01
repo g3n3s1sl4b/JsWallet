@@ -415,10 +415,6 @@ prompt-modal3 = (store)->
         cursor: "pointer"
     max-amount-container =
         text-align: "left"
-    console.log "balanceRaw" balanceRaw 
-    console.log "active_stake" active_stake 
-    console.log "min_stake" min_stake 
-    console.log "rent" rent
     use-max-amount = !->
         store.current.prompt-answer = 
             | not chosenAccount? => 0
