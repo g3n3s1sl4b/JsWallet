@@ -11,6 +11,7 @@ require! {
     \../math.ls : { minus, div, plus, times }
 }
 .confirmation
+    backdrop-filter: blur(5px)
     @-webkit-keyframes appear
         from
             opacity: 0
@@ -260,6 +261,7 @@ prompt-modal = (store)->
         background: style.app.input
         color: style.app.text
         border: "0"
+        text-align: "center"
     button-style=
         color: style.app.text
     confirmation=
