@@ -88,6 +88,13 @@ as-callback = (p, cb)->
         &:hover
             .tooltip
                 visibility: visible
+    .title
+        h3
+            display: inline
+        .amount
+            color: white
+            font-size: 11px
+            opacity: 0.5    
     .form-group
         .subtitle
             margin: 20px 0 10px
@@ -312,7 +319,8 @@ staking-accounts-content = (store, web3t)->
             .form-group.pug(id="staking-accounts")
                 .pug.section
                     .title.pug
-                        h3.pug #{lang.yourStakingAccounts}
+                        h3.pug.section-title #{lang.yourStakingAccounts} 
+                            span.pug.amount (#{store.staking.accounts.length}) 
                         .pug
                             .loader.pug(on-click=refresh style=icon-style title="refresh" class="#{isSpinned}")
                                 icon \Sync, 25

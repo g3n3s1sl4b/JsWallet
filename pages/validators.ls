@@ -138,6 +138,13 @@ require! {
             cursor: pointer
             vertical-align: top
             text-align: center
+        .title
+            h3
+                display: inline
+            .amount
+                color: white
+                font-size: 11px
+                opacity: 0.5 
         .form-group
             text-align: center
             padding-top: 0px
@@ -763,7 +770,8 @@ staking-content = (store, web3t)->
                 alert-txn { store }
                 .pug.section
                     .title.pug
-                        h3.pug #{lang.validators}
+                        h3.pug.section-title #{lang.validators} 
+                            span.pug.amount (#{store.staking.pools.length})
                     .description.pug
                         if store.staking.pools-are-loading is no then
                             .pug.table-scroll
