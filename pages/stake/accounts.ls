@@ -217,11 +217,16 @@ staking-accounts-content = (store, web3t)->
             store.staking.chosen-account = item
             navigate store, web3t, \poolchoosing
             cb null
+        stake-data = item?account?data?parsed?info?stake
         $button =
             | item.status is \inactive =>
                 button { store, text: lang.to_delegate, on-click: choose, type: \secondary , icon : \arrowRight }
             | _ => 
                 disabled = item.status in <[ deactivating ]>
+                if stake-data? and stake-data.delegation?
+                    {activationEpoch, deactivationEpoch} = stake-data.delegation
+                    if +activationEpoch < +deactivationEpoch and +deactivationEpoch isnt +max-epoch
+                        disabled = yes     
                 button { store, classes: "action-undelegate" text: lang.to_undelegate, on-click: undelegate , type: \secondary , icon : \arrowLeft, makeDisabled: disabled }
         tr.pug(class="#{item.status}" key="#{address}")
             td.pug
