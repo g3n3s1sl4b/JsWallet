@@ -6,6 +6,7 @@ require! {
     \prelude-ls : { find }
     \../math.ls : { times }
     \./keyboard.ls
+    \../numbers.js : {parseNum, formatNum}
 }
 .input-area
     @import scheme
@@ -91,20 +92,39 @@ module.exports = ({ store, value, on-change, placeholder, id, show-details, toke
         [first=\0, second=\0] = it.split('.')
         "#{parse-int first}.#{second}"
     get-number = (value)->
-        return \0 if value is ""
-        value = value.replace(/,/gi, '.')
-        value = value.match(/^[0-9]+([.]([0-9]+)?)?$/)?0
-        value2 =
-            | value?0 is \0 and value?1? and value?1 isnt \. => value.substr(1, value.length)
-            | _ => value
-        value2
+        number = (value ? "").toString!
+        return \0 if number is ""
+        #value = number.replace(/,/gi, '.')
+        #value = value.match(/^[0-9]+([.]([0-9]+)?)?$/)?0
+        #value2 =
+            #| value?0 is \0 and value?1? and value?1 isnt \. => value.substr(1, value.length)
+            #| _ => value
+        value
     on-change-internal = (it)->
         value = get-number it.target?value
+        if not value-without-decimal-with-dot(value)
+            value = parseNum(value)
+        value = value.toString!
+        value = value
         on-change { target: { value } }
     token = \vlx if token is \vlx2
     token-label = token.to-upper-case!
+    value-without-decimal-with-dot = (value)->
+        value = (value ? "").toString()
+        res = value.split(".")
+        value.index-of('.') > -1 and (res.length > 1 and res[1] is "")
+    format-my-number = (value)->
+        value = value
+        number-isnt-normal = value-without-decimal-with-dot(value)
+        value = 
+            | number-isnt-normal =>
+                res = (value ? "").split(".")
+                left = formatNum(res.0)
+                value = left + "."    
+            | _ =>  value = formatNum(value)  
+        value   
     .pug.input-area
-        input.pug(type="text" value="#{value-token}" style=input-style on-change=on-change-internal placeholder=actual-placeholder id="#{id}" disabled=disabled)
+        input.pug(type="text" value="#{format-my-number(value-token)}" style=input-style on-change=on-change-internal placeholder=actual-placeholder id="#{id}" disabled=disabled)
         span.suffix.pug(style=input-style)
             img.icon.pug(src="#{wallet.coin.image}")
             span.pug #{token-label}
