@@ -565,17 +565,17 @@ send = ({ store, web3t })->
                         tr.pug
                             td.pug #{lang.you-spend}
                             td.pug
-                                span.pug(title="#{send.amount-charged}") #{round5(send.amount-charged)}
+                                span.pug(title="#{send.amount-charged}") #{round-human(send.amount-charged)}
                                     img.label-coin.pug(src="#{send.coin.image}")
                                     span.pug(title="#{send.amount-charged}") #{token-display}
-                                .pug.usd $ #{round5 send.amount-charged-usd}
+                                .pug.usd $ #{round-human send.amount-charged-usd}
                         tr.pug.orange
                             td.pug #{lang.fee}
                             td.pug
-                                span.pug(title="#{send.amount-send-fee}") #{round5 send.amount-send-fee}
+                                span.pug(title="#{send.amount-send-fee}") #{round-human send.amount-send-fee}
                                     img.label-coin.pug(src="#{fee-coin-image}")
                                     span.pug(title="#{send.amount-send-fee}") #{fee-token-display}
-                                .pug.usd $ #{round5 send.amount-send-fee-usd}
+                                .pug.usd $ #{round-human send.amount-send-fee-usd}
             .pug.button-container
                 .pug.buttons
                     button { store, text: \send , on-click: send-func , loading: send.sending, type: \primary, error: send.error, makeDisabled: makeDisabled, id: "send-confirm" }
