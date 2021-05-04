@@ -722,7 +722,13 @@ staking-content = (store, web3t)->
         amount = account.lamports `plus` rent
         err, result <- as-callback web3t.velas.NativeStaking.withdraw(address, amount)
         console.error "Undelegate error: " err if err?
-        return alert store, err.toString! if err?
+        err-message = err.toString!
+        if err?
+            err-message = 
+                | err.toString().index-of("Insufficient funds for fee") > -1 =>
+                    "Not enough VLX Native balance to execute this operation."
+                | _ => err.toString!
+        return alert store, err-message if err?
         <- set-timeout _, 1000
         <- notify store, lang.fundsWithdrawn
         store.staking.getAccountsFromCashe = no
