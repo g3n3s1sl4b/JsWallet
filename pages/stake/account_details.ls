@@ -944,10 +944,13 @@ account-details = ({ store, web3t })->
         filter: info.app.icon-filter
     show-class =
         if store.current.open-menu then \hide else \ ""
+    just-go-back = ->
+        store.staking.getAccountsFromCashe = yes
+        go-back!    
     .pug.staking
         .pug.title(style=border-style)
             .pug.header(class="#{show-class}") #{lang.delegateStake}
-            .pug.close(on-click=go-back)
+            .pug.close(on-click=just-go-back)
                 img.icon-svg.pug(src="#{icons.arrow-left}" style=icon-color)
             burger store, web3t
             epoch store, web3t

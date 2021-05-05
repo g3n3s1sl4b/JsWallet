@@ -908,5 +908,5 @@ validators.init = ({ store, web3t }, cb)!->
     return cb err if err?
     store.staking.pools = convert-pools-to-view-model pools
     store.staking.poolsFiltered = store.staking.pools
-    store.staking.getAccountsFromCashe = yes
+    store.staking.getAccountsFromCashe = no
 module.exports = validators
