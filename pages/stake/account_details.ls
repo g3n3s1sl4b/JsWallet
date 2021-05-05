@@ -722,7 +722,7 @@ staking-content = (store, web3t)->
         amount = account.lamports `plus` rent
         err, result <- as-callback web3t.velas.NativeStaking.withdraw(address, amount)
         console.error "Undelegate error: " err if err?
-        err-message = err.toString!
+        err-message = ""
         if err?
             err-message = 
                 | err.toString().index-of("Insufficient funds for fee") > -1 =>
