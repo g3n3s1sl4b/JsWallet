@@ -36,6 +36,19 @@ require! {
         height: 12px
         top: 2px
         margin-right: 3px
+    .downloadwallet
+        padding: 0 0 30px
+    .icon-download
+        padding: 10px
+        height: 20px
+        cursor: pointer
+        margin: 20px 6px 0
+        transition: all 1s
+        position: relative
+        opacity: 0.7
+        &:hover
+            opacity: 1
+            filter: drop-shadow(0px 8px 11px #71f4c0)
     .language
         position: absolute
     .password
@@ -379,8 +392,13 @@ locked = ({ store, web3t })->
         export-import-seed store
         footer store, web3t
         if not process?versions?electron?
-            .pug.downloadwallet
-                button { store, on-click=download, text: \apps , icon: \download  , type : \secondary, id: \install-app }
+            .pug.downloadwallet 
+                a.pug(href="https://apps.apple.com/us/app/velas-mobile-wallet/id1541032748" target="_blank")
+                    img.icon-download.pug(src="#{icons[\ios]}" )
+                a.pug(href="https://play.google.com/store/apps/details?id=com.velas.mobile_wallet" target="_blank")
+                    img.icon-download.pug(src="#{icons[\android]}" )
+                span.pug
+                    img.icon-download.pug(on-click=download src="#{icons[\desktop]}" )
 focus = ({ store }, cb)->
     cb null
 locked.focus = focus
