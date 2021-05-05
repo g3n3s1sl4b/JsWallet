@@ -232,7 +232,8 @@ module.exports = (store, web3t)->
         value
     amount-change = (event)->
         value = get-value event
-        return if not value?    
+        # if empty string return zero!    
+        value = "0" if not value? or isNaN(value)   
         <- change-amount store, value, no
     perform-amount-eur-change = (value)->
         to-send = calc-crypto-from-eur store, value

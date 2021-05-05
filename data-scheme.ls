@@ -46,6 +46,7 @@ url-hash-params =
     | window? => qs.parse window.location.hash.replace('#', '')
     | _ => {}
 store =
+    inputCaretPosition: 0  
     url-params: url-params
     url-hash-params: url-hash-params
     root: null

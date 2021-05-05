@@ -3,10 +3,11 @@ require! {
     \../get-primary-info.ls
     \../round5.ls
     \../round.ls
+    \../round-number.ls
     \prelude-ls : { find }
     \../math.ls : { times }
     \./keyboard.ls
-    \../numbers.js : {parseNum, formatNum}
+    \../numbers.js : {formatNum, parse-num}
 }
 .input-area
     @import scheme
@@ -25,6 +26,9 @@ require! {
         vertical-align: top
         z-index: 1
     >input
+        background: transparent
+        overflow-x: auto
+        color: white
         display: inline-block
         width: calc(100% - 70px) !important
         padding: 0 10px
@@ -68,6 +72,9 @@ require! {
                 text-align: left
 module.exports = ({ store, value, on-change, placeholder, id, show-details, token="vlx2", disabled=no })->
     style = get-primary-info store
+    usd = null
+    eur = null
+    ref=null
     input-style =
         background: style.app.input
         color: style.app.text
@@ -77,54 +84,98 @@ module.exports = ({ store, value, on-change, placeholder, id, show-details, toke
     { wallets } = store.current.account
     wallet =
         wallets |> find (-> it.coin.token is token)
-    value-token = value ? 0
-    usd =
-        | wallet.usd-rate? => (value-token || "0") `times` wallet.usd-rate
-        | _ => ".."
-    eur =
-        | wallet.eur-rate? => (value-token || "0") `times` wallet.eur-rate
-        | _ => ".."
-    actual-placeholder = placeholder ? ""
+    if wallet?
+        usd =
+            | wallet.usd-rate? => (value || "0") `times` wallet.usd-rate
+            | _ => ".."
+        eur =
+            | wallet.eur-rate? => (value || "0") `times` wallet.eur-rate
+            | _ => ".."
+    # Input validation #
+    decimalsConfig = wallet.network.decimals
+    decimals = value.toString!.split(".").1
+    if decimals? and (decimals.length > decimalsConfig) then
+        value = round-number(value, {decimals: decimalsConfig})
+    max-amount = 1e10
+    if +value > max-amount then
+        value =  max-amount
+    ####################
+    actual-placeholder = placeholder ? ""        
     normalize = ->
         return \0 if not it?
         return parse-int it if it.index-of('.') is -1
         return parse-int(it) + "." if it.substr(it.length - 1, 1) is "."
         [first=\0, second=\0] = it.split('.')
         "#{parse-int first}.#{second}"
-    get-number = (value)->
-        number = (value ? "").toString!
+    get-number = (val)->
+        number = (val ? "").toString!
         return \0 if number is ""
-        #value = number.replace(/,/gi, '.')
-        #value = value.match(/^[0-9]+([.]([0-9]+)?)?$/)?0
-        #value2 =
-            #| value?0 is \0 and value?1? and value?1 isnt \. => value.substr(1, value.length)
-            #| _ => value
-        value
+        val
+    on-click = (it)->
+        store.inputCaretPosition = it.target.selectionEnd
     on-change-internal = (it)->
-        value = get-number it.target?value
-        if not value-without-decimal-with-dot(value)
-            value = parseNum(value)
-        value = value.toString!
-        value = value
+        if (store.inputCaretPosition - it.target.selectionEnd) <= 1
+            store.inputCaretPosition = it.target.selectionEnd
+        value = it.target?value
+        value = get-number(value)
+        # Restrictions check #
+        decimals = value.toString!.split(".").1
+        if decimals? and (decimals.length > decimalsConfig) then
+            value = round-number(value, {decimals: decimalsConfig})
+        balance = +wallet.balance
+        max-amount = Math.max 1e10, balance
+        if +value > max-amount then
+            value = max-amount
+        # # # # # # # # # # #
+        res = (value ? "0").toString().split(".")
+        parsed-left = parseNum(res?0)
+        has-dot = res.length > 1
+        value = "0" if not value? or value is ""
+        str_val = (value ? "0").toString()
+        $value = 
+            | it.target?value is "" => 0
+            | value-without-decimal-with-dot(value) =>
+                left = res.0
+                parseNum(left) + "."
+            | has-dot and parsed-left is parseNum(it.target?value) =>
+                parsed-left + "." + (res?1 ? "" )    
+            | has-dot and (str_val.length isnt (+str_val).toString().length) and (+value is +str_val) =>
+                parseNum(res.0) + "." + (res?1 ? "" )          
+            | _ => parseNum(value)
+        value = $value
+        console.log "parse #{it.target?value} to #{value}"
+        it.target.selectionEnd = store.inputCaretPosition
+        it.target.selectionStart = store.inputCaretPosition
         on-change { target: { value } }
     token = \vlx if token is \vlx2
     token-label = token.to-upper-case!
     value-without-decimal-with-dot = (value)->
-        value = (value ? "").toString()
+        value = (value ? "0").toString()
         res = value.split(".")
         value.index-of('.') > -1 and (res.length > 1 and res[1] is "")
     format-my-number = (value)->
-        value = value
         number-isnt-normal = value-without-decimal-with-dot(value)
-        value = 
+        str_val = (value ? "0").toString()
+        res = str_val.split(".")
+        has-dot = res.length > 1
+        $value = 
+            | value is "" => "0"
             | number-isnt-normal =>
-                res = (value ? "").split(".")
                 left = formatNum(res.0)
-                value = left + "."    
-            | _ =>  value = formatNum(value)  
-        value   
+                left + "."
+            | has-dot and res?1 and (+value is res.0) =>
+                formatNum(res.0) + "." + res.1  
+            # if number has zeroes in the decimals at the end  
+            | has-dot and (str_val.length isnt (+str_val).toString().length) and (+value is +str_val) =>
+                formatNum(res.0) + "." + res.1    
+            | _ =>  formatNum(value)  
+        $value  
+    focus-input = (ref)!->
+        ref.focus! if ref? 
+    func = (r)->
+        current.ref = r
     .pug.input-area
-        input.pug(type="text" value="#{format-my-number(value-token)}" style=input-style on-change=on-change-internal placeholder=actual-placeholder id="#{id}" disabled=disabled)
+        input.pug( ref=func type="text" value="#{format-my-number(value)}" style=input-style on-click=on-click on-change=on-change-internal placeholder=actual-placeholder id="#{id}" disabled=disabled)
         span.suffix.pug(style=input-style)
             img.icon.pug(src="#{wallet.coin.image}")
             span.pug #{token-label}

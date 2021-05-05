@@ -19,6 +19,7 @@ require! {
     \../history-funcs.ls
     \../components/burger.ls
     \../components/amount-field.ls
+    \../components/amount-fiat-field.ls
     \../components/sliders/network-slider.ls
     \../math.ls : { times }
     \ethereumjs-util : {BN}
@@ -537,11 +538,9 @@ send = ({ store, web3t })->
                                 .label.crypto.pug
                                     img.label-coin.pug(src="#{send.coin.image}")
                                     | #{token-display}
-                                amount-field { store, value: "#{round5edit send.amount-send}", on-change: amount-change, placeholder="0", id="send-amount", token, disabled }
+                                amount-field { store, value: send.amount-send, on-change: amount-change, placeholder="0", id="send-amount", token, disabled }
                             if active-usd is \active
-                                .input-wrapper.small.pug(style=amount-style)
-                                    .label.lusd.pug $
-                                    input.pug.amount-usd(type='text' style=just-crypto-background on-change=amount-usd-change placeholder="0" title="#{send.amount-send-usd}" value="#{round-number send.amount-send-usd, {decimals: 8}}" id="send-amount-usd" disabled=disabled)
+                                amount-fiat-field { store, on-change:amount-usd-change, placeholder:"0", title:"#{send.amount-send-usd}" value:"#{send.amount-send-usd}", id:"send-amount-usd", disabled: disabled }
                             if active-eur is \active
                                 .input-wrapper.small.pug(style=amount-style)
                                     .label.lusd.pug €

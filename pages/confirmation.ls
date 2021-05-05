@@ -307,6 +307,7 @@ prompt-modal2 = (store)->
         max-amount = Math.floor(balance `minus` 1)
         amount =
             | e.target.value > max-amount => max-amount
+            | isNaN(e.target.value) => 0
             | _ => e.target.value
         store.current.prompt-answer = amount
     style = get-primary-info store
@@ -346,7 +347,7 @@ prompt-modal2 = (store)->
             .pug.header(style=style=confirmation-style)#{store.current.prompt2}
             .pug.text(style=style=confirmation-style)
             .pug(style=input-holder-style)
-                amount-field { store, value: "#{round5edit store.current.prompt-answer}", on-change: amount-change, placeholder="0", id="prompt-input" }
+                amount-field { store, value: "#{round5edit store.current.prompt-answer}", on-change: amount-change, placeholder="0", id="prompt-input", token: "vlx_native" }
                 .pug.max-amount(style=max-amount-container)
                     button.pug.send-all(on-click=use-max-amount style=button-primary3-style type="button" id="send-max") #{lang.use-max}
             .pug.buttons

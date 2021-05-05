@@ -44,11 +44,13 @@ const defaultOptions = {
 }
 
 const formatNum = (number, opts) => {
+    console.log("[format-number]")
     opts = renameKeyShortcuts(Object.assign({}, defaultOptions, opts))
     number = parseNum(number)
 
     if (isNaN(number)) {
-        if (opts.nanZero === false) return 'NaN'
+        console.log("isNaN", number);
+        if (opts.nanZero === false) return number;
         else number = 0
     }
 
