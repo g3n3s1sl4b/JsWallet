@@ -34,6 +34,7 @@ require! {
     \../../components/amount-field.ls
     \../../seed.ls : seedmem
     \../../components/burger.ls
+    \./error-funcs.ls : { get-error-message }
 }
 .staking
     @import scheme
@@ -635,9 +636,9 @@ staking-content = (store, web3t)->
         return cb null if not pay-account
         console.log ""
         err, result <- as-callback web3t.velas.NativeStaking.delegate(pay-account.address, account.address)
-        console.log "result" result
         console.error "Result sending:" err if err?
-        alert store, err.toString! if err?
+        err-message = get-error-message(err, result)
+        return alert store, err-message if err-message?
         <- notify store, "FUNDS DELEGATED"
         navigate store, web3t, \validators
     velas-node-applied-template =
@@ -721,14 +722,8 @@ staking-content = (store, web3t)->
         { balanceRaw, rent, address, account } = store.staking.chosenAccount
         amount = account.lamports `plus` rent
         err, result <- as-callback web3t.velas.NativeStaking.withdraw(address, amount)
-        console.error "Undelegate error: " err if err?
-        err-message = ""
-        if err?
-            err-message = 
-                | err.toString().index-of("Insufficient funds for fee") > -1 =>
-                    "Not enough VLX Native balance to execute this operation."
-                | _ => err.toString!
-        return alert store, err-message if err?
+        err-message = get-error-message(err, result)
+        return alert store, err-message if err-message?
         <- set-timeout _, 1000
         <- notify store, lang.fundsWithdrawn
         store.staking.getAccountsFromCashe = no
@@ -741,7 +736,8 @@ staking-content = (store, web3t)->
         #
         err, result <- as-callback web3t.velas.NativeStaking.undelegate(store.staking.chosenAccount.address)
         console.error "Undelegate error: " err if err?
-        return alert store, err.toString! if err?
+        err-message = get-error-message(err, result)
+        return alert store, err-message if err-message?
         <- set-timeout _, 1000
         <- notify store, lang.fundsUndelegated
         store.staking.getAccountsFromCashe = no
@@ -752,7 +748,8 @@ staking-content = (store, web3t)->
         console.error err if err?
         /* Get next account seed */
         err, seed <- as-callback web3t.velas.NativeStaking.getNextSeed()
-        return alert store, err.toString! if err?
+        err-message = get-error-message(err, seed)
+        return alert store, err-message if err-message?
         /**/
         amount <- prompt3 store, lang.howMuchToSplit
         return if amount+"".trim!.length is 0
@@ -766,14 +763,13 @@ staking-content = (store, web3t)->
         /* Create new account */
         fromPubkey$ = store.staking.chosenAccount.address
         err, splitStakePubkey <- as-callback web3t.velas.NativeStaking.createNewStakeAccountWithSeed()
-        console.error "Result sending:" err if err?
         return alert store, err.toString! if err?
         /**/
         /* Split account */
         stakeAccount = store.staking.chosenAccount.address
         err, result <- as-callback web3t.velas.NativeStaking.splitStakeAccount(stakeAccount, splitStakePubkey, amount)
-        console.error "Result sending:" err if err?
-        return alert store, err.toString! if err?
+        err-message = get-error-message(err, result)
+        return alert store, err-message if err-message?
         <- set-timeout _, 500
         <- notify store, lang.accountCreatedAndFundsSplitted
         store.staking.getAccountsFromCashe = no

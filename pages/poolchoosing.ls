@@ -39,6 +39,7 @@ require! {
     \../seed.ls : seedmem
     \../components/burger.ls
     \./stake/accounts.ls : \stake-accounts
+    \./stake/error-funcs.ls : { get-error-message }
 }
 .staking
     @import scheme
@@ -639,8 +640,8 @@ staking-content = (store, web3t)->
         pay-account = store.staking.accounts |> find (-> it.address is account.address)
         return cb null if not pay-account
         err, result <- as-callback web3t.velas.NativeStaking.delegate(pay-account.address, pool.address)
-        console.error "Result sending:" err if err?
-        retun alert store, err.toString! if err?
+        err-message = get-error-message(err, result)
+        return alert store, err-message if err-message?
         store.staking.getAccountsFromCashe = no
         <- notify store, "Funds delegated to\n #{store.staking.chosenPool.address}" 
         navigate store, web3t, \validators
