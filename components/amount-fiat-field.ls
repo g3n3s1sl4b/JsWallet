@@ -24,8 +24,6 @@ module.exports = ({ store, value, on-change, placeholder, id, show-details, titl
     if decimals? and (decimals.length > decimalsConfig) then
         value = round-number(value, {decimals: 4})
     max-amount = 1e12
-    if +value > max-amount then
-        value =  max-amount
     ###########################
     # Listeners
     get-number = (value)->
@@ -59,7 +57,6 @@ module.exports = ({ store, value, on-change, placeholder, id, show-details, titl
         value = get-number(value)
         # Restrictions check #
         if decimals? and (decimals.length > decimalsConfig) then
-            console.log "more than 4 decimals"
             value = it.target.value = round-number(value, {decimals: 4})
         max-amount = 1e12
         if +value > max-amount then

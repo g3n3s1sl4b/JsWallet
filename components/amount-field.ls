@@ -97,8 +97,6 @@ module.exports = ({ store, value, on-change, placeholder, id, show-details, toke
     if decimals? and (decimals.length > decimalsConfig) then
         value = round-number(value, {decimals: decimalsConfig})
     max-amount = 1e10
-    if +value > max-amount then
-        value =  max-amount
     ####################
     actual-placeholder = placeholder ? ""        
     normalize = ->
@@ -124,8 +122,6 @@ module.exports = ({ store, value, on-change, placeholder, id, show-details, toke
             value = round-number(value, {decimals: decimalsConfig})
         balance = +wallet.balance
         max-amount = Math.max 1e10, balance
-        if +value > max-amount then
-            value = max-amount
         # # # # # # # # # # #
         res = (value ? "0").toString().split(".")
         parsed-left = parseNum(res?0)
@@ -143,7 +139,6 @@ module.exports = ({ store, value, on-change, placeholder, id, show-details, toke
                 parseNum(res.0) + "." + (res?1 ? "" )          
             | _ => parseNum(value)
         value = $value
-        console.log "parse #{it.target?value} to #{value}"
         it.target.selectionEnd = store.inputCaretPosition
         it.target.selectionStart = store.inputCaretPosition
         on-change { target: { value } }
