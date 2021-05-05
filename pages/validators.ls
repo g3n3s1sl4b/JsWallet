@@ -35,6 +35,7 @@ require! {
     \../seed.ls : seedmem
     \../components/burger.ls
     \./stake/accounts.ls : \stake-accounts
+    \../calc-certain-wallet.ls
 }
 .staking
     @import scheme
@@ -844,7 +845,7 @@ stringify = (value) ->
     else
         '..'
 validators.init = ({ store, web3t }, cb)!->
-    console.log "validators.init"
+    err <- calc-certain-wallet(store, "vlx_native")
     #return cb null if store.staking.pools-are-loading is yes
     store.staking.max-withdraw = 0
     random = ->
