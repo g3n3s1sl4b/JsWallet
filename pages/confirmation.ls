@@ -7,7 +7,7 @@ require! {
     \../components/text-field.ls   
     \../round5edit.ls
     \../components/amount-field.ls
-    \prelude-ls : { find }
+    \prelude-ls : { find, map }
     \../math.ls : { minus, div, plus, times }
 }
 .confirmation
@@ -155,10 +155,15 @@ alert-modal = (store)->
         color: style.app.text
         border-bottom: "1px solid #{style.app.border}"
     lang = get-lang store
+    text = store.current.alert
+    text-rows = text.split("\n")
+    build-text = (txt)->
+        .pug.text-block #{txt}
     .pug.confirmation
         .pug.confirmation-body(style=confirmation)
             .pug.header(style=confirmation-style) Alert
-            .pug.text(style=confirmation-style2) #{store.current.alert}
+            .pug.text(style=confirmation-style2) 
+                text-rows |> map build-text
             .pug.buttons
                 button.pug.button(on-click=cancel style=button-style id="alert-close")
                     span.cancel.pug
