@@ -4,7 +4,8 @@ require! {
     \../get-lang.ls
     \./icon.ls
     \../icons.ls 
-    \../components/text-field.ls   
+    \../components/text-field.ls
+    \../components/button.ls
     \../round5edit.ls
     \../components/amount-field.ls
     \prelude-ls : { find, map }
@@ -45,6 +46,24 @@ require! {
     justify-content: center
     align-items: center
     animation: appear .1s ease-in
+    .token-select
+        max-width: 300px
+        margin: auto
+        input
+            width: 80% !important
+        .tokens-drop
+            ul
+                li
+                    transition: all .5s
+                    margin: 3px
+                    opacity: 0.5
+                    padding: 2px 10px 10px !important
+                    &.active
+                        opacity: 1
+                        background: rgb(5, 6, 31) none repeat scroll 0% 0%
+                    &:hover
+                        opacity: 1
+                        background: rgb(5, 6, 31) none repeat scroll 0% 0%
     .icon-svg-apply
         position: relative
         height: 12px
@@ -75,7 +94,7 @@ require! {
             font-size: 13px
             outline: none
         >.header
-            padding: 15px 0 0
+            padding: 15px 10px
             font-size: 17px
             font-weight: bold
             margin-bottom: 10px
@@ -444,6 +463,113 @@ prompt-modal3 = (store)->
                     span.cancel.pug
                         img.icon-svg-cancel.pug(src="#{icons.close}")
                         | #{lang.cancel}
+data = {token: null}
+prompt-choose-token-modal = store = (store)->
+    return null if typeof! store.current.choose-token isnt \String
+    text = store.current.choose-token
+    confirm = ->
+        return if not store.current.prompt-answer? or store.current.prompt-answer is ""
+        store.current.choose-token = yes
+        callback = state.callback
+        state.callback = null
+        prompt-answer = store.current.prompt-answer
+        store.current.prompt-answer = ""
+        callback prompt-answer if typeof! callback is \Function
+    cancel = ->
+        store.current.prompt3 = no
+        callback = state.callback
+        state.callback = null
+        callback null if typeof! callback is \Function
+        store.current.prompt-answer = ""
+    style = get-primary-info store
+    confirmation-style =
+        background: style.app.background
+        background-color: style.app.bgspare
+        color: style.app.text
+    input-style =
+        background: style.app.input
+        color: style.app.text
+        border: "0"
+    input-holder-style =
+        max-width: '250px'
+        margin: 'auto'
+    button-style=
+        color: style.app.text
+    confirmation=
+        background: style.app.background
+        background-color: style.app.bgspare
+        color: style.app.text
+        border-bottom: "1px solid #{style.app.border}"
+    lang = get-lang store
+    open-tokens-dropdown = ->
+        store.current.tokens-dropdown = !store.current.tokens-dropdown
+    menu-out = ->
+        store.current.tokens-dropdown = no
+    button-primary3-style=
+        border: "0"
+        color: style.app.text2
+        background: style.app.primary3
+        background-color: style.app.primary3-spare
+        cursor: "pointer"
+    input-style =
+        color: "black"
+        border: "0"
+        margin-right: "10px"
+        height: "32px"
+        text-align: "center"
+    filter-body =
+        border: "1px solid #{style.app.border}"
+        background: style.app.header
+    imgStyle =
+        width: "30px"
+        position: "relative"
+        top: "8px"
+    optionStyle =
+        list-style: "none"
+        color: style.app.text
+        padding: "5px 10px"
+        cursor: "pointer"
+        display: "inline-block"
+    ul-style=
+        padding: 0
+        text-align: "left"
+        max-width: "300px"
+        margin: "20px auto"
+    text-style =
+        padding: "5px"
+    build-item = (item)->
+        {image, name, token} = item.coin
+        on-click = ->
+            store.current.tokens-dropdown = no
+            store.current.prompt-answer = token
+            data.token = name
+        active-class = if store.current.prompt-answer is token then "active" else ""
+        li.pug.lang-item(on-click=on-click style=optionStyle class="#{active-class}")
+            img.pug(src="#{image}" style=imgStyle)
+            span.pug(style=text-style) #{name}
+    prompt-answer = store.current.prompt-answer ? null
+    display-token = data.token ? ""
+    btn-disabled = (typeof store.current.prompt-answer isnt "string") or (typeof store.current.prompt-answer is "string" and store.current.prompt-answer.length is 0)
+    console.log "typeof store.current.prompt-answer" typeof store.current.prompt-answer
+    .pug.confirmation
+        .pug.confirmation-body(style=confirmation)
+            .pug.header(style=style=confirmation-style)#{store.current.choose-token}
+            .pug.text(style=style=confirmation-style)
+            .pug.token-select
+                input.pug( type="text" value="#{display-token}" read-only=yes style=inputStyle )
+                .pug.tokens-drop
+                    ul.pug(style=ul-style)
+                        store.current.account.wallets
+                            |> map build-item
+            .pug.buttons
+                button.pug.button(on-click=confirm style=button-style id="prompt-confirm" disabled=btn-disabled)
+                    span.apply.pug
+                        img.icon-svg-apply.pug(src="#{icons.apply}")
+                        | #{lang.confirm}
+                button.pug.button(on-click=cancel style=button-style id="prompt-close")
+                    span.cancel.pug
+                        img.icon-svg-cancel.pug(src="#{icons.close}")
+                        | #{lang.cancel}
 prompt-password-modal = (store)->
     return null if typeof! store.current.prompt-password isnt \String
     confirm = ->
@@ -508,6 +634,7 @@ export confirmation-control = (store)->
         prompt-password-modal store
         alert-modal store
         notification-modal store
+        prompt-choose-token-modal store
 state=
     callback: null
 export confirm = (store, text, cb)->
@@ -527,6 +654,10 @@ export prompt3 = (store, text, cb)->
     state.callback = cb
 export prompt-password = (store, text, cb)->
     store.current.prompt-password = text
+    state.callback = cb
+export prompt-choose-token = (store, text, cb)->
+    store.current.choose-token = text
+    store.current.prompt-answer = ''
     state.callback = cb
 export alert = (store, text, cb)->
     store.current.alert = text
