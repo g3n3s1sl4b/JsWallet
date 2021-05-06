@@ -81,7 +81,6 @@ require! {
             width: 130px
             display: inline-block
             div
-                position: relative
                 .division
                     float: none
                     margin: 15px auto 0
