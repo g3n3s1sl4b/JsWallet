@@ -476,7 +476,7 @@ prompt-choose-token-modal = store = (store)->
         store.current.prompt-answer = ""
         callback prompt-answer if typeof! callback is \Function
     cancel = ->
-        store.current.prompt3 = no
+        store.current.choose-token = no
         callback = state.callback
         state.callback = null
         callback null if typeof! callback is \Function
