@@ -64,4 +64,4 @@ module.exports = (store)->
                 img.icon-svg-cancel.pug(src="#{icons.close}")
         .copied-inner.pug
             .pug.mb-5 #{lang.copied}
-            .pug.contents #{cut copied}
+            h4.pug.contents #{cut copied}
