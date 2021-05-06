@@ -27,13 +27,14 @@ require! {
     \../../icons.ls
     \../placeholder.ls
     \../epoch.ls
-    \../confirmation.ls : { alert, notify, confirm, prompt2 }
+    \../confirmation.ls : { alert, notify, confirm, prompt2, prompt3 }
     \../../components/button.ls
     \../../components/address-holder.ls
     \../alert-txn.ls
     \../../components/amount-field.ls
     \../../seed.ls : seedmem
     \../../components/burger.ls
+    \./error-funcs.ls : { get-error-message }
 }
 .staking
     @import scheme
@@ -635,9 +636,9 @@ staking-content = (store, web3t)->
         return cb null if not pay-account
         console.log ""
         err, result <- as-callback web3t.velas.NativeStaking.delegate(pay-account.address, account.address)
-        console.log "result" result
         console.error "Result sending:" err if err?
-        alert store, err.toString! if err?
+        err-message = get-error-message(err, result)
+        return alert store, err-message if err-message?
         <- notify store, "FUNDS DELEGATED"
         navigate store, web3t, \validators
     velas-node-applied-template =
@@ -700,10 +701,7 @@ staking-content = (store, web3t)->
         #err, options <- get-options
         #return alert store, err, cb if err?
         store.staking.add.add-validator-stake = Math.max (get-balance! `minus` 0.1), 0
-    your-balance = " #{store.staking.chosenAccount.balance} "
-    your-staking-amount = store.staking.stakeAmountTotal `div` (10^18)
-    your-staking = " #{round-human your-staking-amount}"
-    vlx-token = "VLX"
+    your-balance = store.staking.chosenAccount.balanceRaw `div` (10^9) `plus` store.staking.chosenAccount.rent 
     isSpinned = if ((store.staking.all-pools-loaded is no or !store.staking.all-pools-loaded?) and store.staking.pools-are-loading is yes) then "spin disabled" else ""
     cancel-pool = ->
         store.staking.chosenAccount = null
@@ -724,8 +722,8 @@ staking-content = (store, web3t)->
         { balanceRaw, rent, address, account } = store.staking.chosenAccount
         amount = account.lamports `plus` rent
         err, result <- as-callback web3t.velas.NativeStaking.withdraw(address, amount)
-        console.error "Undelegate error: " err if err?
-        return alert store, err.toString! if err?
+        err-message = get-error-message(err, result)
+        return alert store, err-message if err-message?
         <- set-timeout _, 1000
         <- notify store, lang.fundsWithdrawn
         store.staking.getAccountsFromCashe = no
@@ -738,7 +736,8 @@ staking-content = (store, web3t)->
         #
         err, result <- as-callback web3t.velas.NativeStaking.undelegate(store.staking.chosenAccount.address)
         console.error "Undelegate error: " err if err?
-        return alert store, err.toString! if err?
+        err-message = get-error-message(err, result)
+        return alert store, err-message if err-message?
         <- set-timeout _, 1000
         <- notify store, lang.fundsUndelegated
         store.staking.getAccountsFromCashe = no
@@ -749,9 +748,10 @@ staking-content = (store, web3t)->
         console.error err if err?
         /* Get next account seed */
         err, seed <- as-callback web3t.velas.NativeStaking.getNextSeed()
-        return alert store, err.toString! if err?
+        err-message = get-error-message(err, seed)
+        return alert store, err-message if err-message?
         /**/
-        amount <- prompt2 store, lang.howMuchToSplit
+        amount <- prompt3 store, lang.howMuchToSplit
         return if amount+"".trim!.length is 0
         min_stake = web3t.velas.NativeStaking.min_stake
         balance = store.staking.chosenAccount.balanceRaw
@@ -763,14 +763,13 @@ staking-content = (store, web3t)->
         /* Create new account */
         fromPubkey$ = store.staking.chosenAccount.address
         err, splitStakePubkey <- as-callback web3t.velas.NativeStaking.createNewStakeAccountWithSeed()
-        console.error "Result sending:" err if err?
         return alert store, err.toString! if err?
         /**/
         /* Split account */
         stakeAccount = store.staking.chosenAccount.address
         err, result <- as-callback web3t.velas.NativeStaking.splitStakeAccount(stakeAccount, splitStakePubkey, amount)
-        console.error "Result sending:" err if err?
-        return alert store, err.toString! if err?
+        err-message = get-error-message(err, result)
+        return alert store, err-message if err-message?
         <- set-timeout _, 500
         <- notify store, lang.accountCreatedAndFundsSplitted
         store.staking.getAccountsFromCashe = no
@@ -790,7 +789,7 @@ staking-content = (store, web3t)->
     inactive_stake = store.staking.chosenAccount.inactive_stake `div` (10^9)
     delegated_stake = active_stake `plus` inactive_stake 
     usd-rate = wallet?usdRate ? 0
-    usd-balance = round-number(store.staking.chosenAccount.balanceRaw `times` usd-rate, {decimals:2})
+    usd-balance = round-number(your-balance `times` usd-rate, {decimals:2})
     usd-rent = round-number(store.staking.chosenAccount.rent `times` usd-rate,{decimals:2})
     usd-active_stake = round-number(active_stake `times` usd-rate, {decimals:2})
     usd-inactive_stake = round-number(inactive_stake `times` usd-rate, {decimals:2})
@@ -843,7 +842,7 @@ staking-content = (store, web3t)->
                     h3.pug #{lang.balance}
                 .description.pug
                     span.pug
-                        | #{store.staking.chosenAccount.balance} VLX
+                        | #{your-balance} VLX
                     span.pug.usd-amount
                         | $#{usd-balance}
             .pug
@@ -945,10 +944,13 @@ account-details = ({ store, web3t })->
         filter: info.app.icon-filter
     show-class =
         if store.current.open-menu then \hide else \ ""
+    just-go-back = ->
+        store.staking.getAccountsFromCashe = yes
+        go-back!    
     .pug.staking
         .pug.title(style=border-style)
             .pug.header(class="#{show-class}") #{lang.delegateStake}
-            .pug.close(on-click=go-back)
+            .pug.close(on-click=just-go-back)
                 img.icon-svg.pug(src="#{icons.arrow-left}" style=icon-color)
             burger store, web3t
             epoch store, web3t

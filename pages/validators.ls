@@ -35,6 +35,7 @@ require! {
     \../seed.ls : seedmem
     \../components/burger.ls
     \./stake/accounts.ls : \stake-accounts
+    \../calc-certain-wallet.ls
 }
 .staking
     @import scheme
@@ -138,6 +139,13 @@ require! {
             cursor: pointer
             vertical-align: top
             text-align: center
+        .title
+            h3
+                display: inline
+            .amount
+                color: white
+                font-size: 11px
+                opacity: 0.5 
         .form-group
             text-align: center
             padding-top: 0px
@@ -763,7 +771,8 @@ staking-content = (store, web3t)->
                 alert-txn { store }
                 .pug.section
                     .title.pug
-                        h3.pug #{lang.validators}
+                        h3.pug.section-title #{lang.validators} 
+                            span.pug.amount (#{store.staking.pools.length})
                     .description.pug
                         if store.staking.pools-are-loading is no then
                             .pug.table-scroll
@@ -771,7 +780,7 @@ staking-content = (store, web3t)->
                                     thead.pug
                                         tr.pug
                                             td.pug(width="30%" style=staker-pool-style title="Validator Staking Address. Permanent") #{lang.validator} (?)
-                                            td.pug(width="15%" style=stats title="Sum of all stakings") #{lang.total-stake} (?)
+                                            td.pug(width="15%" style=stats title="Sum of all stakings") #{lang.total-active-stake} (?)
                                             td.pug(width="5%" style=stats title="Validator Interest. (100% - Validator Interest = Pool Staking Reward)") #{lang.comission} (?)
                                             td.pug(width="10%" style=stats title="Last Staking Amount") #{lang.lastVote} (?)
                                             td.pug(width="10%" style=stats title="Find you staking by Seed") #{lang.my-stake} (?)
@@ -836,7 +845,7 @@ stringify = (value) ->
     else
         '..'
 validators.init = ({ store, web3t }, cb)!->
-    console.log "validators.init"
+    err <- calc-certain-wallet(store, "vlx_native")
     #return cb null if store.staking.pools-are-loading is yes
     store.staking.max-withdraw = 0
     random = ->
@@ -888,11 +897,17 @@ validators.init = ({ store, web3t }, cb)!->
     err, result <- query-accounts store, web3t, on-progress
     return cb err if err?
     store.staking.accounts = convert-accounts-to-view-model result
+    # Normalize currrent page for accounts in pagination
+    type = "accounts"
+    page = store.staking["current_#{type}_page"] ? 1
+    per-page = store.staking["#{type}_per_page"]
+    if +(page `times` per-page) >= store.staking.accounts.length
+        store.staking["current_#{type}_page"] = 1    
     on-progress = ->
         store.staking.pools = convert-pools-to-view-model [...it]
     err, pools <- query-pools {store, web3t, on-progress}
     return cb err if err?
     store.staking.pools = convert-pools-to-view-model pools
     store.staking.poolsFiltered = store.staking.pools
-    store.staking.getAccountsFromCashe = yes
+    store.staking.getAccountsFromCashe = no
 module.exports = validators

@@ -7,10 +7,11 @@ require! {
     \../components/text-field.ls   
     \../round5edit.ls
     \../components/amount-field.ls
-    \prelude-ls : { find }
-    \../math.ls : { minus }
+    \prelude-ls : { find, map }
+    \../math.ls : { minus, div, plus, times }
 }
 .confirmation
+    backdrop-filter: blur(5px)
     @-webkit-keyframes appear
         from
             opacity: 0
@@ -154,10 +155,15 @@ alert-modal = (store)->
         color: style.app.text
         border-bottom: "1px solid #{style.app.border}"
     lang = get-lang store
+    text = store.current.alert
+    text-rows = text.split("\n")
+    build-text = (txt)->
+        .pug.text-block #{txt}
     .pug.confirmation
         .pug.confirmation-body(style=confirmation)
             .pug.header(style=confirmation-style) Alert
-            .pug.text(style=confirmation-style2) #{store.current.alert}
+            .pug.text(style=confirmation-style2) 
+                text-rows |> map build-text
             .pug.buttons
                 button.pug.button(on-click=cancel style=button-style id="alert-close")
                     span.cancel.pug
@@ -260,6 +266,7 @@ prompt-modal = (store)->
         background: style.app.input
         color: style.app.text
         border: "0"
+        text-align: "center"
     button-style=
         color: style.app.text
     confirmation=
@@ -305,6 +312,7 @@ prompt-modal2 = (store)->
         max-amount = Math.floor(balance `minus` 1)
         amount =
             | e.target.value > max-amount => max-amount
+            | isNaN(e.target.value) => 0
             | _ => e.target.value
         store.current.prompt-answer = amount
     style = get-primary-info store
@@ -342,6 +350,86 @@ prompt-modal2 = (store)->
     .pug.confirmation
         .pug.confirmation-body(style=confirmation)
             .pug.header(style=style=confirmation-style)#{store.current.prompt2}
+            .pug.text(style=style=confirmation-style)
+            .pug(style=input-holder-style)
+                amount-field { store, value: "#{round5edit store.current.prompt-answer}", on-change: amount-change, placeholder="0", id="prompt-input", token: "vlx_native" }
+                .pug.max-amount(style=max-amount-container)
+                    button.pug.send-all(on-click=use-max-amount style=button-primary3-style type="button" id="send-max") #{lang.use-max}
+            .pug.buttons
+                button.pug.button(on-click=confirm style=button-style id="prompt-confirm")
+                    span.apply.pug
+                        img.icon-svg-apply.pug(src="#{icons.apply}")
+                        | #{lang.confirm}
+                button.pug.button(on-click=cancel style=button-style id="prompt-close")
+                    span.cancel.pug
+                        img.icon-svg-cancel.pug(src="#{icons.close}")
+                        | #{lang.cancel}
+prompt-modal3 = (store)->
+    return null if typeof! store.current.prompt3 isnt \String
+    console.log "prompt3-modal" 
+    chosenAccount = store.staking.chosenAccount
+    rent = chosenAccount.rent
+    active_stake = chosenAccount.active_stake `div` (10^9)
+    inactive_stake = chosenAccount.inactive_stake `div` (10^9)
+    balanceRaw = chosenAccount.balanceRaw `div` (10^9)
+    console.log "Account" chosenAccount
+    min_stake = "1"
+    confirm = ->
+        return if not store.current.prompt-answer? or +store.current.prompt-answer is 0 or store.current.prompt-answer is ""
+        store.current.prompt3 = yes
+        callback = state.callback
+        state.callback = null
+        prompt-answer = store.current.prompt-answer
+        store.current.prompt-answer = ""
+        callback prompt-answer if typeof! callback is \Function
+    cancel = ->
+        store.current.prompt3 = no
+        callback = state.callback
+        state.callback = null
+        callback null if typeof! callback is \Function
+        store.current.prompt-answer = ""
+    amount-change = (e)->
+        balance = (chosenAccount?balance ? 1)
+        max-amount = Math.floor(balance `minus` min_stake)
+        amount =
+            | e.target.value > max-amount => max-amount
+            | _ => e.target.value
+        store.current.prompt-answer = amount
+    style = get-primary-info store
+    confirmation-style =
+        background: style.app.background
+        background-color: style.app.bgspare
+        color: style.app.text
+    input-style =
+        background: style.app.input
+        color: style.app.text
+        border: "0"
+    input-holder-style = 
+        max-width: '250px'
+        margin: 'auto'
+    button-style=
+        color: style.app.text
+    confirmation=
+        background: style.app.background
+        background-color: style.app.bgspare
+        color: style.app.text
+        border-bottom: "1px solid #{style.app.border}"
+    lang = get-lang store
+    button-primary3-style=
+        border: "0"
+        color: style.app.text2
+        background: style.app.primary3
+        background-color: style.app.primary3-spare
+        cursor: "pointer"
+    max-amount-container =
+        text-align: "left"
+    use-max-amount = !->
+        store.current.prompt-answer = 
+            | not chosenAccount? => 0
+            | _ => balanceRaw `minus` active_stake `minus` min_stake
+    .pug.confirmation
+        .pug.confirmation-body(style=confirmation)
+            .pug.header(style=style=confirmation-style)#{store.current.prompt3}
             .pug.text(style=style=confirmation-style)
             .pug(style=input-holder-style)
                 amount-field { store, value: "#{round5edit store.current.prompt-answer}", on-change: amount-change, placeholder="0", id="prompt-input" }
@@ -413,6 +501,7 @@ export confirmation-control = (store)->
     #for situation when we ask peen before action. this window should be hidden
     return null if store.current.page-pin?
     .pug
+        prompt-modal3 store
         confirmation-modal store
         prompt-modal2 store
         prompt-modal store
@@ -432,6 +521,9 @@ export prompt = (store, text, cb)->
     state.callback = cb
 export prompt2 = (store, text, cb)->
     store.current.prompt2 = text
+    state.callback = cb
+export prompt3 = (store, text, cb)->
+    store.current.prompt3 = text
     state.callback = cb
 export prompt-password = (store, text, cb)->
     store.current.prompt-password = text

@@ -222,16 +222,18 @@ module.exports = (store, web3t)->
         return send.error = err if err? 
         send.error = '' 
     get-value = (event)-> 
+        value = event.target?value     
         return null if not event.target?value      
         return \0 if event.target?value is ""    
-        value = event.target.value.match(/^[0-9]+([.]([0-9]+)?)?$/)?0
-        value2 =
-            | value?0 is \0 and value?1? and value?1 isnt \. => value.substr(1, value.length)
-            | _ => value
-        value2
+        #value = event.target.value.match(/^[0-9]+([.]([0-9]+)?)?$/)?0
+        #value2 =
+            #| value?0 is \0 and value?1? and value?1 isnt \. => value.substr(1, value.length)
+            #| _ => value
+        value
     amount-change = (event)->
         value = get-value event
-        return if not value?    
+        # if empty string return zero!    
+        value = "0" if not value? or isNaN(value)   
         <- change-amount store, value, no
     perform-amount-eur-change = (value)->
         to-send = calc-crypto-from-eur store, value

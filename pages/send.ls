@@ -19,6 +19,7 @@ require! {
     \../history-funcs.ls
     \../components/burger.ls
     \../components/amount-field.ls
+    \../components/amount-fiat-field.ls
     \../components/sliders/network-slider.ls
     \../math.ls : { times }
     \ethereumjs-util : {BN}
@@ -537,11 +538,9 @@ send = ({ store, web3t })->
                                 .label.crypto.pug
                                     img.label-coin.pug(src="#{send.coin.image}")
                                     | #{token-display}
-                                amount-field { store, value: "#{round5edit send.amount-send}", on-change: amount-change, placeholder="0", id="send-amount", token, disabled }
+                                amount-field { store, value: send.amount-send, on-change: amount-change, placeholder="0", id="send-amount", token, disabled }
                             if active-usd is \active
-                                .input-wrapper.small.pug(style=amount-style)
-                                    .label.lusd.pug $
-                                    input.pug.amount-usd(type='text' style=just-crypto-background on-change=amount-usd-change placeholder="0" title="#{send.amount-send-usd}" value="#{round-number send.amount-send-usd, {decimals: 8}}" id="send-amount-usd" disabled=disabled)
+                                amount-fiat-field { store, on-change:amount-usd-change, placeholder:"0", title:"#{send.amount-send-usd}" value:"#{send.amount-send-usd}", id:"send-amount-usd", disabled: disabled }
                             if active-eur is \active
                                 .input-wrapper.small.pug(style=amount-style)
                                     .label.lusd.pug €
@@ -565,17 +564,17 @@ send = ({ store, web3t })->
                         tr.pug
                             td.pug #{lang.you-spend}
                             td.pug
-                                span.pug(title="#{send.amount-charged}") #{round5(send.amount-charged)}
+                                span.pug(title="#{send.amount-charged}") #{round-human(send.amount-charged)}
                                     img.label-coin.pug(src="#{send.coin.image}")
                                     span.pug(title="#{send.amount-charged}") #{token-display}
-                                .pug.usd $ #{round5 send.amount-charged-usd}
+                                .pug.usd $ #{round-human send.amount-charged-usd}
                         tr.pug.orange
                             td.pug #{lang.fee}
                             td.pug
-                                span.pug(title="#{send.amount-send-fee}") #{round5 send.amount-send-fee}
+                                span.pug(title="#{send.amount-send-fee}") #{round-human send.amount-send-fee}
                                     img.label-coin.pug(src="#{fee-coin-image}")
                                     span.pug(title="#{send.amount-send-fee}") #{fee-token-display}
-                                .pug.usd $ #{round5 send.amount-send-fee-usd}
+                                .pug.usd $ #{round-human send.amount-send-fee-usd}
             .pug.button-container
                 .pug.buttons
                     button { store, text: \send , on-click: send-func , loading: send.sending, type: \primary, error: send.error, makeDisabled: makeDisabled, id: "send-confirm" }
