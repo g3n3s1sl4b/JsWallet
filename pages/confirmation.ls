@@ -474,11 +474,13 @@ prompt-choose-token-modal = store = (store)->
         state.callback = null
         prompt-answer = store.current.prompt-answer
         store.current.prompt-answer = ""
+        data.token = null
         callback prompt-answer if typeof! callback is \Function
     cancel = ->
         store.current.choose-token = no
         callback = state.callback
         state.callback = null
+        data.token = null
         callback null if typeof! callback is \Function
         store.current.prompt-answer = ""
     style = get-primary-info store
