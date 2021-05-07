@@ -300,7 +300,6 @@ module.exports = (store, web3t)->
         amount-send-fee = send.amount-send-fee      
         send.fee-type = \custom
         max-amount = Math.max 1e8, balance
-        amount = round-number(amount, {decimals: send.network.decimals, maxValue:max-amount})
         send.amount-send-fee = send.fee-custom-amount = amount
         <- change-amount store, send.amount-send, no
     chosen-cheap = if send.fee-type is \cheap then \chosen else ""

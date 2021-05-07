@@ -4,10 +4,12 @@ require! {
     \prelude-ls : { find }
     \../math.ls : { times }
     \./keyboard.ls
-    \../numbers.js : {parseNum, formatNum}
+    \../numbers.js : {parseNum}
     \../send-funcs.ls
     \../round-number.ls
+    \react-currency-input-field : { default: CurrencyInput }
 }
+DECIMAL_SEPARATOR = '.'
 module.exports = ({ store, value, on-change, placeholder, id, show-details, title, token="vlx2", disabled=no })->
     # Styles ##################
     style = get-primary-info store
@@ -19,68 +21,50 @@ module.exports = ({ store, value, on-change, placeholder, id, show-details, titl
         background: style.app.wallet  
     ###########################
     # Input validation ########
-    decimalsConfig = 4
-    decimals = value.toString!.split(".").1
-    if decimals? and (decimals.length > decimalsConfig) then
-        value = round-number(value, {decimals: 4})
-    max-amount = 1e12
+    decimalsLimit = 4
+    # Input validation #
+    decimals = value.toString!.split(DECIMAL_SEPARATOR).1
+    if decimals? and (decimals.length > decimalsLimit) then
+        value = round-number(value, {decimals: decimalsLimit})
     ###########################
     # Listeners
-    get-number = (value)->
-        number = (value ? "").toString!
+    get-number = (val)->
+        number = (val ? "").toString!
         return \0 if number is ""
-        value
+        val
     value-without-decimal-with-dot = (value)->
         value = (value ? "").toString()
-        res = value.split(".")
-        value.index-of('.') > -1 and (res.length > 1 and res[1] is "")
-    format-my-number = (value)->
-        number-isnt-normal = value-without-decimal-with-dot(value)
-        str_val = (value ? "0").toString()
-        res = str_val.split(".")
-        has-dot = res.length > 1
-        $value = 
-            | value is "" => "0"
-            | number-isnt-normal =>
-                left = formatNum(res.0)
-                left + "."
-            | has-dot and res?1 and (+value is res.0) =>
-                formatNum(res.0) + "." + res.1  
-            # if number has zeroes in the decimals at the end  
-            | has-dot and (str_val.length isnt (+str_val).toString().length) and (+value is +str_val) =>
-                formatNum(res.0) + "." + res.1    
-            | _ =>  formatNum(value)  
-        $value  
+        res = value.split(DECIMAL_SEPARATOR)
+        value.index-of(DECIMAL_SEPARATOR) > -1 and (res.length > 1 and res[1] is "")
     on-change-internal = (it)->
-        console.log "fiat on-change"
-        value = it.target?value
+        value = it
         value = get-number(value)
         # Restrictions check #
-        if decimals? and (decimals.length > decimalsConfig) then
-            value = it.target.value = round-number(value, {decimals: 4})
-        max-amount = 1e12
-        if +value > max-amount then
-            value = it.target.value = max-amount
-        ######################
-        res = (value ? "0").toString().split(".")
+        result = value.toString!.split(DECIMAL_SEPARATOR)
+        groups = result.0
+        decimals = result.1
+        if +groups > 10^15 then 
+            return
+        if decimals? and (decimals.length > decimalsLimit) then
+            return
+        # # # # # # # # # # #
+        res = (value ? "0").toString().split(DECIMAL_SEPARATOR)
         parsed-left = parseNum(res?0)
         has-dot = res.length > 1
         value = "0" if not value? or value is ""
         str_val = (value ? "0").toString()
         $value = 
-            | it.target?value is "" => 0
+            | it is "" => 0
             | value-without-decimal-with-dot(value) =>
                 left = res.0
-                parseNum(left) + "."
-            | has-dot and parsed-left is parseNum(it.target?value) =>
-                parsed-left + "." + (res?1 ? "" )    
+                parseNum(left) + DECIMAL_SEPARATOR
+            | has-dot and parsed-left is parseNum(it) =>
+                parsed-left + DECIMAL_SEPARATOR + (res?1 ? "")    
             | has-dot and (str_val.length isnt (+str_val).toString().length) and (+value is +str_val) =>
-                parseNum(res.0) + "." + (res?1 ? "" )          
+                parseNum(res.0) + DECIMAL_SEPARATOR + (res?1 ? "")          
             | _ => parseNum(value)
-        value = $value
-        #it.target.selectionEnd = store.inputCaretPosition
-        #it.target.selectionStart = store.inputCaretPosition
+        value = $value 
         on-change { target: { value } }
     .input-wrapper.small.pug(style=amount-style)
         .label.lusd.pug $
-        input.pug.amount-usd(type='text' style=just-crypto-background on-change=on-change-internal placeholder=placeholder title=title value="#{format-my-number(value)}" id="send-amount-usd" disabled=disabled)
+        CurrencyInput.pug(class="textfield amount-usd" key="amount-usd" style=just-crypto-background allowDecimals=yes value="#{value}" decimalsLimit=decimalsLimit label="Send" decimalSeparator=DECIMAL_SEPARATOR groupSeparator="," onValueChange=on-change-internal)
