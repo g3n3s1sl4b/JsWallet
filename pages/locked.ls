@@ -19,8 +19,8 @@ require! {
     @import scheme
     padding-top: 20px
     padding-bottom: 20px
-    height: $height
     height: 100vh
+    overflow: scroll
     box-sizing: border-box
     text-align: center
     background-size: cover !important

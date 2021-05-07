@@ -2,6 +2,7 @@ require! {
     \react
     \./get-primary-info.ls
     \./get-lang.ls
+    \./icons.ls
 }
 .copied
     @import scheme
@@ -14,7 +15,7 @@ require! {
     width: 100%
     height: 80px
     padding: 10px
-    left: 0
+    right: 0
     text-align: center
     border-radius: 0px 0px var(--border-btn) var(--border-btn)
     box-shadow: 0px 0px 0px 0px #aee7f3
@@ -22,6 +23,10 @@ require! {
     border-radius: calc(var(--border-btn) * 2)
     width: calc(100% - 20px)
     box-shadow: 7px 10px 13px #0000001f, -16px 20px 13px #00000024
+    opacity: 0.85
+    min-width: 30%
+    max-width: 400px
+    background: green
     @keyframes top
         0%
             top: -80px
@@ -29,6 +34,11 @@ require! {
             top: 0
     &.opened
         animation: top 0.5s forwards
+    .button-close
+        cursor: pointer
+        float: right
+        img
+            width: 13px
     .mb-5
         margin-bottom: 5px
     .contents
@@ -46,8 +56,12 @@ module.exports = (store)->
         #r.to-upper-case!
     copy-style=
         color: style.app.text
-        background: style.app.bg-primary-light
-        border: "1px solid #{style.app.border}"
+    cancel = ->
+        store.current.copied = ""
     .copied.pug(class="#{copied-class}" key="copy-message" style=copy-style)
-        .pug.mb-5 #{lang.copied}
-        .pug.contents #{cut copied}
+        .pug.button-close(on-click=cancel id="prompt-close")
+            span.cancel.pug
+                img.icon-svg-cancel.pug(src="#{icons.close}")
+        .copied-inner.pug
+            .pug.mb-5 #{lang.copied}
+            h4.pug.contents #{cut copied}

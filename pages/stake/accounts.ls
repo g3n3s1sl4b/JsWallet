@@ -88,6 +88,13 @@ as-callback = (p, cb)->
         &:hover
             .tooltip
                 visibility: visible
+    .title
+        h3
+            display: inline
+        .amount
+            color: white
+            font-size: 11px
+            opacity: 0.5    
     .form-group
         .subtitle
             margin: 20px 0 10px
@@ -217,11 +224,16 @@ staking-accounts-content = (store, web3t)->
             store.staking.chosen-account = item
             navigate store, web3t, \poolchoosing
             cb null
+        stake-data = item?account?data?parsed?info?stake
         $button =
             | item.status is \inactive =>
                 button { store, text: lang.to_delegate, on-click: choose, type: \secondary , icon : \arrowRight }
             | _ => 
                 disabled = item.status in <[ deactivating ]>
+                if stake-data? and stake-data.delegation?
+                    {activationEpoch, deactivationEpoch} = stake-data.delegation
+                    if +activationEpoch < +deactivationEpoch and +deactivationEpoch isnt +max-epoch
+                        disabled = yes     
                 button { store, classes: "action-undelegate" text: lang.to_undelegate, on-click: undelegate , type: \secondary , icon : \arrowLeft, makeDisabled: disabled }
         tr.pug(class="#{item.status}" key="#{address}")
             td.pug
@@ -307,7 +319,8 @@ staking-accounts-content = (store, web3t)->
             .form-group.pug(id="staking-accounts")
                 .pug.section
                     .title.pug
-                        h3.pug #{lang.yourStakingAccounts}
+                        h3.pug.section-title #{lang.yourStakingAccounts} 
+                            span.pug.amount (#{store.staking.accounts.length}) 
                         .pug
                             .loader.pug(on-click=refresh style=icon-style title="refresh" class="#{isSpinned}")
                                 icon \Sync, 25
@@ -323,7 +336,7 @@ staking-accounts-content = (store, web3t)->
                                             td.pug(width="30%" style=stats title="Where you staked") #{lang.validator} (?)
                                             td.pug(width="7%" style=stats title="The ID of your stake. This is made to simplify the search of your stake in validator list") #{lang.seed} (?)
                                             if no
-                                                td.pug(width="10%" style=stats title="Current staking status. Please notice that you cannot stake / unstake immediately. You need to go through the waiting period. This is made to reduce attacks by stacking and unstacking spam.") #{lang.status} (?)
+                                                td.pug(width="10%" style=stats title="Current staking status. Please notice that you cannot stake / unstake immediately. You need to go through the waiting period. This is made to reduce attacks by staking and unstaking spam.") #{lang.status} (?)
                                             td.pug(width="10%" style=stats) #{(lang.action ? "Action")}
                                     tbody.pug
                                         paginate( (store.staking.accounts |> sort-by (.seed-index)), perPage, page)

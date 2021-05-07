@@ -11,7 +11,7 @@ require! {
     \../web3t/plugins/ltc-coin.js : ltc
     \../web3t/plugins/usdt-coin.js : usdt
     \../web3t/plugins/usdt_erc20.json : usdt_erc20
-    \../web3t/plugins/sol-coin.js : sol
+    #\../web3t/plugins/gobyte-coin.js : gbx
     \../web3t/plugins/vlx_erc20-coin.js : vlx_erc20
     \../web3t/plugins/vlx-coin.js : vlx_evm
 }

@@ -46,6 +46,7 @@ url-hash-params =
     | window? => qs.parse window.location.hash.replace('#', '')
     | _ => {}
 store =
+    inputCaretPosition: 0  
     url-params: url-params
     url-hash-params: url-hash-params
     root: null
@@ -157,8 +158,8 @@ store =
         getAccountsFromCashe: yes
         parsedProgramAccounts: []
         accountsCached: {}
-        validators_per_page: 5
-        accounts_per_page: 5
+        validators_per_page: 10
+        accounts_per_page: 10
         visible_per_page_accounts_selector: no
         visible_per_page_validators_selector: no
         add:
@@ -252,6 +253,7 @@ store =
         prompt-answer: ""
         prompt: no
         prompt2: no 
+        prompt3: no  
         prompt-password: no 
         prompt-password-answer: ""
         step: "first"
@@ -290,6 +292,8 @@ store =
         confirmation: null
         notification: null    
         alert: null
+        choose-token: null
+        tokens-dropdown: no
         demo: location.href.index-of('web3.space/wallet') > -1
         network: \mainnet
         pin: ""

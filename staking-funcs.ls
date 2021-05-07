@@ -162,7 +162,7 @@ convert-accounts-to-view-model = (accounts) ->
             account: it.account
             address: it.key ? '..'
             key: it.key
-            balanceRaw: it.balance ? 0
+            balanceRaw: it.balanceRaw ? 0
             balance: if it.balance? then round-human(it.balance) else '..'
             rent: if it.rent? then it.rent else "-"
             lastVote: it.lastVote ? '..'

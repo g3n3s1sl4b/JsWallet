@@ -27,13 +27,14 @@ require! {
     \../../icons.ls
     \../placeholder.ls
     \../epoch.ls
-    \../confirmation.ls : { alert, notify, confirm, prompt2 }
+    \../confirmation.ls : { alert, notify, confirm, prompt2, prompt3 }
     \../../components/button.ls
     \../../components/address-holder.ls
     \../alert-txn.ls
     \../../components/amount-field.ls
     \../../seed.ls : seedmem
     \../../components/burger.ls
+    \./error-funcs.ls : { get-error-message }
 }
 .staking
     @import scheme
@@ -196,6 +197,9 @@ require! {
                     font-size: 14px
                     width: 80%
                     text-align: left
+                    .notification
+                        @media(max-width:800px)
+                            text-align: left
                     hr
                         margin: 15px auto
                         border: 1px solid rgba(240, 237, 237, 0.16)
@@ -635,9 +639,9 @@ staking-content = (store, web3t)->
         return cb null if not pay-account
         console.log ""
         err, result <- as-callback web3t.velas.NativeStaking.delegate(pay-account.address, account.address)
-        console.log "result" result
         console.error "Result sending:" err if err?
-        alert store, err.toString! if err?
+        err-message = get-error-message(err, result)
+        return alert store, err-message if err-message?
         <- notify store, "FUNDS DELEGATED"
         navigate store, web3t, \validators
     velas-node-applied-template =
@@ -700,10 +704,7 @@ staking-content = (store, web3t)->
         #err, options <- get-options
         #return alert store, err, cb if err?
         store.staking.add.add-validator-stake = Math.max (get-balance! `minus` 0.1), 0
-    your-balance = " #{store.staking.chosenAccount.balance} "
-    your-staking-amount = store.staking.stakeAmountTotal `div` (10^18)
-    your-staking = " #{round-human your-staking-amount}"
-    vlx-token = "VLX"
+    your-balance = store.staking.chosenAccount.balanceRaw `div` (10^9) `plus` store.staking.chosenAccount.rent 
     isSpinned = if ((store.staking.all-pools-loaded is no or !store.staking.all-pools-loaded?) and store.staking.pools-are-loading is yes) then "spin disabled" else ""
     cancel-pool = ->
         store.staking.chosenAccount = null
@@ -724,8 +725,8 @@ staking-content = (store, web3t)->
         { balanceRaw, rent, address, account } = store.staking.chosenAccount
         amount = account.lamports `plus` rent
         err, result <- as-callback web3t.velas.NativeStaking.withdraw(address, amount)
-        console.error "Undelegate error: " err if err?
-        return alert store, err.toString! if err?
+        err-message = get-error-message(err, result)
+        return alert store, err-message if err-message?
         <- set-timeout _, 1000
         <- notify store, lang.fundsWithdrawn
         store.staking.getAccountsFromCashe = no
@@ -738,7 +739,8 @@ staking-content = (store, web3t)->
         #
         err, result <- as-callback web3t.velas.NativeStaking.undelegate(store.staking.chosenAccount.address)
         console.error "Undelegate error: " err if err?
-        return alert store, err.toString! if err?
+        err-message = get-error-message(err, result)
+        return alert store, err-message if err-message?
         <- set-timeout _, 1000
         <- notify store, lang.fundsUndelegated
         store.staking.getAccountsFromCashe = no
@@ -749,9 +751,10 @@ staking-content = (store, web3t)->
         console.error err if err?
         /* Get next account seed */
         err, seed <- as-callback web3t.velas.NativeStaking.getNextSeed()
-        return alert store, err.toString! if err?
+        err-message = get-error-message(err, seed)
+        return alert store, err-message if err-message?
         /**/
-        amount <- prompt2 store, lang.howMuchToSplit
+        amount <- prompt3 store, lang.howMuchToSplit
         return if amount+"".trim!.length is 0
         min_stake = web3t.velas.NativeStaking.min_stake
         balance = store.staking.chosenAccount.balanceRaw
@@ -763,14 +766,13 @@ staking-content = (store, web3t)->
         /* Create new account */
         fromPubkey$ = store.staking.chosenAccount.address
         err, splitStakePubkey <- as-callback web3t.velas.NativeStaking.createNewStakeAccountWithSeed()
-        console.error "Result sending:" err if err?
         return alert store, err.toString! if err?
         /**/
         /* Split account */
         stakeAccount = store.staking.chosenAccount.address
         err, result <- as-callback web3t.velas.NativeStaking.splitStakeAccount(stakeAccount, splitStakePubkey, amount)
-        console.error "Result sending:" err if err?
-        return alert store, err.toString! if err?
+        err-message = get-error-message(err, result)
+        return alert store, err-message if err-message?
         <- set-timeout _, 500
         <- notify store, lang.accountCreatedAndFundsSplitted
         store.staking.getAccountsFromCashe = no
@@ -790,7 +792,7 @@ staking-content = (store, web3t)->
     inactive_stake = store.staking.chosenAccount.inactive_stake `div` (10^9)
     delegated_stake = active_stake `plus` inactive_stake 
     usd-rate = wallet?usdRate ? 0
-    usd-balance = round-number(store.staking.chosenAccount.balanceRaw `times` usd-rate, {decimals:2})
+    usd-balance = round-number(your-balance `times` usd-rate, {decimals:2})
     usd-rent = round-number(store.staking.chosenAccount.rent `times` usd-rate,{decimals:2})
     usd-active_stake = round-number(active_stake `times` usd-rate, {decimals:2})
     usd-inactive_stake = round-number(inactive_stake `times` usd-rate, {decimals:2})
@@ -811,6 +813,9 @@ staking-content = (store, web3t)->
         | store.staking.chosenAccount.status is "inactive" and has-validator => "Delegated (Inactive)"
         | store.staking.chosenAccount.status is "activating" => ""
         | _ => store.staking.chosenAccount.status
+    inactiveStakeLabel =
+        | store.staking.chosenAccount.status is "activating" => lang.warminUp
+        | _ => lang.inactiveStake
     .pug.staking-content.delegate
         .pug.single-section.form-group(id="choosen-pull")
             .pug.section
@@ -843,7 +848,7 @@ staking-content = (store, web3t)->
                     h3.pug #{lang.balance}
                 .description.pug
                     span.pug
-                        | #{store.staking.chosenAccount.balance} VLX
+                        | #{your-balance} VLX
                     span.pug.usd-amount
                         | $#{usd-balance}
             .pug
@@ -874,6 +879,14 @@ staking-content = (store, web3t)->
                         | #{credits_observed}
             .pug.section
                 .title.pug
+                    h3.pug #{lang.delegatedStake}
+                .description.pug
+                    span.pug
+                        | #{round-human(delegated_stake)} VLX
+                    span.pug.usd-amount
+                        | $#{usd-delegated_stake}
+            .pug.section
+                .title.pug
                     h3.pug #{lang.activeStake}
                 .description.pug
                     span.pug
@@ -889,20 +902,33 @@ staking-content = (store, web3t)->
                             | #{myStakeMaxPart}
             .pug.section
                 .title.pug
-                    h3.pug #{lang.inactiveStake}
+                    h3.pug #{inactiveStakeLabel}
                 .description.pug
                     span.pug
                         | #{round-human(inactive_stake)} VLX
                     span.pug.usd-amount
                         | $#{usd-inactive_stake}
-            .pug.section
-                .title.pug
-                    h3.pug #{lang.delegatedStake}
-                .description.pug
-                    span.pug
-                        | #{round-human(delegated_stake)} VLX
-                    span.pug.usd-amount
-                        | $#{usd-delegated_stake}
+                    if store.staking.chosenAccount.status is "activating"
+                        more-style =
+                            text-decoration: "none"
+                            opacity: 0.8
+                            line-height: 1.6
+                            font-size: "14px"
+                            letter-spacing: "2px"
+                            margin-left: "5px"
+                        tip-style =
+                            color: "#16ffb2"
+                            opacity: 0.8
+                        link-style =
+                            text-decoration: "none"
+                            color: "white"
+                            opacity: 0.8
+                        notification-style =
+                            margin-top: "10px"
+                        .pug.notification(style=notification-style)
+                            span.pug(style=tip-style) Only 25% of active stake can be activated per epoch.
+                            a.pug(href="https://support.velas.com/hc/en-150/articles/360021044820-Delegation-Warmup-and-Cooldown" target="_blank" style=link-style)
+                                span.pug(style=more-style) More...
             .pug.section
                 .title.pug
                     h2.pug Actions
@@ -945,10 +971,13 @@ account-details = ({ store, web3t })->
         filter: info.app.icon-filter
     show-class =
         if store.current.open-menu then \hide else \ ""
+    just-go-back = ->
+        store.staking.getAccountsFromCashe = yes
+        go-back!    
     .pug.staking
         .pug.title(style=border-style)
             .pug.header(class="#{show-class}") #{lang.delegateStake}
-            .pug.close(on-click=go-back)
+            .pug.close(on-click=just-go-back)
                 img.icon-svg.pug(src="#{icons.arrow-left}" style=icon-color)
             burger store, web3t
             epoch store, web3t
@@ -959,13 +988,10 @@ account-details.init = ({ store, web3t }, cb)!->
     stake-accounts = store.staking.parsedProgramAccounts
     err, stakeActivation <- as-callback web3t.velas.NativeStaking.getStakeActivation(store.staking.chosenAccount.address)
     if not err? and stakeActivation?
-        item.status = stakeActivation.state
-        item.active_stake = stakeActivation.active
-        item.inactive_stake = stakeActivation.inactive
+        store.staking.chosenAccount.status = stakeActivation.state
+        store.staking.chosenAccount.active_stake = stakeActivation.active
+        store.staking.chosenAccount.inactive_stake = stakeActivation.inactive
     return alert store, err, cb if err?
-    store.staking.chosenAccount.status = state
-    store.staking.chosenAccount.active_stake = active
-    store.staking.chosenAccount.inactive_stake = inactive
     #if true
         #err, all-stakes <- get-all-active-stake(stake-accounts)
         #console.log "all-active-stake" all-stakes
