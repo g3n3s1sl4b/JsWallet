@@ -93,6 +93,7 @@ module.exports = ({ store, value, on-change, placeholder, id, show-details, toke
         eur =
             | wallet.eur-rate? => (value || "0") `times` wallet.eur-rate
             | _ => ".."
+    value = 0 if value is "" or not value?
     # Input validation #
     decimalsLimit = wallet?network?decimals ? 4
     decimals = value.toString!.split(DECIMAL_SEPARATOR).1
@@ -141,7 +142,7 @@ module.exports = ({ store, value, on-change, placeholder, id, show-details, toke
         res = value.split(DECIMAL_SEPARATOR)
         value.index-of(DECIMAL_SEPARATOR) > -1 and (res.length > 1 and res[1] is "")
     .pug.input-area
-        CurrencyInput.pug(class="textfield" key="amount" allowDecimals=yes value="#{value}" decimalsLimit=decimalsLimit label="Send" decimalSeparator=DECIMAL_SEPARATOR groupSeparator="," onValueChange=on-change-internal)
+        CurrencyInput.pug(class="textfield" style=input-style key="amount" allowDecimals=yes value="#{value}" decimalsLimit=decimalsLimit label="Send" decimalSeparator=DECIMAL_SEPARATOR groupSeparator="," onValueChange=on-change-internal)
         span.suffix.pug(style=input-style)
             img.icon.pug(src="#{wallet.coin.image}")
             span.pug #{token-label}
