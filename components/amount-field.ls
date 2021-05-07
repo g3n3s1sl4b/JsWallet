@@ -71,7 +71,7 @@ require! {
                 max-width: 250px
                 min-width: 250px
                 text-align: left
-DECIMAL_SEPARATOR = '.'
+DECIMAL_SEPARATOR = '.' 
 module.exports = ({ store, value, on-change, placeholder, id, show-details, token="vlx2", disabled=no })->
     style = get-primary-info store
     usd = null
