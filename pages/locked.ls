@@ -28,9 +28,8 @@ require! {
     justify-content: center
     align-items: center
     .locked-inner
-        width: 100%
+        max-width: 550px
         max-height: 700px
-        overflow: scroll
         .notice
             max-width: 300px
             text-align: center
