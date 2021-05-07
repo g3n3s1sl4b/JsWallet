@@ -28,7 +28,9 @@ require! {
     justify-content: center
     align-items: center
     .locked-inner
-        max-width: 550px
+        width: 100%
+        max-height: 700px
+        overflow: scroll
         .notice
             max-width: 300px
             text-align: center
@@ -311,7 +313,7 @@ wrong-trials = (store)->
         return if res is no
         reset-wallet store
     wrong-pin-text = "#{left-trials}/#{total-trials} #{lang.notice-reset}."
-    .pug
+    .pug.wrong-pin-trial
         .pug.wrong(key="wrong-trial") #{wrong-pin-text}
         .pug.notice(style=notice)
             span.orange.pug #{lang.notice}!
