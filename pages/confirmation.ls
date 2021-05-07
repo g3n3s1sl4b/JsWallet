@@ -385,13 +385,12 @@ prompt-modal2 = (store)->
                         | #{lang.cancel}
 prompt-modal3 = (store)->
     return null if typeof! store.current.prompt3 isnt \String
-    console.log "prompt3-modal" 
+    console.log "prompt modal split" 
     chosenAccount = store.staking.chosenAccount
     rent = chosenAccount.rent
     active_stake = chosenAccount.active_stake `div` (10^9)
     inactive_stake = chosenAccount.inactive_stake `div` (10^9)
     balanceRaw = chosenAccount.balanceRaw `div` (10^9)
-    console.log "Account" chosenAccount
     min_stake = "1"
     confirm = ->
         return if not store.current.prompt-answer? or +store.current.prompt-answer is 0 or store.current.prompt-answer is ""
@@ -408,7 +407,7 @@ prompt-modal3 = (store)->
         callback null if typeof! callback is \Function
         store.current.prompt-answer = ""
     amount-change = (e)->
-        balance = (chosenAccount?balance ? 1)
+        balance = chosenAccount.balanceRaw `div` (10^9)      
         max-amount = Math.floor(balance `minus` min_stake)
         amount =
             | e.target.value > max-amount => max-amount
@@ -451,7 +450,7 @@ prompt-modal3 = (store)->
             .pug.header(style=style=confirmation-style)#{store.current.prompt3}
             .pug.text(style=style=confirmation-style)
             .pug(style=input-holder-style)
-                amount-field { store, value: "#{round5edit store.current.prompt-answer}", on-change: amount-change, placeholder="0", id="prompt-input" }
+                amount-field { store, token: "vlx_native", value: "#{round5edit store.current.prompt-answer}", on-change: amount-change, placeholder="0", id="prompt-input" }
                 .pug.max-amount(style=max-amount-container)
                     button.pug.send-all(on-click=use-max-amount style=button-primary3-style type="button" id="send-max") #{lang.use-max}
             .pug.buttons
