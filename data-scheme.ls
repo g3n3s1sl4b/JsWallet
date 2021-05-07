@@ -292,6 +292,8 @@ store =
         confirmation: null
         notification: null    
         alert: null
+        choose-token: null
+        tokens-dropdown: no
         demo: location.href.index-of('web3.space/wallet') > -1
         network: \mainnet
         pin: ""

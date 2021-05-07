@@ -197,6 +197,9 @@ require! {
                     font-size: 14px
                     width: 80%
                     text-align: left
+                    .notification
+                        @media(max-width:800px)
+                            text-align: left
                     hr
                         margin: 15px auto
                         border: 1px solid rgba(240, 237, 237, 0.16)
@@ -810,6 +813,9 @@ staking-content = (store, web3t)->
         | store.staking.chosenAccount.status is "inactive" and has-validator => "Delegated (Inactive)"
         | store.staking.chosenAccount.status is "activating" => ""
         | _ => store.staking.chosenAccount.status
+    inactiveStakeLabel =
+        | store.staking.chosenAccount.status is "activating" => lang.warminUp
+        | _ => lang.inactiveStake
     .pug.staking-content.delegate
         .pug.single-section.form-group(id="choosen-pull")
             .pug.section
@@ -873,6 +879,14 @@ staking-content = (store, web3t)->
                         | #{credits_observed}
             .pug.section
                 .title.pug
+                    h3.pug #{lang.delegatedStake}
+                .description.pug
+                    span.pug
+                        | #{round-human(delegated_stake)} VLX
+                    span.pug.usd-amount
+                        | $#{usd-delegated_stake}
+            .pug.section
+                .title.pug
                     h3.pug #{lang.activeStake}
                 .description.pug
                     span.pug
@@ -888,20 +902,33 @@ staking-content = (store, web3t)->
                             | #{myStakeMaxPart}
             .pug.section
                 .title.pug
-                    h3.pug #{lang.inactiveStake}
+                    h3.pug #{inactiveStakeLabel}
                 .description.pug
                     span.pug
                         | #{round-human(inactive_stake)} VLX
                     span.pug.usd-amount
                         | $#{usd-inactive_stake}
-            .pug.section
-                .title.pug
-                    h3.pug #{lang.delegatedStake}
-                .description.pug
-                    span.pug
-                        | #{round-human(delegated_stake)} VLX
-                    span.pug.usd-amount
-                        | $#{usd-delegated_stake}
+                    if store.staking.chosenAccount.status is "activating"
+                        more-style =
+                            text-decoration: "none"
+                            opacity: 0.8
+                            line-height: 1.6
+                            font-size: "14px"
+                            letter-spacing: "2px"
+                            margin-left: "5px"
+                        tip-style =
+                            color: "#16ffb2"
+                            opacity: 0.8
+                        link-style =
+                            text-decoration: "none"
+                            color: "white"
+                            opacity: 0.8
+                        notification-style =
+                            margin-top: "10px"
+                        .pug.notification(style=notification-style)
+                            span.pug(style=tip-style) Only 25% of active stake can be activated per epoch.
+                            a.pug(href="https://support.velas.com/hc/en-150/articles/360021044820-Delegation-Warmup-and-Cooldown" target="_blank" style=link-style)
+                                span.pug(style=more-style) More...
             .pug.section
                 .title.pug
                     h2.pug Actions

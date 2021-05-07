@@ -36,6 +36,11 @@ require! {
     width: calc(100% - 0px) !important
     margin-left: 0px !important
     max-width: none !important
+    height: 100vh
+    display: flex !important
+    flex-direction: column
+    justify-content: center
+    align-items: center
     @media(max-width:800px)
         margin-left: 0 !important
     .icon-svg
@@ -48,8 +53,8 @@ require! {
     .content-body
         max-width: 450px !important
     >.title
-        position: sticky
-        position: -webkit-sticky
+        position: fixed
+        position: -webkit-fixed
         background: var(--background)
         box-sizing: border-box
         top: 0
@@ -104,9 +109,9 @@ require! {
                 vertical-align: middle
     >.content-body
         margin-top: 15px
-        height: 531px
         @import scheme
         color: gray
+        padding: 20px 10px
         a
             color: #6f6fe2
         >form
@@ -303,6 +308,7 @@ require! {
                 width: 80%
                 &.center
                     padding-left: 10px
+                    text-align: center
                 &.left
                     width: 10%
                     text-align: center
@@ -405,6 +411,7 @@ form-group = (classes, title, style, content)->
 send = ({ store, web3t })->
     { token, name, fee-token, bridge-fee-token, network, send, wallet, pending, recipient-change, amount-change, amount-usd-change, amount-eur-change, use-max-amount, show-data, show-label, history, cancel, send-anyway, before-send-anyway, choose-auto, round5edit, round5, is-data, encode-decode, change-amount, invoice } = send-funcs store, web3t
     return send-contract { store, web3t } if send.details is no
+    theme = get-primary-info(store)
     send.sending = false
     { go-back } = history-funcs store, web3t
     return go-back! if not wallet?
@@ -444,6 +451,10 @@ send = ({ store, web3t })->
         width: "50%"
     just-crypto-background =
         background: style.app.wallet
+    content-body-style=
+        color: style.app.text
+        border: "1px solid #{style.app.border}"
+        background: theme.app.sendForm ? theme.app.background
     more-text=
         color: style.app.text
     border-header =
@@ -497,7 +508,7 @@ send = ({ store, web3t })->
             burger store, web3t
             epoch store, web3t
             switch-account store, web3t
-        .pug.content-body(style=more-text)
+        .pug.content-body(style=content-body-style)
             if store.current.device isnt \mobile
                 .pug.header
                     span.head.pug.left
