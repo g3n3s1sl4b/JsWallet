@@ -108,10 +108,12 @@ require! {
                 display: inline-block
                 vertical-align: middle
     >.content-body
-        margin-top: 15px
+        margin-top: 75px    
         @import scheme
         color: gray
         padding: 20px 10px
+        @media(max-width:800px)
+            margin-top: -5px  
         a
             color: #6f6fe2
         >form
