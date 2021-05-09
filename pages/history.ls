@@ -1,6 +1,6 @@
 require! {
     \react
-    \prelude-ls : { sort-by, reverse, filter, map, find, take }
+    \prelude-ls : { sort-by, reverse, filter, map, find, take, obj-to-pairs }
     \../history-funcs.ls
     \../get-primary-info.ls
     \../get-lang.ls
@@ -21,6 +21,23 @@ require! {
     position: relative
     padding-bottom: 0px
     display: inline-block
+    .filters
+        white-space: nowrap
+        height: 30px
+        overflow: auto
+        .filter-item
+            display: inline-block
+            background: #404167
+            color: white
+            padding: 5px 10px
+            text-align: center
+            font-size: 10px
+            margin: 0 5px 5px 0
+            cursor: pointer
+            .key
+                font-weight: bold
+            .close-icon
+                margin-left: 5px
     .from-to
         width: 40px
         display: inline-block
@@ -124,10 +141,7 @@ require! {
                 text-align: left
     .header, .header-table
         text-align: left
-        height: 100px
         box-sizing: border-box
-        left: 0
-        top: 0
         width: 100%
         .table-header
             width: 100%
@@ -205,6 +219,11 @@ require! {
                     font-size: 14px
                     border: 0px
                     box-shadow: none
+                    border-left: 8px solid
+                    &.from
+                        border-color: #0349fb
+                    &.from
+                        border-color: #6cf8f9
                 button
                     outline: none
                     cursor: pointer
@@ -836,7 +855,7 @@ render-transaction = (store, web3t, tran)-->
                         .pug.balance
                             span.color.pug #{rounded-fee}
 module.exports = ({ store, web3t })->
-    { go-back, switch-type-in, switch-type-out, coins, is-active, switch-filter } = history-funcs store, web3t
+    { go-back, switch-type-in, switch-type-out, switch-sender, switch-receiver, remove-type-from-filter, remove-filter-raram, coins, is-active, switch-filter } = history-funcs store, web3t
     style = get-primary-info store
     lang = get-lang store
     header-style =
@@ -894,8 +913,36 @@ module.exports = ({ store, web3t })->
     rowRenderer = ({ key, index, isScrolling, isVisible, style })->
         return render-transaction store, web3t, store.transactions.applied[index] # if isVisible
         null
+    build-types = (item)->
+        remove-type = remove-type-from-filter(item)
+        span.pug.filter-item(on-click=remove-type)
+            span.pug.key #{item}
+            span.pug.close-icon
+                icon \X, 10
+    build-filter-items = (item)->
+        key = item.0
+        value = item.1
+        return null if not value?
+        return null if key is \token
+        $key = (item.0 ? "").to-upper-case!
+        obj = {}
+        obj["#{key}"] = value
+        span.pug.filter-item(on-click=remove-filter-raram(obj)
+            span.pug 
+                span.pug.key #{$key}:
+                span.pug.value #{value}
+                span.pug.close-icon
+                    icon \X, 10
     history-width = store.current.size.width / 1.9
     history-height = store.current.size.height - 200 - 60
+    on-sender-filter = (e) ->
+        e.target.value = (e.target.value ? "").trim!
+        switch-sender(e.target.value)    
+    on-receiver-filter = (e) ->
+        e.target.value = (e.target.value ? "").trim!
+        switch-receiver(e.target.value)
+    send-from = (store.current.filter.from ? "")
+    send-to = (store.current.filter.to ? "")
     .pug.normalheader.history
         .header.pug(style=header-style-light)
             if store.current.device is \mobile
@@ -904,6 +951,12 @@ module.exports = ({ store, web3t })->
             span.pug.head.left.h1 #{lang.your-transactions}
             span.pug.head.right(on-click=expand-collapse)
                 img.icon-svg1.pug(src="#{icons.filter}" style=icon2)
+            .pug.filters
+                .pug.filter__types
+                    store.current.filter-txs-types |> map build-types      
+                    store.current.filter
+                        |> obj-to-pairs 
+                        |> map build-filter-items
             .pug.table-header
                 span.pug.from-to
                     | #{lang.from}
@@ -923,22 +976,26 @@ module.exports = ({ store, web3t })->
                             img.icon-svg.pug(src="#{icons.get}")
                     .pug.middle(style=border-b)
                         .pug
-                            input.pug(type='text' style=input-style placeholder="#{lang.from}")
+                            input.pug.from(type='text' value="#{send-from}" on-change=on-sender-filter style=input-style placeholder="#{lang.from}")
                         .pug
-                            input.pug(type='text' style=input-style placeholder="#{lang.to}")
-                        button.pug(on-click style=button-primary1-style)
-                            span.pug
-                                img.icon-svg-btn.pug(src="#{icons.apply}")
-                                | #{lang.btn-apply}
-                    .pug.bottom
-                        for coin in coins
-                            button.pug(key="#{coin.token}" class="#{is-active(coin.token)}" style=filter-style on-click=switch-filter(coin.token))
-                                img.pug(src="#{coin.image}")
+                            input.pug.to(type='text' value="#{send-to}" on-change=on-receiver-filter style=input-style placeholder="#{lang.to}")
+                        if no
+                            button.pug(on-click=filter-txs style=button-primary1-style)
+                                span.pug
+                                    img.icon-svg-btn.pug(src="#{icons.apply}")
+                                    | #{lang.btn-apply}
+                    if no
+                        .pug.bottom
+                            for coin in coins
+                                button.pug(key="#{coin.token}" class="#{is-active(coin.token)}" style=filter-style on-click=switch-filter(coin.token))
+                                    img.pug(src="#{coin.image}")
         .pug
             .pug
                 loading { store }
             .pug.table(style=border-t)
-                store.transactions.applied |> take 30 |> map render-transaction store, web3t
+                store.transactions.applied 
+                    |> take 30 
+                    |> map render-transaction store, web3t
             if length is 0 and store.current.transactions-are-loading isnt yes
                 .pug.nothin-to-show(style=menu-style)
                     img.pug(style=nothing-icon src="#{icons.search-history}"

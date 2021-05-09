@@ -318,7 +318,11 @@ store =
         seed-generated: no
         saved-seed: saved-seed
         balance-usd: \...
-        filter: <[ IN OUT ]>
+        filter-txs-types: <[ IN OUT ]> 
+        filter: 
+            from: null
+            to: null
+            token: null    
         loading: no
         send : create-send!
         invoice : create-send!
@@ -329,6 +333,8 @@ store =
         search: ""
         vote-index: null
     history:
+        filter-from: ''
+        filter-to: ''    
         filter-open: no
         tx-details: no
     pages: [\wallets]

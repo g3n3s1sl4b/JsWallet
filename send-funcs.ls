@@ -271,7 +271,7 @@ module.exports = (store, web3t)->
         if (str ? "").length is 0 then def else str
     history = ->
         store.current.send-menu-open = no
-        store.current.filter = [\IN, \OUT, send.coin.token]
+        store.current.filter = {token: send.coin.token}
         apply-transactions store
         navigate store, web3t, \history
     export network =
