@@ -35,6 +35,7 @@ require! {
     \../../seed.ls : seedmem
     \../../components/burger.ls
     \./error-funcs.ls : { get-error-message }
+    \./rewards-stats.ls
 }
 .staking
     @import scheme
@@ -975,7 +976,8 @@ staking-content = (store, web3t)->
                                 td.pug(width="7%" style=stats title="Percent Change") Percent Change (?)
                                 td.pug(width="7%" style=stats title="APR") APR (?)
                         tbody.pug
-                            store.staking.chosenAccount.rewards |> map build-rewards  
+                            store.staking.chosenAccount.rewards |> map build-rewards 
+                rewards-stats {store, web3t}
 account-details = ({ store, web3t })->
     lang = get-lang store
     { go-back } = history-funcs store, web3t
