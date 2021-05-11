@@ -1,7 +1,7 @@
 require! {
     \react-chartjs-2 : { Line }
     \react
-    \prelude-ls : { map, reverse, take }
+    \prelude-ls : { map, reverse, take, filter }
     \../../round-number.ls
     \../../math.ls : { div, times, plus, minus }
 }
@@ -36,7 +36,8 @@ legend =
 module.exports = ({store, web3t})->
     return null if not store.staking.chosenAccount?
     return null if store.staking.chosenAccount.rewards.length < 2
-    rewards = store.staking.chosenAccount.rewards |> take 10 |> reverse
+    current-epoch = store.staking.current-epoch
+    rewards = store.staking.chosenAccount.rewards |> filter (.epoch isnt current-epoch) |> take 10 |> reverse
     data = build-data rewards
     options = {
         scales: {

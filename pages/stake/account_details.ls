@@ -50,6 +50,39 @@ require! {
     box-sizing: border-box
     padding: 0px
     background: transparent
+    .syncing
+        -webkit-mask-image: linear-gradient(90deg, rgba(255, 255, 255, 0.6) 0%, #000000 50%, rgba(255, 255, 255, 0.6) 70%)
+        -webkit-mask-size: 50%
+        animation: fb 1s infinite
+        animation-fill-mode: forwards
+        background: var(--placeholder)
+    @keyframes gradient
+        0%
+            background-position: 0% 50%
+        50%
+            background-position: 100% 50%
+        100%
+            background-position: 0% 50%
+    @keyframes fb
+        0%
+            -webkit-mask-position: left
+        100%
+            -webkit-mask-position: right
+    @media (max-width: 800px)
+        .wallet-main, >.content, .history, .search, .filestore, .resources, .staking, .settings-menu, .staking-res, .stats, .monitor
+            margin: 60px 0 0
+            >.title
+                margin: 0
+                position: fixed
+                z-index: 11
+    .error-no-connection
+        -webkit-mask-image: linear-gradient(90deg, rgba(255, 255, 255, 0.6) 0%, #000000 50%, rgba(255, 255, 255, 0.6) 70%)
+        -webkit-mask-size: 50%
+        animation: fb 1s infinite
+        animation-fill-mode: forwards
+        background: var(--placeholder)
+        padding: 10px 20px
+        display: inline-block
     .buttons
         display: flex
     .usd-amount
@@ -130,6 +163,8 @@ require! {
                 &.with-stake
                     filter: saturate(6.5)
             tr
+                &.current-epoch
+                    background: transparent
                 &.chosen
                     background: #305673
                 &.active
@@ -828,15 +863,20 @@ staking-content = (store, web3t)->
             percentChange
             apr
         } = item
+        return null if epoch is store.staking.current-epoch   
         $amount = amount `div` (10^9)
         $newBalance = newBalance `div` (10^9)
-        tr.pug(class="" key="")
-            td.pug #{epoch}
-            td.pug #{rewardSlot}
-            td.pug #{$amount}
-            td.pug #{$newBalance}
-            td.pug #{percentChange}
-            td.pug #{apr}
+        if store.staking.current-epoch is epoch then
+            rewardSlot = $amount = $newBalance = percentChange = apr =  "Loading..."
+        $class = if epoch is store.staking.current-epoch then "syncing" else ""
+        $tr-class = if epoch is store.staking.current-epoch then "current-epoch " else ""
+        tr.pug(key="epoch#{epoch}" class="#{$tr-class}")
+            td.pug(class="#{$class}") #{epoch}
+            td.pug(class="#{$class}") #{rewardSlot}
+            td.pug(class="#{$class}") #{$amount}
+            td.pug(class="#{$class}") #{$newBalance}
+            td.pug(class="#{$class}") #{percentChange}
+            td.pug(class="#{$class}") #{apr}
     .pug.staking-content.delegate
         .pug.single-section.form-group(id="choosen-pull")
             .pug.section
@@ -1026,6 +1066,9 @@ account-details.init = ({ store, web3t }, cb)!->
     return null if not account?
     store.staking.chosenAccount.rewards = []
     stake-accounts = store.staking.parsedProgramAccounts
+    err, epochInfo <- as-callback web3t.velas.NativeStaking.getCurrentEpochInfo()
+    console.error err if err?
+    store.staking.current-epoch = epochInfo.epoch
     err, stakeActivation <- as-callback web3t.velas.NativeStaking.getStakeActivation(store.staking.chosenAccount.address)
     if not err? and stakeActivation?
         store.staking.chosenAccount.status = stakeActivation.state
@@ -1064,40 +1107,70 @@ fetchEpochRewards = (address, activationEpoch, cb)->
     err, rewards <- query-rewards-loop(address, activationEpoch, firstNormalSlot, slotsPerEpoch, slotsInEpoch, firstAvailableBlock, firstNormalEpoch, epoch)    
     cb null, rewards
 #
+prev-epoch-data = {epoch_start_time: null, rewards: null, first_confirmed_block: null}
+# 
 query-rewards-loop = (address, activationEpoch, firstNormalSlot, slotsPerEpoch, slotsInEpoch, firstAvailableBlock, firstNormalEpoch, epoch, cb)->
-    console.log "activationEpoch" activationEpoch
-    console.log "epoch" epoch
     return cb null, [] if epoch < (activationEpoch) or epoch < 0    
     # Get not skipped slot here!  
     err, firstSlotInEpoch <- get_first_slot_in_epoch(firstNormalSlot, slotsPerEpoch, slotsInEpoch, firstNormalEpoch, epoch)
-    console.log "firstSlotInEpoch" firstSlotInEpoch     
-    err, first_confirmed_block <- retrieveRewardData(firstSlotInEpoch, firstNormalSlot, slotsPerEpoch, slotsInEpoch, firstAvailableBlock, firstNormalEpoch, epoch)
-    console.log "result" first_confirmed_block
-    console.log "___________________________" 
+    # Get first comfirmed block/slot in epoch
+    limit = 1
+    err, result <- as-callback(web3t.velas.NativeStaking.getConfirmedBlocksWithLimit(firstSlotInEpoch, limit))
+    first_confirmed_block_in_epoch = result?result?0    
+    # Get first confirmed block    
+    err, first_confirmed_block <- get_confirmed_block_with_encoding(first_confirmed_block_in_epoch)
+    console.log "epoch #{epoch}, first_confirmed_block_in_epoch" first_confirmed_block_in_epoch
     rewards = []
-    if first_confirmed_block?
-        SECONDS_PER_DAY = 86400
-        epoch_start_time = first_confirmed_block.block_time       
-        wallclock_epoch_duration = 124272
-        wallclock_epochs_per_year = (SECONDS_PER_DAY * 365) `div` wallclock_epoch_duration 
-        all-rewards = first_confirmed_block.rewards
-        rewards = 
-            all-rewards 
-                |> filter (-> it.pubkey is address)
-                |> map (it)->
-                    percentChange = (it.lamports `div` it.postBalance) `times` 100
-                    percentChange = round-number(percentChange, {decimals: 2})
-                    rateChange = it.lamports `div` (it.postBalance - it.lamports)  
-                    apr = rateChange `times` wallclock_epochs_per_year  
-                    apr = round-number(apr, {decimals: 2})
-                    {
-                        epoch: (epoch - 1)
-                        rewardSlot: firstSlotInEpoch
-                        amount: it.lamports
-                        newBalance: it.postBalance 
-                        percentChange: percentChange + "%"
-                        apr: apr + "%"  
-                    } 
+    #
+    SECONDS_PER_DAY = 86400
+    # Get previous epoch start time
+    epoch_start_time = 
+        | not first_confirmed_block? => 0
+        | _ => first_confirmed_block.blockTime
+    epoch_end_time = prev-epoch-data.epoch_start_time
+    #set epoch_start_time for previous epoch
+    wallclock_epoch_duration =
+        | not epoch_end_time? => 0 
+        | _ => epoch_end_time `minus` epoch_start_time
+    wallclock_epochs_per_year = (SECONDS_PER_DAY * 365) `div` wallclock_epoch_duration 
+    all-rewards = (prev-epoch-data.rewards ? [])
+    rewards = 
+        all-rewards 
+            |> filter (-> it.pubkey is address)
+            |> map (it)->
+                percentChange = (it.lamports `div` it.postBalance) `times` 100
+                percentChange = round-number(percentChange, {decimals: 2})
+                rateChange = it.lamports `div` (it.postBalance - it.lamports)   
+                apr = 
+                    | not epoch_end_time? => "0" 
+                    | _ => (rateChange `times` wallclock_epochs_per_year) `times` 100
+                apr = round-number(apr, {decimals: 2})
+                {
+                    epoch: (epoch)
+                    rewardSlot: prev-epoch-data.rewardSlot
+                    amount: it.lamports
+                    newBalance: it.postBalance 
+                    percentChange: percentChange + "%"
+                    apr: apr + "%"
+                    disabled: not first_confirmed_block?  
+                }
+    if not prev-epoch-data.first_confirmed_block?
+        rewards = [
+            {
+                epoch: (epoch)
+                rewardSlot: (prev-epoch-data?rewardSlot ? "no result")
+                amount: "0"
+                newBalance: "0"
+                percentChange: ".."
+                apr: ".." 
+                disabled: yes 
+            }
+        ]
+    # Set previous block start time and rewards
+    prev-epoch-data.first_confirmed_block = first_confirmed_block
+    prev-epoch-data.epoch_start_time =  first_confirmed_block?blockTime
+    prev-epoch-data.rewards = first_confirmed_block?rewards 
+    prev-epoch-data.rewardSlot = firstSlotInEpoch        
     err, rest <- query-rewards-loop(address, activationEpoch, firstNormalSlot, slotsPerEpoch, slotsInEpoch, firstAvailableBlock, firstNormalEpoch, --epoch)
     all = rewards ++ rest
     cb null, all
@@ -1109,10 +1182,16 @@ get_first_slot_in_epoch = (firstNormalSlot, slotsPerEpoch, slotsInEpoch, firstNo
     #return (epoch - firstNormalEpoch) * slotsPerEpoch + firstNormalSlot
     limit = 1
     firstSlotInEpoch = (epoch - firstNormalEpoch) * slotsPerEpoch + firstNormalSlot
-    err, result <- as-callback(web3t.velas.NativeStaking.getConfirmedBlocksWithLimit(firstSlotInEpoch, limit))
-    return cb err if err? or not result?result
-    firstSlot = result?result?0
-    cb null, firstSlot
+    #err, result <- as-callback(web3t.velas.NativeStaking.getConfirmedBlocksWithLimit(firstSlotInEpoch, limit))
+    #return cb err if err? or not result?result
+    #firstSlot = result?result?0
+    #cb null, firstSlot
+    return cb null,  firstSlotInEpoch
+try-get-extra-slot = (default-response, new-slot, cb)->
+    return cb null, default-response, if default-response?
+    limit = 1
+    err, result <- as-callback(web3t.velas.NativeStaking.getConfirmedBlocksWithLimit(new-slot, limit))
+    cb null, result?result?0
 #    
 get_confirmed_block_with_encoding = (slot, cb)->    
     err, confirmedBlock <- as-callback(web3t.velas.NativeStaking.getConfirmedBlock(slot))

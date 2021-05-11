@@ -56,6 +56,9 @@ class VelasStaking {
     async getConfirmedBlocksWithLimit(slot, limit) {
         return await this.connection.getConfirmedBlocksWithLimit(slot, limit)
     }
+    async getBlockTime(blockNum) {
+        return this.connection.getBlockTime(blockNum);
+    }
 
     async getStakeActivation(address) {
         try {
