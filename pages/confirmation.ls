@@ -463,10 +463,11 @@ prompt-modal3 = (store)->
                         img.icon-svg-cancel.pug(src="#{icons.close}")
                         | #{lang.cancel}
 data = {token: null}
-prompt-choose-token-modal = store = (store)->
+prompt-choose-token-modal = (store)->
     return null if typeof! store.current.choose-token isnt \String
     text = store.current.choose-token
     confirm = ->
+        on-focus!
         return if not store.current.prompt-answer? or store.current.prompt-answer is ""
         store.current.choose-token = yes
         callback = state.callback
@@ -502,10 +503,6 @@ prompt-choose-token-modal = store = (store)->
         color: style.app.text
         border-bottom: "1px solid #{style.app.border}"
     lang = get-lang store
-    open-tokens-dropdown = ->
-        store.current.tokens-dropdown = !store.current.tokens-dropdown
-    menu-out = ->
-        store.current.tokens-dropdown = no
     button-primary3-style=
         border: "0"
         color: style.app.text2
@@ -541,23 +538,38 @@ prompt-choose-token-modal = store = (store)->
     build-item = (item)->
         {image, name, token} = item.coin
         on-click = ->
-            store.current.tokens-dropdown = no
             store.current.prompt-answer = token
             data.token = name
         active-class = if store.current.prompt-answer is token then "active" else ""
         li.pug.lang-item(on-click=on-click style=optionStyle class="#{active-class}")
             img.pug(src="#{image}" style=imgStyle)
             span.pug(style=text-style) #{name}
+    input-style = 
+        position: "relative"
+        text-align: "center"
+        display: "flex"
+    disabled-layout-style =
+        z-index: 1 
+        background: "transparent"
+        position: "absolute"
+        top: 0
+        bottom: 0
+        left: 0
+        right: 0
+        width: "62%"
     prompt-answer = store.current.prompt-answer ? null
     display-token = data.token ? ""
     btn-disabled = (typeof store.current.prompt-answer isnt "string") or (typeof store.current.prompt-answer is "string" and store.current.prompt-answer.length is 0)
-    console.log "typeof store.current.prompt-answer" typeof store.current.prompt-answer
+    on-focus = ->
+        (document.query-selector \.tokeninput).focus!
     .pug.confirmation
         .pug.confirmation-body(style=confirmation)
-            .pug.header(style=style=confirmation-style)#{store.current.choose-token}
+            .pug.header(style=style=confirmation-style)#{text}
             .pug.text(style=style=confirmation-style)
             .pug.token-select
-                input.pug( type="text" value="#{display-token}" read-only=yes style=inputStyle )
+                .input-holder.pug(style=input-style)
+                    .pug.dlayout(style=disabled-layout-style)
+                    input.pug.tokeninput( type="text" value="#{display-token}" style=inputStyle )
                 .pug.tokens-drop
                     ul.pug(style=ul-style)
                         store.current.account.wallets
