@@ -1083,7 +1083,6 @@ account-details.init = ({ store, web3t }, cb)!->
     prev-epoch = epoch `minus` 1
     activationEpoch = store.staking.chosenAccount.account?data?parsed?info?stake?delegation?activationEpoch
     err, rewards <- fetchEpochRewards(account.address, activationEpoch)
-    console.log "rewards" rewards  
     store.staking.chosenAccount.rewards = rewards
     cb null
 stringify = (value) ->
@@ -1120,7 +1119,6 @@ query-rewards-loop = (address, activationEpoch, firstNormalSlot, slotsPerEpoch, 
     first_confirmed_block_in_epoch = result?result?0    
     # Get first confirmed block    
     err, first_confirmed_block <- get_confirmed_block_with_encoding(first_confirmed_block_in_epoch)
-    console.log "epoch #{epoch}, first_confirmed_block_in_epoch" first_confirmed_block_in_epoch
     rewards = []
     #
     SECONDS_PER_DAY = 86400
