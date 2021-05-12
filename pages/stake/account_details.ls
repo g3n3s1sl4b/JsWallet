@@ -1091,7 +1091,8 @@ stringify = (value) ->
         round-human(parse-float value `div` (10^18))
     else
         '..'
-fetchEpochRewards = (address, activationEpoch, cb)->
+fetchEpochRewards = (address, activationEpoch, cb)->    
+    return cb null, [] if (not store.staking.chosenAccount.validator? or store.staking.chosenAccount.validator.toString!.length is 0)    
     err, epochSchedule <- as-callback(web3t.velas.NativeStaking.getEpochSchedule!)
     console.error err if err?
     {firstNormalEpoch, firstNormalSlot, leaderScheduleSlotOffset, slotsPerEpoch, warmup} = epochSchedule
@@ -1154,18 +1155,18 @@ query-rewards-loop = (address, activationEpoch, firstNormalSlot, slotsPerEpoch, 
                     apr: apr + "%"
                     disabled: not first_confirmed_block?  
                 }
-    if not prev-epoch-data.first_confirmed_block?
-        rewards = [
-            {
-                epoch: (epoch)
-                rewardSlot: (prev-epoch-data?rewardSlot ? "no result")
-                amount: "0"
-                newBalance: "0"
-                percentChange: ".."
-                apr: ".." 
-                disabled: yes 
-            }
-        ]
+    #if not prev-epoch-data.first_confirmed_block?
+        #rewards = [
+            #{
+                #epoch: (epoch)
+                #rewardSlot: (prev-epoch-data?rewardSlot ? "no result")
+                #amount: "0"
+                #newBalance: "0"
+                #percentChange: ".."
+                #apr: ".." 
+                #disabled: yes 
+            #}
+        #]
     # Set previous block start time and rewards
     prev-epoch-data.first_confirmed_block = first_confirmed_block
     prev-epoch-data.epoch_start_time =  first_confirmed_block?blockTime
