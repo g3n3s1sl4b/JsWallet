@@ -910,4 +910,5 @@ validators.init = ({ store, web3t }, cb)!->
     store.staking.pools = convert-pools-to-view-model pools
     store.staking.poolsFiltered = store.staking.pools
     store.staking.getAccountsFromCashe = no
+    err <- calc-certain-wallet(store, "vlx_native")
 module.exports = validators

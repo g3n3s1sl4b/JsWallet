@@ -44,6 +44,21 @@ class VelasStaking {
     async getEpochSchedule() {
         return await this.connection.getEpochSchedule();
     }
+    async getSlot() {
+        return await this.connection.getSlot();
+    }
+    async getFirstAvailableBlock() {
+        return await this.connection.getFirstAvailableBlock(); 
+    }
+    async getConfirmedBlock(slot) {
+        return await this.connection.getConfirmedBlock(slot);
+    }
+    async getConfirmedBlocksWithLimit(slot, limit) {
+        return await this.connection.getConfirmedBlocksWithLimit(slot, limit)
+    }
+    async getBlockTime(blockNum) {
+        return this.connection.getBlockTime(blockNum);
+    }
 
     async getStakeActivation(address) {
         try {

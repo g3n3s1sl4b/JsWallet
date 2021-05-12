@@ -270,12 +270,10 @@ module.exports = (store, web3t)->
         return cb null if err?
         { epoch, blockHeight, slotIndex, slotsInEpoch, transactionCount } = epochInfo
         next-block = slotsInEpoch
-        err, start-block <- web3t.velas.Staking.stakingEpochStartBlock
-        console.error err if err?   
-        return cb null if err?
         current-block = blockHeight
         seconds-per-block = 0.4
         seconds = (epochInfo.slotsInEpoch `minus` epochInfo.slotIndex) `times` seconds-per-block
+        console.log "seconds per epoch" seconds
         epoch-time = epochInfo.slotsInEpoch `times` seconds-per-block
         rest = epoch-time `minus` seconds
         store.dashboard.epoch-percent = 100 - ( 100 `div` epoch-time ) `times` seconds
