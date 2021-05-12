@@ -41,22 +41,18 @@ module.exports = ({store, web3t})->
     data = build-data rewards
     options = {
         scales: {
-            xAxisID: {
-                grid: {
-                    borderColor: "red"
-                    color: "red"
-                    drawBorder: true
-                }
-            }
-            yAxisID: {
+            xAxes: [
                 gridLines: {
-                    drawBorder: true
-                    color: 'rgb(255 255 255 / 42%)'
-                    zeroLineColor: 'rgb(255 255 255 / 42%)'
+                    color: "rgba(240, 237, 237, 0.16)"
                 }
-            }
+            ]
+            yAxes: [
+                gridLines: {
+                    color: 'rgba(240, 237, 237, 0.16)'
+                }
+            ]
         }
     }
     .pug.rewards-linear-graph
         .pug.rewards-stats-container
-            Line.pug(data=data options=options width="300px" height=100 legend=legend)
+            Line.pug(data=data options=options width=300 height=100 legend=legend)
