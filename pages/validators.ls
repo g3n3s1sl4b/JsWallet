@@ -9,7 +9,7 @@ require! {
     \../history-funcs.ls
     \../staking-funcs.ls : { query-pools, query-accounts, convert-pools-to-view-model, convert-accounts-to-view-model }
     \./icon.ls
-    \prelude-ls : { map, split, filter, find, foldl, sort-by, unique, head, each, obj-to-pairs, take }
+    \prelude-ls : { map, split, filter, find, foldl, sort-by, unique, head, each, obj-to-pairs, take, reverse }
     \../math.ls : { div, times, plus, minus }
     \../../web3t/providers/deps.js : { hdkey, bip39 }
     \md5
@@ -908,6 +908,8 @@ validators.init = ({ store, web3t }, cb)!->
     err, pools <- query-pools {store, web3t, on-progress}
     return cb err if err?
     store.staking.pools = convert-pools-to-view-model pools
+        |> sort-by (-> it.myStake.length ) |> reverse 
     store.staking.poolsFiltered = store.staking.pools
     store.staking.getAccountsFromCashe = no
+    err <- calc-certain-wallet(store, "vlx_native")
 module.exports = validators
