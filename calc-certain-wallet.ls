@@ -63,7 +63,7 @@ calc-wallet = (store, token, cb)->
             |> map -> [loaders.index-of(it).to-string!, it]
             |> pairs-to-obj
     <- run [tasks] .then
-    store.current.balance-usd = state.balance-usd
+    #store.current.balance-usd = state.balance-usd
     if store.current.account.wallets[current.token-index]?
         store.current.account.wallets[current.token-index] = wallet
     cb null

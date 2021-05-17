@@ -35,6 +35,7 @@ require! {
     \../../seed.ls : seedmem
     \../../components/burger.ls
     \./error-funcs.ls : { get-error-message }
+    \./rewards-stats.ls
 }
 .staking
     @import scheme
@@ -49,6 +50,39 @@ require! {
     box-sizing: border-box
     padding: 0px
     background: transparent
+    .syncing
+        -webkit-mask-image: linear-gradient(90deg, rgba(255, 255, 255, 0.6) 0%, #000000 50%, rgba(255, 255, 255, 0.6) 70%)
+        -webkit-mask-size: 50%
+        animation: fb 1s infinite
+        animation-fill-mode: forwards
+        background: var(--placeholder)
+    @keyframes gradient
+        0%
+            background-position: 0% 50%
+        50%
+            background-position: 100% 50%
+        100%
+            background-position: 0% 50%
+    @keyframes fb
+        0%
+            -webkit-mask-position: left
+        100%
+            -webkit-mask-position: right
+    @media (max-width: 800px)
+        .wallet-main, >.content, .history, .search, .filestore, .resources, .staking, .settings-menu, .staking-res, .stats, .monitor
+            margin: 60px 0 0
+            >.title
+                margin: 0
+                position: fixed
+                z-index: 11
+    .error-no-connection
+        -webkit-mask-image: linear-gradient(90deg, rgba(255, 255, 255, 0.6) 0%, #000000 50%, rgba(255, 255, 255, 0.6) 70%)
+        -webkit-mask-size: 50%
+        animation: fb 1s infinite
+        animation-fill-mode: forwards
+        background: var(--placeholder)
+        padding: 10px 20px
+        display: inline-block
     .buttons
         display: flex
     .usd-amount
@@ -99,6 +133,90 @@ require! {
         border-radius: 0px
         position: relative
         box-sizing: border-box
+        .table-scroll
+            overflow-x: scroll
+            background: linear-gradient(var(--color1) 30%, rgba(50,18,96, 0)), linear-gradient(rgba(50,18,96, 0), var(--color1) 70%) 0 100%, radial-gradient(farthest-side at 50% 0, var(--color2), rgba(0,0,0,0)), radial-gradient(farthest-side at 50% 100%, var(--color2), rgba(0,0,0,0)) 0 100%
+            background-repeat: no-repeat
+            background-attachment: local, local, scroll, scroll
+            background-size: 100% 30px, 100% 30px, 100% 15px, 100% 15px
+            animation: breathe 3s ease-in infinite
+            -moz-transition: breathe 3s ease-in infinite
+            -web-kit-transition: breathe 3s ease-in infinite
+            height: auto
+            max-height: 400px
+            .stake-pointer
+                background: rgb(37, 87, 127)
+            &.lockup
+                height: auto
+            .address-holder
+                a
+                    padding-left: 30px !important
+                .browse
+                    right: 30px !important
+            thead
+                th
+                    @media(min-width:800px) and (max-width: 900px)
+                        font-size: 11px !important
+            td
+                &:nth-child(2)
+                    cursor: pointer
+                &.with-stake
+                    filter: saturate(6.5)
+            tr
+                &.current-epoch
+                    background: transparent
+                &.chosen
+                    background: #305673
+                &.active
+                    color: var(--color-td)
+                &.inactive
+                    color: orange
+                &.banned
+                    color: red
+                .circle
+                    border-radius: 0px
+                    width: 20px
+                    height: 20px
+                    display: inline-block
+                    color: white
+                    line-height: 1.6
+                    border-radius: 4px
+                    background: gray
+                    &.active
+                        background: rgb(38, 219, 85)
+                    &.inactive
+                        background: orange
+                    &.banned
+                        background: red
+            button
+                width: 100%
+                height: 36px
+                margin: 0
+            table
+                width: 100%
+                border-collapse: collapse
+                margin: 0px auto
+            tr:nth-of-type(odd)
+                background: rgba(gray, 0.2)
+            th
+                font-weight: 400
+                &:first-child
+                    text-align: center
+                    width: 5%
+            td
+                &:nth-child(1), &:nth-child(6)
+                    text-align: center
+                img.copy
+                    height: 16px
+                    margin-right: 5px
+            td, th
+                padding: 8px
+                max-width: 200px
+                border: 1px solid rgba(240, 237, 237, 0.16)
+                white-space: nowrap
+                font-size: 13px
+                @media(max-width:800px)
+                    text-align: left
         .claim-table
             max-height: 100px
             width: 300px
@@ -138,6 +256,8 @@ require! {
                 border-bottom: 1px solid rgba(240, 237, 237, 0.16)
                 padding: 20px 20px
                 display: flex
+                &.rewards
+                    display: block
                 .chosen-account
                     .buttons
                         text-align: left
@@ -216,89 +336,7 @@ require! {
                             td,td
                                 padding: 0 3px
                         .choose-pool
-                            max-width: 50px
-                    &.table-scroll
-                        overflow-x: scroll
-                        background: linear-gradient(var(--color1) 30%, rgba(50,18,96, 0)), linear-gradient(rgba(50,18,96, 0), var(--color1) 70%) 0 100%, radial-gradient(farthest-side at 50% 0, var(--color2), rgba(0,0,0,0)), radial-gradient(farthest-side at 50% 100%, var(--color2), rgba(0,0,0,0)) 0 100%
-                        background-repeat: no-repeat
-                        background-attachment: local, local, scroll, scroll
-                        background-size: 100% 30px, 100% 30px, 100% 15px, 100% 15px
-                        animation: breathe 3s ease-in infinite
-                        -moz-transition: breathe 3s ease-in infinite
-                        -web-kit-transition: breathe 3s ease-in infinite
-                        height: auto
-                        max-height: 400px
-                        .stake-pointer
-                            background: rgb(37, 87, 127)
-                        &.lockup
-                            height: auto
-                        .address-holder
-                            a
-                                padding-left: 30px !important
-                            .browse
-                                right: 30px !important
-                        thead
-                            th
-                                @media(min-width:800px) and (max-width: 900px)
-                                    font-size: 11px !important
-                        td
-                            &:nth-child(2)
-                                cursor: pointer
-                            &.with-stake
-                                filter: saturate(6.5)
-                        tr
-                            &.chosen
-                                background: #305673
-                            &.active
-                                color: var(--color-td)
-                            &.inactive
-                                color: orange
-                            &.banned
-                                color: red
-                            .circle
-                                border-radius: 0px
-                                width: 20px
-                                height: 20px
-                                display: inline-block
-                                color: white
-                                line-height: 1.6
-                                border-radius: 4px
-                                background: gray
-                                &.active
-                                    background: rgb(38, 219, 85)
-                                &.inactive
-                                    background: orange
-                                &.banned
-                                    background: red
-                        button
-                            width: 100%
-                            height: 36px
-                            margin: 0
-                    table
-                        width: 100%
-                        border-collapse: collapse
-                        margin: 0px auto
-                    tr:nth-of-type(odd)
-                        background: rgba(gray, 0.2)
-                    th
-                        font-weight: 400
-                        &:first-child
-                            text-align: center
-                            width: 5%
-                    td
-                        &:nth-child(1), &:nth-child(6)
-                            text-align: center
-                        img.copy
-                            height: 16px
-                            margin-right: 5px
-                    td, th
-                        padding: 8px
-                        max-width: 200px
-                        border: 1px solid rgba(240, 237, 237, 0.16)
-                        white-space: nowrap
-                        font-size: 13px
-                        @media(max-width:800px)
-                            text-align: left
+                            max-width: 50px     
                     .left
                         position: relative
                         .small-btns
@@ -816,6 +854,29 @@ staking-content = (store, web3t)->
     inactiveStakeLabel =
         | store.staking.chosenAccount.status is "activating" => lang.warminUp
         | _ => lang.inactiveStake
+    build-rewards = (item)->
+        {
+            epoch
+            rewardSlot
+            amount
+            newBalance
+            percentChange
+            apr
+        } = item
+        return null if epoch is store.staking.current-epoch   
+        $amount = amount `div` (10^9)
+        $newBalance = newBalance `div` (10^9)
+        if store.staking.current-epoch is epoch then
+            rewardSlot = $amount = $newBalance = percentChange = apr =  "Loading..."
+        $class = if epoch is store.staking.current-epoch then "syncing" else ""
+        $tr-class = if epoch is store.staking.current-epoch then "current-epoch " else ""
+        tr.pug(key="epoch#{epoch}" class="#{$tr-class}")
+            td.pug(class="#{$class}") #{epoch}
+            td.pug(class="#{$class}") #{rewardSlot}
+            td.pug(class="#{$class}") #{$amount}
+            td.pug(class="#{$class}") #{$newBalance}
+            td.pug(class="#{$class}") #{percentChange}
+            td.pug(class="#{$class}") #{apr}
     .pug.staking-content.delegate
         .pug.single-section.form-group(id="choosen-pull")
             .pug.section
@@ -941,6 +1002,22 @@ staking-content = (store, web3t)->
                         else if store.staking.chosenAccount.status isnt \deactivating then
                             button { store, on-click: undelegate , type: \secondary , text: lang.to_undelegate, icon : \arrowLeft, classes: "action-undelegate" }
                         button { store, on-click: split-account , type: \secondary , text: lang.to_split, classes: "action-split", no-icon: yes }
+            .pug.section.rewards
+                .title.pug
+                    h2.pug #{lang.uRewards}
+                .pug.table-scroll
+                    table.pug
+                        thead.pug
+                            tr.pug
+                                td.pug(width="3%" style=staker-pool-style title="Epoch") #{lang.epoch} (?)
+                                td.pug(width="25%" style=stats title="Reward Slot") Reward Slot (?)
+                                td.pug(width="25%" style=stats title="Amount") #{lang.amount} (?)
+                                td.pug(width="25%" style=stats title="New Balance") #{lang.newBalance} (?)
+                                td.pug(width="7%" style=stats title="Percent Change") Percent Change (?)
+                                td.pug(width="7%" style=stats title="APR") APR (?)
+                        tbody.pug
+                            store.staking.chosenAccount.rewards |> map build-rewards 
+                rewards-stats {store, web3t}
 account-details = ({ store, web3t })->
     lang = get-lang store
     { go-back } = history-funcs store, web3t
@@ -985,26 +1062,145 @@ account-details = ({ store, web3t })->
         staking-content store, web3t
 account-details.init = ({ store, web3t }, cb)!->
     console.log "account-details.init"
+    account = store.staking.chosenAccount
+    return null if not account?
+    store.staking.chosenAccount.rewards = []
     stake-accounts = store.staking.parsedProgramAccounts
+    err, epochInfo <- as-callback web3t.velas.NativeStaking.getCurrentEpochInfo()
+    console.error err if err?
+    store.staking.current-epoch = epochInfo.epoch
     err, stakeActivation <- as-callback web3t.velas.NativeStaking.getStakeActivation(store.staking.chosenAccount.address)
     if not err? and stakeActivation?
         store.staking.chosenAccount.status = stakeActivation.state
         store.staking.chosenAccount.active_stake = stakeActivation.active
         store.staking.chosenAccount.inactive_stake = stakeActivation.inactive
     return alert store, err, cb if err?
-    #if true
-        #err, all-stakes <- get-all-active-stake(stake-accounts)
-        #console.log "all-active-stake" all-stakes
-        #store.staking.all-active-stake = (all-stakes ? 0)
-        #my-stake = store.staking.chosenAccount.balanceRaw `times` (10^9)
-        #my-weight = my-stake `div` all-stakes.inactive-stake
-        #activateMaxInSystem = all-stakes.active-stake `times` 0.25
-        #yourMaxPart = my-weight `times` activateMaxInSystem
-        #store.staking.myStakeMaxPart = yourMaxPart
+    # Get rewards per prev epoch
+    err, epochInfo <- as-callback web3t.velas.NativeStaking.getCurrentEpochInfo()
+    console.error err if err?
+    return cb null if err?
+    { epoch, blockHeight, slotIndex, slotsInEpoch, transactionCount } = epochInfo
+    prev-epoch = epoch `minus` 1
+    activationEpoch = store.staking.chosenAccount.account?data?parsed?info?stake?delegation?activationEpoch
+    err, rewards <- fetchEpochRewards(account.address, activationEpoch)
+    store.staking.chosenAccount.rewards = rewards
     cb null
 stringify = (value) ->
     if value? then
         round-human(parse-float value `div` (10^18))
     else
         '..'
+fetchEpochRewards = (address, activationEpoch, cb)->    
+    return cb null, [] if (not store.staking.chosenAccount.validator? or store.staking.chosenAccount.validator.toString!.length is 0)    
+    err, epochSchedule <- as-callback(web3t.velas.NativeStaking.getEpochSchedule!)
+    console.error err if err?
+    {firstNormalEpoch, firstNormalSlot, leaderScheduleSlotOffset, slotsPerEpoch, warmup} = epochSchedule
+    err, slot <- as-callback(web3t.velas.NativeStaking.getSlot!)
+    console.error err if err?
+    err, firstAvailableBlock <- as-callback(web3t.velas.NativeStaking.getFirstAvailableBlock!)
+    console.error err if err?
+    err, epochInfo <- as-callback web3t.velas.NativeStaking.getCurrentEpochInfo()
+    console.error err if err?
+    return cb null if err?
+    { epoch, blockHeight, slotIndex, slotsInEpoch, transactionCount } = epochInfo
+    # make loop here!
+    err, rewards <- query-rewards-loop(address, activationEpoch, firstNormalSlot, slotsPerEpoch, slotsInEpoch, firstAvailableBlock, firstNormalEpoch, epoch)    
+    cb null, rewards
+#
+prev-epoch-data = {epoch_start_time: null, rewards: null, first_confirmed_block: null}
+# 
+query-rewards-loop = (address, activationEpoch, firstNormalSlot, slotsPerEpoch, slotsInEpoch, firstAvailableBlock, firstNormalEpoch, epoch, cb)->
+    return cb null, [] if epoch < (activationEpoch) or epoch < 0    
+    # Get not skipped slot here!  
+    err, firstSlotInEpoch <- get_first_slot_in_epoch(firstNormalSlot, slotsPerEpoch, slotsInEpoch, firstNormalEpoch, epoch)
+    # Get first comfirmed block/slot in epoch
+    limit = 1
+    err, result <- as-callback(web3t.velas.NativeStaking.getConfirmedBlocksWithLimit(firstSlotInEpoch, limit))
+    first_confirmed_block_in_epoch = result?result?0    
+    # Get first confirmed block    
+    err, first_confirmed_block <- get_confirmed_block_with_encoding(first_confirmed_block_in_epoch)
+    rewards = []
+    #
+    SECONDS_PER_DAY = 86400
+    # Get previous epoch start time
+    epoch_start_time = 
+        | not first_confirmed_block? => 0
+        | _ => first_confirmed_block.blockTime
+    epoch_end_time = prev-epoch-data.epoch_start_time
+    #set epoch_start_time for previous epoch
+    wallclock_epoch_duration =
+        | not epoch_end_time? => 0 
+        | _ => epoch_end_time `minus` epoch_start_time
+    wallclock_epochs_per_year = (SECONDS_PER_DAY * 365) `div` wallclock_epoch_duration 
+    all-rewards = (prev-epoch-data.rewards ? [])
+    rewards = 
+        all-rewards 
+            |> filter (-> it.pubkey is address)
+            |> map (it)->
+                percentChange = (it.lamports `div` it.postBalance) `times` 100
+                percentChange = round-number(percentChange, {decimals: 2})
+                rateChange = it.lamports `div` (it.postBalance - it.lamports)   
+                apr = 
+                    | not epoch_end_time? => "0" 
+                    | _ => (rateChange `times` wallclock_epochs_per_year) `times` 100
+                apr = round-number(apr, {decimals: 2})
+                {
+                    epoch: (epoch)
+                    rewardSlot: prev-epoch-data.rewardSlot
+                    amount: it.lamports
+                    newBalance: it.postBalance 
+                    percentChange: percentChange + "%"
+                    apr: apr + "%"
+                    disabled: not first_confirmed_block?  
+                }
+    #if not prev-epoch-data.first_confirmed_block?
+        #rewards = [
+            #{
+                #epoch: (epoch)
+                #rewardSlot: (prev-epoch-data?rewardSlot ? "no result")
+                #amount: "0"
+                #newBalance: "0"
+                #percentChange: ".."
+                #apr: ".." 
+                #disabled: yes 
+            #}
+        #]
+    # Set previous block start time and rewards
+    prev-epoch-data.first_confirmed_block = first_confirmed_block
+    prev-epoch-data.epoch_start_time =  first_confirmed_block?blockTime
+    prev-epoch-data.rewards = first_confirmed_block?rewards 
+    prev-epoch-data.rewardSlot = firstSlotInEpoch        
+    err, rest <- query-rewards-loop(address, activationEpoch, firstNormalSlot, slotsPerEpoch, slotsInEpoch, firstAvailableBlock, firstNormalEpoch, --epoch)
+    all = rewards ++ rest
+    cb null, all
+#    
+get_first_slot_in_epoch = (firstNormalSlot, slotsPerEpoch, slotsInEpoch, firstNormalEpoch, epoch, cb)->
+    #if epoch <= firstNormalEpoch
+        #console.log "Epoch is less or equals to firstNormalEpoch"
+        #return (Math.pow(2, epoch) - 1) * slotsInEpoch #MINIMUM_SLOTS_PER_EPOCH
+    #return (epoch - firstNormalEpoch) * slotsPerEpoch + firstNormalSlot
+    limit = 1
+    firstSlotInEpoch = (epoch - firstNormalEpoch) * slotsPerEpoch + firstNormalSlot
+    #err, result <- as-callback(web3t.velas.NativeStaking.getConfirmedBlocksWithLimit(firstSlotInEpoch, limit))
+    #return cb err if err? or not result?result
+    #firstSlot = result?result?0
+    #cb null, firstSlot
+    return cb null,  firstSlotInEpoch
+try-get-extra-slot = (default-response, new-slot, cb)->
+    return cb null, default-response, if default-response?
+    limit = 1
+    err, result <- as-callback(web3t.velas.NativeStaking.getConfirmedBlocksWithLimit(new-slot, limit))
+    cb null, result?result?0
+#    
+get_confirmed_block_with_encoding = (slot, cb)->    
+    err, confirmedBlock <- as-callback(web3t.velas.NativeStaking.getConfirmedBlock(slot))
+    console.error err if err?
+    cb null, confirmedBlock 
+#    
+retrieveRewardData = (firstSlotInEpoch, firstNormalSlot, slotsPerEpoch, slotsInEpoch, firstAvailableBlock, firstNormalEpoch, epoch, cb)->
+    if firstSlotInEpoch < firstAvailableBlock
+        # RPC node is out of history data
+        return cb "RPC node is out of history data"
+    err, confirmed_block_with_encoding <- get_confirmed_block_with_encoding(firstSlotInEpoch)
+    cb null, confirmed_block_with_encoding    
 module.exports = account-details

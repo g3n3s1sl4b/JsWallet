@@ -556,6 +556,9 @@ module.exports = ({ store, web3t } )->
         border-bottom: "1px solid #{style.app.border}"
         background: style.app.background
         background-color: style.app.bgspare
+    settings-style = 
+        overflow: "auto"
+        max-height: "100vh"
     lang = get-lang store
     .pug.settings-menu
         .pug.title(style=border-style)
@@ -564,5 +567,5 @@ module.exports = ({ store, web3t } )->
                 img.icon-svg.pug(src="#{icons.arrow-left}" style=icon-color)
             burger store, web3t
         .account-body.pug(style=account-body-style)
-            .pug.settings
+            .pug.settings(style=settings-style)
                 manage-account store, web3t

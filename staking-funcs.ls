@@ -134,6 +134,7 @@ fill-accounts = ({ store, web3t, on-progress, on-finish }, [item, ...rest]) ->
     item.balanceRaw = if rent? then (item.account.lamports `minus` rent) else '-'
     item.balance = if rent? then (Math.round((item.account.lamports `minus` rent) `div` (10^9)) `times` 100) `div` 100  else "-"
     item.rent    = if rent? then (rent `div` (10^9)) else "-"
+    item.credits_observed = item.account?data?parsed?info?stake?creditsObserved ? 0
     item.status  = "inactive"
     item.validator = null
     item.account = item.account
@@ -172,6 +173,7 @@ convert-accounts-to-view-model = (accounts) ->
             active_stake = it?active_stake ? 0
             inactive_stake = it?inactive_stake ? 0
             seed-index =  it.seed-index
+            credits_observed : it.credits_observed
         }
 ##################
 convert-pools-to-view-model = (pools) ->
