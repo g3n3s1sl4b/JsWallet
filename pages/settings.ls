@@ -365,6 +365,9 @@ list-language = (store, web3t)->
     change-lang-es = ->
         store.current.language-menu = no
         return set-lang \es
+    change-lang-ar = ->
+        store.current.language-menu = no
+        return set-lang \ar
     color =
         color: style.app.text
     comming-soon =
@@ -386,6 +389,9 @@ list-language = (store, web3t)->
         li.pug.lang-item(on-click=change-lang-cn style=color)
             img.pug(src="#{icons.langs-kr}")
             | 中文語言
+        li.pug.lang-item(on-click=change-lang-ar style=color)
+            img.pug(src="#{icons.langs-ar}")
+            | عربى
         li.pug.lang-item(style=comming-soon)
             img.pug(src="#{icons.langs-jp}")
             | 日本語
