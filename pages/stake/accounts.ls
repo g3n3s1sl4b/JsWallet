@@ -314,7 +314,7 @@ staking-accounts-content = (store, web3t)->
                         if store.staking.accounts.length is 0
                             span.pug.notification-entity(style=notification-border) Please create a staking account before you stake
                         else 
-                            span.pug.notification-entity(style=notification-border) You can stake more by creating new accounts
+                            span.pug.notification-entity(style=notification-border) #{lang.youCanStakeMore}
         .pug
             .form-group.pug(id="staking-accounts")
                 .pug.section

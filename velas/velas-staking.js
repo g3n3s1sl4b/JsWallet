@@ -40,7 +40,9 @@ class VelasStaking {
         const info = await this.connection.getEpochInfo();
         return info;
     }
-
+    async getBlockProduction(identity) {
+        return await this.connection.getBlockProduction(identity);
+    }
     async getEpochSchedule() {
         return await this.connection.getEpochSchedule();
     }
@@ -114,6 +116,7 @@ class VelasStaking {
         const voteAccounts = await this.connection.getVoteAccounts();
 
         const validators = voteAccounts.current.concat(voteAccounts.delinquent);
+        console.log("validators", validators);
 
         for (var i in validators) {
             validators[i].key   = validators[i].votePubkey;
