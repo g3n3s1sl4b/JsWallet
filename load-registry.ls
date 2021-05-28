@@ -3,9 +3,7 @@ require! {
     \atob
     \./providers.ls
     \../web3t/plugins/btc-coin.js : btc
-    \../web3t/plugins/dash-coin.js : dash
     \../web3t/plugins/eth-coin.js : eth
-    \../web3t/plugins/etc-coin.js : etc
     \../web3t/plugins/symblox.js : syx
     \../web3t/plugins/symblox-v2.js : syx2
     \../web3t/plugins/ltc-coin.js : ltc

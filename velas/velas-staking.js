@@ -40,8 +40,14 @@ class VelasStaking {
         const info = await this.connection.getEpochInfo();
         return info;
     }
+    async getConfirmedBlocks(start_slot, end_slot) {
+        return await this.connection.getConfirmedBlocks(start_slot, end_slot);
+    }
     async getBlockProduction(identity) {
         return await this.connection.getBlockProduction(identity);
+    }
+    async getLeaderSchedule(identity) {
+        return await this.connection.getLeaderSchedule(identity);
     }
     async getEpochSchedule() {
         return await this.connection.getEpochSchedule();
