@@ -342,17 +342,7 @@ dapps = (store, web3t)->
                 li.pug
                     span.pug(on-click=goto-videostorage) #{lang.video-storage}
                 li.pug(on-click=goto-soundstorage style=hide-sound)
-                    span.pug Sound Storage
-        .pug.section
-            .source.pug(on-click=goto-resources2)
-                .pug.address #{lang.velas-sphere}
-                .pug.header #{lang.velas-cpu-staking}
-            .pug.description
-            ul.pug.links
-                li.pug
-                    span.pug About
-                li.pug
-                    span.pug FAQs
+                    span.pug Sound Storage    
         .pug.section
             .source.pug(on-click=goto-resources)
                 .pug.address #{lang.velas-sphere}
@@ -380,11 +370,6 @@ dapps = (store, web3t)->
             .source.pug(on-click=goto-notice)
                 .pug.address #{lang.velas-sphere}
                 .pug.header #{lang.velas-messenger}
-            .pug.description
-        .pug.section
-            .source.pug(on-click=goto-vote)
-                .pug.address #{lang.velas-sphere}
-                .pug.header Vote
             .pug.description
         .pug.section
             .source.pug(on-click=goto-util)

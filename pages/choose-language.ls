@@ -243,6 +243,8 @@ language = (store, web3t)->
         return set-lang \fr
     change-lang-es = ->
         return set-lang \es
+    change-lang-ar = ->
+        return set-lang \ar
     comming-soon =
         opacity: ".3"
         cursor: "no-drop"
@@ -291,6 +293,9 @@ language = (store, web3t)->
                     li.pug.lang-item(style=comming-soon id="lang-kz")
                         img.pug(src="#{icons.langs-kz}")
                         .pug Қазақ
+                    li.pug.lang-item(on-click=change-lang-ar style=color id="lang-ar")
+                        img.pug(src="#{icons.langs-ar}")
+                        .pug عربى
             .pug.downloadwalletlist
                 a.pug(href="https://apps.apple.com/us/app/velas-mobile-wallet/id1541032748" target="_blank")
                     img.icon-download.pug(src="#{icons[\ios]}")
