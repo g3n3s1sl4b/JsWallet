@@ -553,7 +553,7 @@ send = ({ store, web3t })->
                                     | #{token-display}
                                 amount-field { store, value: send.amount-send, on-change: amount-change, placeholder="0", id="send-amount", token, disabled }
                             if active-usd is \active
-                                amount-fiat-field { store, on-change:amount-usd-change, placeholder:"0", title:"#{send.amount-send-usd}" value:"#{send.amount-send-usd}", id:"send-amount-usd", disabled: yes }
+                                amount-fiat-field { store, on-change:amount-usd-change, placeholder:"0", title:"#{send.amount-send-usd}" value:"#{send.amount-send-usd}", id:"send-amount-usd", disabled: no }
                             if active-eur is \active
                                 .input-wrapper.small.pug(style=amount-style)
                                     .label.lusd.pug €
