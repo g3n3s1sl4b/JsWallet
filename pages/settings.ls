@@ -368,6 +368,21 @@ list-language = (store, web3t)->
     change-lang-ar = ->
         store.current.language-menu = no
         return set-lang \ar
+    change-lang-in = ->
+        store.current.language-menu = no
+        return set-lang \in
+    change-lang-id = ->
+        store.current.language-menu = no
+        return set-lang \id
+    change-lang-ph = ->
+        store.current.language-menu = no
+        return set-lang \ph
+    change-lang-yr = ->
+        store.current.language-menu = no
+        return set-lang \yr
+    change-lang-vn = ->
+        store.current.language-menu = no
+        return set-lang \vn
     color =
         color: style.app.text
     comming-soon =
@@ -395,8 +410,8 @@ list-language = (store, web3t)->
         li.pug.lang-item(style=comming-soon)
             img.pug(src="#{icons.langs-jp}")
             | 日本語
-        li.pug.lang-item(style=comming-soon)
-            img.pug(src="#{icons.langs-hn}")
+        li.pug.lang-item(on-click=change-lang-in style=color)
+            img.pug(src="#{icons.langs-in}")
             | हिंदी
         li.pug.lang-item(on-click=change-lang-es style=color)
             img.pug(src="#{icons.langs-sp}")
@@ -410,6 +425,18 @@ list-language = (store, web3t)->
         li.pug.lang-item(style=comming-soon)
             img.pug(src="#{icons.langs-kz}")
             | Қазақ
+        li.pug.lang-item(on-click=change-lang-id style=color id="lang-id")
+            img.pug(src="#{icons.langs-id}")
+            .pug Indonesian
+        li.pug.lang-item(on-click=change-lang-ph style=color id="lang-ph")
+            img.pug(src="#{icons.langs-ph}")
+            .pug Pilipino
+        li.pug.lang-item(on-click=change-lang-yr style=color id="lang-yr")
+            img.pug(src="#{icons.langs-yr}")
+            .pug Yoruba
+        li.pug.lang-item(on-click=change-lang-vn style=color id="lang-vn")
+            img.pug(src="#{icons.langs-vn}")
+            .pug Tiếng Việt
 switch-language = (store, web3t)->
     style = get-primary-info store
     lang = get-lang store

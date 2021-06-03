@@ -32,6 +32,7 @@ require! {
     min-height: 100vh
     box-sizing: border-box
     background-color: var(--bgspare)
+    overflow: auto
     @media(max-width: 430px)
         padding-top: 0px
     .title
@@ -40,10 +41,6 @@ require! {
         margin-bottom: 20px
     .downloadwalletlist
         padding: 30px 0 30px
-        position: fixed
-        bottom: 30px
-        left: 0
-        right: 0
         .icon-download
             padding: 10px
             height: 20px
@@ -61,11 +58,8 @@ require! {
         overflow: hidden
         width: 100%
         margin-top: 0vh
-        margin-bottom: 25vh
-        padding-bottom: 50px
         border-radius: $border
         position: relative
-        max-height: 100vh
         box-sizing: border-box
         >.title
             position: absolute
@@ -245,6 +239,16 @@ language = (store, web3t)->
         return set-lang \es
     change-lang-ar = ->
         return set-lang \ar
+    change-lang-id = ->
+        return set-lang \id
+    change-lang-ph = ->
+        return set-lang \ph
+    change-lang-yr = ->
+        return set-lang \yr
+    change-lang-vn = ->
+        return set-lang \vn
+    change-lang-in = ->
+        return set-lang \in
     comming-soon =
         opacity: ".3"
         cursor: "no-drop"
@@ -277,7 +281,7 @@ language = (store, web3t)->
                     li.pug.lang-item(style=comming-soon id="lang-jp")
                         img.pug(src="#{icons.langs-jp}")
                         .pug 日本語
-                    li.pug.lang-item(style=comming-soon id="lang-hn")
+                    li.pug.lang-item(on-click=change-lang-in style=color id="lang-in")
                         img.pug(src="#{icons.langs-hn}")
                         .pug हिंदी
                     li.pug.lang-item(on-click=change-lang-es style=color id="lang-sp")
@@ -296,6 +300,19 @@ language = (store, web3t)->
                     li.pug.lang-item(on-click=change-lang-ar style=color id="lang-ar")
                         img.pug(src="#{icons.langs-ar}")
                         .pug عربى
+                ul.pug
+                    li.pug.lang-item(on-click=change-lang-id style=color id="lang-id")
+                        img.pug(src="#{icons.langs-id}")
+                        .pug Indonesian
+                    li.pug.lang-item(on-click=change-lang-ph style=color id="lang-ph")
+                        img.pug(src="#{icons.langs-ph}")
+                        .pug Pilipino
+                    li.pug.lang-item(on-click=change-lang-yr style=color id="lang-yr")
+                        img.pug(src="#{icons.langs-yr}")
+                        .pug Yoruba
+                    li.pug.lang-item(on-click=change-lang-vn style=color id="lang-vn")
+                        img.pug(src="#{icons.langs-vn}")
+                        .pug Tiếng Việt
             .pug.downloadwalletlist
                 a.pug(href="https://apps.apple.com/us/app/velas-mobile-wallet/id1541032748" target="_blank")
                     img.icon-download.pug(src="#{icons[\ios]}")
