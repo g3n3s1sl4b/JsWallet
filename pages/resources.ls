@@ -383,16 +383,16 @@ resources = ({ store, web3t })->
                                     | / PER MONTH
                         .entry-content.pug
                             ul.pug
-                                li.pug
+                                li.pug(key="mining" )
                                     strong.pug 
                                     |  for mining
-                                li.pug
+                                li.pug(key="calculation" )
                                     strong.pug 
                                     |  for distributed calculations
-                                li.pug
+                                li.pug(key="remote-serverside" )
                                     strong.pug 
                                     |   for remote serverside
-                                li.pug
+                                li.pug(key="vfr" )
                                     strong.pug 
                                     |   for VFR, etc
                         .wallet-middle.pug
@@ -412,16 +412,16 @@ resources = ({ store, web3t })->
                                     | / PER MONTH
                         .entry-content.pug
                             ul.pug
-                                li.pug
+                                li.pug(key="mining2" )
                                     strong.pug 
                                     |  for mining
-                                li.pug
+                                li.pug(key="rendering-video" )
                                     strong.pug 
                                     |  for rendering of video
-                                li.pug
+                                li.pug(key="destr-calc" )
                                     strong.pug 
                                     |  for distributed calculations
-                                li.pug
+                                li.pug(key="science" )
                                     strong.pug 
                                     |  for science
                         .wallet-middle.pug
@@ -441,16 +441,16 @@ resources = ({ store, web3t })->
                                     | / PER MONTH
                         .entry-content.pug
                             ul.pug
-                                li.pug
+                                li.pug(key="file-sharing" )
                                     strong.pug 
                                     |  for file sharing
-                                li.pug
+                                li.pug(key="file-storage" )
                                     strong.pug 
                                     |  for file storage
-                                li.pug
+                                li.pug(key="distributed-ai" )
                                     strong.pug 
                                     |  for distributed AI
-                                li.pug
+                                li.pug(key="dapps" )
                                     strong.pug 
                                     |  for DAPPS
                         .wallet-middle.pug

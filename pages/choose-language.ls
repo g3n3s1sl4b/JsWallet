@@ -262,55 +262,55 @@ language = (store, web3t)->
             .welcome.pug(style=text-style) #{lang.language}
             .pug.langs
                 ul.pug
-                    li.pug.lang-item(style=comming-soon id="lang-gr")
+                    li.pug.lang-item(key="lang-gr" style=comming-soon id="lang-gr")
                         img.pug(src="#{icons.langs-gr}")
                         .pug Deutsch
-                    li.pug.lang-item(on-click=change-lang-fr style=color id="lang-fr")
+                    li.pug.lang-item(key="lang-fr" on-click=change-lang-fr style=color id="lang-fr")
                         img.pug(src="#{icons.langs-fr}")
                         .pug Français
-                    li.pug.lang-item(on-click=change-lang-en style=color id="lang-en")
+                    li.pug.lang-item(key="lang-en" on-click=change-lang-en style=color id="lang-en")
                         img.pug(src="#{icons.langs-en}")
                         .pug English
-                    li.pug.lang-item(on-click=change-lang-kr style=color id="lang-kr")
+                    li.pug.lang-item(key="lang-kr" on-click=change-lang-kr style=color id="lang-kr")
                         img.pug(src="#{icons.langs-cn}")
                         .pug 한국어
                 ul.pug
-                    li.pug.lang-item(on-click=change-lang-cn style=color id="lang-cn")
+                    li.pug.lang-item(key="lang-cn" on-click=change-lang-cn style=color id="lang-cn")
                         img.pug(src="#{icons.langs-kr}")
                         .pug 中文語言
-                    li.pug.lang-item(style=comming-soon id="lang-jp")
+                    li.pug.lang-item(key="lang-jp" style=comming-soon id="lang-jp")
                         img.pug(src="#{icons.langs-jp}")
                         .pug 日本語
-                    li.pug.lang-item(on-click=change-lang-in style=color id="lang-in")
+                    li.pug.lang-item(key="lang-in" on-click=change-lang-in style=color id="lang-in")
                         img.pug(src="#{icons.langs-hn}")
                         .pug हिंदी
-                    li.pug.lang-item(on-click=change-lang-es style=color id="lang-sp")
+                    li.pug.lang-item(key="lang-sp" on-click=change-lang-es style=color id="lang-sp")
                         img.pug(src="#{icons.langs-sp}")
                         .pug Español
                 ul.pug
-                    li.pug.lang-item(on-click=change-lang-ua style=color id="lang-ua")
+                    li.pug.lang-item(key="lang-ua" on-click=change-lang-ua style=color id="lang-ua")
                         img.pug(src="#{icons.langs-ua}")
                         .pug Українська
-                    li.pug.lang-item(on-click=change-lang-ru style=color id="lang-ru")
+                    li.pug.lang-item(key="lang-ru" on-click=change-lang-ru style=color id="lang-ru")
                         img.pug(src="#{icons.langs-ru}")
                         .pug Русский
-                    li.pug.lang-item(style=comming-soon id="lang-kz")
+                    li.pug.lang-item(key="lang-kz" style=comming-soon id="lang-kz")
                         img.pug(src="#{icons.langs-kz}")
                         .pug Қазақ
-                    li.pug.lang-item(on-click=change-lang-ar style=color id="lang-ar")
+                    li.pug.lang-item(key="lang-ar" on-click=change-lang-ar style=color id="lang-ar")
                         img.pug(src="#{icons.langs-ar}")
                         .pug عربى
                 ul.pug
-                    li.pug.lang-item(on-click=change-lang-id style=color id="lang-id")
+                    li.pug.lang-item(key="lang-id" on-click=change-lang-id style=color id="lang-id")
                         img.pug(src="#{icons.langs-id}")
                         .pug Indonesian
-                    li.pug.lang-item(on-click=change-lang-ph style=color id="lang-ph")
+                    li.pug.lang-item(key="lang-ph" on-click=change-lang-ph style=color id="lang-ph")
                         img.pug(src="#{icons.langs-ph}")
                         .pug Pilipino
-                    li.pug.lang-item(on-click=change-lang-yr style=color id="lang-yr")
+                    li.pug.lang-item(key="lang-yr" on-click=change-lang-yr style=color id="lang-yr")
                         img.pug(src="#{icons.langs-yr}")
                         .pug Yoruba
-                    li.pug.lang-item(on-click=change-lang-vn style=color id="lang-vn")
+                    li.pug.lang-item(key="lang-vn" on-click=change-lang-vn style=color id="lang-vn")
                         img.pug(src="#{icons.langs-vn}")
                         .pug Tiếng Việt
             .pug.downloadwalletlist

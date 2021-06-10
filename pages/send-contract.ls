@@ -155,7 +155,7 @@ form-group = (title, style, content)->
         label.pug.control-label(style=style) #{title}
         content!
 build-part = (store, item)-->
-    li.pug #{item}
+    li.pug(key="build-part-#{item}" ) #{item}
 send-contract = ({ store, web3t })->
     { token, name, fee-token, network, send, wallet, round5, pending, history, cancel, send-anyway, round5, is-data, invoice } = send-funcs store, web3t
     style = get-primary-info store

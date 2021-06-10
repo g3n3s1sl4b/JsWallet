@@ -541,7 +541,7 @@ prompt-choose-token-modal = (store)->
             store.current.prompt-answer = token
             data.token = name
         active-class = if store.current.prompt-answer is token then "active" else ""
-        li.pug.lang-item(on-click=on-click style=optionStyle class="#{active-class}")
+        li.pug.lang-item(key="lang-item-#{name}" on-click=on-click style=optionStyle class="#{active-class}")
             img.pug(src="#{image}" style=imgStyle)
             span.pug(style=text-style) #{name}
     input-style = 

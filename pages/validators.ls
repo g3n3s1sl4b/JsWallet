@@ -7,7 +7,7 @@ require! {
     \bignumber.js
     \../get-lang.ls
     \../history-funcs.ls
-    \../staking-funcs.ls : { query-pools, query-accounts, convert-pools-to-view-model, convert-accounts-to-view-model }
+    \../staking-funcs.ls : { query-pools, get-my-stakes, query-accounts, convert-pools-to-view-model, convert-accounts-to-view-model }
     \./icon.ls
     \prelude-ls : { map, split, filter, find, foldl, sort-by, unique, head, each, obj-to-pairs, take, reverse }
     \../math.ls : { div, times, plus, minus }
@@ -620,7 +620,7 @@ as-callback = (p, cb)->
     p.then (data)->
         cb null, data
 show-validator = (store, web3t)-> (validator)->
-    li.pug #{validator}
+    li.pug(key="validator-#{validator}" ) #{validator}
 staking-content = (store, web3t)->
     { go-back } = history-funcs store, web3t
     style = get-primary-info store

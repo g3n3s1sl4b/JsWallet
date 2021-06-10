@@ -389,52 +389,52 @@ list-language = (store, web3t)->
         opacity: ".3"
         cursor: "no-drop"
     ul.pug
-        li.pug.lang-item(style=comming-soon)
+        li.pug.lang-item(key="langs-gr" style=comming-soon)
             img.pug(src="#{icons.langs-gr}")
             | Deutsch
-        li.pug.lang-item(on-click=change-lang-fr style=color)
+        li.pug.lang-item(key="langs-fr" on-click=change-lang-fr style=color)
             img.pug(src="#{icons.langs-fr}")
             | Français
-        li.pug.lang-item(on-click=change-lang-en style=color)
+        li.pug.lang-item(key="langs-en" on-click=change-lang-en style=color)
             img.pug(src="#{icons.langs-en}")
             | English
-        li.pug.lang-item(on-click=change-lang-kr style=color)
+        li.pug.lang-item(key="langs-kr" on-click=change-lang-kr style=color)
             img.pug(src="#{icons.langs-cn}")
             | 한국어
-        li.pug.lang-item(on-click=change-lang-cn style=color)
+        li.pug.lang-item(key="langs-cn" on-click=change-lang-cn style=color)
             img.pug(src="#{icons.langs-kr}")
             | 中文語言
-        li.pug.lang-item(on-click=change-lang-ar style=color)
+        li.pug.lang-item(key="langs-ar" on-click=change-lang-ar style=color)
             img.pug(src="#{icons.langs-ar}")
             | عربى
-        li.pug.lang-item(style=comming-soon)
+        li.pug.lang-item(key="langs-jp" style=comming-soon)
             img.pug(src="#{icons.langs-jp}")
             | 日本語
-        li.pug.lang-item(on-click=change-lang-in style=color)
+        li.pug.lang-item(key="langs-in" on-click=change-lang-in style=color)
             img.pug(src="#{icons.langs-in}")
             | हिंदी
-        li.pug.lang-item(on-click=change-lang-es style=color)
+        li.pug.lang-item(key="langs-es" on-click=change-lang-es style=color)
             img.pug(src="#{icons.langs-sp}")
             | Español
-        li.pug.lang-item(on-click=change-lang-ua style=color)
+        li.pug.lang-item(key="langs-ua" on-click=change-lang-ua style=color)
             img.pug(src="#{icons.langs-ua}")
             | Українська
-        li.pug.lang-item(on-click=change-lang-ru style=color)
+        li.pug.lang-item(key="langs-ru" on-click=change-lang-ru style=color)
             img.pug(src="#{icons.langs-ru}")
             | Русский
-        li.pug.lang-item(style=comming-soon)
+        li.pug.lang-item(key="langs-kz" style=comming-soon)
             img.pug(src="#{icons.langs-kz}")
             | Қазақ
-        li.pug.lang-item(on-click=change-lang-id style=color id="lang-id")
+        li.pug.lang-item(key="langs-id" on-click=change-lang-id style=color id="lang-id")
             img.pug(src="#{icons.langs-id}")
             .pug Indonesian
-        li.pug.lang-item(on-click=change-lang-ph style=color id="lang-ph")
+        li.pug.lang-item(key="langs-ph" on-click=change-lang-ph style=color id="lang-ph")
             img.pug(src="#{icons.langs-ph}")
             .pug Pilipino
-        li.pug.lang-item(on-click=change-lang-yr style=color id="lang-yr")
+        li.pug.lang-item(key="langs-yr" on-click=change-lang-yr style=color id="lang-yr")
             img.pug(src="#{icons.langs-yr}")
             .pug Yoruba
-        li.pug.lang-item(on-click=change-lang-vn style=color id="lang-vn")
+        li.pug.lang-item(key="langs-vn" on-click=change-lang-vn style=color id="lang-vn")
             img.pug(src="#{icons.langs-vn}")
             .pug Tiếng Việt
 switch-language = (store, web3t)->

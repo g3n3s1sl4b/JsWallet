@@ -474,10 +474,10 @@ token-migration = (store, web3t)->
                             span.pug
                                 span.pug.orange I am not:
                                 ol.pug(type='I')
-                                    li.pug a citizen or resident of, or domiciled in;
-                                    li.pug participating in the token swap from a location in;
-                                    li.pug representing or acting on behalf of a person residing or located in,
-                                    li.pug representing or acting on behalf of an entity (including, but not limited to, any company or partnership) incorporated, established or registered in or under the laws of: the United States of America (USA) and its territories (American Samoa, Guam, the Northern Mariana Islands, Puerto Rico, and the U.S. Virgin Islands), Peoples Republic of China (except for Hong Kong and Macao), Cuba, Democratic Republic of Congo, Iran, Iraq, Malaysia, North Korea, Sudan, Syria, Zimbabwe.
+                                    li.pug(key="one" ) a citizen or resident of, or domiciled in;
+                                    li.pug(key="two" ) participating in the token swap from a location in;
+                                    li.pug(key="three" ) representing or acting on behalf of a person residing or located in,
+                                    li.pug(key="four" ) representing or acting on behalf of an entity (including, but not limited to, any company or partnership) incorporated, established or registered in or under the laws of: the United States of America (USA) and its territories (American Samoa, Guam, the Northern Mariana Islands, Puerto Rico, and the U.S. Virgin Islands), Peoples Republic of China (except for Hong Kong and Macao), Cuba, Democratic Republic of Congo, Iran, Iraq, Malaysia, North Korea, Sudan, Syria, Zimbabwe.
                     .pug.content
                         button.pug(on-click=visible-migrate-accept style=button-primary3-style)
                             span.pug

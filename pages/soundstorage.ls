@@ -858,34 +858,34 @@ play-bar = (store, web3t)->
         border-top: "1px solid #{info.app.border}"
     .pug.play-bar(style=play-bar)
         ul.pug.btn-area
-            li.pug
+            li.pug(key="icons-prev")
                 img.pug(src="#{icons.prev}")
-            li.pug
+            li.pug(key="icons-play")
                 img.pug(src="#{icons.play}")
-            li.pug
+            li.pug(key="icons-next")
                 img.pug(src="#{icons.next}")
-            li.pug
+            li.pug(key="icons-shuffle")
                 img.pug(src="#{icons.shuffle}")
-            li.pug
+            li.pug(key="icons-repeat")
                 img.pug(src="#{icons.repeat}")
         ul.pug.play-area
-            li.pug.start 1:45
-            li.pug
+            li.pug.start(key="_start") 1:45
+            li.pug(key="play-area")
                 span.pug.progress
                     span.pug.progress
-            li.pug 4:21
-            li.pug
+            li.pug(key="4_21") 4:21
+            li.pug(key="icons-volume")
                 img.pug(src="#{icons.volume}")
         ul.pug.album-area
-            li.pug.album
+            li.pug.album(key="album")
                 span.pug
                     img.pug(src='data:image/png;base64,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')
                 span.pug
                     .pug.user velas
                     .pug.singer Lana Del Rey - West Coast - Solomun Remix
-            li.pug
+            li.pug(key="icons-like2")
                 img.pug(src="#{icons.like}")
-            li.pug
+            li.pug(key="icons-next-up")
                 img.pug(src="#{icons.next-up}")
 home = (store, web3t)->
     lang = get-lang store
@@ -973,7 +973,7 @@ home = (store, web3t)->
                             span.pug
                                 .pug.header Morning Chillout
                                 ul.pug.stat
-                                    li.pug
+                                    li.pug(key="mighty")
                                         span.pug Mighty
                 .pug.section
                     .source.pug
@@ -982,7 +982,7 @@ home = (store, web3t)->
                             span.pug
                                 .pug.header Morning Chillout
                                 ul.pug.stat
-                                    li.pug
+                                    li.pug(key="mighty2")
                                         span.pug Mighty
                 .pug.section
                     .source.pug
@@ -991,7 +991,7 @@ home = (store, web3t)->
                             span.pug
                                 .pug.header Morning Chillout
                                 ul.pug.stat
-                                    li.pug
+                                    li.pug(key="mighty3")
                                         span.pug Mighty
                 .pug.section
                     .source.pug
@@ -1000,7 +1000,7 @@ home = (store, web3t)->
                             span.pug
                                 .pug.header Morning Chillout
                                 ul.pug.stat
-                                    li.pug
+                                    li.pug(key="mighty4")
                                         span.pug Mighty
         .block-content.pug(style=header-style-light)
             h2.header.pug Party
@@ -1012,7 +1012,7 @@ home = (store, web3t)->
                         span.pug
                             .pug.header Morning Chillout
                             ul.pug.stat
-                                li.pug
+                                li.pug(key="mighty5")
                                     span.pug Mighty
             .pug.section
                 .source.pug
@@ -1021,7 +1021,7 @@ home = (store, web3t)->
                         span.pug
                             .pug.header Morning Chillout
                             ul.pug.stat
-                                li.pug
+                                li.pug(key="mighty6")
                                     span.pug Mighty
 stream = (store, web3t)->
     info = get-primary-info store
@@ -1138,10 +1138,10 @@ videostorage = ({ store, web3t })->
                     span.col.folder-menu.pug
                         .pug Uploading 1 item
                     ul.action.col.pug(class="#{active}")
-                        li.pug(on-click=switch-progress class="#{hide-progress}")
+                        li.pug(on-click=switch-progress class="#{hide-progress}" key="hide-progress2")
                             span.pug
                                 icon "ChevronDown", 15
-                        li.pug
+                        li.pug(key="hide-progress-close")
                             span.pug
                                 icon \X, 15
             .pug(style=header-table-style class="#{hide-progress}")
@@ -1175,13 +1175,13 @@ videostorage = ({ store, web3t })->
                     .pug.section.filter
                         .tabs.pug
                             ul.pug
-                                li.pug(on-click=activate-home class="#{active-home}" style=border-menu)
+                                li.pug(key="activate-home" on-click=activate-home class="#{active-home}" style=border-menu)
                                     span.icon.pug
                                         | Home
-                                li.pug(on-click=activate-stream class="#{active-stream}" style=border-menu)
+                                li.pug(key="activate-stream" on-click=activate-stream class="#{active-stream}" style=border-menu)
                                     span.icon.pug
                                         | Stream
-                                li.pug(on-click=activate-library class="#{active-library}" style=border-menu)
+                                li.pug(key="activate-library" on-click=activate-library class="#{active-library}" style=border-menu)
                                     span.icon.pug
                                         | Library
                 .description.search-field.pug
