@@ -33,10 +33,10 @@ module.exports = ({ store, web3t } )->
                     span.col.folder-menu.pug
                         .pug Uploading #{file-descriptions.length} item(s)
                     ul.action.col.pug(class="#{active}")
-                        li.pug(on-click=switch-progress class="#{hide-progress}")
+                        li.pug(key="hide-progress3" on-click=switch-progress class="#{hide-progress}")
                             span.pug
                                 icon "ChevronDown", 15
-                        li.pug
+                        li.pug(key="close3") 
                             span.pug
                                 icon \X, 15
             .pug(style=header-table-style class="#{hide-progress}")
