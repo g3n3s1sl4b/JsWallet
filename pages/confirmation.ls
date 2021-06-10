@@ -562,6 +562,7 @@ prompt-choose-token-modal = (store)->
     btn-disabled = (typeof store.current.prompt-answer isnt "string") or (typeof store.current.prompt-answer is "string" and store.current.prompt-answer.length is 0)
     on-focus = ->
         (document.query-selector \.tokeninput).focus!
+    onChange = ->
     .pug.confirmation
         .pug.confirmation-body(style=confirmation)
             .pug.header(style=style=confirmation-style)#{text}
@@ -569,7 +570,7 @@ prompt-choose-token-modal = (store)->
             .pug.token-select
                 .input-holder.pug(style=input-style)
                     .pug.dlayout(style=disabled-layout-style)
-                    input.pug.tokeninput( type="text" value="#{display-token}" style=inputStyle )
+                    input.pug.tokeninput( type="text" value="#{display-token}" style=inputStyle onChange=onChange)
                 .pug.tokens-drop
                     ul.pug(style=ul-style)
                         store.current.account.wallets
