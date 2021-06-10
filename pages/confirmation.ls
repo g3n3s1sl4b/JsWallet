@@ -561,7 +561,7 @@ prompt-choose-token-modal = (store)->
     display-token = data.token ? ""
     btn-disabled = (typeof store.current.prompt-answer isnt "string") or (typeof store.current.prompt-answer is "string" and store.current.prompt-answer.length is 0)
     on-focus = ->
-        (document.query-selector \.tokeninput).focus!
+        (document.query-selector \.tokeninput).focus! if (document.query-selector \.tokeninput)?
     onChange = ->
     .pug.confirmation
         .pug.confirmation-body(style=confirmation)
