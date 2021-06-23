@@ -17,6 +17,7 @@ require! {
     \localStorage
     \../icons.ls
     \../components/header.ls
+    \./popup-connected-wallets.ls
 }
 .wallets-container
     @import scheme
@@ -279,6 +280,7 @@ mobile = ({ store, web3t })->
                     manage-account { store, web3t }
                     token-migration { store, web3t }
                 add-coin-page { store, web3t }
+                popup-connected-wallets { store, web3t }
                 .wallets.hide-detail.pug(key="wallets-body")
                     if no
                         .header.pug(style=header-style)

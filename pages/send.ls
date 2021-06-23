@@ -598,8 +598,9 @@ module.exports.init = ({ store, web3t }, cb)->
     return cb null if not wallet?
     return cb null if send.sending is yes
     store.current.send.foreign-network-fee = 0
-    store.current.send.amountCharged = 0
-    store.current.send.amountChargedUsd = 0
+    if +store.current.send.amountSend is 0
+        store.current.send.amountCharged = 0
+        store.current.send.amountChargedUsd = 0
     store.current.send.error = ''
     if store.current.send.is-swap isnt yes
         store.current.send.contract-address = null

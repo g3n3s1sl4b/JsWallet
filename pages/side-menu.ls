@@ -233,6 +233,8 @@ require! {
 #setup-pages = <[ locked newseed chooseinit loading loading2 verifyseed terms terms2 ]>
 module.exports = (store, web3t)->
     return null if not store? or store.current.page in setup-pages
+    # Do not show side menu if current page is Connect Site do Velas Dapp
+    retrun null if store?connected-wallet?status?queried is yes
     { current, open-account, lock, wallet-style, info, activate-s1, activate-s2, activate-s3, switch-network, refresh, lock } = menu-funcs store, web3t
     style = get-primary-info store
     wallets = if store.current.page is \wallets then \active else \not-active

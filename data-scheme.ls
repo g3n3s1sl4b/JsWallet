@@ -235,6 +235,17 @@ store =
         all: []
         applied: []
     releases: []
+    connected-wallet: 
+        isConnecting: no
+        isConnected: no
+        status:
+            queried: yes 
+            canceled: no  
+            connected: no
+        connected-site: []
+        chosenAccounts: []
+        openStatusBarPopup: no    
+        site: ""   
     current:
         transactions-are-loading: no
         address-suffix: ''

@@ -181,8 +181,9 @@ alert-modal = (store)->
     .pug.confirmation
         .pug.confirmation-body(style=confirmation)
             .pug.header(style=confirmation-style) Alert
-            .pug.text(style=confirmation-style2) 
-                text-rows |> map build-text
+            .pug.text(style=confirmation-style2)
+                .pug 
+                    text-rows |> map build-text
             .pug.buttons
                 button.pug.button(on-click=cancel style=button-style id="alert-close")
                     span.cancel.pug

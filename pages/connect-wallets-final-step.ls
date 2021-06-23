@@ -1,0 +1,382 @@
+require! {
+    \react
+    \./check-wallet.ls
+    \prelude-ls : { map, take, drop, join }
+    \../seed.ls : seedmem
+    \./menu.ls
+    \../web3.ls
+    \../wallets-funcs.ls
+    \./manage-account.ls
+    \./token-migration.ls
+    \./add-coin.ls : add-coin-page
+    \../get-lang.ls
+    \../get-primary-info.ls
+    \./history.ls
+    \../icons.ls
+    \./icon.ls
+    \../menu-funcs.ls
+    \../navigate.ls
+    \./your-account.ls
+}
+.connect-wallets-final-step
+    $mobile: 425px
+    $tablet: 800px
+    min-height: 100vh
+    button.btn
+        min-width: auto
+        margin: 0
+    @keyframes blink-animation
+        50%
+            opacity: 0.3
+    @-webkit-keyframes blink-animation
+        50%
+            opacity: 0.3
+    .blink
+        animation: 1s linear blink-animation  infinite
+        -webkit-animation: 1s linear blink-animation  infinite
+    .entities-loader
+        position: fixed
+        width: 100%
+        left: 0
+        right: 0
+        top: 0
+        bottom: 0
+        height: 100vh
+        text-align: center
+        background: rgba(7, 6, 16, 0.83)
+        .inner-section
+            margin: auto
+            position: absolute
+            height: 100px
+            left: 0
+            right: 0
+            top: 0
+            bottom: 0
+    .goback
+        display: inline-block
+        width: auto
+        padding: 10px 20px
+        float: left
+        cursor: pointer
+        margin-bottom: 40px
+        position: absolute
+        top: 20px
+        left: 20px
+    .container
+        margin: auto
+        margin-top: 50px
+        margin-bottom: 30px
+        @media(max-width: $mobile)
+            max-width: 600px
+        max-width: 85vh 
+        .trust-notification
+            font-size: 14px
+            opacity: 0.7
+            padding: 20px 10px 0px
+            display: block
+        .permissions-list
+            list-style: circle
+            text-align: left
+            max-width: 370px
+            margin: 20px auto 50px
+        .head
+            margin-bottom: 20px
+        .buttons
+            text-align: center
+            >.button
+                display: inline-block
+                cursor: pointer
+                height: 36px
+                width: 120px
+                font-weight: bold
+                font-size: 10px
+                text-transform: uppercase
+                border-radius: var(--border-btn)
+                border: 1px solid #CCC
+                margin: 15px 5px
+                padding: 0px 6px
+                background: transparent
+                text-overflow: ellipsis
+                overflow: hidden
+                white-space: nowrap
+                &.disabled
+                    opacity: 0.35
+                .apply
+                    vertical-align: middle
+                    margin-right: 2px
+                .cancel
+                    vertical-align: middle
+                    margin-right: 2px  
+                .icon-svg-apply
+                    position: relative
+                    height: 12px
+                    top: 2px
+                    margin-right: 3px
+                    filter: invert(23%) sepia(99%) saturate(1747%) hue-rotate(430deg) brightness(58%) contrast(175%)
+                .icon-svg-cancel
+                    position: relative
+                    height: 12px
+                    top: 2px
+                    margin-right: 3px
+                    filter: invert(22%) sepia(65%) saturate(7127%) hue-rotate(694deg) brightness(94%) contrast(115%)
+    .your-account
+        position: relative
+        display: block
+        border: 0 !important
+        .tor
+            right: 0px
+            bottom: -27px
+            .tor-content
+                right: -55px
+                &:after, &:before
+                    right: 33%
+                    top: -10%
+        .switch-menu
+            right: -1px
+            top: 10px
+            @media(max-width: 480px)
+                right: -2px
+    @media(max-width: 800px)
+        margin-top: 0px
+    .connect-wallets-inner
+        @import scheme
+        display: flex
+        align-items: center
+        $border: var(--border-btn)
+        $real-height: 300px
+        $cards-height: 296px
+        $pad: 20px
+        $radius: 15px    
+        height: 100vh
+        overflow: auto
+        box-sizing: border-box
+        position: absolute
+        left: 0
+        top: 0
+        bottom: 0
+        $cards-pad: 15px
+        right: 0
+        margin: auto
+        z-index: 2
+        @media(max-width: $mobile)
+            margin: 0
+            height: calc(100vh - 100px)
+        >.arrow
+            position: absolute
+            text-align: center
+            cursor: pointer
+            &.arrow-t
+                top: 0
+                margin-top: 10px
+            &.arrow-d
+                bottom: 0
+                margin-bottom: 10px
+                transform: rotate(180deg)
+            &:not(.true)
+                >.arrow-d
+                    visibility: hidden
+            >.arrow-container
+                display: inline-block
+                width: 100%
+                max-width: 450px
+                position: relative
+        padding-top: 20px
+        .wallet-container
+            overflow: hidden
+            overflow-y: auto
+            border-radius: 0 0 $border $border
+            max-height: 500px
+            border-top: 1px solid #213040
+            @media(max-width: $mobile)
+                max-height: 100vh
+                height: auto
+                margin-bottom: 0px
+            .wallet
+                background: var(--bg-secondary)
+                &:last-child
+                    margin-bottom: -1px
+                &.big
+                    background: var(--bg-secondary)
+            @media(max-width: $mobile)
+                border-width: 1px 0 0 0 !important
+        .switch-account
+            float: right
+            line-height: 2
+            right: 20px
+            position: relative
+            display: inline-flex
+            .ckeck
+                color: #3cd5af
+            .cancel
+                color: #c25b5f
+            .name
+                text-overflow: ellipsis
+                white-space: nowrap
+                overflow: hidden
+                width: 90px
+                text-align: right
+                cursor: default
+            input
+                outline: none
+                width: 100px
+                margin-top: -6px
+                height: 36px
+                line-height: 36px
+                border-radius: 0px
+                padding: 0px 10px
+                font-size: 12px
+                opacity: 1
+            span
+                cursor: pointer
+            .icon
+                vertical-align: middle
+                margin-left: 20px
+                transition: transform .5s
+                &.rotate
+                    transform: rotate(180deg)
+                    transition: transform .5s
+        .h1
+            font-size: 12px
+            text-transform: uppercase
+            letter-spacing: 2px
+            opacity: .8
+        .icon-svg1
+            position: relative
+            height: 16px
+            top: 2px
+        .icon-svg2
+            position: relative
+            height: 10px
+        .header
+            margin: 0 auto
+            border-left: 1px solid var(--border)
+            border-right: 1px solid var(--border)
+            @media(max-width: $mobile)
+                border: 0
+    .wallet
+        .wallet-middle
+            width: 100%
+            padding: 10px 12px
+            box-sizing: border-box
+            color: #A8BACB
+            font-size: 14px
+            margin-top: 5px
+            text-align: center
+            position: relative
+            display: inline-block
+            height: auto
+            border: 0 !important
+            .address-holder
+                div
+                    a
+                        padding-right: 10px
+            &.title-balance
+                display: none
+connect-wallets = ({ store, web3t })->
+    return null if store.connected-wallet.status.queried is no
+    { current, open-account, lock, wallet-style, info, refresh, lock } = menu-funcs store, web3t
+    { wallets, go-up, can-up, go-down, can-down } = wallets-funcs store, web3t
+    style = get-primary-info store
+    lang = get-lang store
+    /* Props */
+    accounts-to-connnect = 
+        | store.connected-wallet.chosenAccounts.length is store.current.account.wallets.length =>
+            "all your accounts"
+        | _ => 
+            ending = 
+                | store.connected-wallet.chosenAccounts.length > 1 => "s"
+                | _ => ""
+            accs = store.connected-wallet.chosenAccounts |> map (-> it.to-upper-case!) |> join (", ")
+            "#{accs} account#{ending}" 
+    /* Styles */
+    icon-color-style=
+        filter: info.app.icon-filter
+    border-style-w =
+        border: "1px solid #{style.app.border}"
+        background: "#{style.app.input}99"
+    border-style =
+        border-top: "1px solid #{style.app.border}"
+    row =
+        display: "flex"
+        height: "100vh"
+        margin-left: "60px"
+    left-side =
+        width: "45%"
+    right-side =
+        width: "55%"
+        border-left: "1px solid #{style.app.border}"
+    header-style =
+        border-top: "1px solid #{style.app.border}"
+        padding: "17px 0px 20px"
+        color: style.app.text
+        text-align: "left"
+    input=
+        background: style.app.wallet
+        border: "1px solid #{style.app.border}"
+        color: style.app.text
+    header-left =
+        margin-left: "10px"
+    border-right=
+        border-right: "1px solid #{style.app.border}"
+    logo-style = 
+        width: "30px"
+        margin-left: "10px"
+    button-style=
+        color: style.app.text
+    subtitle-style =
+        margin-top: "-10px"
+    /* Action Listeners */
+    cancel = ->
+        go-to-home!
+    confirm = ->
+        store.connected-wallet.isConnecting = yes
+        chrome.tabs.query {
+            currentWindow: true
+            active: true
+        }, (tabs) ->
+            activeTab = tabs.0
+            response <- chrome.tabs.sendMessage activeTab.id, {'networks': store.connected-wallet.chosenAccounts}
+            console.log "response", response 
+            store.connected-wallet.isConnecting = no
+            go-to-home!
+        /* Force extension to close itself */ 
+        #open(location, '_self').close()
+    go-to-home = ->
+        store.connected-wallet.status.queried = no
+        navigate store, web3t, "wallets"
+    go-back = ->
+        store.connected-wallet.status.queried = yes
+        navigate store, web3t, "wallets"
+    /* * * * * * * * * * * * */
+    .pug.connect-wallets-final-step(key="wallets")
+        manage-account { store, web3t }
+        token-migration { store, web3t }
+        add-coin-page { store, web3t }
+        .connect-wallets-inner.pug(key="wallets-body")
+            .pug.goback(on-click=go-back)
+                img.icon-svg.pug(src="#{icons.arrow-left}" style=icon-color-style)
+            .container.pug
+                .head.pug
+                    h3.pug.site-to-connect Connect #{store.connected-wallet.site}        
+                        | to
+                        span.pug.account-count #{accounts-to-connnect} 
+                span.pug.trust-notification 
+                    | Allow this sites to:
+                ul.pug.permissions-list
+                    li.pug(key="permissions-item1") View the addresses of your permitted accounts
+                    li.pug(key="permissions-item2") Sign the transactions of your permitted accounts
+                .pug.confirmation
+                    .pug.buttons
+                        button.pug.button(on-click=cancel style=button-style id="prompt-close")
+                            span.cancel.pug
+                                img.icon-svg-cancel.pug(src="#{icons.close}")
+                                | #{lang.cancel}
+                        button.pug.button(on-click=confirm style=button-style id="connect-prompt-confirm" disabled=no)
+                            span.apply.pug
+                                img.icon-svg-apply.pug(src="#{icons.apply}")
+                                | Connect
+                if store.connected-wallet.isConnecting is yes then
+                    span.pug.entities-loader
+                        span.pug.inner-section
+                            h3.pug.item.blink Connecting...
+module.exports = connect-wallets

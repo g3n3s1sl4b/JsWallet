@@ -6,6 +6,7 @@ require! {
     \../pages/switch-account.ls
     \../navigate.ls
     \../pages/add-wallet.ls
+    \./connected-statusbar.ls : \statusbar
 }
 .header
     @import scheme
@@ -135,6 +136,7 @@ module.exports = (store, web3t)->
                 img.pug(src="#{icons.search}" style=icon-color)
             add-wallet { store, web3t }
         .right-side.pug(style=right-side)
+            statusbar {store}
             switch-account store, web3t
             if store.preference.lock-visible is yes
                 .menu-item.bottom.pug(on-click=lock style=icon-style)

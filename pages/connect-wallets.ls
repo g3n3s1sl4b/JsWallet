@@ -1,7 +1,8 @@
 require! {
     \react
-    \./wallet.ls
+    \./check-wallet.ls
     \prelude-ls : { map, take, drop }
+    \../seed.ls : seedmem
     \./menu.ls
     \../web3.ls
     \../wallets-funcs.ls
@@ -13,19 +14,71 @@ require! {
     \./history.ls
     \../icons.ls
     \./icon.ls
+    \../menu-funcs.ls
+    \../navigate.ls
+    \../components/switch-account.ls
     \../components/connected-statusbar.ls : \statusbar
-    \./popup-connected-wallets.ls
 }
-.wallet-mobile
+.connect-wallet
     $mobile: 425px
     $tablet: 800px
+    min-height: 100vh
     button.btn
         min-width: auto
         margin: 0
+    .container
+        margin: auto
+        margin-top: 30px
+        margin-bottom: 30px
+        @media(max-width: $mobile)
+            max-width: 600px
+        max-width: 85vh 
+        .trust-notification
+            font-size: 14px
+            opacity: 0.7
+            padding: 20px 10px 0px
+            display: block
+        .buttons
+            text-align: center
+            >.button
+                display: inline-block
+                cursor: pointer
+                height: 36px
+                width: 120px
+                font-weight: bold
+                font-size: 10px
+                text-transform: uppercase
+                border-radius: var(--border-btn)
+                border: 1px solid #CCC
+                margin: 15px 5px
+                padding: 0px 6px
+                background: transparent
+                text-overflow: ellipsis
+                overflow: hidden
+                white-space: nowrap
+                &.disabled
+                    opacity: 0.35
+                .apply
+                    vertical-align: middle
+                    margin-right: 2px
+                .cancel
+                    vertical-align: middle
+                    margin-right: 2px  
+                .icon-svg-apply
+                    position: relative
+                    height: 12px
+                    top: 2px
+                    margin-right: 3px
+                    filter: invert(23%) sepia(99%) saturate(1747%) hue-rotate(430deg) brightness(58%) contrast(175%)
+                .icon-svg-cancel
+                    position: relative
+                    height: 12px
+                    top: 2px
+                    margin-right: 3px
+                    filter: invert(22%) sepia(65%) saturate(7127%) hue-rotate(694deg) brightness(94%) contrast(115%)
     .your-account
         position: relative
         display: block
-        max-width: 450px
         border: 0 !important
         .tor
             right: 0px
@@ -40,7 +93,6 @@ require! {
             top: 10px
             @media(max-width: 480px)
                 right: -2px
-                top: 10px
     @media(max-width: 800px)
         margin-top: 0px
     .wallets
@@ -50,13 +102,16 @@ require! {
         $cards-height: 296px
         $pad: 20px
         $radius: 15px    
-        height: 395px
+        height: 100vh
+        overflow: auto
         box-sizing: border-box
-        position: relative
+        position: absolute
         left: 0
+        top: 0
+        bottom: 0
         $cards-pad: 15px
         right: 0
-        margin: 0 $cards-pad
+        margin: auto
         z-index: 2
         @media(max-width: $mobile)
             margin: 0
@@ -83,23 +138,18 @@ require! {
                 max-width: 450px
                 position: relative
         padding-top: 20px
-        >.wallet-container
+        .wallet-container
             overflow: hidden
             overflow-y: auto
             border-radius: 0 0 $border $border
-            max-height: 268px
-            height: 100%
-            max-width: 450px
+            max-height: 500px
             border-top: 1px solid #213040
-            display: inline-block
             @media(max-width: $mobile)
                 max-height: 100vh
                 height: auto
                 margin-bottom: 0px
             .wallet
                 background: var(--bg-secondary)
-                &:last-child
-                    margin-bottom: -1px
                 &.big
                     background: var(--bg-secondary)
             @media(max-width: $mobile)
@@ -153,7 +203,6 @@ require! {
             position: relative
             height: 10px
         .header
-            max-width: 450px
             margin: 0 auto
             border-left: 1px solid var(--border)
             border-right: 1px solid var(--border)
@@ -166,7 +215,6 @@ require! {
             box-sizing: border-box
             color: #A8BACB
             font-size: 14px
-            margin-top: 5px
             text-align: center
             position: relative
             display: inline-block
@@ -178,45 +226,18 @@ require! {
                         padding-right: 10px
             &.title-balance
                 display: none
-mobile = ({ store, web3t })->
-    return null if not store.current.account?
+connect-wallets = (store, web3t)->
+    return null if store.connected-wallet.status.queried is no
+    { current, open-account, lock, wallet-style, info, refresh, lock } = menu-funcs store, web3t
     { wallets, go-up, can-up, go-down, can-down } = wallets-funcs store, web3t
     style = get-primary-info store
     lang = get-lang store
-    border-style-w =
-        border: "1px solid #{style.app.border}"
-        background: "#{style.app.input}99"
-    border-style =
-        border-top: "1px solid #{style.app.border}"
-    row =
-        display: "flex"
-        height: "100vh"
-        margin-left: "60px"
-    left-side =
-        width: "45%"
-    right-side =
-        width: "55%"
-        border-left: "1px solid #{style.app.border}"
-    header-style =
-        border-top: "1px solid #{style.app.border}"
-        padding: "17px 0px 20px"
-        color: style.app.text
-        text-align: "left"
-    input=
-        background: style.app.wallet
-        border: "1px solid #{style.app.border}"
-        color: style.app.text
-    header-left =
-        margin-left: "10px"
-    border-right=
-        border-right: "1px solid #{style.app.border}"
     open-account = ->
         store.current.switch-account = not store.current.switch-account
     edit-account-name = ->
         store.current.edit-account-name = current-account-name!
     default-account-name = -> "Account #{store.current.account-index}"
     edit-account = (e)->
-        #console.log e
         store.current.edit-account-name = e.target.value
     done-edit = ->
         local-storage.set-item default-account-name!, store.current.edit-account-name
@@ -244,17 +265,89 @@ mobile = ({ store, web3t })->
                 icon "X", 20
     chosen-account-template =
         if store.current.edit-account-name is "" then view-account-template! else edit-account-template!
-    .pug.wallet-mobile(key="wallets")
-        statusbar { store }
-        menu { store, web3t }
+    /* Props */
+    button-disabled = 
+        | store.connected-wallet.chosenAccounts.length > 0 => false
+        | _ => true
+    button-disabled-class = if button-disabled then "disabled" else ""
+    /* Styles */
+    border-style-w =
+        border: "1px solid #{style.app.border}"
+        background: "#{style.app.input}99"
+    border-style =
+        border-top: "1px solid #{style.app.border}"
+    row =
+        display: "flex"
+        height: "100vh"
+        margin-left: "60px"
+    left-side =
+        width: "45%"
+    right-side =
+        width: "55%"
+        border-left: "1px solid #{style.app.border}"
+    header-style =
+        border-top: "1px solid #{style.app.border}"
+        padding: "17px 0px 20px"
+        color: style.app.text
+        text-align: "left"
+    input=
+        background: style.app.wallet
+        border: "1px solid #{style.app.border}"
+        color: style.app.text
+    header-left =
+        margin-left: "10px"
+    border-right=
+        border-right: "1px solid #{style.app.border}"
+    logo-style = 
+        width: "30px"
+        margin-left: "10px"
+    button-style=
+        color: style.app.text
+    subtitle-style =
+        margin-top: "-10px"
+    /* Action Listeners */
+    cancel = ->
+        go-to-home!
+    confirm = ->
+        navigate store, web3t, "connectwalletsfinalstep"
+    go-to-home = ->
+        store.connected-wallet.status.queried = no
+        navigate store, web3t, "wallets"
+    /* * * * * * * * * * * * */
+    .pug.connect-wallet(key="wallets")
+        #statusbar { store }
         manage-account { store, web3t }
         token-migration { store, web3t }
         add-coin-page { store, web3t }
-        popup-connected-wallets {store, web3t}
         .wallets.pug(key="wallets-body")
-            .header.pug(style=header-style)
-                span.pug.head.left.h1.hidden(style=header-left) #{lang.your-wallets}
-                chosen-account-template
-            .wallet-container.pug(key="wallets-viewport" style=border-style-w)
-                wallets |> map wallet store, web3t, wallets
-module.exports = mobile
+            .container.pug
+                .head.pug
+                    h3.pug.site-to-connect #{store.connected-wallet.site}
+                    h1.pug.header-title 
+                        | Connect with Velas
+                        span.pug.branding
+                            img.pug(src="#{info.branding.logo-sm}" style=logo-style)
+                h5.pug(style=subtitle-style) Select account(s)
+                .header.pug(style=header-style)
+                    span.pug.head.left.h1.hidden(style=header-left) #{lang.your-wallets}
+                    chosen-account-template
+                    switch-account store, web3
+                .wallet-container.pug(key="wallets-viewport" style=border-style-w)
+                    wallets |> map check-wallet store, web3t, wallets
+                span.pug.trust-notification 
+                    | Only connect with sites you trust.
+                .pug.confirmation
+                    .pug.buttons
+                        button.pug.button(on-click=cancel style=button-style id="prompt-close")
+                            span.cancel.pug
+                                img.icon-svg-cancel.pug(src="#{icons.close}")
+                                | #{lang.cancel}
+                        button.pug.button(class="#{button-disabled-class}" on-click=confirm style=button-style id="prompt-confirm" disabled=button-disabled)
+                            span.apply.pug
+                                img.icon-svg-apply.pug(src="#{icons.apply}")
+                                | #{lang.confirm}
+connect-wallets.init = ({ store, web3t }, cb)->
+    err <- web3t.init
+    store.current.page = "connectwallets"
+    cb null
+module.exports = connect-wallets
