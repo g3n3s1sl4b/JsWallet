@@ -38,6 +38,8 @@ require! {
     \./pages/util.ls
     \./pages/poolchoosing.ls
     \./pages/stake/account_details.ls
+    \./pages/connect-wallets.ls : "connectwallets"
+    \./pages/connect-wallets-final-step.ls : "connectwalletsfinalstep"
 }
 is-in-iframe = window != window.parent
 if is-in-iframe
@@ -56,7 +58,11 @@ if is-in-iframe
     export newseedrestore
     export restorewords
     export reviewwords
+    export connectwallets 
+    export connectwalletsfinalstep   
 else
+    export connectwalletsfinalstep 
+    export connectwallets    
     export offlinewallets
     export downloadwallet
     export monitor

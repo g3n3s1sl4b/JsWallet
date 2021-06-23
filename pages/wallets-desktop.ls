@@ -274,19 +274,9 @@ mobile = ({ store, web3t })->
         header store, web3t
         .pug.left-side(style=row)
             .pug(style=left-side)
-                if no
-                    menu { store, web3t }
-                if no
-                    manage-account { store, web3t }
-                    token-migration { store, web3t }
                 add-coin-page { store, web3t }
                 popup-connected-wallets { store, web3t }
                 .wallets.hide-detail.pug(key="wallets-body")
-                    if no
-                        .header.pug(style=header-style)
-                            span.pug.head.left.h1.hidden(style=header-left) #{lang.your-wallets}
-                            chosen-account-template
-                            your-account store, web3t
                     .wallet-container.pug(key="wallets-viewport")
                         wallets
                             |> filter ({coin}) -> ((coin.name + coin.token).to-lower-case!.index-of store.current.search.to-lower-case!) != -1

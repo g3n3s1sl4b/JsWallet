@@ -8,6 +8,7 @@ require! {
     \./icon.ls
     \../icons.ls
     \../../web3t/providers/superagent.ls : { get }
+    \../navigate.ls
 }
 .manage-connected-wallets   
     @import scheme
@@ -42,25 +43,31 @@ require! {
         height: 65vh
         overflow: hidden
         box-shadow: 17px 10px 13px #0000001f, -6px 10px 13px #00000024
-        >.title
+        .closed
             position: absolute
+            z-index: 3
+            padding: 10px 20px
+            font-size: 20px
+            right: 0
+            top: 0
+            cursor: pointer
+            &:hover
+                color: #CCC
+        .account-body-inner
+            margin: auto
+            position: absolute
+            top: 0
+            bottom: 0
+            left: 0
+            right: 0
+            padding: 20px
+        .title
             z-index: 999
             top: 0
             box-sizing: border-box
             width: 100%
-            height: 100px
             color: gray
             font-size: 22px
-            padding: 10px
-            .closed
-                position: absolute
-                padding: 10px 20px
-                font-size: 20px
-                right: 0
-                top: 0
-                cursor: pointer
-                &:hover
-                    color: #CCC
             .search-content
                 position: relative
                 padding: 0 10px
@@ -82,9 +89,9 @@ require! {
                     position: absolute
                     @media (max-width: 580px)
                         left: 10px
-        >.settings
-            padding-top: 90px
-            padding-bottom: 90px
+        .settings
+            padding-top: 0px
+            padding-bottom: 30px
             height: calc(65vh - 180px)
             overflow-y: scroll
             .section
@@ -155,20 +162,35 @@ require! {
                                 width: 15px    
                             >*
                                 vertical-align: middle
+        .extra-button    
+            display: inline-block
+            cursor: pointer
+            padding: 10px
+            width: auto
+            font-weight: bold
+            font-size: 10px
+            text-transform: uppercase
+            border-radius: var(--border-btn)
+            border: 1px solid #CCC
+            margin: 15px 5px
+            background: transparent
+            text-overflow: ellipsis
+            overflow: hidden
+            white-space: nowrap
+            margin-top: 40px
 create-item = ({ store, web3t }, item)-->
-    console.log "item" item
     extension-disconnect = ->
-        (store.connected-wallet.chosenAccounts).splice(store.connected-wallet.chosenAccounts.index-of(item), 1)      
-        store.connected-wallet.openStatusBarPopup = no
-        chrome.tabs.query {
-            currentWindow: true
-            active: true
-        }, (tabs) ->
-            activeTab = tabs.0
-            response <- chrome.tabs.sendMessage activeTab.id, {'networks': store.connected-wallet.chosenAccounts}
-            console.log "response", response 
+        whom = store.connected-wallet.activeTab
+        return if not whom?
+        /* Get current opened tab origin */ 
+        origin = store.connected-wallet.origin 
+        chosenAccounts = store.connected-wallet.connected-sites["#{origin}"] ? [] 
+        chosenAccounts.splice(chosenAccounts.index-of(item), 1)      
+        tabs <- chrome.tabs.query {currentWindow: true, active: true}
+        activeTab = tabs?0
+        response <- chrome.tabs.sendMessage whom, {'networks': chosenAccounts}
+        console.log "response", response 
     wallet = store.current.account.wallets |> find (-> it.coin.token is item)
-    console.log "wallet" wallet 
     {name, image} = wallet.coin    
     title = "#{name}"
     style = get-primary-info store
@@ -201,18 +223,32 @@ module.exports = ({ store, web3t } )->
         color: style.app.text
         background: style.app.input
         border: "0"
-    site = store.connected-wallet.site    
-    connected-number = store.connected-wallet.chosenAccounts.length    
+    button-style =
+        border: "1px solid #{style.app.text}"
+        color: style.app.text
+    site = store.connected-wallet.site 
+    origin = store.connected-wallet.origin  
+    chosenAccounts = store.connected-wallet.connected-sites["#{origin}"] ? []  
+    connected-number = chosenAccounts.length 
+    go-to-manual-connect = ->
+        store.connected-wallet.status.queried = yes      
+        navigate store, web3t, "connectwallets"   
     .pug.manage-connected-wallets
         .account-body.pug(style=account-body-style)
-            .pug.title(style=color)
-                .pug
-                    .pug #{site}
-                    h4.pug You have #{connected-number} accounts connected to this site.   
-                    .pug.closed(on-click=close)
-                        icon \X, 20             
-            .pug.settings
-                .pug.section
-                    .list.pug
-                        store.connected-wallet.chosenAccounts
-                            |> map create-item { store, web3t }
+            .pug.closed(on-click=close)
+                icon \X, 20   
+            .account-body-inner.pug
+                .pug.title(style=color)
+                    .pug
+                        .pug #{site}
+                        h6.pug You have #{connected-number} wallet(s) connected to this site.   
+                .pug.settings
+                    .pug.section
+                        if chosenAccounts.length <= 0
+                            .pug
+                                .pug Velas is not connected this site.\nTo connect site to a web3t, find the connect button on their site.\n\nOr you can manually connect current site.
+                                .extra-button.pug(on-click=go-to-manual-connect style=button-style) Manually connect
+                        else
+                            .list.pug
+                                chosenAccounts
+                                    |> map create-item { store, web3t }

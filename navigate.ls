@@ -16,6 +16,7 @@ init-flow = (prev)->
     return \terms if prev is \verifyseed
     return \choosestaker if prev is \choosestaker-pool
     #return \chooseinit if not saved!
+    return \connectwallets if store.connected-wallet.status.queried is yes
     \wallets
 get-page = (store, page, prev) ->
     return page if page isnt \:init
@@ -47,6 +48,7 @@ module.exports = (store, web3t, page, ask-pin, cb) !->
                 store.pages.splice(-(store.pages.length - index), 1)
             store.pages.push(page) 
     store.pages = [\wallets] if page is \wallets
+    store.pages = [\connectwallets] if page is \connectwallets
     prev = store.current.page
     store.current.page = \loading
     store.current.loading = yes

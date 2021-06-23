@@ -17,7 +17,7 @@ require! {
     \../menu-funcs.ls
     \../navigate.ls
     \../components/switch-account.ls
-    \../components/connected-statusbar.ls : \statusbar
+    \../components/checkbox.ls
 }
 .connect-wallet
     $mobile: 425px
@@ -118,6 +118,10 @@ require! {
             height: calc(100vh - 100px)
         >*
             width: 100%
+        .select-all-checkbox
+            margin-left: 10px
+            input:checked + .track
+                background-color: #7081d8
         >.arrow
             position: absolute
             text-align: center
@@ -203,11 +207,18 @@ require! {
             position: relative
             height: 10px
         .header
+            display: flex
+            align-items: center
             margin: 0 auto
             border-left: 1px solid var(--border)
             border-right: 1px solid var(--border)
             @media(max-width: $mobile)
                 border: 0
+            .head
+                margin-left: 10px
+                flex: 2
+            .switch-account
+                flex: 1
     .wallet
         .wallet-middle
             width: 100%
@@ -226,7 +237,7 @@ require! {
                         padding-right: 10px
             &.title-balance
                 display: none
-connect-wallets = (store, web3t)->
+connect-wallets = ({store, web3t})->
     return null if store.connected-wallet.status.queried is no
     { current, open-account, lock, wallet-style, info, refresh, lock } = menu-funcs store, web3t
     { wallets, go-up, can-up, go-down, can-down } = wallets-funcs store, web3t
@@ -267,9 +278,15 @@ connect-wallets = (store, web3t)->
         if store.current.edit-account-name is "" then view-account-template! else edit-account-template!
     /* Props */
     button-disabled = 
-        | store.connected-wallet.chosenAccounts.length > 0 => false
+        | store.connected-wallet.tempChosenAccounts.length > 0 => false
         | _ => true
     button-disabled-class = if button-disabled then "disabled" else ""
+    allAreChecked = store.connected-wallet.tempChosenAccountsAllChecked
+    wallets_keys = wallets |> map (-> it.coin.token)
+    tempChosenAccounts = store.connected-wallet.tempChosenAccounts
+    allCheckedValue = 
+        | (allAreChecked is yes) => 'all' 
+        | _ => null   
     /* Styles */
     border-style-w =
         border: "1px solid #{style.app.border}"
@@ -307,31 +324,39 @@ connect-wallets = (store, web3t)->
         margin-top: "-10px"
     /* Action Listeners */
     cancel = ->
+        store.connected-wallet.tempChosenAccounts = []
         go-to-home!
     confirm = ->
         navigate store, web3t, "connectwalletsfinalstep"
     go-to-home = ->
         store.connected-wallet.status.queried = no
         navigate store, web3t, "wallets"
+    on-change = -> 
+        store.connected-wallet.tempChosenAccountsAllChecked = !store.connected-wallet.tempChosenAccountsAllChecked  
+        if store.connected-wallet.tempChosenAccountsAllChecked is yes     
+            store.connected-wallet.tempChosenAccounts = wallets_keys
+        else 
+            store.connected-wallet.tempChosenAccounts = [] 
     /* * * * * * * * * * * * */
     .pug.connect-wallet(key="wallets")
-        #statusbar { store }
         manage-account { store, web3t }
         token-migration { store, web3t }
         add-coin-page { store, web3t }
         .wallets.pug(key="wallets-body")
             .container.pug
                 .head.pug
-                    h3.pug.site-to-connect #{store.connected-wallet.site}
+                    h3.pug.site-to-connect #{store.connected-wallet.origin }
                     h1.pug.header-title 
                         | Connect with Velas
                         span.pug.branding
                             img.pug(src="#{info.branding.logo-sm}" style=logo-style)
-                h5.pug(style=subtitle-style) Select account(s)
+                h5.pug(style=subtitle-style) Select wallet(s)
                 .header.pug(style=header-style)
-                    span.pug.head.left.h1.hidden(style=header-left) #{lang.your-wallets}
+                    .pug.select-all-checkbox
+                        checkbox { store, on-change, value="#{allCheckedValue}" checked=allAreChecked, disabled=no }
+                    span.pug.head.left.h1.hidden(style=header-left) All #{lang.your-wallets}
                     chosen-account-template
-                    switch-account store, web3
+                    switch-account store, web3t
                 .wallet-container.pug(key="wallets-viewport" style=border-style-w)
                     wallets |> map check-wallet store, web3t, wallets
                 span.pug.trust-notification 
@@ -347,7 +372,30 @@ connect-wallets = (store, web3t)->
                                 img.icon-svg-apply.pug(src="#{icons.apply}")
                                 | #{lang.confirm}
 connect-wallets.init = ({ store, web3t }, cb)->
+    console.log "1. [init]"
+    delete store.current.send?wallet
+    store.current.send?tx-type = \regular
+    store.current.send.is-swap = no
+    store.current.send.chosen-network = null
+    console.log "We do not have account" if not store.current.account? 
+    #return cb null if store.current.account?
+    #TODO: fix this seedmem.get! but before need to ask users to make backup wallets
+    seedmem.mnemonic = seedmem.get!
     err <- web3t.init
-    store.current.page = "connectwallets"
+    #console.log err
+    /* Set chosen previously accounts */ 
+    origin = store.connected-wallet.origin
+    console.log "Get origin: " origin 
+    chosenAccounts = 
+        | store.connected-wallet.connectedSites["#{origin}"]? => [...store.connected-wallet.connectedSites["#{origin}"]]
+        | _ => []
+    #chosenAccounts = [...store.connected-wallet.chosenAccounts]
+    store.connected-wallet.tempChosenAccounts = chosenAccounts
     cb null
+connect-wallets.focus = ({ store, web3t }, cb)->
+    console.log "2. [focus]"
+    #err <- web3t.refresh   
+    err <- web3t.refresh-balances
+    err <- web3t.refresh-interface
+    cb err
 module.exports = connect-wallets

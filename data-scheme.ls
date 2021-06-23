@@ -236,6 +236,7 @@ store =
         applied: []
     releases: []
     connected-wallet: 
+        activeTab: null    
         isConnecting: no
         isConnected: no
         status:
@@ -244,8 +245,12 @@ store =
             connected: no
         connected-site: []
         chosenAccounts: []
-        openStatusBarPopup: no    
-        site: ""   
+        tempChosenAccounts: []
+        openStatusBarPopup: no
+        tempChosenAccountsAllChecked: no    
+        site: ""
+        origin: ""  
+        connectedSites: {} 
     current:
         transactions-are-loading: no
         address-suffix: ''

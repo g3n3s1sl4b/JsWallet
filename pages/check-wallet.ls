@@ -1,7 +1,7 @@
 require! {
     \react
     \../tools.ls : { money }
-    \prelude-ls : { each, find }
+    \prelude-ls : { each, find, map }
     \../wallet-funcs.ls
     \../get-lang.ls
     \./icon.ls
@@ -86,7 +86,7 @@ require! {
             font-size: 14px
             text-align: left
         span
-            padding-left: 10px
+            padding-left: 40px
         a
             text-align: left
     .wallet-top
@@ -253,15 +253,21 @@ module.exports = (store, web3t, wallets, wallet)-->
     makeDisabled = store.current.refreshing
     wallet-is-disabled  = isNaN(wallet.balance)
     is-loading = store.current.refreshing is yes
-    account-index = store.connected-wallet.chosenAccounts.index-of(token)
+    account-index = store.connected-wallet.tempChosenAccounts.index-of(token)
     disabled-class = if not is-loading and wallet-is-disabled then "disabled-wallet-item" else ""
-    value = store.connected-wallet.chosenAccounts[account-index] ? null
+    value = store.connected-wallet.tempChosenAccounts[account-index] ? null
     isChecked = value?
+    wallets_keys = wallets |> map (-> it.coin.token)
+    tempChosenAccounts = store.connected-wallet.tempChosenAccounts
     on-change = ->
+        console.log "[Check wallet on-change]"         
         if account-index > -1
-            store.connected-wallet.chosenAccounts.splice(account-index, 1)
+            store.connected-wallet.tempChosenAccounts.splice(account-index, 1)
         else
-            store.connected-wallet.chosenAccounts.push(token)
+            store.connected-wallet.tempChosenAccounts.push(token)
+        store.connected-wallet.tempChosenAccountsAllChecked = 
+            | wallets_keys.length is tempChosenAccounts.length => yes 
+            | _ => no   
     .wallet.pug.wallet-item(class="big" key="#{token}" style=border-style)
         .wallet-top.pug
             .top-left.pug(style=wallet-style)

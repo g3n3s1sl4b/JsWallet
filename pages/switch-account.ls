@@ -3,7 +3,7 @@ require! {
     \./wallet.ls
     \prelude-ls : { map, take, drop, filter }
     \./menu.ls
-    #\../web3.ls
+    \../web3.ls
     \../wallets-funcs.ls
     #\./manage-account.ls
     #\./token-migration.ls

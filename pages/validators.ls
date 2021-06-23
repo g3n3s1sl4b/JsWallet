@@ -839,15 +839,6 @@ validators = ({ store, web3t })->
             epoch store, web3t
             switch-account store, web3t
         staking-content store, web3t
-get-async-accounts = (owner, cb)->
-    #cb = console.log 
-    <- set-timeout _, 1
-    on-progress = ->
-        store.staking.accounts = convert-accounts-to-view-model [...it]
-    err, result <- query-accounts store, web3t, owner, on-progress
-    return cb err if err?
-    store.staking.accounts = convert-accounts-to-view-model result
-    cb null
 stringify = (value) ->
     if value? then
         round-human(parse-float value `div` (10^18))
@@ -901,13 +892,11 @@ validators.init = ({ store, web3t }, cb)!->
     #parsedProgramAccounts = [] if err?
     #store.staking.parsedProgramAccounts = parsedProgramAccounts
     # get validators array
-#    on-progress = ->
-#        store.staking.accounts = convert-accounts-to-view-model [...it]
-    err <- get-async-accounts(wallet.publicKey)
+    on-progress = ->
+        store.staking.accounts = convert-accounts-to-view-model [...it]
+    err, result <- query-accounts store, web3t, on-progress
     return cb err if err?
-#    err, result <- query-accounts store, web3t, on-progress
-#    return cb err if err?
-#    store.staking.accounts = convert-accounts-to-view-model result
+    store.staking.accounts = convert-accounts-to-view-model result
     # Normalize currrent page for accounts in pagination
     type = "accounts"
     page = store.staking["current_#{type}_page"] ? 1
@@ -920,9 +909,6 @@ validators.init = ({ store, web3t }, cb)!->
     return cb err if err?
     store.staking.pools = convert-pools-to-view-model pools
         |> sort-by (-> it.myStake.length ) |> reverse 
-    err <- get-my-stakes(store, store.staking.accounts, store.staking.pools)
-    return cb err if err?
-    convert-pools-to-view-model store.staking.pools 
     store.staking.poolsFiltered = store.staking.pools
     store.staking.getAccountsFromCashe = no
     err <- calc-certain-wallet(store, "vlx_native")

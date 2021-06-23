@@ -62,7 +62,6 @@ require! {
     position: relative
     color: white
     text-align: center
-    width: 100vw
     .icon-svg
         position: relative
         height: 12px

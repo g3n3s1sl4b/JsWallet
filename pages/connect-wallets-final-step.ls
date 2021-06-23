@@ -280,13 +280,13 @@ connect-wallets = ({ store, web3t })->
     lang = get-lang store
     /* Props */
     accounts-to-connnect = 
-        | store.connected-wallet.chosenAccounts.length is store.current.account.wallets.length =>
-            "all your accounts"
+        | store.connected-wallet.tempChosenAccounts.length is store.current.account.wallets.length =>
+            "all your wallets of account"
         | _ => 
             ending = 
-                | store.connected-wallet.chosenAccounts.length > 1 => "s"
+                | store.connected-wallet.tempChosenAccounts.length > 1 => "s"
                 | _ => ""
-            accs = store.connected-wallet.chosenAccounts |> map (-> it.to-upper-case!) |> join (", ")
+            accs = store.connected-wallet.tempChosenAccounts |> map (-> it.to-upper-case!) |> join (", ")
             "#{accs} account#{ending}" 
     /* Styles */
     icon-color-style=
@@ -327,18 +327,24 @@ connect-wallets = ({ store, web3t })->
         margin-top: "-10px"
     /* Action Listeners */
     cancel = ->
+        store.connected-wallet.tempChosenAccounts = []
         go-to-home!
     confirm = ->
+        whom = store.connected-wallet.activeTab
+        return if not whom?
+        /* Check if origin in the conected-sites array */ 
+        origin = store.connected-wallet.origin
+        store.connected-wallet.chosenAccounts = [ ...store.connected-wallet.tempChosenAccounts ]
         store.connected-wallet.isConnecting = yes
-        chrome.tabs.query {
-            currentWindow: true
-            active: true
-        }, (tabs) ->
-            activeTab = tabs.0
-            response <- chrome.tabs.sendMessage activeTab.id, {'networks': store.connected-wallet.chosenAccounts}
-            console.log "response", response 
-            store.connected-wallet.isConnecting = no
-            go-to-home!
+        /* Add networks for origin */
+        store.connected-wallet.connected-sites["#{origin}"] = store.connected-wallet.chosenAccounts  
+        tabs <- chrome.tabs.query { currentWindow: true active: true }
+        activeTab = tabs?0
+        console.log "activeTab browser" activeTab
+        response <- chrome.tabs.sendMessage whom, {'networks': store.connected-wallet.chosenAccounts, method: "inject-chosen-accounts"}
+        console.log "confirm response", response 
+        store.connected-wallet.isConnecting = no
+        go-to-home!
         /* Force extension to close itself */ 
         #open(location, '_self').close()
     go-to-home = ->
@@ -363,8 +369,8 @@ connect-wallets = ({ store, web3t })->
                 span.pug.trust-notification 
                     | Allow this sites to:
                 ul.pug.permissions-list
-                    li.pug(key="permissions-item1") View the addresses of your permitted accounts
-                    li.pug(key="permissions-item2") Sign the transactions of your permitted accounts
+                    li.pug(key="permissions-item1") View the addresses of your permitted account
+                    li.pug(key="permissions-item2") Sign the transactions of your permitted account
                 .pug.confirmation
                     .pug.buttons
                         button.pug.button(on-click=cancel style=button-style id="prompt-close")

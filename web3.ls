@@ -34,16 +34,29 @@ show-cases = (store, [title, ...titles], cb)->
     <- set-timeout _, 1000
     <- show-cases store, titles
     return cb null
-build-get-balance = (store, coin)-> (cb)->
+build-get-tx-history = (store, coin)-> (cb)->
+    console.log "[web3.ls build-get-balance]" coin
     network = coin[store.current.network]
-    { wallet } = coin
+    wallet = store.current.account.wallets |> find (.coin.token is coin.token)
+    console.log "{params}:" { coin.token, network, wallet.address }
     get-balance { coin.token, network, wallet.address }, cb
+build-get-balance = (store, coin)-> (cb)->
+    console.log "Callback:" cb
+    return "Error: cb not defined" if not cb?
+    console.log "[web3.ls build-get-balance]" coin
+    network = coin[store.current.network]
+    wallet = store.current.account.wallets |> find (.coin.token is coin.token)
+    console.log "{params}:" { coin.token, network, wallet.address }
+    err, balance <- get-balance { coin.token, network, wallet.address }
+    return cb err if err?
+    return cb null, balance
 build-unlock = (store, cweb3)-> (cb)->
     return cb null if store.page is \locked
     err, data <- wait-form-result \unlock
     return cb err if err?
     cb null, data
 build-send-transaction = (store, cweb3, coin)-> (tx, cb)->
+    console.log "[web3.ls build-send-transaction]" cb
     network = coin[store.current.network]
     return cb "Transaction is required" if typeof! tx isnt \Object
     { to, data, decoded-data, value, gas, amount, gas-price, swap } = tx
@@ -135,7 +148,7 @@ get-apis = (cweb3, store, cb)->
             |> map -> [it.token, build-api(store, cweb3, it)]
             |> pairs-to-obj
     cb null, res
-refresh-apis = (cweb3, store, cb)->
+export refresh-apis = (cweb3, store, cb)->
     store.coins |> map (.token) |> each (-> delete cweb3[it])
     cweb3.velas = velas-api store
     #console.log \refresh-apis,
@@ -170,6 +183,7 @@ module.exports = (store, config)->
     cweb3 = {}
     #velas-web3
     refresh-timer = config?refresh-timer
+    console.log "refresh-timer" config
     use = build-use cweb3, store
     install = build-install cweb3, store
     install-quick = build-quick-install cweb3, store
@@ -190,7 +204,8 @@ module.exports = (store, config)->
         return cb err if err?
         cb null
     refresh-page = (cb)->
-        return cb null if store.current.page in  <[ wallets ]>
+        console.log "[refresh-page]"
+        return cb null if store.current.page in  <[ wallets connectwallets ]>
         page = pages[store.current.page]
         return cb null if not page?
         return cb null if typeof! page.init isnt \Function
@@ -204,6 +219,50 @@ module.exports = (store, config)->
         err <- refresh-balances
         return cb err if err?
         refresh-page cb
+    injectedNetworks = (data, cb)->
+        console.log "[injectedNetworks] data" data  
+        { sender, origin } = data
+        strip-origin = (addr)->
+            protocol = (addr + "").split("://").0 + "://"
+            url = (addr + "").split("://").1    
+            origin = url.split("/").0
+            { site: protocol + origin, origin } 
+        {site, origin} = strip-origin(origin)   
+        store.connected-wallet.origin = origin
+        store.connected-wallet.site = site
+        store.connected-wallet.activeTab = sender
+        # Check if origin who queried available networks is in connected-site array
+        console.log "store.connected-wallet" store.connected-wallet  
+        responseArray = store.connected-wallet.connectedSites["#{origin}"] ? []
+        wallets_keys = 
+            | store.current.account? =>
+                store.current.account.wallets |> map (-> it.coin.token)
+            | _ => []
+        store.connected-wallet.tempChosenAccountsAllChecked = 
+            | wallets_keys.length > 0 and wallets_keys.length is responseArray.length => yes 
+            | _ => no  
+        /* Update temporary chosen wallets for import  */
+        store.connected-wallet.tempChosenAccounts = responseArray
+        /* Update chosen acccounts for wallet for certain domain */
+        store.connected-wallet.chosenAccounts = responseArray    
+        tabs <- chrome.tabs.query { currentWindow: true active: true }
+        activeTab = tabs?0
+        response <- chrome.tabs.sendMessage sender, { networks: responseArray }
+        console.log "Extension response sent", response 
+        cb null
+    /* [Extension] Open choose accounts to import screen initiated by client. */
+    injectAccounts = (data, cb)->
+        whom = store.connected-wallet.activeTab
+        return cb "active client`s Tab was not defined" if not whom?
+        console.log "[injectedAccounts] data" data
+        store.connected-wallet.status.queried = yes
+        navigate store, cweb3, \connectwallets
+        /* Send response */
+        #tabs <- chrome.tabs.query { currentWindow: true active: true }
+        #activeTab = tabs?0
+        #response <- chrome.tabs.sendMessage whom, {"myResponse": "Response from extension"}
+        #console.log "confirm response", response 
+        cb null
     set-theme = (it)!->
         return if it not in supported-themes
         store.theme = it
@@ -225,5 +284,5 @@ module.exports = (store, config)->
     refresh-interface ->
     web3 = new Web3!
     velas = velas-api store
-    cweb3 <<<< { velas, web3.utils, unlock, set-preference, get-supported-tokens, use, refresh, lock, init, install, uninstall, install-by-name, naming, get-account-name, set-theme, set-lang, install-quick }
+    cweb3 <<<< { velas, injectedNetworks, refresh-balances, refresh-interface, injectAccounts, web3.utils, unlock, set-preference, get-supported-tokens, use, refresh, lock, init, install, uninstall, install-by-name, naming, get-account-name, set-theme, set-lang, install-quick }
     cweb3
