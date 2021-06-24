@@ -298,7 +298,7 @@ require! {
                                         left: 50px
                                         opacity: .8
                                         font-size: 10px
-                                        top: 14px
+                                        top: 16px
                                         font-weight: bold 
                             .circle
                                 border-radius: 0px
@@ -932,7 +932,13 @@ validators.init = ({ store, web3t }, cb)!->
     err, pools <- query-pools {store, web3t, on-progress}
     return cb err if err?
     store.staking.pools = convert-pools-to-view-model pools
-        |> sort-by (-> it.myStake.length ) |> reverse 
+        |> sort-by (-> it.myStake.length )
+    delinquent = store.staking.pools |> filter (-> it.status is "delinquent")
+    running = store.staking.pools
+        |> filter (it)->
+            delinquent.index-of(it) < 0
+        |> reverse
+    store.staking.pools = running ++ delinquent
     store.staking.poolsFiltered = store.staking.pools
     store.staking.getAccountsFromCashe = no
     err <- calc-certain-wallet(store, "vlx_native")
