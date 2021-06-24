@@ -281,6 +281,8 @@ require! {
                                 color: orange
                             &.banned
                                 color: red
+                            .inner-address-holder
+                                text-align: left !important 
                             &.validator-item                
                                 &.delinquent
                                     .inner-address-holder
@@ -288,7 +290,6 @@ require! {
                                             content: "Delinquent"
                                             color: #e84444
                                 .inner-address-holder
-                                    text-align: left !important 
                                     overflow: visible
                                     &:after
                                         content: "Running"
