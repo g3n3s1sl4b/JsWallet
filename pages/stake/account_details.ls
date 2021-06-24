@@ -35,7 +35,7 @@ require! {
     \../../seed.ls : seedmem
     \../../components/burger.ls
     \./error-funcs.ls : { get-error-message }
-    \./rewards-stats.ls
+    \./rewards-stats.ls : RewardsStats
 }
 .staking
     @import scheme
@@ -50,6 +50,26 @@ require! {
     box-sizing: border-box
     padding: 0px
     background: transparent
+    @keyframes blink-animation
+        50%
+            opacity: 0.3
+    @-webkit-keyframes blink-animation
+        50%
+            opacity: 0.3
+    .blink
+        animation: 1s linear blink-animation  infinite
+        -webkit-animation: 1s linear blink-animation  infinite
+    .entities-loader
+        position: absolute;
+        top: 0
+        bottom: 0
+        left: 0
+        right: 0
+        background: rgba(12, 12, 39, 0.79)
+        display: flex
+        align-items: center
+        .inner-section
+            margin: auto
     .syncing
         -webkit-mask-image: linear-gradient(90deg, rgba(255, 255, 255, 0.6) 0%, #000000 50%, rgba(255, 255, 255, 0.6) 70%)
         -webkit-mask-size: 50%
@@ -134,6 +154,7 @@ require! {
         position: relative
         box-sizing: border-box
         .table-scroll
+            position: relative
             overflow-x: scroll
             background: linear-gradient(var(--color1) 30%, rgba(50,18,96, 0)), linear-gradient(rgba(50,18,96, 0), var(--color1) 70%) 0 100%, radial-gradient(farthest-side at 50% 0, var(--color2), rgba(0,0,0,0)), radial-gradient(farthest-side at 50% 100%, var(--color2), rgba(0,0,0,0)) 0 100%
             background-repeat: no-repeat
@@ -143,6 +164,7 @@ require! {
             -moz-transition: breathe 3s ease-in infinite
             -web-kit-transition: breathe 3s ease-in infinite
             height: auto
+            min-height: 200px
             max-height: 400px
             .stake-pointer
                 background: rgb(37, 87, 127)
@@ -639,6 +661,68 @@ to-keystore = (store, with-keystore)->
     { staking, mining, password }
 show-validator = (store, web3t)-> (validator)->
     li.pug #{validator}
+Rewards = (props)->
+    lang = get-lang store
+    style = get-primary-info store
+    account = store.staking.chosenAccount
+    activationEpoch = account.account?data?parsed?info?stake?delegation?activationEpoch
+    [rewards, setRewards] = react.useState([])
+    [isLoading, setLoading] = react.useState(true)
+    build-rewards = (item)->
+        {
+            epoch
+            rewardSlot
+            amount
+            newBalance
+            percentChange
+            apr
+        } = item
+        return null if epoch is store.staking.current-epoch   
+        $amount = amount `div` (10^9)
+        $newBalance = newBalance `div` (10^9)
+        if store.staking.current-epoch is epoch then
+            rewardSlot = $amount = $newBalance = percentChange = apr =  "Loading..."
+        $class = if epoch is store.staking.current-epoch then "syncing" else ""
+        $tr-class = if epoch is store.staking.current-epoch then "current-epoch " else ""
+        tr.pug(key="epoch#{epoch}" class="#{$tr-class}")
+            td.pug(class="#{$class}") #{epoch}
+            td.pug(class="#{$class}") #{rewardSlot}
+            td.pug(class="#{$class}") #{$amount}
+            td.pug(class="#{$class}") #{$newBalance}
+            td.pug(class="#{$class}") #{percentChange}
+            td.pug(class="#{$class}") #{apr}
+    staker-pool-style =
+        max-width: 200px
+        background: style.app.stats
+    stats=
+        background: style.app.stats
+    react.useEffect (->
+        err, $rewards <- fetchEpochRewards(account.address, activationEpoch)
+        setLoading(no)
+        setRewards($rewards)
+        store.staking.chosenAccount.rewards = rewards
+        return ), []
+    .pug.section.rewards
+        .title.pug
+            h2.pug #{lang.uRewards}
+        .pug.table-scroll
+            if isLoading then
+                span.pug.entities-loader
+                    span.pug.inner-section
+                        h3.pug.item.blink Loading... 
+            else        
+                table.pug
+                    thead.pug
+                        tr.pug
+                            td.pug(width="3%" style=staker-pool-style title="Epoch") #{lang.epoch} (?)
+                            td.pug(width="25%" style=stats title="Reward Slot") Reward Slot (?)
+                            td.pug(width="25%" style=stats title="Amount") #{lang.amount} (?)
+                            td.pug(width="25%" style=stats title="New Balance") #{lang.newBalance} (?)
+                            td.pug(width="7%" style=stats title="Percent Change") Percent Change (?)
+                            td.pug(width="7%" style=stats title="APR") APR (?)
+                    tbody.pug
+                        rewards |> map build-rewards 
+        RewardsStats.pug(rewards=rewards)
 staking-content = (store, web3t)->
     { go-back } = history-funcs store, web3t
     style = get-primary-info store
@@ -853,30 +937,7 @@ staking-content = (store, web3t)->
         | _ => store.staking.chosenAccount.status
     inactiveStakeLabel =
         | store.staking.chosenAccount.status is "activating" => lang.warminUp
-        | _ => lang.inactiveStake
-    build-rewards = (item)->
-        {
-            epoch
-            rewardSlot
-            amount
-            newBalance
-            percentChange
-            apr
-        } = item
-        return null if epoch is store.staking.current-epoch   
-        $amount = amount `div` (10^9)
-        $newBalance = newBalance `div` (10^9)
-        if store.staking.current-epoch is epoch then
-            rewardSlot = $amount = $newBalance = percentChange = apr =  "Loading..."
-        $class = if epoch is store.staking.current-epoch then "syncing" else ""
-        $tr-class = if epoch is store.staking.current-epoch then "current-epoch " else ""
-        tr.pug(key="epoch#{epoch}" class="#{$tr-class}")
-            td.pug(class="#{$class}") #{epoch}
-            td.pug(class="#{$class}") #{rewardSlot}
-            td.pug(class="#{$class}") #{$amount}
-            td.pug(class="#{$class}") #{$newBalance}
-            td.pug(class="#{$class}") #{percentChange}
-            td.pug(class="#{$class}") #{apr}
+        | _ => lang.inactiveStake   
     .pug.staking-content.delegate
         .pug.single-section.form-group(id="choosen-pull")
             .pug.section
@@ -1002,22 +1063,7 @@ staking-content = (store, web3t)->
                         else if store.staking.chosenAccount.status isnt \deactivating then
                             button { store, on-click: undelegate , type: \secondary , text: lang.to_undelegate, icon : \arrowLeft, classes: "action-undelegate" }
                         button { store, on-click: split-account , type: \secondary , text: lang.to_split, classes: "action-split", no-icon: yes }
-            .pug.section.rewards
-                .title.pug
-                    h2.pug #{lang.uRewards}
-                .pug.table-scroll
-                    table.pug
-                        thead.pug
-                            tr.pug
-                                td.pug(width="3%" style=staker-pool-style title="Epoch") #{lang.epoch} (?)
-                                td.pug(width="25%" style=stats title="Reward Slot") Reward Slot (?)
-                                td.pug(width="25%" style=stats title="Amount") #{lang.amount} (?)
-                                td.pug(width="25%" style=stats title="New Balance") #{lang.newBalance} (?)
-                                td.pug(width="7%" style=stats title="Percent Change") Percent Change (?)
-                                td.pug(width="7%" style=stats title="APR") APR (?)
-                        tbody.pug
-                            store.staking.chosenAccount.rewards |> map build-rewards 
-                rewards-stats {store, web3t}
+            Rewards.pug  
 account-details = ({ store, web3t })->
     lang = get-lang store
     { go-back } = history-funcs store, web3t
@@ -1049,6 +1095,7 @@ account-details = ({ store, web3t })->
     show-class =
         if store.current.open-menu then \hide else \ ""
     just-go-back = ->
+        store.staking.chosenAccount.stopLoadingRewards = yes
         store.staking.getAccountsFromCashe = yes
         go-back!    
     .pug.staking
@@ -1061,9 +1108,9 @@ account-details = ({ store, web3t })->
             switch-account store, web3t
         staking-content store, web3t
 account-details.init = ({ store, web3t }, cb)!->
-    console.log "account-details.init"
     account = store.staking.chosenAccount
     return null if not account?
+    store.staking.chosenAccount.stopLoadingRewards = no
     store.staking.chosenAccount.rewards = []
     stake-accounts = store.staking.parsedProgramAccounts
     err, epochInfo <- as-callback web3t.velas.NativeStaking.getCurrentEpochInfo()
@@ -1075,15 +1122,6 @@ account-details.init = ({ store, web3t }, cb)!->
         store.staking.chosenAccount.active_stake = stakeActivation.active
         store.staking.chosenAccount.inactive_stake = stakeActivation.inactive
     return alert store, err, cb if err?
-    # Get rewards per prev epoch
-    err, epochInfo <- as-callback web3t.velas.NativeStaking.getCurrentEpochInfo()
-    console.error err if err?
-    return cb null if err?
-    { epoch, blockHeight, slotIndex, slotsInEpoch, transactionCount } = epochInfo
-    prev-epoch = epoch `minus` 1
-    activationEpoch = store.staking.chosenAccount.account?data?parsed?info?stake?delegation?activationEpoch
-    err, rewards <- fetchEpochRewards(account.address, activationEpoch)
-    store.staking.chosenAccount.rewards = rewards
     cb null
 stringify = (value) ->
     if value? then
@@ -1110,7 +1148,8 @@ fetchEpochRewards = (address, activationEpoch, cb)->
 prev-epoch-data = {epoch_start_time: null, rewards: null, first_confirmed_block: null}
 # 
 query-rewards-loop = (address, activationEpoch, firstNormalSlot, slotsPerEpoch, slotsInEpoch, firstAvailableBlock, firstNormalEpoch, epoch, cb)->
-    return cb null, [] if epoch < (activationEpoch) or epoch < 0    
+    return cb null, [] if epoch < (activationEpoch) or epoch < 0
+    return cb null, [] if store.staking.chosenAccount.stopLoadingRewards is yes    
     # Get not skipped slot here!  
     err, firstSlotInEpoch <- get_first_slot_in_epoch(firstNormalSlot, slotsPerEpoch, slotsInEpoch, firstNormalEpoch, epoch)
     # Get first comfirmed block/slot in epoch
