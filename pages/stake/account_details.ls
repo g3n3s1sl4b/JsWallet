@@ -65,7 +65,6 @@ require! {
         bottom: 0
         left: 0
         right: 0
-        background: rgba(12, 12, 39, 0.79)
         display: flex
         align-items: center
         .inner-section
