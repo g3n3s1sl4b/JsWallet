@@ -1170,7 +1170,7 @@ query-rewards-loop = (address, activationEpoch, firstNormalSlot, slotsPerEpoch, 
     wallclock_epoch_duration =
         | not epoch_end_time? => 0 
         | _ => epoch_end_time `minus` epoch_start_time
-    wallclock_epochs_per_year = (SECONDS_PER_DAY * 365) `div` wallclock_epoch_duration 
+    wallclock_epochs_per_year = (SECONDS_PER_DAY * 365.25) `div` wallclock_epoch_duration 
     all-rewards = (prev-epoch-data.rewards ? [])
     rewards = 
         all-rewards 
