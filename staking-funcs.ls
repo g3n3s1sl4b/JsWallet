@@ -104,11 +104,11 @@ query-accounts = (store, web3t, on-progress, on-finish) ->
     store.staking.accountsCached[accountIndex] = accounts
     on-finish err, accounts
 query-accounts-web3t = (store, web3t, on-progress, on-finish) -> 
-    owner-wallet = store.current.account.wallets |> find(-> it.coin.token is "vlx_native")
-    owner = 
-        | owner-wallet? => owner-wallet.address
-        | _ => null    
-    err, parsedProgramAccounts <- as-callback web3t.velas.NativeStaking.getParsedProgramAccounts(owner)
+    #owner-wallet = store.current.account.wallets |> find(-> it.coin.token is "vlx_native")
+    #owner = 
+        #| owner-wallet? => owner-wallet.address
+        #| _ => null    
+    err, parsedProgramAccounts <- as-callback web3t.velas.NativeStaking.getParsedProgramAccounts(null)
     parsedProgramAccounts = [] if err?
     store.staking.parsedProgramAccounts = parsedProgramAccounts
     err, accs <- as-callback web3t.velas.NativeStaking.getOwnStakingAccounts(parsedProgramAccounts) 
