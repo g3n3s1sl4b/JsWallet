@@ -3,19 +3,18 @@ require! {
     \./math.ls : { div, times, plus, minus }
     \./round-human.ls
 }
-SIMULATION_COUNT = 14600
-EPOCHS_PER_YEAR = 1460
-VALIDATOR_COUNT = 19
 as-callback = (p, cb)->
     p.catch (err) -> cb err
     p.then (data)->
         cb null, data
 get-stakes-from-stakes-accounts = (store, item)->
+    console.log "store.staking.accounts", store.staking.accounts.length, item.votePubkey
     found = store.staking.accounts
         |> filter (it)->
             stake-data = it?account?data?parsed?info?stake?delegation
+            console.log "     not stake-data" if not stake-data?
             return no if not stake-data?
-            +stake-data.activationEpoch < +stake-data.deactivationEpoch and stake-data?voter is item.key
+            +stake-data.activationEpoch < +stake-data.deactivationEpoch and stake-data?voter is item.votePubkey
     stakes =
         | found.length > 0 =>
             found |> map (-> {seed: it.seed, item: it, stake: it.account?data?parsed?info?stake?delegation?stake})
@@ -44,8 +43,8 @@ fill-pools = ({ store, web3t, on-progress}, on-finish, [item, ...rest]) ->
                 it[1]
             |> foldl plus, 0
     item.delegators = store.staking.delegators[item.votePubkey] ? 0
-    stakes = get-stakes-from-stakes-accounts(store, item)
-    item.stakes = stakes
+    #stakes = get-stakes-from-stakes-accounts(store, item)
+    item.stakes = []
     on-progress [item, ...rest] if on-progress?
     on-finish-local = (err, pools) ->
         on-finish err, [item, ...pools]
@@ -184,6 +183,7 @@ convert-pools-to-view-model = (pools) ->
     pools
         |> map -> {
             address: it.key ? '..',
+            votePubkey: it.votePubkey
             balanceRaw: it.activatedStake,
             checked: no,
             stake: if it.stake? then it.stake else '..',
@@ -196,4 +196,37 @@ convert-pools-to-view-model = (pools) ->
             my-stake: if it?stakes then it.stakes else []
             credits_observed : it.credits_observed
         }
-module.exports = { query-pools, query-accounts, convert-accounts-to-view-model, convert-pools-to-view-model }
+
+get-my-stakes-from-stakes-accounts = (accounts, item)->
+    found = accounts
+        |> filter (it)->
+            stake-data = it?account?data?parsed?info?stake?delegation
+            console.log "     not stake-data" if not stake-data?
+            return no if not stake-data?
+            +stake-data.activationEpoch < +stake-data.deactivationEpoch and stake-data?voter is item.votePubkey
+    stakes =
+        | found.length > 0 =>
+            found |> map (-> {seed: it.seed, item: it, stake: it.account?data?parsed?info?stake?delegation?stake})
+        | _ => []
+    return stakes
+
+calc-my-stakes = (accounts, all-pools) ->
+    for i from 0 to all-pools.length - 1
+        pool = all-pools[i]
+        stakes = get-my-stakes-from-stakes-accounts(accounts, pool)
+        all-pools[i].stakes = stakes
+        all-pools[i].my-stake = stakes
+    return all-pools
+
+#calc-my-stakes = (store, pools, on-finish)->
+#    accounts = store.staking.accounts
+#    calc-stakes pools, accounts, on-finish
+#    on-finish null, pools
+
+calc-stakes = ([item, ...rest], accounts, on-finish)->
+    return on-finish null, if not item?
+    stakes = get-my-stakes-from-stakes-accounts(accounts, item)
+    item.stakes = stakes
+    console.log "got stakes" stakes if stakes.lengh > 0
+    calc-stakes(rest, accounts, on-finish)
+module.exports = { query-pools, query-accounts, convert-accounts-to-view-model, convert-pools-to-view-model, calc-my-stakes }

@@ -683,7 +683,7 @@ Rewards = (props)->
             rewardSlot = $amount = $newBalance = percentChange = apr =  "Loading..."
         $class = if epoch is store.staking.current-epoch then "syncing" else ""
         $tr-class = if epoch is store.staking.current-epoch then "current-epoch " else ""
-        tr.pug(key="epoch#{epoch}" class="#{$tr-class}")
+        tr.pug(key="epoch#{amount}" class="#{$tr-class}")
             td.pug(class="#{$class}") #{epoch}
             td.pug(class="#{$class}") #{rewardSlot}
             td.pug(class="#{$class}") #{$amount}
@@ -696,11 +696,14 @@ Rewards = (props)->
     stats=
         background: style.app.stats
     react.useEffect (->
+        isSubscribed = true
         err, $rewards <- fetchEpochRewards(account.address, activationEpoch)
+        return null if isSubscribed is no
         setLoading(no)
         setRewards($rewards)
         store.staking.chosenAccount.rewards = rewards
-        return ), []
+        # cancel subscription to useEffect
+        return -> isSubscribed = no), []
     .pug.section.rewards
         .title.pug
             h2.pug #{lang.uRewards}

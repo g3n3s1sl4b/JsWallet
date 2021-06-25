@@ -7,7 +7,7 @@ require! {
     \bignumber.js
     \../get-lang.ls
     \../history-funcs.ls
-    \../staking-funcs.ls : { query-pools, query-accounts, convert-pools-to-view-model, convert-accounts-to-view-model }
+    \../staking-funcs.ls : { query-pools, query-accounts, convert-pools-to-view-model, convert-accounts-to-view-model, calc-my-stakes }
     \./icon.ls
     \prelude-ls : { map, split, filter, find, foldl, sort-by, unique, head, each, obj-to-pairs, take, reverse }
     \../math.ls : { div, times, plus, minus }
@@ -29,12 +29,12 @@ require! {
     \../components/button.ls
     \../components/address-holder.ls
     \../components/address-holder-popup.ls
-    \../components/pagination.ls
+    \../components/pagination.ls : PaginationComponent
     \./alert-txn.ls
     \../components/amount-field.ls
     \../seed.ls : seedmem
     \../components/burger.ls
-    \./stake/accounts.ls : \stake-accounts
+    \./stake/accounts.ls : StakeAccountsComponent
     \../calc-certain-wallet.ls
 }
 .staking
@@ -638,25 +638,16 @@ as-callback = (p, cb)->
     p.catch (err) -> cb err
     p.then (data)->
         cb null, data
-show-validator = (store, web3t)-> (validator)->
-    li.pug #{validator}
-staking-content = (store, web3t)->
+
+
+
+StakingContent = (props)->
     { go-back } = history-funcs store, web3t
     style = get-primary-info store
     lang = get-lang store
-    button-primary3-style=
-        border: "1px solid #{style.app.primary3}"
-        color: style.app.text2
-        background: style.app.primary3
-        background-color: style.app.primary3-spare
-    filter-icon=
-        filter: style.app.filterIcon
-    comming-soon =
-        opacity: ".3"
-    i-stake-choosen-pool = ->
-        pool = store.staking.chosenPool
-        myStake = +pool.myStake
-        myStake >= 10000
+
+    [validators, setValidators] = react.useState([])
+
     {  account-left, account-right, change-account-index } = menu-funcs store, web3t
     line-style =
         padding: "10px"
@@ -666,33 +657,95 @@ staking-content = (store, web3t)->
             store.current.account.wallets
                 |> find -> it.coin.token is \vlx_native
         wallet.balance
-    get-options = (cb)->
-        i-am-staker = i-stake-choosen-pool!
-        return cb null if i-am-staker
-        err, data <- web3t.velas.Staking.candidateMinStake
-        return cb err if err?
-        min =
-            | +store.staking.stake-amount-total >= 10000 => 1
-            | _ => data `div` (10^18)
-        balance = get-balance! `minus` 0.1
-        stake = store.staking.add.add-validator-stake
-        return cb lang.amountLessStaking if 10000 > +stake
-        return cb lang.balanceLessStaking if +balance < +stake
-        max = +balance
-        cb null, { min, max }
-    use-min = ->
-        #err, options <- get-options
-        #return alert store, err, cb if err?
-        store.staking.add.add-validator-stake = 10000
-    use-max = ->
-        #err, options <- get-options
-        #return alert store, err, cb if err?
-        store.staking.add.add-validator-stake = Math.max (get-balance! `minus` 0.1), 0
     your-balance = " #{round-human get-balance!} "
     your-staking-amount = store.staking.stakeAmountTotal `div` (10^18)
     your-staking = " #{round-human your-staking-amount}"
     vlx-token = "VLX"
     isSpinned = if ((store.staking.all-pools-loaded is no or !store.staking.all-pools-loaded?) and store.staking.pools-are-loading is yes) then "spin disabled" else ""
+    cancel-pool = ->
+        store.staking.chosen-pool = null
+    update-pools-and-accounts = (cb)->
+        return if store.staking.accounts.length > 0
+        store.staking.all-accounts-loaded = no
+        store.staking.accounts-are-loading = yes
+        store.staking.accounts = []
+        err <- validatorsPage.init { store, web3t }
+        return cb err if err?
+        cb null
+    refresh = ->
+        store.staking.getAccountsFromCashe = no
+        store.staking.all-pools-loaded = no
+        if ((store.staking.all-pools-loaded is no or !store.staking.all-pools-loaded?) and store.staking.pools-are-loading is yes)
+            return no
+        store.staking.pools-are-loading = yes
+        cb = console.log
+        #store.staking.pools = []
+        #store.staking.delegators = {}
+        <- update-pools-and-accounts!
+        cb null, \done
+
+    .pug.staking-content.delegate
+        .pug.main-sections
+            .pug.section
+                .title.pug
+                    h2.pug #{lang.balance}
+                .description.pug
+                    span.pug #{your-balance} VLX
+            StakeAccountsComponent.pug(validators=validators setValidators=setValidators)
+            .form-group.pug(id="pools")
+                alert-txn { store }
+                ValidatorsComponent.pug( validators=validators setValidators=setValidators)
+ValidatorsComponent = (props)->
+    console.log "ValidatorsComponent" props.validators
+    { validators, setValidators } = props
+
+    style = get-primary-info store
+    lang = get-lang store
+
+
+    [isLoading, setLoading] = react.useState(true)
+    [page, setPage] = react.useState(1)
+    [perPage, setPerPage] = react.useState(10)
+
+    /* Query validators list */
+    react.useEffect (->
+        isSubscribed = true
+        setLoading(yes)
+        on-progress = ->
+            store.staking.pools = convert-pools-to-view-model [...it]
+        err, pools <- query-pools {store, web3t, on-progress}
+        return cb err if err?
+        store.staking.pools = convert-pools-to-view-model pools
+        setValidators(store.staking.pools)
+#
+#        delinquent = store.staking.pools |> filter (-> it.status is "delinquent")
+#        running = store.staking.pools
+#            |> filter (it)->
+#                delinquent.index-of(it) < 0
+#            |> reverse
+#        store.staking.pools = running ++ delinquent
+#        store.staking.poolsFiltered = store.staking.pools
+#        store.staking.getAccountsFromCashe = no
+#        err <- calc-certain-wallet(store, "vlx_native")
+
+        setLoading(no)
+        store.staking.pools-are-loading = no
+        setValidators(store.staking.pools)
+
+        # cancel subscription to useEffect
+        return), []
+
+    /*Styles*/
+    stats=
+        background: style.app.stats
+    icon-style =
+        color: style.app.loader
+        margin-top: "10px"
+        width: "inherit"
+    staker-pool-style =
+        max-width: 200px
+        background: style.app.stats
+    /*Callbacks*/
     build-staker = (store, web3t)-> (item)->
         checked = item.checked
         stake = item.stakeInitial
@@ -707,22 +760,12 @@ staking-content = (store, web3t)->
                 return null if not account?
                 store.staking.chosen-account = account
                 navigate store, web3t, \account_details
-            .pug(class="stake-item" on-click=show-details)
+            .pug(key="stake#{stake.seed}" class="stake-item" on-click=show-details)
                 .pug.name
                     span.pug #{stake.seed}
         fee = item.commission
         lastVote = item.lastVote
         index = store.staking.pools.index-of(item) + 1
-        reward =
-            | item.validator-reward-percent is ".." => ".."
-            | _ => (100 - +item.validator-reward-percent) * 1.4285714286
-        filled = "#{round-human reward}%"
-        filled-color =
-            color:
-                | reward > 95 => \red
-                | reward > 75 => \orange
-                | reward > 40 => "rgb(165, 174, 81)"
-                | _ => "rgb(38, 219, 85)"
         delinquent-class =
             | isDelinquent => "delinquent"
             | _ => ""
@@ -733,95 +776,46 @@ staking-content = (store, web3t)->
             address: item.address
             network: vlx_native.network
             coin: vlx_native.coin
-        vote-power =
-            | item.vote-power? => "#{item.vote-power}%"
-            | _ => "..."
         mystake-class = if my-stake isnt 0 then "with-stake" else ""
-        tr.pug( key="validator-item-#{item.address}" class="validator-item #{item.status} #{delinquent-class}")
-            td.pug(datacolumn='Staker Address' title="#{item.address}")
+        tr.pug(id="validator-item-#{item.address}"  key="validator-item-#{item.address}" class="validator-item #{item.status} #{delinquent-class}")
+            td.pug(key="address#{item.address}" datacolumn='Staker Address' title="#{item.address}")
                 address-holder-popup { store, wallet }
-            td.pug #{$stake}
-            td.pug #{fee}%
-            td.pug #{lastVote}
-            td.pug(class="#{mystake-class}")
+            td.pug(key="stake#{item.address}") #{$stake}
+            td.pug(key="fee#{item.address}") #{fee}%
+            td.pug(key="lastVote#{item.address}") #{lastVote}
+            td.pug(key="mystake#{item.address}" class="#{mystake-class}")
                 my-stake |> map build-my-stake
             td.pug #{item.stakers}
-    cancel-pool = ->
-        store.staking.chosen-pool = null
-    update-pools-and-accounts = (cb)->
-        return if store.staking.accounts.length > 0
-        store.staking.all-accounts-loaded = no
-        store.staking.accounts-are-loading = yes
-        store.staking.accounts = []
-        err <- validators.init { store, web3t }
-        return cb err if err?
-        cb null
-    refresh = ->
-        store.staking.getAccountsFromCashe = no
-        store.staking.all-pools-loaded = no
-        if ((store.staking.all-pools-loaded is no or !store.staking.all-pools-loaded?) and store.staking.pools-are-loading is yes)
-            return no
-        store.staking.pools-are-loading = yes
-        cb = console.log
-        store.staking.pools = []
-        store.staking.delegators = {}
-        <- update-pools-and-accounts!
-        cb null, \done
-    icon-style =
-        color: style.app.loader
-        margin-top: "10px"
-        width: "inherit"
-    staker-pool-style =
-        max-width: 200px
-        background: style.app.stats
-    stats=
-        background: style.app.stats
-    totalValidators = (store.staking.totalValidators ? 0)    
-    allPages = Math.ceil(totalValidators `div` store.staking.validators_per_page)
-    loadingValidatorIndex = store.staking.loadingValidatorIndex
-    per-page = store.staking.validators_per_page
-    page = store.staking.current_validators_page
-    pagination-disabled = store.staking.pools-are-loading is yes
-    .pug.staking-content.delegate
-        .pug.main-sections
-            .pug.section
-                .title.pug
-                    h2.pug #{lang.balance}
-                .description.pug
-                    span.pug #{your-balance} VLX
-            stake-accounts {store, web3t}
-            .form-group.pug(id="pools")
-                alert-txn { store }
-                .pug.section
-                    .title.pug
-                        h3.pug.section-title #{lang.validators} 
-                            span.pug.amount (#{store.staking.pools.length})
-                    .description.pug
-                        if store.staking.pools-are-loading is no then
-                            .pug.table-scroll
-                                table.pug
-                                    thead.pug
-                                        tr.pug
-                                            td.pug(width="30%" style=staker-pool-style title="Validator Staking Address. Permanent") #{lang.validator} (?)
-                                            td.pug(width="15%" style=stats title="Sum of all stakings") #{lang.total-active-stake} (?)
-                                            td.pug(width="5%" style=stats title="Validator Interest. (100% - Validator Interest = Pool Staking Reward)") #{lang.comission} (?)
-                                            td.pug(width="10%" style=stats title="Last Staking Amount") #{lang.lastVote} (?)
-                                            td.pug(width="10%" style=stats title="Find you staking by Seed") #{lang.my-stake} (?)
-                                            td.pug(width="5%" style=stats title="How many stakers in a pool") #{lang.stakers} (?)
-                                    tbody.pug
-                                        paginate(store.staking.pools, per-page, store.staking.current_validators_page) 
-                                            |> map build-staker store, web3t
-                        else
-                            .pug.table-scroll
-                                span.pug.entities-loader
-                                    span.pug.inner-section
-                                        h3.pug.item.blink Loading...
-                                            if no
-                                                span.pug.item  #{store.staking.loadingValidatorIndex}
-                                                span.pug.item of
-                                                span.pug.item  #{totalValidators}
-                        pagination {store, type: \validators, disabled: pagination-disabled, config: {array: store.staking.pools }}
-validators = ({ store, web3t })->
+    /*Props*/
+    pagination-disabled = isLoading is yes
+    totalValidators = (validators.length ? 0)
+    /*Render*/
+    .pug.section
+        .title.pug
+            h3.pug.section-title #{lang.validators}
+                span.pug.amount (#{store.staking.pools.length})
+        .description.pug
+            if isLoading is no then
+                .pug.table-scroll
+                    table.pug
+                        thead.pug
+                            tr.pug
+                                td.pug(width="30%" style=staker-pool-style title="Validator Staking Address. Permanent") #{lang.validator} (?)
+                                td.pug(width="15%" style=stats title="Sum of all stakings") #{lang.total-active-stake} (?)
+                                td.pug(width="5%" style=stats title="Validator Interest. (100% - Validator Interest = Pool Staking Reward)") #{lang.comission} (?)
+                                td.pug(width="10%" style=stats title="Last Staking Amount") #{lang.lastVote} (?)
+                                td.pug(width="10%" style=stats title="Find you staking by Seed") #{lang.my-stake} (?)
+                                td.pug(width="5%" style=stats title="How many stakers in a pool") #{lang.stakers} (?)
+                        tbody.pug
+                            paginate(validators, perPage, page)
+                                |> map build-staker store, web3t
+            else
+                .pug.table-scroll
+                    span.pug.entities-loader
+                        span.pug.inner-section
+                            h3.pug.item.blink Loading...
+            PaginationComponent.pug( setPerPage=setPerPage page=page setPage=setPage perPage=perPage array=store.staking.pools type="validators")
+validatorsPage = ({ store, web3t })->
     lang = get-lang store
     { go-back } = history-funcs store, web3t
     wallet = store.current.account.wallets |> find (-> it.coin.token is \vlx_native)
@@ -861,13 +855,14 @@ validators = ({ store, web3t })->
             burger store, web3t
             epoch store, web3t
             switch-account store, web3t
-        staking-content store, web3t
+        StakingContent.pug
 stringify = (value) ->
     if value? then
         round-human(parse-float value `div` (10^18))
     else
         '..'
-validators.init = ({ store, web3t }, cb)!->
+validatorsPage.init = ({ store, web3t }, cb)!->
+    console.log "validators.init"
     err <- calc-certain-wallet(store, "vlx_native")
     #return cb null if store.staking.pools-are-loading is yes
     store.staking.max-withdraw = 0
@@ -893,15 +888,10 @@ validators.init = ({ store, web3t }, cb)!->
     index-is-different = store.current.accountIndex isnt store.staking.accountIndex
     if store.staking.pools-network is store.current.network then
         if (store.staking.all-pools-loaded? and store.staking.all-pools-loaded is yes and not index-is-different)
+            console.log "Stop proceed inittializqtion of validators"
             return cb null
     else
         store.staking.pools-network = store.current.network
-    #<- web3t.refresh
-    #err, voteAccounts <- as-callback web3t.velas.NativeStaking.getVoteAccounts()
-    #console.log "Vote accounts" err, voteAccounts
-    #voteAccounts = [] if err?
-    #store.staking.totalValidators = voteAccounts.length
-    #console.log "acc length must be more then 0" voteAccounts.length
     store.staking.pools = []
     err, rent <- as-callback web3t.velas.NativeStaking.connection.getMinimumBalanceForRentExemption(200)
     rent = 2282880 if err?
@@ -915,31 +905,7 @@ validators.init = ({ store, web3t }, cb)!->
     #parsedProgramAccounts = [] if err?
     #store.staking.parsedProgramAccounts = parsedProgramAccounts
     # get validators array
-    on-progress = ->
-        store.staking.accounts = convert-accounts-to-view-model [...it]
-    err, result <- query-accounts store, web3t, on-progress
-    return cb err if err?
-    store.staking.accounts = convert-accounts-to-view-model result
-    # Normalize currrent page for accounts in pagination
-    type = "accounts"
-    page = store.staking["current_#{type}_page"] ? 1
-    per-page = store.staking["#{type}_per_page"]
-    if +(page `times` per-page) >= store.staking.accounts.length
-        store.staking["current_#{type}_page"] = 1 
-    #<- set-timeout _, 4000
-    on-progress = ->
-        store.staking.pools = convert-pools-to-view-model [...it]
-    err, pools <- query-pools {store, web3t, on-progress}
-    return cb err if err?
-    store.staking.pools = convert-pools-to-view-model pools
-        |> sort-by (-> it.myStake.length )
-    delinquent = store.staking.pools |> filter (-> it.status is "delinquent")
-    running = store.staking.pools
-        |> filter (it)->
-            delinquent.index-of(it) < 0
-        |> reverse
-    store.staking.pools = running ++ delinquent
-    store.staking.poolsFiltered = store.staking.pools
-    store.staking.getAccountsFromCashe = no
-    err <- calc-certain-wallet(store, "vlx_native")
-module.exports = validators
+
+
+    cb null
+module.exports = validatorsPage

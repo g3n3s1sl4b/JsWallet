@@ -18,6 +18,7 @@ require! {
             display: flex
             align-items: flex-start
         .current-page
+            display: inline
             flex: 2
         button                      
             margin: 0 20px 0 !important
@@ -51,62 +52,74 @@ require! {
                     padding: 2px 5px
                     &:hover
                         background: #555668
-module.exports = ({ store, type, disabled, config })->
-    { array } = config
+module.exports = (props)->
+
+    { setPage, setPerPage, array, page, type, perPage } = props
+
+    [disabled, setDisabled] = react.useState(true)
+    [openedSelector, setOpenedSelector] = react.useState(false)
+
     new-array = ^^array
-    page = store.staking["current_#{type}_page"] ? 1
-    store.staking["#{type}_per_page"] = 10 if not store.staking?["#{type}_per_page"]
-    per-page = store.staking["#{type}_per_page"]
-    allPages = Math.ceil(array.length `div` perPage)
+
     style = get-primary-info store
     page$ = page - 1
-    new-array.slice page$ * per-page, (page$ + 1) * per-page
+    new-array.slice page$ * perPage, (page$ + 1) * perPage
+    allPages = Math.ceil(array.length `div` perPage)
     entities = new-array.length
+
     #Props
-    prev-button-disabled = (+page <= 1) or disabled is yes
-    next-button-disabled = (allPages <= +page) or disabled is yes
-    $class = if store.staking["visible_per_page_#{type}_selector"] then "visible" else "hidden"
+    prev-button-disabled = (+page <= 1)
+    next-button-disabled = (allPages <= +page)
+    $class = if not disabled then "visible" else "hidden"
+
+
     # Listeners
     go-back = ->
-        store.staking["current_#{type}_page"] = 
+        $page =
             | page > 1 => page - 1
             | _ => 1
+        setPage($page)
+
     go-forward = ->
-        page = store.staking["current_#{type}_page"]
-        store.staking["current_#{type}_page"] = 
+        $page =
             | page < allPages => page + 1
             | _ => allPages
-    normalize-current-page = ->
-        allPages = Math.ceil(config.array.length `div` store.staking["#{type}_per_page"])
-        store.staking["current_#{type}_page"] =
-            | (+page > +allPages) and +allPages > 0 => allPages
-            | +allPages < 1 => 1
-            | _ => store.staking["current_#{type}_page"]
-        store.staking["visible_per_page_#{type}_selector"] = no
-        window.scroll-to 0, 0
-    set-per-page = (per-page, cb=null)!-->
-        store.staking["#{type}_per_page"] = per-page
-        normalize-current-page!
-        <- set-timeout _, 1
-        store.staking["visible_per_page_#{type}_selector"] = no
-    switch-per-page-selector = ->
-        store.staking["visible_per_page_#{type}_selector"] = !store.staking["visible_per_page_#{type}_selector"]
+        setPage($page)
+
+    normalize-current-page = (_perPage)->
+        _allPages = Math.ceil(array.length `div` _perPage)
+        $$page =
+            | (+page > +_allPages) and +_allPages > 0 => _allPages
+            | +_allPages < 1 => 1
+            | _ => page
+        return $$page
+
+    setting-per-page = (_perPage, cb=null)!-->
+        setPerPage(_perPage)
+        new-page = normalize-current-page(_perPage)
+        setPage(new-page)
+        setDisabled(true)
+
+    open-per-page-selector = ->
+        setOpenedSelector(true)
+
     close-per-page-selector = ->
-        store.staking["visible_per_page_#{type}_selector"] = no
+        setOpenedSelector(false)
+
     # Render
     .pug.table-pagination
         .pug.pagination-holder
-            span.pug.per-page-selector(key="#{type}-selector" id="#{type}-selector" on-click=switch-per-page-selector onMouseLeave=close-per-page-selector)
+            .pug.per-page-selector(key="selector" on-click=open-per-page-selector onMouseLeave=close-per-page-selector)
                 .to-show.pug Show #{per-page}
-                if store.staking["visible_per_page_#{type}_selector"] is yes
+                if openedSelector
                     .per-page-options.pug
-                        .span.pug.per-page-option(on-click=set-per-page(5)) 5
-                        .span.pug.per-page-option(on-click=set-per-page(10)) 10
-                        .span.pug.per-page-option(on-click=set-per-page(20)) 20
-            if +entities > +store.staking["#{type}_per_page"]
+                        .span.pug.per-page-option(on-click=setting-per-page(5)) 5
+                        .span.pug.per-page-option(on-click=setting-per-page(10)) 10
+                        .span.pug.per-page-option(on-click=setting-per-page(20)) 20
+            if +entities > perPage
                 .pug
                     button {store, classes: "width-auto", text: "<", no-icon:yes, on-click: go-back, style: {width: \auto, display: \block}, makeDisabled: prev-button-disabled}
-                    span.pug.current-page
+                    .pug.current-page
                         span.pug Page
                             | #{page}
                             | /
