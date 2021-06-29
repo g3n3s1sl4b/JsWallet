@@ -42,6 +42,9 @@ create-send =->
 url-params =
     | window? => qs.parse window.location.search.replace('?', '')
     | _ => {}
+network =
+    | url-params.network? and url-params.network is "testnet" => "testnet"
+    | _ => "mainnet"
 url-hash-params =
     | window? => qs.parse window.location.hash.replace('#', '')
     | _ => {}
@@ -295,7 +298,7 @@ store =
         choose-token: null
         tokens-dropdown: no
         demo: location.href.index-of('web3.space/wallet') > -1
-        network: \mainnet
+        network: network
         pin: ""
         last-tx-url: ""
         try-edit-seed: no
