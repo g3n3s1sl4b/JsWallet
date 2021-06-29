@@ -1,6 +1,6 @@
 import { Env } from './types';
 
-const env: Env = 'testnet';
+const env: Env = 'local';
 
 export const config = {
   defaultWaitTimeout: Number(process.env.DEFAULT_WAIT_TIMEOUT) || 5000,

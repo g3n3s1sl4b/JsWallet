@@ -9,7 +9,7 @@ module.exports = {
   jobs: 1,
   // ui: "tdd",
   // recursive: true,
-  // require: "src/mocha-wrapper/hooks/hooks.ts",
+  require: "src/mocha-wrapper/hooks/hooks.ts",
   reporter: "./node_modules/mochawesome",
   "reporter-option": [
     "reportTitle=XQR tests report",
