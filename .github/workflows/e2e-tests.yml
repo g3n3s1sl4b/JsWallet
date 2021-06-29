@@ -15,7 +15,7 @@ jobs:
     steps:
       - name: setup web3t
         working-directory: ./
-        run: cd .. && git clone git@github.com:velas/web3t.git && cd web3t && npm i
+        run: cd web3t && git pull && npm i
       - uses: actions/checkout@v2
       - name: copy web3t
         working-directory: ./
