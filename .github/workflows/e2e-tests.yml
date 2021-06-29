@@ -1,10 +1,9 @@
 name: e2e-tests
 on:
   pull_request:
-    # branches: [testnet]
-# concurrency:
-#   group: e2e-tests-${{github.event.pull_request.number}}
-#   cancel-in-progress: true
+concurrency:
+  group: e2e-tests-${{github.event.pull_request.number}}
+  cancel-in-progress: true
 jobs:
   e2e-tests:
     # runs-on: ubuntu-latest
@@ -23,6 +22,7 @@ jobs:
       - name: copy web3t
         working-directory: ../
         run: cp -pr web3t/ JsWallet/.compiled-ssr/web3t/
+        # sleep required for wallet start
       - name: run wallet
         working-directory: ./
         run: |
@@ -33,9 +33,3 @@ jobs:
         run: npm ci
       - name: run tests
         run: npm test
-
-      # RUN IN DOCKER
-      # - name: prepare
-      #   run: docker build -t wallet-tests .
-      # - name: run tests
-      #   run: docker run wallet-tests /bin/bash -c "npm test"
