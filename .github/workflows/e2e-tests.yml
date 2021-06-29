@@ -13,18 +13,12 @@ jobs:
       run:
         working-directory: ./e2e
     steps:
-      - name: pwd
-        working-directory: ./
-        run: pwd
-      - name: ls
-        working-directory: ./
-        run: ls
       - name: setup web3t
         working-directory: ./
         run: cd .. && cd web3t && git pull && npm i
       - uses: actions/checkout@v2
       - name: copy web3t
-        working-directory: ./
+        working-directory: ../
         run: cp -pr web3t/ ./.compiled-ssr/web3t/
       - name: run wallet
         working-directory: ./
