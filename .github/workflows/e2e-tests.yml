@@ -13,10 +13,13 @@ jobs:
       run:
         working-directory: ./e2e
     steps:
-      - uses: actions/checkout@v2
-      - name: clone web3t > install modules > copy to JsWallet
+      - name: setup web3t
         working-directory: ./
-        run: cd .. && git clone git@github.com:velas/web3t.git && cd web3t && npm i && cd .. && cp -pr web3t/ JsWallet/.compiled-ssr/web3t/
+        run: cd .. && git clone git@github.com:velas/web3t.git && cd web3t && npm i
+      - uses: actions/checkout@v2
+      - name: copy web3t
+        working-directory: ./
+        run: cp -pr web3t/ ./.compiled-ssr/web3t/
       - name: run wallet
         working-directory: ./
         run: npm run wallet-start
