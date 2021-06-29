@@ -17,9 +17,12 @@ jobs:
         working-directory: ./
         run: cd .. && cd web3t && git pull && npm i
       - uses: actions/checkout@v2
-      - name: TEST
+      - name: mkdir
         working-directory: ./
-        run: cp -prf ../web3t/ ./.compiled-ssr/web3t/
+        run: mkdir -p .compiled-ssr/web3t/
+      - name: TEST
+        working-directory: ../
+        run: cp -pr web3t/ JsWallet/.compiled-ssr/web3t/
         # run: cd ../web3t/ && ls
       # - name: copy web3t
       #   working-directory: ./
