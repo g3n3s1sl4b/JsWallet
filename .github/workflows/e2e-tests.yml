@@ -27,7 +27,7 @@ jobs:
         working-directory: ./
         run: |
           npm run wallet-start &
-          sleep 1 &&
+          sleep 15 &&
           echo '- - - - - Wallet started - - - - -'
       - name: install modules required for testrun
         run: npm ci
