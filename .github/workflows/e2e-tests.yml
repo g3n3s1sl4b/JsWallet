@@ -21,7 +21,7 @@ jobs:
         run: ls
       - name: setup web3t
         working-directory: ./
-        run: cd web3t && git pull && npm i
+        run: cd .. && cd web3t && git pull && npm i
       - uses: actions/checkout@v2
       - name: copy web3t
         working-directory: ./
