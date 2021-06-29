@@ -13,13 +13,13 @@ jobs:
       run:
         working-directory: ./e2e
     steps:
+      - uses: actions/checkout@v2
       - name: run wallet
         working-directory: ./
         run: npm run wallet-start
       - name: pwd
         run: pwd
-      - uses: actions/checkout@v2
-      - name: prepare
+      - name: install modules required for testrun
         run: npm ci
       - name: run tests
         run: npm test
