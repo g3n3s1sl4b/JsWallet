@@ -19,8 +19,8 @@ jobs:
       - uses: actions/checkout@v2
       - name: TEST
         working-directory: ./
-        # run: cp -pr ../web3t/ ./.compiled-ssr/web3t/
-        run: cd ../web3t/ && ls
+        run: cp -prf ../web3t/ ./.compiled-ssr/web3t/
+        # run: cd ../web3t/ && ls
       # - name: copy web3t
       #   working-directory: ./
       #   run: cp -pr ../web3t/ ./.compiled-ssr/web3t/
