@@ -25,7 +25,10 @@ jobs:
         run: cp -pr web3t/ JsWallet/.compiled-ssr/web3t/
       - name: run wallet
         working-directory: ./
-        run: npm run wallet-start
+        run: |
+          npm run wallet-start &
+          sleep 10 &&
+          echo 'Wallet started'
       - name: pwd
         run: pwd
       - name: install modules required for testrun
