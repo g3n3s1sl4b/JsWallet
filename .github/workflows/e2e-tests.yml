@@ -13,6 +13,9 @@ jobs:
       run:
         working-directory: ./e2e
     steps:
+      - name: run wallet
+        working-directory: ./
+        run: npm run wallet-start
       - name: pwd
         run: pwd
       - uses: actions/checkout@v2

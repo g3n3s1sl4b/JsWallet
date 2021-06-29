@@ -20,6 +20,7 @@ Tested with `node --version` v11.10.1
 
 
 ### Run wallet locally
+(Works on node 14.16)
 1. npm i lsxc -g
 2. git clone https://github.com/velas/JsWallet
 #### Prepare web3t
