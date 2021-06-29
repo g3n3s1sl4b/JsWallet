@@ -1,0 +1,36 @@
+{
+  "name": "wallet-tests",
+  "version": "1.0.0",
+  "description": "Tests for Velas Wallet",
+  "main": "index.js",
+  "scripts": {
+    "test": "npx ts-mocha src/tests/**.test.ts --recursive"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/velas/wallet-tests.git"
+  },
+  "author": "Velas / Oleksandr Pelykh",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/velas/wallet-tests/issues"
+  },
+  "homepage": "https://github.com/velas/wallet-tests#readme",
+  "devDependencies": {
+    "@types/chai": "^4.2.18",
+    "@types/mocha": "^8.2.2",
+    "@types/node": "^15.12.1",
+    "mocha": "^8.4.0",
+    "typescript": "^4.3.2"
+  },
+  "dependencies": {
+    "axios": "^0.21.1",
+    "chai": "^4.3.4",
+    "mochawesome": "^6.2.2",
+    "playwright": "^1.11.1",
+    "playwright-chromium": "^1.11.1",
+    "tracer": "^1.1.4",
+    "ts-mocha": "^8.0.0",
+    "ts-node": "^10.0.0"
+  }
+}
