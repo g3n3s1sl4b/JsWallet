@@ -20,22 +20,18 @@ jobs:
       - name: mkdir
         working-directory: ./
         run: mkdir -p .compiled-ssr/web3t/
-      - name: TEST
+      - name: copy web3t
         working-directory: ../
         run: cp -pr web3t/ JsWallet/.compiled-ssr/web3t/
-        # run: cd ../web3t/ && ls
-      # - name: copy web3t
-      #   working-directory: ./
-      #   run: cp -pr ../web3t/ ./.compiled-ssr/web3t/
-      # - name: run wallet
-      #   working-directory: ./
-      #   run: npm run wallet-start
-      # - name: pwd
-      #   run: pwd
-      # - name: install modules required for testrun
-      #   run: npm ci
-      # - name: run tests
-      #   run: npm test
+      - name: run wallet
+        working-directory: ./
+        run: npm run wallet-start
+      - name: pwd
+        run: pwd
+      - name: install modules required for testrun
+        run: npm ci
+      - name: run tests
+        run: npm test
 
       # RUN IN DOCKER
       # - name: prepare
