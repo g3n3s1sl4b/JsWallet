@@ -13,6 +13,12 @@ jobs:
       run:
         working-directory: ./e2e
     steps:
+      - name: pwd
+        working-directory: ./
+        run: pwd
+      - name: ls
+        working-directory: ./
+        run: ls
       - name: setup web3t
         working-directory: ./
         run: cd web3t && git pull && npm i
