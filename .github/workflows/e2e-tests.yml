@@ -1,7 +1,7 @@
 name: e2e-tests
 on:
   pull_request:
-    branches: [testnet]
+    # branches: [testnet]
 concurrency:
   group: e2e-tests-${{github.event.pull_request.number}}
   cancel-in-progress: true
