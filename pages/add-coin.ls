@@ -270,7 +270,9 @@ module.exports = ({ store, web3t } )->
                         if store.registry.length > -1
                             store.registry
                                 |> filter (it)->
-                                    (it[network].disabled is no) or (not it[network].disabled?)  
+                                    it[network]?
+                                |> filter (it)->
+                                    (it[network]?disabled is no) or (not it[network]?disabled?)
                                 |> filter filter-item store
                                 |> map create-item { store, web3t }
                         else
