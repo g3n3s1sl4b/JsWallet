@@ -44,6 +44,7 @@ url-params =
     | _ => {}
 network =
     | url-params.network? and url-params.network is "testnet" => "testnet"
+    | url-params.network? and url-params.network is "devnet" => "devnet"
     | _ => "mainnet"
 url-hash-params =
     | window? => qs.parse window.location.hash.replace('#', '')
