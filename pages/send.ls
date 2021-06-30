@@ -614,10 +614,12 @@ module.exports.init = ({ store, web3t }, cb)->
         default-network = networks[network-keys.0].name
     /* If it is Swap! */
     if wallet.network.networks? and (store.current.send.isSwap is yes) then
+        $wallets = store.current.account.wallets |> map (-> [it.coin.token, it]) |> pairs-to-obj
         available-networks = 
             wallet.network.networks 
                 |> obj-to-pairs
-                |> filter (-> (not it[1].disabled?) or it[1].disabled is no)
+                |> filter (-> $wallets[it[1]?referTo]?)
+                |> filter (-> (not it[1]?disabled?) or it[1]?disabled is no)
                 |> pairs-to-obj
         wallet-swap-networks-ids = Object.keys(available-networks)
         if wallet-swap-networks-ids.length > 0
