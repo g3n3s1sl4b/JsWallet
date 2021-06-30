@@ -525,6 +525,8 @@ manage-account = (store, web3t)->
             .pug.description(style=color)
                 if store.current.network is \testnet
                     span.pug #{lang.network-description2}
+                else if store.current.network is \devnet
+                    span.pug The default network for all transactions is Devnet
                 else
                     span.pug #{lang.network-description}
             .pug.content
