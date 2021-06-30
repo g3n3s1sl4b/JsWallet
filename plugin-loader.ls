@@ -17,9 +17,10 @@ export get-coins = (store, cb)->
     base =
         common store
             |> filter (?)
+            |> filter (-> it[network]?)
             |> filter (.type is \coin)
             |> filter (.enabled)
-            |> filter (-> not it[network].disabled is yes)
+            |> filter (-> not (it[network]?disabled is yes))
     err, items <- get-install-list
     return cb err if err?
     installed =
