@@ -385,6 +385,10 @@ module.exports = (store, web3t)->
                 .menu-item.pug(on-click=goto-support style=icon-style id="menu-support")
                     span.arrow_box.pug #{lang.support}
                     img.pug(src="#{icons.support}" style=icon-color)
+            if store.current.network is \devnet
+                .menu-item.pug.testnet(on-click=goto-mainnet style=icon-style class="#{settings}" id="menu-devnet")
+                    span.arrow_box.pug Devnet
+                    img.pug(src="#{icons.test}" style=icon-color)
             if store.current.network is \testnet
                 .menu-item.pug.testnet(on-click=goto-mainnet style=icon-style class="#{settings}" id="menu-testnet")
                     span.arrow_box.pug Testnet
