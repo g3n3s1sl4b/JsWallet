@@ -1,0 +1,35 @@
+name: e2e-tests
+on:
+  pull_request:
+concurrency:
+  group: e2e-tests-${{github.event.pull_request.number}}
+  cancel-in-progress: true
+jobs:
+  e2e-tests:
+    # runs-on: ubuntu-latest
+    runs-on: macos-internal2
+    defaults:
+      run:
+        working-directory: ./e2e
+    steps:
+      - name: setup web3t
+        working-directory: ./
+        run: cd .. && cd web3t && git pull && npm i
+      - uses: actions/checkout@v2
+      - name: mkdir for web3t
+        working-directory: ./
+        run: mkdir -p .compiled-ssr/web3t/
+      - name: copy web3t
+        working-directory: ../
+        run: cp -pr web3t/ JsWallet/.compiled-ssr/web3t/
+        # sleep required for wallet start
+      - name: run wallet
+        working-directory: ./
+        run: |
+          npm run wallet-start &
+          sleep 15 &&
+          echo '- - - - - Wallet started - - - - -'
+      - name: install modules required for testrun
+        run: npm ci
+      - name: run tests
+        run: npm test
