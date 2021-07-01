@@ -18,6 +18,7 @@ require! {
     \../icons.ls
     \../components/header.ls
     \./popup-connected-wallets.ls
+    \../pages/loading.ls
 }
 .wallets-container
     @import scheme
@@ -269,7 +270,9 @@ mobile = ({ store, web3t })->
     wallet-detail =
         wallets
             |> find (-> wallets.index-of(it) is store.current.wallet-index)
-    return null if not wallet-detail?
+    if not wallet-detail?
+        return
+            loading("loading-classs")
     .wallets-container.pug(key="wallets")
         header store, web3t
         .pug.left-side(style=row)
