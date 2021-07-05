@@ -17,7 +17,7 @@ module.exports = (store, web3t)->
     lang = get-lang store
     generate-seed = ->
         seed = bip39.generate-mnemonic! + ' ' + bip39.generate-mnemonic!
-        /* Uncomment below for supporting valid 24 seed words mnemonic (must be fixed on all wallets types at the same time) */    
+        /* Uncomment below for supporting valid 256-bits 24-seed-words mnemonic (must be fixed on all wallets types at the same time) */    
         #seed = bip39.generate-mnemonic(256)
         store.current.seed-words = seed.split(' ').map(-> { part: it })
         store.current.seed-generated = yes
