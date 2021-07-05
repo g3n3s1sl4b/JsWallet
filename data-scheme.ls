@@ -18,7 +18,6 @@ create-send =->
     contract-address: null  
     details: yes
     propose-escrow: no
-    address: ''
     value: \0
     fee-type: \auto
     fee-custom-amount: \0
@@ -236,7 +235,12 @@ store =
         applied: []
     releases: []
     connected-wallet: 
-        activeTab: null    
+        activeTab: null  
+        tokens-groups:   
+            velas:    <[ vlx_native vlx2 vlx_evm syx syx2 ]> 
+            ethereum: <[ eth usdt_erc20 ]>
+            bitcoin:  <[ btc usdt ]>
+            litecoin: <[ ltc ]>  
         isConnecting: no
         isConnected: no
         status:
@@ -245,12 +249,16 @@ store =
             connected: no
         connected-site: []
         chosenAccounts: []
+        chosenNetworks: []
         tempChosenAccounts: []
         openStatusBarPopup: no
         tempChosenAccountsAllChecked: no    
+        tempChosenGroups: []    
         site: ""
         origin: ""  
-        connectedSites: {} 
+        connectedSites: {}
+        installedPlugin: null 
+        importing-networks: no  
     current:
         transactions-are-loading: no
         address-suffix: ''
