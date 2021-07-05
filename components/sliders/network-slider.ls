@@ -21,7 +21,7 @@ require! {
                 top: 0 !important
 module.exports = ({ web3t, wallet, store, id })->
     return null if not wallet.network.networks?
-    return null if not (store.current.send.isSwap? and store.current.send.isSwap is yes)
+    return null if not (store.current.send.swap? and store.current.send.swap is yes)
     return null if not wallet.network.networks? or Object.keys(wallet.network.networks).length is 0
     wallets = store.current.account.wallets |> map (-> [it.coin.token, it]) |> pairs-to-obj 
     available-networks = 

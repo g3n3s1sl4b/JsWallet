@@ -31,7 +31,6 @@ create-send =->
     amount-send-fee-usd: \0
     amount-obtain: \0
     data: ""
-    is-swap: no 
     decoded-data: ""
     show-data-mode: \encoded
     error: ''
