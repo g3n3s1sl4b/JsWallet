@@ -56,10 +56,9 @@ build-unlock = (store, cweb3)-> (cb)->
     return cb err if err?
     cb null, data
 build-send-transaction = (store, cweb3, coin)-> (tx, cb)->
-    console.log "[web3.ls build-send-transaction]" cb
     network = coin[store.current.network]
     return cb "Transaction is required" if typeof! tx isnt \Object
-    { to, data, decoded-data, value, gas, amount, gas-price, swap } = tx
+    { to, data, decoded-data, value, gas, amount, gas-price, swap, is-swap } = tx
     return cb "Recipient (to) is required" if typeof! tx.to isnt \String
     value :=
         | value? => value
@@ -69,22 +68,21 @@ build-send-transaction = (store, cweb3, coin)-> (tx, cb)->
     id = guid!
     { current } = store
     { send } = current
+    contract-address = null
     amount-obtain = \0
     amount-obtain-usd = \0
     amount-send-usd = \0
     amount-send-fee = if network.tx-fee? then network.tx-fee else \0
     amount-send-fee-usd = \0
-    propose-escrow = no
     details = (data ? "").length is 0
     amount-send = value `div` (10 ^ network.decimals)
     wallet = store.current.account.wallets |> find (.coin.token is coin.token)
     send <<<< {
         to, data, decoded-data, network, coin, wallet, value, gas, gas-price, id, amount-send,
         amount-obtain, amount-obtain-usd, amount-send-usd,
-        amount-send-fee, amount-send-fee-usd, propose-escrow, details,
-        swap
+        amount-send-fee, amount-send-fee-usd, details,
+        swap, is-swap
     }
-    #console.log { details }, send.details
     { send-anyway, change-amount, choose-auto } = send-funcs store, web3t
     choose-auto!
     <- change-amount store, amount-send, yes
@@ -219,42 +217,48 @@ module.exports = (store, config)->
         err <- refresh-balances
         return cb err if err?
         refresh-page cb
+        
     injectedNetworks = (data, cb)->
-        console.log "[injectedNetworks] data" data  
+        #console.log "[injectedNetworks] data" data  
         { sender, origin } = data
         strip-origin = (addr)->
             protocol = (addr + "").split("://").0 + "://"
             url = (addr + "").split("://").1    
-            origin = url.split("/").0
+            origin = url.split(\/).0
             { site: protocol + origin, origin } 
         {site, origin} = strip-origin(origin)   
         store.connected-wallet.origin = origin
         store.connected-wallet.site = site
         store.connected-wallet.activeTab = sender
         # Check if origin who queried available networks is in connected-site array
-        console.log "store.connected-wallet" store.connected-wallet  
-        responseArray = store.connected-wallet.connectedSites["#{origin}"] ? []
+        #console.log "store.connected-wallet" store.connected-wallet
+        
+        /* Get previously connected networks Object from connectedSites propery */  
+        responseObject = store.connected-wallet.connectedSites["#{origin}"] ? {}
         wallets_keys = 
             | store.current.account? =>
                 store.current.account.wallets |> map (-> it.coin.token)
             | _ => []
         store.connected-wallet.tempChosenAccountsAllChecked = 
-            | wallets_keys.length > 0 and wallets_keys.length is responseArray.length => yes 
+            | wallets_keys.length > 0 and wallets_keys.length is Object.keys(responseObject).length => yes 
             | _ => no  
+        
         /* Update temporary chosen wallets for import  */
-        store.connected-wallet.tempChosenAccounts = responseArray
+        store.connected-wallet.tempChosenGroups = Object.keys(responseObject)
         /* Update chosen acccounts for wallet for certain domain */
-        store.connected-wallet.chosenAccounts = responseArray    
+        store.connected-wallet.chosenNetworks = responseObject 
+           
+        
         tabs <- chrome.tabs.query { currentWindow: true active: true }
         activeTab = tabs?0
-        response <- chrome.tabs.sendMessage sender, { networks: responseArray }
-        console.log "Extension response sent", response 
+        response <- chrome.tabs.sendMessage sender, { networks: responseObject }
+        #console.log "Extension response sent", response 
         cb null
     /* [Extension] Open choose accounts to import screen initiated by client. */
     injectAccounts = (data, cb)->
         whom = store.connected-wallet.activeTab
         return cb "active client`s Tab was not defined" if not whom?
-        console.log "[injectedAccounts] data" data
+        #console.log "[injectedAccounts] data" data
         store.connected-wallet.status.queried = yes
         navigate store, cweb3, \connectwallets
         /* Send response */
