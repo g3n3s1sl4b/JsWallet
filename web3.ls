@@ -58,7 +58,7 @@ build-unlock = (store, cweb3)-> (cb)->
 build-send-transaction = (store, cweb3, coin)-> (tx, cb)->
     network = coin[store.current.network]
     return cb "Transaction is required" if typeof! tx isnt \Object
-    { to, data, decoded-data, value, gas, amount, gas-price, swap, is-swap } = tx
+    { to, data, decoded-data, value, gas, amount, gas-price, swap } = tx
     return cb "Recipient (to) is required" if typeof! tx.to isnt \String
     value :=
         | value? => value
@@ -81,7 +81,7 @@ build-send-transaction = (store, cweb3, coin)-> (tx, cb)->
         to, data, decoded-data, network, coin, wallet, value, gas, gas-price, id, amount-send,
         amount-obtain, amount-obtain-usd, amount-send-usd,
         amount-send-fee, amount-send-fee-usd, details,
-        swap, is-swap
+        swap
     }
     { send-anyway, change-amount, choose-auto } = send-funcs store, web3t
     choose-auto!

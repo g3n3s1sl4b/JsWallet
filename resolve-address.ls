@@ -9,7 +9,7 @@ module.exports = (config, cb)->
     $token = coin.token
     $network = network
     chosen-network = store.current.send.chosen-network
-    if store.current.send.isSwap is yes and chosen-network.referTo?
+    if store.current.send.swap is yes and chosen-network.referTo?
         $token = chosen-network.referTo
         wallet = store.current.account.wallets |> find (-> it.coin.token is $token)
         return cb "Wallet for token #{chosen-network.name} not found!" if not wallet?

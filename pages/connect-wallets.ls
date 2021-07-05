@@ -404,7 +404,7 @@ connect-wallets.init = ({ store, web3t }, cb)->
     console.log "1. [init]"
     delete store.current.send?wallet
     store.current.send?tx-type = \regular
-    store.current.send.is-swap = no
+    store.current.send.swap = no
     store.connectedWallet.importing-networks = no
     store.current.send.chosen-network = null
     console.log "We do not have account" if not store.current.account? 

@@ -36,7 +36,7 @@ module.exports = (store, web3t, wallets, wallet)->
     swap = (store, wallet, event)-->
         cb = console.log
         store.current.send.contract-address = null
-        store.current.send.is-swap = yes
+        store.current.send.swap = yes
         return alert "Not yet loaded" if not wallet?
         return alert "Not yet loaded" if not web3t[wallet.coin.token]?
         { send-transaction } = web3t[wallet.coin.token]

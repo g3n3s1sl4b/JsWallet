@@ -493,7 +493,7 @@ send = ({ store, web3t })->
         go-back!  
     makeDisabled = send.amount-send <= 0
     token = store.current.send.coin.token
-    is-swap = store.current.send.is-swap is yes
+    is-swap = store.current.send.swap is yes
     send-func = before-send-anyway
     disabled = not send.to? or send.to.trim!.length is 0 or (send.error.index-of "address") > -1     
     receiver-is-swap-contract = contracts.is-swap-contract(store, store.current.send.contract-address)
@@ -501,7 +501,7 @@ send = ({ store, web3t })->
     get-recipient = (address)->
         address
     recipient = get-recipient(send.to)
-    title = if store.current.send.is-swap isnt yes then lang.send else \Swap
+    title = if store.current.send.swap isnt yes then lang.send else \Swap
     .pug.content
         .pug.title(style=border-header)
             .pug.header(class="#{show-class}") #{title}
@@ -602,7 +602,7 @@ module.exports.init = ({ store, web3t }, cb)->
         store.current.send.amountCharged = 0
         store.current.send.amountChargedUsd = 0
     store.current.send.error = ''
-    if store.current.send.is-swap isnt yes
+    if store.current.send.swap isnt yes
         store.current.send.contract-address = null
     is-swap-contract = contracts.is-swap-contract(store, send.to)
     if is-swap-contract then
@@ -614,7 +614,7 @@ module.exports.init = ({ store, web3t }, cb)->
         network-keys = networks |> keys
         default-network = networks[network-keys.0].name
     /* If it is Swap! */
-    if wallet.network.networks? and (store.current.send.isSwap is yes) then
+    if wallet.network.networks? and (store.current.send.swap is yes) then
         available-networks = 
             wallet.network.networks 
                 |> obj-to-pairs
