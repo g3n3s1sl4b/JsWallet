@@ -16,6 +16,8 @@ module.exports = (store, web3t)->
     return null if not store? or not web3t?
     lang = get-lang store
     generate-seed = ->
+        /* Uncomment below for supporting valid 256-bits 24-seed-words mnemonic (must be fixed on all wallets types at the same time) */
+        #seed = bip39.generate-mnemonic(256)
         seed = bip39.generate-mnemonic! + ' ' + bip39.generate-mnemonic!
         store.current.seed-words = seed.split(' ').map(-> { part: it })
         store.current.seed-generated = yes
@@ -34,6 +36,13 @@ module.exports = (store, web3t)->
         #         |> filter not-in-dictionary
         # return cb null if wrong.length is 0
         # res <- confirm store, "Some words do not match the dictionary. Do you want to continue?"
+        /* First check mnemonic generated with 256 bits length seed */
+        try
+            bip39.mnemonic-to-entropy store.current.seed-words.map(-> it.part).join(" ")
+            return cb null
+        catch e
+
+        /* If check fails continue to verify mnemonic generated with two 128 bits length seed phrases */
         try
             for i from 0 to store.current.seed-words.length-11 by 12
                 bip39.mnemonic-to-entropy store.current.seed-words.slice(i, i+12).map(-> it.part).join(" ")
