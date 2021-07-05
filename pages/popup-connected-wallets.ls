@@ -1,6 +1,6 @@
 require! {
     \react
-    \prelude-ls : { map, filter, find }
+    \prelude-ls : { keys, map, filter, find, obj-to-pairs }
     \./loading2.ls
     \../web3.ls
     \../get-primary-info.ls
@@ -103,16 +103,34 @@ require! {
                     margin: auto 10px
                     @media (max-width: 580px)
                         padding: 10px 0
+                    .network-container
+                        border: 1px solid #eeeeee26
+                        padding: 0 10px 10px 10px
+                        margin-bottom: 30px
+                        .network-title
+                            font-weight: 100
+                            text-transform: capitalize
+                            margin-bottom: 0
+                            margin-top: 0
+                            position: relative
+                            top: -17px
+                            display: inline-block
+                            padding: 5px 20px
+                            background: ""
+                        .connected-wallets-list
+                            white-space: nowrap
+                            height: 60px
+                            overflow: auto
                     .item
-                        width: 49%
                         margin-bottom: 10px
+                        margin-right: 10px
                         display: inline-block
                         background: #642dbd
                         border-radius: var(--border-btn)
                         padding: 10px
                         text-align: left
-                        float: left
                         box-sizing: border-box
+                        width: auto
                         @media (max-width: 580px)
                             width: 100%
                             float: none
@@ -123,9 +141,11 @@ require! {
                         >*
                             display: inline-block
                             vertical-align: middle
-                            height: 40px
-                            line-height: 40px
                             box-sizing: border-box
+                        .logo 
+                            img
+                                width: 30px
+                                height: 30px
                         input
                             margin: 0 5px
                             border-radius: var(--border-btn)
@@ -140,11 +160,9 @@ require! {
                         .title
                             margin-left: 10px
                             color: gray
-                            width: calc(100% - 90px)
+                            width: auto
                         button
                             width: 40px
-                            height: 40px
-                            line-height: 45px
                             border-radius: var(--border-btn)
                             border: 0 !important
                             box-sizing: border-box
@@ -179,20 +197,12 @@ require! {
             white-space: nowrap
             margin-top: 40px
 create-item = ({ store, web3t }, item)-->
-    extension-disconnect = ->
-        whom = store.connected-wallet.activeTab
-        return if not whom?
-        /* Get current opened tab origin */ 
-        origin = store.connected-wallet.origin 
-        chosenAccounts = store.connected-wallet.connected-sites["#{origin}"] ? [] 
-        chosenAccounts.splice(chosenAccounts.index-of(item), 1)      
-        tabs <- chrome.tabs.query {currentWindow: true, active: true}
-        activeTab = tabs?0
-        response <- chrome.tabs.sendMessage whom, {'networks': chosenAccounts}
-        console.log "response", response 
-    wallet = store.current.account.wallets |> find (-> it.coin.token is item)
-    {name, image} = wallet.coin    
-    title = "#{name}"
+    console.log "item" item
+    data = Object.keys(item)
+    console.log "3 data" data
+    network = data.0
+    $wallets = item[network]   
+        
     style = get-primary-info store
     button-style =
         border: "1px solid #{style.app.text}"
@@ -201,11 +211,48 @@ create-item = ({ store, web3t }, item)-->
         background: style.app.input
     menu-style=
         color: style.app.text
-    .item.pug(style=background)
-        img.pug(src="#{image}")
-        span.pug.title(style=menu-style) #{title}
-        button.pug(on-click=extension-disconnect style=button-style)
-            img.icon-svg1.pug(src="#{icons.close}")
+        fontSize: "16px"
+        lineHeight: "auto"
+    network-title-style = 
+        background: style.app.background 
+    build-wallet = (network, item)-->
+        console.log "[ build-wallet]"
+        wallet = store.current.account.wallets |> find (-> it.coin.token is item)
+        return null if not wallet?
+        {name, image} = wallet.coin
+        title = "#{name}"
+        /* methods */
+        extension-disconnect = ->
+            whom = store.connected-wallet.activeTab
+            #TODO uncomment in production
+            #return if not whom?
+            /* Get current opened tab origin */ 
+            origin = store.connected-wallet.origin 
+            chosenNetworks = store.connected-wallet.connected-sites["#{origin}"] ? {}
+            connected-wallets = chosenNetworks[network]
+            connected-wallets.splice(connected-wallets.index-of(item), 1)
+            if connected-wallets.length is 0
+               delete chosenNetworks[network]    
+            console.log "store.connected-wallet.connected-sites[#{origin}]" store.connected-wallet.connected-sites["#{origin}"]    
+            /* Stop proceding if it is not an extension */
+            return if not chrome?tabs?query?
+            tabs <- chrome.tabs.query {currentWindow: true, active: true}
+            activeTab = tabs?0
+            response <- chrome.tabs.sendMessage whom, {'networks': chosenNetworks}
+            console.log "response", response   
+        .item.pug(style=background)
+            .logo.pug
+                img.pug(src="#{image}")
+            span.pug.title(style=menu-style) #{title}
+            button.pug(on-click=extension-disconnect style=button-style)
+                img.icon-svg1.pug(src="#{icons.close}")
+        
+    .network-container.pug
+        h3.pug.network-title(style=network-title-style) #{network} Network
+        .connected-wallets-list.pug
+            $wallets |> map build-wallet(network) 
+    
+            
 module.exports = ({ store, web3t } )->
     return null if store.connected-wallet.openStatusBarPopup isnt yes
     network = store.current.network   
@@ -228,8 +275,8 @@ module.exports = ({ store, web3t } )->
         color: style.app.text
     site = store.connected-wallet.site 
     origin = store.connected-wallet.origin  
-    chosenAccounts = store.connected-wallet.connected-sites["#{origin}"] ? []  
-    connected-number = chosenAccounts.length 
+    chosenNetworks = store.connected-wallet.connected-sites["#{origin}"] ? {}  
+    connected-number = Object.keys(chosenNetworks).length 
     go-to-manual-connect = ->
         store.connected-wallet.status.queried = yes      
         navigate store, web3t, "connectwallets"   
@@ -241,14 +288,18 @@ module.exports = ({ store, web3t } )->
                 .pug.title(style=color)
                     .pug
                         .pug #{site}
-                        h6.pug You have #{connected-number} wallet(s) connected to this site.   
+                        h6.pug You have #{connected-number} network(s) connected to this site.   
                 .pug.settings
                     .pug.section
-                        if chosenAccounts.length <= 0
+                        if connected-number <= 0
                             .pug
                                 .pug Velas is not connected this site.\nTo connect site to a web3t, find the connect button on their site.\n\nOr you can manually connect current site.
                                 .extra-button.pug(on-click=go-to-manual-connect style=button-style) Manually connect
                         else
                             .list.pug
-                                chosenAccounts
+                                chosenNetworks
+                                    |> obj-to-pairs
+                                    |> map (-> {"#{it.0}":it.1})
                                     |> map create-item { store, web3t }
+                    if connected-number > 0
+                        .extra-button.pug(on-click=go-to-manual-connect style=button-style) Manually connect
