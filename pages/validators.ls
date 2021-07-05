@@ -281,6 +281,25 @@ require! {
                                 color: orange
                             &.banned
                                 color: red
+                            .inner-address-holder
+                                text-align: left !important 
+                            &.validator-item                
+                                &.delinquent
+                                    .inner-address-holder
+                                        &:after
+                                            content: "Delinquent"
+                                            color: #e84444
+                                .inner-address-holder
+                                    overflow: visible
+                                    &:after
+                                        content: "Running"
+                                        color: green
+                                        position: absolute 
+                                        left: 50px
+                                        opacity: .8
+                                        font-size: 10px
+                                        top: 16px
+                                        font-weight: bold 
                             .circle
                                 border-radius: 0px
                                 width: 20px
@@ -677,6 +696,7 @@ staking-content = (store, web3t)->
     build-staker = (store, web3t)-> (item)->
         checked = item.checked
         stake = item.stakeInitial
+        isDelinquent = item.status is "delinquent"
         $stake = round-human(stake, {decimals:2})
         my-stake =
             | +item.my-stake.length is 0 => []
@@ -703,6 +723,9 @@ staking-content = (store, web3t)->
                 | reward > 75 => \orange
                 | reward > 40 => "rgb(165, 174, 81)"
                 | _ => "rgb(38, 219, 85)"
+        delinquent-class =
+            | isDelinquent => "delinquent"
+            | _ => ""
         vlx_native =
             store.current.account.wallets |> find (.coin.token is \vlx_native)
         return null if not vlx_native?
@@ -714,7 +737,7 @@ staking-content = (store, web3t)->
             | item.vote-power? => "#{item.vote-power}%"
             | _ => "..."
         mystake-class = if my-stake isnt 0 then "with-stake" else ""
-        tr.pug(class="#{item.status}")
+        tr.pug( key="validator-item-#{item.address}" class="validator-item #{item.status} #{delinquent-class}")
             td.pug(datacolumn='Staker Address' title="#{item.address}")
                 address-holder-popup { store, wallet }
             td.pug #{$stake}
@@ -902,13 +925,20 @@ validators.init = ({ store, web3t }, cb)!->
     page = store.staking["current_#{type}_page"] ? 1
     per-page = store.staking["#{type}_per_page"]
     if +(page `times` per-page) >= store.staking.accounts.length
-        store.staking["current_#{type}_page"] = 1    
+        store.staking["current_#{type}_page"] = 1 
+    #<- set-timeout _, 4000
     on-progress = ->
         store.staking.pools = convert-pools-to-view-model [...it]
     err, pools <- query-pools {store, web3t, on-progress}
     return cb err if err?
     store.staking.pools = convert-pools-to-view-model pools
-        |> sort-by (-> it.myStake.length ) |> reverse 
+        |> sort-by (-> it.myStake.length )
+    delinquent = store.staking.pools |> filter (-> it.status is "delinquent")
+    running = store.staking.pools
+        |> filter (it)->
+            delinquent.index-of(it) < 0
+        |> reverse
+    store.staking.pools = running ++ delinquent
     store.staking.poolsFiltered = store.staking.pools
     store.staking.getAccountsFromCashe = no
     err <- calc-certain-wallet(store, "vlx_native")
