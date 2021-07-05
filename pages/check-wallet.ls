@@ -1,7 +1,8 @@
 require! {
     \react
     \../tools.ls : { money }
-    \prelude-ls : { each, find, map }
+    \../math.js : { minus, div, times, plus }
+    \prelude-ls : { each, find, map, foldl, filter, keys }
     \../wallet-funcs.ls
     \../get-lang.ls
     \./icon.ls
@@ -13,6 +14,7 @@ require! {
     \../components/button.ls
     \../components/address-holder.ls
     \../components/checkbox.ls
+    \../plugin-loader.ls : { get-all-coins }
 }
 .wallet
     @import scheme
@@ -135,6 +137,8 @@ require! {
                 width: auto
                 @media screen and (max-width: 390px)
                     display: none
+                .group-title
+                    text-transform: uppercase
                 >.name
                     padding-left: 3px
                 >.price
@@ -215,8 +219,9 @@ require! {
                     width: 40px
                     line-height: 30px
 cb = console~log
-module.exports = (store, web3t, wallets, wallet)-->
-    { button-style, uninstall, wallet, active, big, balance, balance-usd, pending, send, receive, swap, expand, usd-rate, last } = wallet-funcs store, web3t, wallets, wallet
+module.exports = (store, web3t, group-name)-->
+    console.log "[check-wallet] group-name" group-name
+    #{ button-style, uninstall, active, big, balance, balance-usd, pending, send, receive, swap, expand, usd-rate, last } = wallet-funcs store, web3t, wallets, wallet
     lang = get-lang store
     style = get-primary-info store
     label-uninstall =
@@ -247,40 +252,51 @@ module.exports = (store, web3t, wallets, wallet)-->
     placeholder-coin =
         | store.current.refreshing => "placeholder-coin"
         | _ => ""
-    name = wallet.coin.name ? wallet.coin.token
-    token = wallet.coin.token
-    token-display = (wallet.coin.nickname ? "").to-upper-case!
+        
     makeDisabled = store.current.refreshing
-    wallet-is-disabled  = isNaN(wallet.balance)
     is-loading = store.current.refreshing is yes
-    account-index = store.connected-wallet.tempChosenAccounts.index-of(token)
-    disabled-class = if not is-loading and wallet-is-disabled then "disabled-wallet-item" else ""
-    value = store.connected-wallet.tempChosenAccounts[account-index] ? null
+    
+    
+    tokens-groups-array = Object.keys(store.connected-wallet.tokens-groups)
+    /* Array of tokens inthe group */    
+    group-tokens = store.connected-wallet.tokens-groups[group-name]
+    
+    group-index = store.connected-wallet.tempChosenGroups.index-of(group-name)
+    disabled-class = ""
+    value = store.connected-wallet.tempChosenGroups[group-index] ? null
     isChecked = value?
-    wallets_keys = wallets |> map (-> it.coin.token)
-    tempChosenAccounts = store.connected-wallet.tempChosenAccounts
+    
+    all-wallets = get-all-coins(store)
+    all-groups = store.connected-wallet.tokens-groups
+    all-groups-arr = store.connected-wallet.tokens-groups |> keys
+    wallets_keys = all-wallets |> map (-> it.token)
+    
+    tempChosenGroups = store.connectedWallet.tempChosenGroups
+    
+    
+    /* Methods */
+    #remove-wallet-from-chosen = ->
+    
     on-change = ->
-        console.log "[Check wallet on-change]"         
-        if account-index > -1
-            store.connected-wallet.tempChosenAccounts.splice(account-index, 1)
+        if group-index > -1
+            store.connectedWallet.tempChosenGroups.splice(group-index, 1)
         else
-            store.connected-wallet.tempChosenAccounts.push(token)
-        store.connected-wallet.tempChosenAccountsAllChecked = 
-            | wallets_keys.length is tempChosenAccounts.length => yes 
+            store.connectedWallet.tempChosenGroups.push(group-name)
+            
+        store.connected-wallet.tempChosenGroupsAllChecked = 
+            | all-groups-arr.length is tempChosenGroups.length => yes 
             | _ => no   
-    .wallet.pug.wallet-item(class="big" key="#{token}" style=border-style)
+            
+    render-wallets = (group-token)->
+        span.pug.group-token #{group-token}
+            
+    /* Render */
+    .wallet.pug.wallet-item(class="big" style=border-style)
         .wallet-top.pug
             .top-left.pug(style=wallet-style)
                 checkbox { store, on-change, value="#{value}" checked=isChecked, disabled=no }
-                .img.pug(class="#{placeholder-coin}")
-                    img.pug(src="#{wallet.coin.image}")
                 .info.pug
-                    .balance.pug.title(class="#{placeholder}") #{name}
-                    .price.token.pug(class="#{placeholder}" title="#{wallet.balance}")
-                        span.pug #{ round-human wallet.balance }
-                        span.pug #{ token-display }
-                    .price.pug(class="#{placeholder}" title="#{balance-usd}")
-                        span.pug #{ round-human balance-usd}
-                        span.pug USD
-        .wallet-middle.pug(style=border)
-            address-holder { store, wallet, type: \bg }
+                    .balance.pug.group-title(class="#{placeholder}") #{group-name}
+                    .price.token.pug(class="#{placeholder}" )
+                        group-tokens |> map render-wallets
+                    
