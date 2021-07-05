@@ -2,7 +2,7 @@ require! {
     \./navigate.ls
     \./seed.ls : seedmem
     \../web3t/providers/deps.ls : { bip39 }
-    \./pages/confirmation.ls : { confirm }
+    \./pages/confirmation.ls : { alert }
     \prelude-ls : { words, map, filter, join }
     \./get-lang.ls
 }
@@ -48,9 +48,8 @@ module.exports = (store, web3t)->
                 bip39.mnemonic-to-entropy store.current.seed-words.slice(i, i+12).map(-> it.part).join(" ")
             cb null
         catch
-            res <- confirm store, "Seed phrase checksum not match. Do you want to continue?"
-            return cb "cancelled" if res is no
-            cb null
+            alert store, "Seed phrase checksum not match. Please try again."
+            store.current.page = \newseedrestore
     save = ->
         err <- verify-seed
         return if err?
