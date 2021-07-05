@@ -1,7 +1,7 @@
 require! {
     \react
     \./check-wallet.ls
-    \prelude-ls : { map, take, drop, join }
+    \prelude-ls : { map, take, drop, join, keys, each, filter, pairs-to-obj }
     \../seed.ls : seedmem
     \./menu.ls
     \../web3.ls
@@ -17,6 +17,7 @@ require! {
     \../menu-funcs.ls
     \../navigate.ls
     \./your-account.ls
+    \../plugin-loader.ls : { get-all-coins, get-all-plugins }
 }
 .connect-wallets-final-step
     $mobile: 425px
@@ -25,6 +26,9 @@ require! {
     button.btn
         min-width: auto
         margin: 0
+    .confirm-button
+        &:disabled
+            opacity: 0.3
     @keyframes blink-animation
         50%
             opacity: 0.3
@@ -278,16 +282,20 @@ connect-wallets = ({ store, web3t })->
     { wallets, go-up, can-up, go-down, can-down } = wallets-funcs store, web3t
     style = get-primary-info store
     lang = get-lang store
+    
     /* Props */
+    all-groups-arr = store.connected-wallet.tokens-groups |> keys
     accounts-to-connnect = 
-        | store.connected-wallet.tempChosenAccounts.length is store.current.account.wallets.length =>
-            "all your wallets of account"
+        | store.connectedWallet.tempChosenGroups.length is all-groups-arr.length =>
+            "all your networks of account"
         | _ => 
             ending = 
-                | store.connected-wallet.tempChosenAccounts.length > 1 => "s"
+                | store.connected-wallet.tempChosenGroups.length > 1 => "s"
                 | _ => ""
-            accs = store.connected-wallet.tempChosenAccounts |> map (-> it.to-upper-case!) |> join (", ")
-            "#{accs} account#{ending}" 
+            accs = store.connected-wallet.tempChosenGroups |> map (-> it.to-upper-case!) |> join (", ")
+            "#{accs} network#{ending}" 
+    btn-disabled = store.connectedWallet.importing-networks is yes
+    
     /* Styles */
     icon-color-style=
         filter: info.app.icon-filter
@@ -325,23 +333,97 @@ connect-wallets = ({ store, web3t })->
         color: style.app.text
     subtitle-style =
         margin-top: "-10px"
+        
     /* Action Listeners */
     cancel = ->
-        store.connected-wallet.tempChosenAccounts = []
-        go-to-home!
+        store.connected-wallet.tempChosenGroups = []
+        go-to-home!   
+    /*
+    * Get chosen networks object.
+    * @param   { Object } <key: NETWORK_NAME, value: <Array>[] wallets> - Tokens networks 
+    * @returns { Object } <key: NETWORK_NAME, value: <Array>[] wallets> - Object of chosen networks.
+    * */
+    getChosenNetworksObject = (tokens-networks)->
+        /* Get all chosen groups */
+        tempChosenGroups = store.connectedWallet.tempChosenGroups
+        tokens-networks 
+            |> keys
+            |> filter (name)->
+                name in tempChosenGroups
+            |> map (it)-> [ it, tokens-networks[it] ]
+            |> pairs-to-obj    
+
+    install-chosen-plugins = ([plugin, ...rest], cb)->
+        return cb null if not plugin?
+        console.log "trying to install plugin" , { plugin }
+        store.connectedWallet.installedPlugin = plugin
+        #try
+        err <- web3t.install-quick plugin
+        console.log "error" {err} if err?
+        #catch e
+            #console.log "error" {e}
+        #return cb err if err?
+        install-chosen-plugins(rest, cb) 
+        
     confirm = ->
+        console.log "confirm"
+        cb = console.log
+        store.connectedWallet.importing-networks = yes
         whom = store.connected-wallet.activeTab
-        return if not whom?
+        #return if not whom?
+        
+        /* Get all chosen groups */
+        tempChosenGroups = store.connectedWallet.tempChosenGroups
+        
+        /* Get all wallets assosiated to selected groups */
+        tokensGroups = store.connectedWallet.tokensGroups
+        all-plugins = get-all-plugins(store)
+        console.log "all-plugins" all-plugins
+        
+        selected-wallets = {arr:[]}
+        tempChosenGroups 
+            |> filter (group)-> 
+                tokensGroups[group]?
+            |> each (group)->
+                tokens = tokensGroups[group]
+                console.log "tokens1" tokens
+                selected-wallets.arr = selected-wallets.arr ++ [...tokens]
+        
+        if selected-wallets.arr.length is 0
+            store.connectedWallet.importing-networks = no
+            return cb "Selected wallets length must be more than 0"  
+        
+        /* Get only chosen plugins by client */
+        chosen-plugins = all-plugins |> filter (-> it.token in selected-wallets.arr)
+        
+        /* Check if seleted wallets are available in wallet and if its not, try to activate them. */ 
+        err <- install-chosen-plugins(chosen-plugins)
+        return cb err if err?
+        
         /* Check if origin in the conected-sites array */ 
         origin = store.connected-wallet.origin
-        store.connected-wallet.chosenAccounts = [ ...store.connected-wallet.tempChosenAccounts ]
+        
+        /* Prepare chosen networks object for sending back to client */
+        /* { ethereum: [], btc: [], ... } */
+        chosenNetworks = getChosenNetworksObject( store.connected-wallet.tokens-groups )       
+        console.log "Result chosenNetworks:" chosenNetworks     
+        return cb "chosenNetworks object is empty" if Object.keys(chosenNetworks).length <= 0 
+        store.connected-wallet.chosenNetworks = chosenNetworks
+        
+        #store.connected-wallet.chosenAccounts = [ ...store.connected-wallet.tempChosenAccounts ]
         store.connected-wallet.isConnecting = yes
+        
         /* Add networks for origin */
-        store.connected-wallet.connected-sites["#{origin}"] = store.connected-wallet.chosenAccounts  
+        store.connected-wallet.connected-sites["#{origin}"] = store.connected-wallet.chosenNetworks 
+        
+                
+        store.connectedWallet.importing-networks = no
+
+        return if not chrome?tabs?query?
         tabs <- chrome.tabs.query { currentWindow: true active: true }
         activeTab = tabs?0
-        console.log "activeTab browser" activeTab
-        response <- chrome.tabs.sendMessage whom, {'networks': store.connected-wallet.chosenAccounts, method: "inject-chosen-accounts"}
+
+        response <- chrome.tabs.sendMessage whom, {'networks': store.connected-wallet.chosenNetworks, method: "inject-chosen-accounts"}
         console.log "confirm response", response 
         store.connected-wallet.isConnecting = no
         go-to-home!
@@ -353,7 +435,9 @@ connect-wallets = ({ store, web3t })->
     go-back = ->
         store.connected-wallet.status.queried = yes
         navigate store, web3t, "wallets"
-    /* * * * * * * * * * * * */
+        
+        
+    /* Render */
     .pug.connect-wallets-final-step(key="wallets")
         manage-account { store, web3t }
         token-migration { store, web3t }
@@ -377,7 +461,7 @@ connect-wallets = ({ store, web3t })->
                             span.cancel.pug
                                 img.icon-svg-cancel.pug(src="#{icons.close}")
                                 | #{lang.cancel}
-                        button.pug.button(on-click=confirm style=button-style id="connect-prompt-confirm" disabled=no)
+                        button.pug.button.confirm-button(on-click=confirm style=button-style id="connect-prompt-confirm" disabled=btn-disabled)
                             span.apply.pug
                                 img.icon-svg-apply.pug(src="#{icons.apply}")
                                 | Connect

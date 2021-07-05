@@ -1,7 +1,7 @@
 require! {
     \react
     \./check-wallet.ls
-    \prelude-ls : { map, take, drop }
+    \prelude-ls : { each, keys, map, take, drop, foldl }
     \../seed.ls : seedmem
     \./menu.ls
     \../web3.ls
@@ -18,6 +18,7 @@ require! {
     \../navigate.ls
     \../components/switch-account.ls
     \../components/checkbox.ls
+    \../plugin-loader.ls : { get-all-coins }
 }
 .connect-wallet
     $mobile: 425px
@@ -237,6 +238,10 @@ require! {
                         padding-right: 10px
             &.title-balance
                 display: none
+                
+get-all-groups = (store)->
+    store.connected-wallet.tokens-groups |> keys
+                
 connect-wallets = ({store, web3t})->
     return null if store.connected-wallet.status.queried is no
     { current, open-account, lock, wallet-style, info, refresh, lock } = menu-funcs store, web3t
@@ -278,14 +283,16 @@ connect-wallets = ({store, web3t})->
         if store.current.edit-account-name is "" then view-account-template! else edit-account-template!
     /* Props */
     button-disabled = 
-        | store.connected-wallet.tempChosenAccounts.length > 0 => false
+        | store.connected-wallet.tempChosenGroups.length > 0 => false
         | _ => true
+        
     button-disabled-class = if button-disabled then "disabled" else ""
-    allAreChecked = store.connected-wallet.tempChosenAccountsAllChecked
-    wallets_keys = wallets |> map (-> it.coin.token)
-    tempChosenAccounts = store.connected-wallet.tempChosenAccounts
+    
+    allGroupsAreChecked = store.connectedWallet.tempChosenGroups.length is get-all-groups(store).length
+    tokens-groups = store.connected-wallet.tokens-groups
+
     allCheckedValue = 
-        | (allAreChecked is yes) => 'all' 
+        | (allGroupsAreChecked is yes) => 'all' 
         | _ => null   
     /* Styles */
     border-style-w =
@@ -322,22 +329,43 @@ connect-wallets = ({store, web3t})->
         color: style.app.text
     subtitle-style =
         margin-top: "-10px"
+        
+        
     /* Action Listeners */
+    buffer = {tokens: []}
+    get-all-tokens = ->
+        tokens-groups 
+            |> keys
+            |> each (it)->
+                console.log "it" it
+                buffer.tokens = buffer.tokens ++ tokens-groups[it]
+        buffer.tokens   
+             
+    check-all-groups = ->
+        store.connectedWallet.tempChosenGroups = get-all-groups(store)
+        
+    uncheck-all-groups = ->
+        store.connectedWallet.tempChosenGroups = []  
+        
     cancel = ->
-        store.connected-wallet.tempChosenAccounts = []
+        uncheck-all-groups!
         go-to-home!
+        
     confirm = ->
         navigate store, web3t, "connectwalletsfinalstep"
+        
     go-to-home = ->
         store.connected-wallet.status.queried = no
         navigate store, web3t, "wallets"
+        
     on-change = -> 
-        store.connected-wallet.tempChosenAccountsAllChecked = !store.connected-wallet.tempChosenAccountsAllChecked  
-        if store.connected-wallet.tempChosenAccountsAllChecked is yes     
-            store.connected-wallet.tempChosenAccounts = wallets_keys
+        if not allGroupsAreChecked   
+            check-all-groups!
         else 
-            store.connected-wallet.tempChosenAccounts = [] 
-    /* * * * * * * * * * * * */
+            uncheck-all-groups! 
+            
+            
+    /* Render */
     .pug.connect-wallet(key="wallets")
         manage-account { store, web3t }
         token-migration { store, web3t }
@@ -350,15 +378,15 @@ connect-wallets = ({store, web3t})->
                         | Connect with Velas
                         span.pug.branding
                             img.pug(src="#{info.branding.logo-sm}" style=logo-style)
-                h5.pug(style=subtitle-style) Select wallet(s)
+                h5.pug(style=subtitle-style) Select network(s)
                 .header.pug(style=header-style)
                     .pug.select-all-checkbox
-                        checkbox { store, on-change, value="#{allCheckedValue}" checked=allAreChecked, disabled=no }
-                    span.pug.head.left.h1.hidden(style=header-left) All #{lang.your-wallets}
+                        checkbox { store, on-change, value="#{allCheckedValue}" checked=allGroupsAreChecked, disabled=no }
+                    span.pug.head.left.h1.hidden(style=header-left) All Networks
                     chosen-account-template
                     switch-account store, web3t
                 .wallet-container.pug(key="wallets-viewport" style=border-style-w)
-                    wallets |> map check-wallet store, web3t, wallets
+                    tokens-groups |> keys |> map check-wallet store, web3t
                 span.pug.trust-notification 
                     | Only connect with sites you trust.
                 .pug.confirmation
@@ -371,27 +399,39 @@ connect-wallets = ({store, web3t})->
                             span.apply.pug
                                 img.icon-svg-apply.pug(src="#{icons.apply}")
                                 | #{lang.confirm}
+get-choosen-groups = (store, chosenAccounts)->
 connect-wallets.init = ({ store, web3t }, cb)->
     console.log "1. [init]"
     delete store.current.send?wallet
     store.current.send?tx-type = \regular
     store.current.send.is-swap = no
+    store.connectedWallet.importing-networks = no
     store.current.send.chosen-network = null
     console.log "We do not have account" if not store.current.account? 
     #return cb null if store.current.account?
     #TODO: fix this seedmem.get! but before need to ask users to make backup wallets
     seedmem.mnemonic = seedmem.get!
     err <- web3t.init
-    #console.log err
-    /* Set chosen previously accounts */ 
+    
+    #all-coins = get-all-coins(store)
+    #err, wallets <- generate-coin-wallets all-coins
+    #return cb err if err?
+    
+    /* Get previously added networks Object for current site */
     origin = store.connected-wallet.origin
-    console.log "Get origin: " origin 
-    chosenAccounts = 
+    chosenNetworks = 
         | store.connected-wallet.connectedSites["#{origin}"]? => [...store.connected-wallet.connectedSites["#{origin}"]]
-        | _ => []
-    #chosenAccounts = [...store.connected-wallet.chosenAccounts]
-    store.connected-wallet.tempChosenAccounts = chosenAccounts
+        | _ => {}
+    chosenNetworks = store.connected-wallet.connected-sites["#{origin}"] ? {}  
+    
+    tempChosenGroups = Object.keys(chosenNetworks)
+    store.connectedWallet.tempChosenGroups = tempChosenGroups 
+    
+    #store.connectedWallet.tempChosenGroups = get-all-groups(store)    
+        
     cb null
+    
+    
 connect-wallets.focus = ({ store, web3t }, cb)->
     console.log "2. [focus]"
     #err <- web3t.refresh   
