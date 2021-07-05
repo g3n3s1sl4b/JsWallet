@@ -56,7 +56,7 @@ save-registry = (registry)->
 add-to-registry = (name, cb)->
     err, registry <- get-registry
     return cb err if err?
-    return if registry.index-of(name) > -1
+    return cb "#{name} already installed" if registry.index-of(name) > -1
     registry.push name
     save-registry registry
     cb null
