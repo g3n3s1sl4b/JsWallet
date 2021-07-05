@@ -121,6 +121,10 @@ class VelasStaking {
     async getStakingValidators() {
         const voteAccounts = await this.connection.getVoteAccounts();
 
+        for (var i in voteAccounts.delinquent) {
+            voteAccounts.delinquent[i].delinquent = true;
+        }
+
         const validators = voteAccounts.current.concat(voteAccounts.delinquent);
 
         for (var i in validators) {
