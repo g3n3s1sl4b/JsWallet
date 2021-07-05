@@ -188,7 +188,7 @@ convert-pools-to-view-model = (pools) ->
             lastVote: if it.lastVote then round-human(it.lastVote) else '..'
             stakers: if it.delegators? then it.delegators else '..',
             is-validator:  (it?stakes? and it.stakes.length isnt 0) ? false,
-            status: it.status,
+            status: if it?delinquent is yes then "delinquent" else it.status,
             my-stake: if it?stakes then it.stakes else []
             credits_observed : it.credits_observed
         }
