@@ -40,11 +40,16 @@ statusbar = ({ store, web3t })->
     style = get-primary-info store
     applied-text = lang[text] ? text ? ""
     applied-icon = icons[icon ? text] ? icons.more
+    
+    origin = store.connected-wallet.origin
+    chosenNetworks = store.connected-wallet.connected-sites["#{origin}"] ? {}  
+    connected-number = Object.keys(chosenNetworks).length
+    
     text = 
-        | Object.keys(store.connected-wallet.chosenNetworks).length > 0 => "Connected"
+        | connected-number > 0 => "Connected"
         | _ => "Disconnected"
     status = 
-        |  Object.keys(store.connected-wallet.chosenNetworks).length > 0 => "connected"
+        |  connected-number > 0 => "connected"
         | _ => "disconnected" 
     on-click = -> 
         #return alert store, "Velas is not connected this site.\nTo connect site to a web3t, find the connect button on their site.\n\nOr you can manually connect current site." if store.connected-wallet.chosenAccounts.length <= 0  

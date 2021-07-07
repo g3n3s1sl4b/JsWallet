@@ -19,6 +19,7 @@ require! {
     \../components/switch-account.ls
     \../components/checkbox.ls
     \../plugin-loader.ls : { get-all-coins }
+    \../storage.js
 }
 .connect-wallet
     $mobile: 425px
@@ -239,8 +240,14 @@ require! {
             &.title-balance
                 display: none
                 
+network-wallets =   
+    velas:    <[ vlx_native vlx2 vlx_evm syx syx2 ]> 
+    ethereum: <[ eth usdt_erc20 ]>
+    bitcoin:  <[ btc usdt ]>
+    litecoin: <[ ltc ]> 
+                
 get-all-groups = (store)->
-    store.connected-wallet.tokens-groups |> keys
+    network-wallets |> keys
                 
 connect-wallets = ({store, web3t})->
     return null if store.connected-wallet.status.queried is no
@@ -289,7 +296,6 @@ connect-wallets = ({store, web3t})->
     button-disabled-class = if button-disabled then "disabled" else ""
     
     allGroupsAreChecked = store.connectedWallet.tempChosenGroups.length is get-all-groups(store).length
-    tokens-groups = store.connected-wallet.tokens-groups
 
     allCheckedValue = 
         | (allGroupsAreChecked is yes) => 'all' 
@@ -334,11 +340,10 @@ connect-wallets = ({store, web3t})->
     /* Action Listeners */
     buffer = {tokens: []}
     get-all-tokens = ->
-        tokens-groups 
+        network-wallets 
             |> keys
             |> each (it)->
-                console.log "it" it
-                buffer.tokens = buffer.tokens ++ tokens-groups[it]
+                buffer.tokens = buffer.tokens ++ network-wallets[it]
         buffer.tokens   
              
     check-all-groups = ->
@@ -386,7 +391,7 @@ connect-wallets = ({store, web3t})->
                     chosen-account-template
                     switch-account store, web3t
                 .wallet-container.pug(key="wallets-viewport" style=border-style-w)
-                    tokens-groups |> keys |> map check-wallet store, web3t
+                    network-wallets |> keys |> map check-wallet store, web3t
                 span.pug.trust-notification 
                     | Only connect with sites you trust.
                 .pug.confirmation
@@ -418,13 +423,20 @@ connect-wallets.init = ({ store, web3t }, cb)->
     #return cb err if err?
     
     /* Get previously added networks Object for current site */
+    #chromeStorage = new storage()
+    #result <- chromeStorage.getItem("connectedVelasSites") 
     origin = store.connected-wallet.origin
-    chosenNetworks = 
-        | store.connected-wallet.connectedSites["#{origin}"]? => [...store.connected-wallet.connectedSites["#{origin}"]]
-        | _ => {}
-    chosenNetworks = store.connected-wallet.connected-sites["#{origin}"] ? {}  
+    console.log ""
+    console.log "origin" origin 
+    console.log "s[connect wallet.ls] tore.connected-wallet.connectedSites" store.connected-wallet.connectedSites
+    console.log ""
     
+    chosenNetworks = 
+        | store.connected-wallet.connectedSites?["#{origin}"]? => store.connected-wallet.connectedSites["#{origin}"]
+        | _ => {}
+    console.log "chosenNetworks" chosenNetworks 
     tempChosenGroups = Object.keys(chosenNetworks)
+    console.log "tempChosenGroups must be non-empty" tempChosenGroups   
     store.connectedWallet.tempChosenGroups = tempChosenGroups 
     
     #store.connectedWallet.tempChosenGroups = get-all-groups(store)    

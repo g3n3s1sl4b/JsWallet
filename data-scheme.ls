@@ -235,7 +235,7 @@ store =
     releases: []
     connected-wallet: 
         activeTab: null  
-        tokens-groups:   
+        network-wallets:   
             velas:    <[ vlx_native vlx2 vlx_evm syx syx2 ]> 
             ethereum: <[ eth usdt_erc20 ]>
             bitcoin:  <[ btc usdt ]>
@@ -257,7 +257,8 @@ store =
         origin: ""  
         connectedSites: {}
         installedPlugin: null 
-        importing-networks: no  
+        importing-networks: no
+        wallet-is-removing: no  
     current:
         transactions-are-loading: no
         address-suffix: ''

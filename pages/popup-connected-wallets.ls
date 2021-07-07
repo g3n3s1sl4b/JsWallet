@@ -1,6 +1,6 @@
 require! {
     \react
-    \prelude-ls : { keys, map, filter, find, obj-to-pairs }
+    \prelude-ls : { keys, map, filter, find, obj-to-pairs, pairs-to-obj }
     \./loading2.ls
     \../web3.ls
     \../get-primary-info.ls
@@ -9,6 +9,7 @@ require! {
     \../icons.ls
     \../../web3t/providers/superagent.ls : { get }
     \../navigate.ls
+    \../storage.js
 }
 .manage-connected-wallets   
     @import scheme
@@ -197,9 +198,7 @@ require! {
             white-space: nowrap
             margin-top: 40px
 create-item = ({ store, web3t }, item)-->
-    console.log "item" item
     data = Object.keys(item)
-    console.log "3 data" data
     network = data.0
     $wallets = item[network]   
         
@@ -216,30 +215,50 @@ create-item = ({ store, web3t }, item)-->
     network-title-style = 
         background: style.app.background 
     build-wallet = (network, item)-->
-        console.log "[ build-wallet]"
         wallet = store.current.account.wallets |> find (-> it.coin.token is item)
         return null if not wallet?
         {name, image} = wallet.coin
         title = "#{name}"
+        /* Get current opened tab origin */ 
+        origin = store.connected-wallet.origin
+        chosenNetworks = store.connected-wallet.connected-sites["#{origin}"]
+        return null if not chosenNetworks 
         /* methods */
         extension-disconnect = ->
+            store.connected-wallet.openStatusBarPopup = no
+            store.connected-wallet.wallet-is-removing = yes
             whom = store.connected-wallet.activeTab
             #TODO uncomment in production
-            #return if not whom?
-            /* Get current opened tab origin */ 
-            origin = store.connected-wallet.origin 
-            chosenNetworks = store.connected-wallet.connected-sites["#{origin}"] ? {}
+            #return if not whom?           
             connected-wallets = chosenNetworks[network]
             connected-wallets.splice(connected-wallets.index-of(item), 1)
             if connected-wallets.length is 0
-               delete chosenNetworks[network]    
+               delete chosenNetworks[network]
+            store.connected-wallet.openStatusBarPopup = yes
+            console.log "connected-wallets after removing (-) " connected-wallets   
+            /* Update data in the chrome local storage */
+            chromeStorage = new storage()
+            transform = (obj)->
+                obj
+                    |> obj-to-pairs
+                    |> map (-> [it.0, it.1.slice!])
+                    |> pairs-to-obj    
+            cloneResult = store.connected-wallet.connected-sites
+                |> obj-to-pairs
+                |> map (-> [it.0, transform(it.1)])       
+                |> pairs-to-obj 
+            <- chromeStorage.setItem({connectedVelasSites: cloneResult})
+                   
             console.log "store.connected-wallet.connected-sites[#{origin}]" store.connected-wallet.connected-sites["#{origin}"]    
             /* Stop proceding if it is not an extension */
             return if not chrome?tabs?query?
             tabs <- chrome.tabs.query {currentWindow: true, active: true}
             activeTab = tabs?0
             response <- chrome.tabs.sendMessage whom, {'networks': chosenNetworks}
-            console.log "response", response   
+            console.log "response", response 
+            <- set-timeout _, 10 
+            store.connected-wallet.wallet-is-removing = no
+             
         .item.pug(style=background)
             .logo.pug
                 img.pug(src="#{image}")

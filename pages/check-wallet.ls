@@ -220,7 +220,6 @@ require! {
                     line-height: 30px
 cb = console~log
 module.exports = (store, web3t, group-name)-->
-    console.log "[check-wallet] group-name" group-name
     #{ button-style, uninstall, active, big, balance, balance-usd, pending, send, receive, swap, expand, usd-rate, last } = wallet-funcs store, web3t, wallets, wallet
     lang = get-lang store
     style = get-primary-info store
@@ -255,11 +254,12 @@ module.exports = (store, web3t, group-name)-->
         
     makeDisabled = store.current.refreshing
     is-loading = store.current.refreshing is yes
-    
-    
-    tokens-groups-array = Object.keys(store.connected-wallet.tokens-groups)
+       
     /* Array of tokens inthe group */    
-    group-tokens = store.connected-wallet.tokens-groups[group-name]
+    network-wallets = store.connected-wallet.network-wallets[group-name]
+    
+    if network-wallets.length is 0 then
+        throw new Error("Network can not be empty. There is no wallet in the #{group-name} network")
     
     group-index = store.connected-wallet.tempChosenGroups.index-of(group-name)
     disabled-class = ""
@@ -267,8 +267,8 @@ module.exports = (store, web3t, group-name)-->
     isChecked = value?
     
     all-wallets = get-all-coins(store)
-    all-groups = store.connected-wallet.tokens-groups
-    all-groups-arr = store.connected-wallet.tokens-groups |> keys
+    all-groups = store.connected-wallet.network-wallets
+    all-groups-arr = store.connected-wallet.network-wallets |> keys
     wallets_keys = all-wallets |> map (-> it.token)
     
     tempChosenGroups = store.connectedWallet.tempChosenGroups
@@ -298,5 +298,5 @@ module.exports = (store, web3t, group-name)-->
                 .info.pug
                     .balance.pug.group-title(class="#{placeholder}") #{group-name}
                     .price.token.pug(class="#{placeholder}" )
-                        group-tokens |> map render-wallets
+                        network-wallets |> map render-wallets
                     

@@ -22,6 +22,8 @@ require! {
         right: 0
         z-index: 12
         transition: all .5s
+    &.closed
+        right: -500px
     .content
         width: 200px
         text-align: right
@@ -378,7 +380,7 @@ module.exports = (store, web3)->
         store.current.submenu = no
     staking = if store.current.submenu then \active else \not-active
     show-mobile =
-        if store.menu.show then \active else \ ""
+        if store.menu.show then \active else \ "closed"
     close = ->
         store.menu.show = no
     .mobile-menu.pug(class="#{show-mobile}")

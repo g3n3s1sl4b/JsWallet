@@ -1,7 +1,7 @@
 require! {
     \react
     \./check-wallet.ls
-    \prelude-ls : { map, take, drop, join, keys, each, filter, pairs-to-obj }
+    \prelude-ls : { map, take, drop, join, keys, each, filter, pairs-to-obj, obj-to-pairs }
     \../seed.ls : seedmem
     \./menu.ls
     \../web3.ls
@@ -18,6 +18,7 @@ require! {
     \../navigate.ls
     \./your-account.ls
     \../plugin-loader.ls : { get-all-coins, get-all-plugins }
+    \../storage.js
 }
 .connect-wallets-final-step
     $mobile: 425px
@@ -276,15 +277,23 @@ require! {
                         padding-right: 10px
             &.title-balance
                 display: none
+                
+network-wallets =   
+    velas:    <[ vlx_native vlx2 vlx_evm syx syx2 ]> 
+    ethereum: <[ eth usdt_erc20 ]>
+    bitcoin:  <[ btc usdt ]>
+    litecoin: <[ ltc ]> 
+                
 connect-wallets = ({ store, web3t })->
     return null if store.connected-wallet.status.queried is no
+    chromeStorage = new storage()
     { current, open-account, lock, wallet-style, info, refresh, lock } = menu-funcs store, web3t
     { wallets, go-up, can-up, go-down, can-down } = wallets-funcs store, web3t
     style = get-primary-info store
     lang = get-lang store
     
     /* Props */
-    all-groups-arr = store.connected-wallet.tokens-groups |> keys
+    all-groups-arr = -wallets |> keys
     accounts-to-connnect = 
         | store.connectedWallet.tempChosenGroups.length is all-groups-arr.length =>
             "all your networks of account"
@@ -376,16 +385,15 @@ connect-wallets = ({ store, web3t })->
         tempChosenGroups = store.connectedWallet.tempChosenGroups
         
         /* Get all wallets assosiated to selected groups */
-        tokensGroups = store.connectedWallet.tokensGroups
         all-plugins = get-all-plugins(store)
         console.log "all-plugins" all-plugins
         
         selected-wallets = {arr:[]}
         tempChosenGroups 
             |> filter (group)-> 
-                tokensGroups[group]?
+                network-wallets[group]?
             |> each (group)->
-                tokens = tokensGroups[group]
+                tokens = network-wallets[group]
                 console.log "tokens1" tokens
                 selected-wallets.arr = selected-wallets.arr ++ [...tokens]
         
@@ -405,7 +413,7 @@ connect-wallets = ({ store, web3t })->
         
         /* Prepare chosen networks object for sending back to client */
         /* { ethereum: [], btc: [], ... } */
-        chosenNetworks = getChosenNetworksObject( store.connected-wallet.tokens-groups )       
+        chosenNetworks = getChosenNetworksObject( network-wallets )       
         console.log "Result chosenNetworks:" chosenNetworks     
         return cb "chosenNetworks object is empty" if Object.keys(chosenNetworks).length <= 0 
         store.connected-wallet.chosenNetworks = chosenNetworks
@@ -416,6 +424,18 @@ connect-wallets = ({ store, web3t })->
         /* Add networks for origin */
         store.connected-wallet.connected-sites["#{origin}"] = store.connected-wallet.chosenNetworks 
         
+        /* Add data to the chrome local storage */
+        #connected-sites-copy = ^^store.connected-wallet.connected-sites
+        transform = (obj)->
+            obj
+                |> obj-to-pairs
+                |> map (-> [it.0, it.1.slice!])
+                |> pairs-to-obj    
+        cloneResult = store.connected-wallet.connected-sites
+            |> obj-to-pairs
+            |> map (-> [it.0, transform(it.1)])       
+            |> pairs-to-obj 
+        <- chromeStorage.setItem({connectedVelasSites: cloneResult}) 
                 
         store.connectedWallet.importing-networks = no
 

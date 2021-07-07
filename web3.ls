@@ -20,7 +20,12 @@ require! {
     \./pages.ls
     \./themes.ls
     \localStorage
+    \./storage.js
+    \assert
 }
+
+chromeStorage = new storage()
+
 supported-themes =
     themes
         |> obj-to-pairs
@@ -218,8 +223,22 @@ module.exports = (store, config)->
         return cb err if err?
         refresh-page cb
         
+    exitExtension = (data)->
+        console.log "[exitExtension] was" {store.connected-wallet.connected-sites} 
+        { sender, origin } = data
+        
+        transform = (obj)->
+            obj
+                |> obj-to-pairs
+                |> map (-> [it.0, it.1.slice!])
+                |> pairs-to-obj    
+        cloneResult = store.connected-wallet.connected-sites
+            |> obj-to-pairs
+            |> map (-> [it.0, transform(it.1)])       
+            |> pairs-to-obj 
+        <- chromeStorage.setItem({connectedVelasSites: cloneResult}) 
+        
     injectedNetworks = (data, cb)->
-        #console.log "[injectedNetworks] data" data  
         { sender, origin } = data
         strip-origin = (addr)->
             protocol = (addr + "").split("://").0 + "://"
@@ -232,9 +251,30 @@ module.exports = (store, config)->
         store.connected-wallet.activeTab = sender
         # Check if origin who queried available networks is in connected-site array
         #console.log "store.connected-wallet" store.connected-wallet
+        result <- chromeStorage.getItem("connectedVelasSites")
+        #console.log ""
+        #console.log "origin" origin 
+        #console.log "Got data from chrome Storage" result
+        #console.log "Object.keys(result.connectedVelasSites) MUST BE NON EMPTY" Object.keys(result.connectedVelasSites)
+        #console.log ""
         
-        /* Get previously connected networks Object from connectedSites propery */  
-        responseObject = store.connected-wallet.connectedSites["#{origin}"] ? {}
+        #if(Object.keys(result.connectedVelasSites).length > 0 and Object.keys(result.connectedVelasSites)[0].indexOf(".") is -1)
+            #throw new Error("connectedVelasSites has no origin as a property")
+        
+        /* Get previously connected networks Object from connectedSites property */ 
+        #connectedSites = store.connected-wallet.connectedSites 
+        connectedSites = store.connected-wallet.connectedSites <<<< (result?connectedVelasSites ? {})
+            
+        responseObject = connectedSites["#{origin}"] ? {}
+        
+        if result?connectedVelasSites?["#{origin}"]? then
+            console.log "YEs, we have SAVED data for origin" {result.connectedVelasSites["#{origin}"]}    
+        
+        #console.log "****** responseObject" responseObject
+        
+        /* If we got data from chrome local storage update extension local storage as well */ 
+        store.connected-wallet.connectedSites = connectedSites
+            
         wallets_keys = 
             | store.current.account? =>
                 store.current.account.wallets |> map (-> it.coin.token)
@@ -245,8 +285,10 @@ module.exports = (store, config)->
         
         /* Update temporary chosen wallets for import  */
         store.connected-wallet.tempChosenGroups = Object.keys(responseObject)
+        #console.log "Update temporary chosen wallets for import" Object.keys(responseObject)
         /* Update chosen acccounts for wallet for certain domain */
         store.connected-wallet.chosenNetworks = responseObject 
+        #console.log "Update chosen acccounts for wallet for certain domain" responseObject
            
         
         tabs <- chrome.tabs.query { currentWindow: true active: true }
@@ -254,6 +296,7 @@ module.exports = (store, config)->
         response <- chrome.tabs.sendMessage sender, { networks: responseObject }
         #console.log "Extension response sent", response 
         cb null
+        
     /* [Extension] Open choose accounts to import screen initiated by client. */
     injectAccounts = (data, cb)->
         whom = store.connected-wallet.activeTab
@@ -288,5 +331,5 @@ module.exports = (store, config)->
     refresh-interface ->
     web3 = new Web3!
     velas = velas-api store
-    cweb3 <<<< { velas, injectedNetworks, refresh-balances, refresh-interface, injectAccounts, web3.utils, unlock, set-preference, get-supported-tokens, use, refresh, lock, init, install, uninstall, install-by-name, naming, get-account-name, set-theme, set-lang, install-quick }
+    cweb3 <<<< { velas, exitExtension, injectedNetworks, refresh-balances, refresh-interface, injectAccounts, web3.utils, unlock, set-preference, get-supported-tokens, use, refresh, lock, init, install, uninstall, install-by-name, naming, get-account-name, set-theme, set-lang, install-quick }
     cweb3
