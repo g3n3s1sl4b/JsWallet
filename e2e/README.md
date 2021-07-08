@@ -22,3 +22,11 @@ Run all tests:
 `npm test`
 
 Before running tests locally, build and run wallet: `npm run wallet-start`.
+
+### Debug
+#### Enabling debug window
+Add PWDEBUG=1 before your test script, e.g.
+`PWDEBUG=1 npx playwright test`
+
+#### Enable playwright logs
+`DEBUG=pw:api`
