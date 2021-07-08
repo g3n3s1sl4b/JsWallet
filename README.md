@@ -27,17 +27,14 @@ Tested with `node --version` v11.10.1
 2. `git clone http://github.com/velas/web3t`
 3. `cd web3t`
 4. `npm i`
-5. `cd .. && cp -pr web3t/ JsWallet/.compiled-ssr/web3t/`
+5. `cd .. && mkdir -p JsWallet/.compiled-ssr/web3t/ && cp -pr web3t/ JsWallet/.compiled-ssr/web3t/`
 6. `cd JsWallet`
 7. `npm run wallet-start`
 8. open `localhost:8080/main-index.html`
 
 
-### Run tests
-1. `cd e2e`
-###### Don't run next command in the root folder of JsWallet project. Move to **e2e** folder before
-2. `npm i`
-3. `npm test` or `npx ts-mocha <path_to_test_file>`
+### Run e2e tests
+Please refer to e2e/README.md
 
 ### Features
 

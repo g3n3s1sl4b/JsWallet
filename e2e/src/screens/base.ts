@@ -38,6 +38,10 @@ export abstract class BaseScreen {
     }
   }
 
+  async waitForWalletsDataLoaded(): Promise<void> {
+    await this.page.waitForSelector('.wallet-item .top-left [class=" img"]', { state: 'visible' });
+  }
+
   async openMenu(item: MenuItem): Promise<void> {
     let menuItemName: MenuItem | 'delegate' = item;
     if (item === 'staking') menuItemName = 'delegate';
@@ -45,7 +49,7 @@ export abstract class BaseScreen {
 
     // wait for wallets data loaded
     if (menuItemName === 'wallets') {
-      await this.page.waitForSelector('.wallet-item .top-left [class=" img"]', { state: 'visible' });
+      await this.waitForWalletsDataLoaded();
     }
   }
 }

@@ -1,42 +1,30 @@
-import { assert } from '../mocha-wrapper/assert';
-import { PW } from '../playwright-helpers';
+import { test } from '@playwright/test';
+import { assert } from '../assert';
+import { setupPage } from '../pw-helpers/setup-page';
 import { Auth } from '../screens/auth';
-import { MainScreen } from '../screens/wallets';
-import { data, walletURL } from '../test-data';
+import { WalletsScreen } from '../screens/wallets';
+import { data, getWalletURL } from '../test-data';
 import { log } from '../tools/logger';
-import { Browser, BrowserContext, Page } from '../types';
 
-describe('Settings', function () {
-  let browser: Browser;
-  let context: BrowserContext;
-  let page: Page;
-  let auth: Auth;
-  let pw: PW;
-  let mainScreen: MainScreen;
+let walletsScreen: WalletsScreen;
+let auth: Auth;
 
-  async function clearClipboard() {
-    await page.evaluate(async () => await navigator.clipboard.writeText(''));
-  }
-
-  before(async function () {
-    pw = new PW();
-    ({ browser, context, page } = await pw.init());
+test.describe('Settings', () => {
+  test.beforeEach(async ({ page }) => {
+    setupPage(page);
+    walletsScreen = new WalletsScreen(page);
     auth = new Auth(page);
-    mainScreen = new MainScreen(page);
+    await page.goto(getWalletURL());
+    await auth.loginByRestoringSeed(data.wallets.login.seed);
   });
 
-  after(async function () {
-    await browser.close();
-  });
-
-  it('Copy private key', async function () {
+  test('Copy private key', async ({ context, page }) => {
     // arrange
-    await page.goto(walletURL);
-    await auth.loginByRestoringSeed(data.seedPhrase);
     await context.grantPermissions(["clipboard-read", "clipboard-write"]);
-    await clearClipboard();
+    // clear clipboard
+    await page.evaluate(async () => await navigator.clipboard.writeText(''));
 
-    await mainScreen.openMenu('settings');
+    await walletsScreen.openMenu('settings');
     await page.click('" Copy"');
     await page.type('[type="password"]', '111222');
     await page.click('#prompt-confirm');
@@ -46,37 +34,23 @@ describe('Settings', function () {
 
     const copiedKey = await page.evaluate(async () => await navigator.clipboard.readText());
     log.info(copiedKey);
-    assert.equal(copiedKey, '0xb1d4dcae5b7666408a5f6c229f97bac6856cbc4d5e2a639d535c27411a91d7b0');
+    assert.equal(copiedKey, '0xb1d4dcae5b7666408a5f6c229f97bac6856cbc4d5e2a639d535c27411a91d7b0')
   });
 
-  describe('Switch testnet', function () {
-    before(async function () {
-      page = await pw.getPage();
-      mainScreen = new MainScreen(page);
-      auth = new Auth(page);
-      await page.goto(walletURL);
-      await auth.loginByRestoringSeed(data.seedPhrase);
-    });
-    
-    it('Enable', async function () {
-      await mainScreen.waitForWalletsDataLoaded();
-      await mainScreen.selectWallet('Bitcoin');
-      await mainScreen.openMenu('settings');
-      await page.click('.active-network');
-      await mainScreen.openMenu('wallets');
-
-      assert.equal(await mainScreen.getWalletAddress(), 'n415iSKJwmoSZXTWYb6VqNSNTSA1YMwL8U', 'Testnet BTC address on UI does not equal expected');
-      await mainScreen.openMenu('settings');
-      assert.isTrue(await page.isVisible('#menu-testnet'));
-    });
-
-    it('Disable', async function () {
-      await page.click('.active-network');
-      await mainScreen.openMenu('wallets');
-
-      assert.equal(await mainScreen.getWalletAddress(), '1PV8RPEL8kNBnQytq2881TE3bSZJbJazDw', 'Mainnet BTC address on UI does not equal expected');
-      await mainScreen.openMenu('settings');
+  test.describe('Switch testnet', () => {
+    test('Enable/Disable', async ({ page }) => {
+      await walletsScreen.waitForWalletsDataLoaded();
+      await walletsScreen.selectWallet('Bitcoin');
+      assert.equal(await walletsScreen.getWalletAddress(), '1PV8RPEL8kNBnQytq2881TE3bSZJbJazDw', 'Mainnet BTC address on UI does not equal expected');
+      await walletsScreen.openMenu('settings');
       assert.isFalse(await page.isVisible('#menu-testnet'));
+
+      await walletsScreen.openMenu('settings');
+      await page.click('.active-network');
+      assert.isTrue(await page.isVisible('#menu-testnet'));
+      await walletsScreen.openMenu('wallets');
+      await walletsScreen.waitForWalletsDataLoaded();
+      assert.equal(await walletsScreen.getWalletAddress(), 'n415iSKJwmoSZXTWYb6VqNSNTSA1YMwL8U', 'Testnet BTC address on UI does not equal expected');
     });
   });
 });

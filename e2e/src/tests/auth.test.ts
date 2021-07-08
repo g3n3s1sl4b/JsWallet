@@ -1,52 +1,34 @@
-import { assert } from '../mocha-wrapper/assert';
-import { PW } from '../playwright-helpers';
+import { test } from '@playwright/test';
+import { assert } from '../assert';
+import { setupPage } from '../pw-helpers/setup-page';
 import { Auth, Language } from '../screens/auth';
-import { MainScreen } from '../screens/wallets';
-import { data, walletURL } from '../test-data';
+import { WalletsScreen } from '../screens/wallets';
+import { data, getWalletURL } from '../test-data';
 import { log } from '../tools/logger';
-import { Browser, BrowserContext, Page } from '../types';
 
-
-describe('Auth', function () {
-  let browser: Browser;
-  let context: BrowserContext;
-  let page: Page;
+test.describe('Auth', () => {
   let auth: Auth;
-  let mainScreen: MainScreen;
+  let walletsScreen: WalletsScreen;
   const accountAddress24Words = 'VCtQbbgQHnXfEAsYgbhWuWhyftzYRk6h6a';
   const accountAddress12Words = 'V2BrnFYpvAx6RTkjb1Db7AU7JFtnDrv19Q';
-  let pw: PW;
 
-  before(async function () {
-    pw = new PW();
-    ({ browser, context, page } = await pw.init());
+  test.beforeEach(async ({ page }) => {
+    setupPage(page);
+    await page.goto(getWalletURL());
+    walletsScreen = new WalletsScreen(page);
+    auth = new Auth(page);
   });
 
-  after(async function () {
-    await browser.close();
-  });
-
-  describe('Sign up', function () {
-    before(async function () {
-      context = await pw.getContext();
-      page = await pw.getPage();
-      auth = new Auth(page);
-    });
-
-    afterEach(async function () {
-      await context.close();
-    });
-
-    it('Create wallet', async function () {
-      await page.goto(walletURL);
+  test.describe('Sign up', () => {
+    test('Create wallet', async ({ page }) => {
       await auth.language.select('en');
       await auth.welcome.create();
-      await auth.passwordForNewAcc.typeAndConfirm('111222');
+      await auth.passwordForNewAcc.fillAndConfirm('111222');
 
       const seedWords = await auth.newSeed.getArrayWithSeed({ log: true });
 
       await auth.newSeed.clickNext();
-      await auth.wordByWordSeedPhraseInputForm.fill(seedWords);
+      await auth.wordByWordSeedInputForm.fill(seedWords);
       await auth.terms.accept();
 
       assert.isTrue(await page.isVisible('.menu-item'));
@@ -54,98 +36,64 @@ describe('Auth', function () {
     });
   });
 
-  describe('Restore with:', function () {
-    beforeEach(async function () {
-      context = await pw.getContext();
-      page = await pw.getPage();
-      auth = new Auth(page);
-      mainScreen = new MainScreen(page);
-    });
-
-    afterEach(async function () {
+  test.describe('Restore with:', () => {
+    test.afterEach(async ({ context }) => {
       await context.close();
     });
 
-    it('custom seed phrase', async function () {
-      await page.goto(walletURL);
-      await auth.loginByRestoringSeed(data.seedPhrase);
+    test('custom seed phrase', async () => {
+      await auth.loginByRestoringSeed(data.wallets.login.seed);
     });
 
-    it('24-words seed phrase', async function () {
-      await page.goto(walletURL);
+    test('24-words seed phrase', async ({ page }) => {
       await auth.language.select('en');
       await auth.welcome.restore();
       await auth.restoreFrom.seed('24');
-      await auth.passwordForNewAcc.typeAndConfirm('111222');
-      await auth.wordByWordSeedPhraseInputForm.fill(data.seedPhrase);
+      await auth.passwordForNewAcc.fillAndConfirm('111222');
+      await auth.wordByWordSeedInputForm.fill(data.wallets.login.seed);
 
       assert.isTrue(await page.isVisible('.menu-item'));
       assert.isTrue(await page.isVisible('.balance'));
-      assert.equal(await mainScreen.getWalletAddress(), accountAddress24Words, 'Account address on UI does not equal expected');
+      assert.equal(await walletsScreen.getWalletAddress(), accountAddress24Words, 'Account address on UI does not equal expected');
     });
 
-    it('12-words seed phrase', async function () {
-      await page.goto(walletURL);
+    test('12-words seed phrase', async ({ page }) => {
       await auth.language.select('en');
       await auth.welcome.restore();
       await auth.restoreFrom.seed('12');
-      await auth.passwordForNewAcc.typeAndConfirm('111222');
-      const seed12Words: string[] = { ...data.seedPhrase };
+      await auth.passwordForNewAcc.fillAndConfirm('111222');
+      const seed12Words: string[] = { ...data.wallets.login.seed };
       seed12Words.length = 12;
-      await auth.wordByWordSeedPhraseInputForm.fill(seed12Words);
+      await auth.wordByWordSeedInputForm.fill(seed12Words);
 
       assert.isTrue(await page.isVisible('.menu-item'));
       assert.isTrue(await page.isVisible('.balance'));
-      assert.equal(await mainScreen.getWalletAddress(), accountAddress12Words, 'Account address on UI does not equal expected');
+      assert.equal(await walletsScreen.getWalletAddress(), accountAddress12Words, 'Account address on UI does not equal expected');
     });
   });
 
-  describe('Log in', function () {
-    let mainScreen: MainScreen;
-
-    before(async function () {
-      context = await pw.getContext();
-      page = await pw.getPage();
-      mainScreen = new MainScreen(page);
-      auth = new Auth(page);
-      await page.goto(walletURL);
-      await auth.loginByRestoringSeed(data.seedPhrase);
-    });
-
-    after(async function () {
-      await context.close();
-    });
-
-    beforeEach(async function () {
+  test.describe('Log in', () => {
+    test.beforeEach(async ({ page }) => {
+      walletsScreen = new WalletsScreen(page);
+      await auth.loginByRestoringSeed(data.wallets.login.seed);
       await page.reload();
     });
 
-    it('Can\'t log in with incorrect password', async function () {
+    test('Can\'t log in with incorrect password', async ({ page }) => {
       await auth.passwordForLoggedOutAcc.typeAndConfirm('111111');
       assert.isTrue(await page.isVisible('.wrong'));
     });
 
-    it('Log in with pin', async function () {
+    test('Log in with pin', async () => {
       await auth.passwordForLoggedOutAcc.typeAndConfirm('111222');
 
-      assert.isTrue(await mainScreen.isLoggedIn());
-      assert.equal(await mainScreen.getWalletAddress(), accountAddress24Words, 'Account address on UI does not equal expected');
+      assert.isTrue(await walletsScreen.isLoggedIn());
+      assert.equal(await walletsScreen.getWalletAddress(), accountAddress24Words, 'Account address on UI does not equal expected');
     });
   });
 
-  describe('Choose language on sign up', function () {
-    before(async function () {
-      context = await pw.getContext();
-      page = await pw.getPage({ newInstance: true });
-      auth = new Auth(page);
-      await page.goto(walletURL);
-    });
-
-    after(async function () {
-      await context.close();
-    });
-
-    it('Change language', async function () {
+  test.describe('Choose language on sign up', () => {
+    test('Change language', async ({ page }) => {
       const welcomeTexts = {
         fr: 'Bienvenu(e)!',
         en: 'Welcome!',
@@ -161,8 +109,8 @@ describe('Auth', function () {
         //yr: 'Kaabo!',
         //vn: 'Chào mừng!'
       };
-
       const languages = Object.keys(welcomeTexts) as Language[];
+
       for (let i = 0; i < languages.length; i++) {
         const language = languages[i];
         log.info(language);

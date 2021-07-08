@@ -2,13 +2,13 @@ import { log } from '../tools/logger';
 import { Page } from '../types';
 import { BaseScreen } from './base';
 
-//export type Language = 'fr' | 'en' | 'kr' | 'cn' | 'in' | 'sp' | 'ua' | 'ru' | 'ar' | 'id' | 'ph' | 'yr' | 'vn';
 export type Language = 'fr' | 'en' | 'kr' | 'cn' | 'sp' | 'ua' | 'ru' | 'ar';
+
 export class Auth extends BaseScreen {
   constructor(public page: Page) {
     super(page);
   };
-
+ 
   customSeedInput = {
     fillAndConfirm: async (seedPhrase: string | string[]): Promise<void> => {
       if (typeof seedPhrase !== 'string') seedPhrase = seedPhrase.join(' ');
@@ -36,7 +36,7 @@ export class Auth extends BaseScreen {
     await auth.language.select('en');
     await auth.welcome.restore();
     await auth.restoreFrom.seed('custom');
-    await auth.passwordForNewAcc.typeAndConfirm('111222');
+    await auth.passwordForNewAcc.fillAndConfirm('111222');
     await auth.customSeedInput.fillAndConfirm(seedPhrase);
 
     await this.page.waitForSelector('.menu-item');
@@ -79,8 +79,8 @@ export class Auth extends BaseScreen {
   }
 
   passwordForNewAcc = {
-    typeAndConfirm: async (password: string): Promise<void> => {
-      await this.page.type('[type="password"]', password);
+    fillAndConfirm: async (password: string): Promise<void> => {
+      await this.page.fill('[type="password"]', password);
       await this.page.click('button.setup');
     }
   }
@@ -113,7 +113,7 @@ export class Auth extends BaseScreen {
     },
   }
 
-  wordByWordSeedPhraseInputForm = {
+  wordByWordSeedInputForm = {
     fill: async (seedWords: string[]): Promise<void> => {
       const elementWithWordNumberSelector = '.words [placeholder*="word #"]';
       for (let i = 0; i < seedWords.length; i++) {
