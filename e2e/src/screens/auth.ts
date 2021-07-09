@@ -30,13 +30,13 @@ export class Auth extends BaseScreen {
     const passwordInput = await this.page.isVisible('[placeholder="Password or PIN"]', { timeout: 2000 });
     if (passwordInput) {
       log.info(`You try to log in. And login was already performed in this context. Adding new account...`);
-      await auth.passwordForLoggedOutAcc.newAccount();
+      await auth.pinForLoggedOutAcc.newAccount();
     }
 
     await auth.language.select('en');
     await auth.welcome.restore();
     await auth.restoreFrom.seed('custom');
-    await auth.passwordForNewAcc.fillAndConfirm('111222');
+    await auth.pinForNewAcc.fillAndConfirm('111222');
     await auth.customSeedInput.fillAndConfirm(seedPhrase);
 
     await this.page.waitForSelector('.menu-item');
@@ -61,12 +61,12 @@ export class Auth extends BaseScreen {
       return seedWords;
     },
 
-    clickNext: async (): Promise<void> => {
+    next: async (): Promise<void> => {
       await this.page.click('#seed-next');
     }
   }
 
-  passwordForLoggedOutAcc = {
+  pinForLoggedOutAcc = {
     typeAndConfirm: async (password: string): Promise<void> => {
       await this.page.type('[type="password"]', password);
       await this.page.click('" Enter"');
@@ -78,7 +78,7 @@ export class Auth extends BaseScreen {
     },
   }
 
-  passwordForNewAcc = {
+  pinForNewAcc = {
     fillAndConfirm: async (password: string): Promise<void> => {
       await this.page.fill('[type="password"]', password);
       await this.page.click('button.setup');

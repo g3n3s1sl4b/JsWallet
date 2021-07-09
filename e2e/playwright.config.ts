@@ -7,7 +7,7 @@ const config: PlaywrightTestConfig = {
   globalSetup: 'src/pw-helpers/before-hook.ts',
   // globalTeardown: '',
   maxFailures: 4,
-  retries: 1,
+  retries: globalConfig.retries,
   timeout: 120000,
   workers: 1,
   // reporter: 'list',
@@ -26,7 +26,7 @@ const config: PlaywrightTestConfig = {
         screenshot: 'only-on-failure',
         slowMo: 100,
         viewport: { width: 1900, height: 1080 },
-        video: 'retry-with-video',
+        video: 'retain-on-failure'
       },
       // testDir: '',
     },
