@@ -244,7 +244,7 @@ store =
         isConnecting: no
         isConnected: no
         status:
-            queried: yes 
+            queried: no 
             canceled: no  
             connected: no
         connected-site: []
