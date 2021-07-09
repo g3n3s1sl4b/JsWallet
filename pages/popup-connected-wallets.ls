@@ -30,18 +30,27 @@ require! {
     background: rgba(black, 0.08)
     backdrop-filter: blur(5px)
     height: 100vh
-    >.account-body
+    .cover
+        height: 100vh
+        align-items: center
+        vertical-align: middle
+        display: flex
+    .account-body
+        left: 0
+        right: 0
+        top: 0;
+        bottom: 0;
+        margin: auto
+        display: inline-table
+        min-height: 360px
         max-width: 600px
         display: inline-block
         animation-duration: 0.5s
         animation-name: bounceIn
         background: white
         width: 100%
-        margin-top: 5vh
-        margin-bottom: 25vh
         border-radius: var(--border-btn)
         position: relative
-        height: 65vh
         overflow: hidden
         box-shadow: 17px 10px 13px #0000001f, -6px 10px 13px #00000024
         .closed
@@ -56,11 +65,6 @@ require! {
                 color: #CCC
         .account-body-inner
             margin: auto
-            position: absolute
-            top: 0
-            bottom: 0
-            left: 0
-            right: 0
             padding: 20px
         .title
             z-index: 999
@@ -93,11 +97,11 @@ require! {
         .settings
             padding-top: 0px
             padding-bottom: 30px
-            height: calc(65vh - 180px)
+            max-height: calc(65vh - 180px)
             overflow-y: scroll
             .section
                 position: relative
-                min-height: 200px
+                min-height: 150px
                 .list
                     height: 80%
                     padding: 10px
@@ -196,7 +200,6 @@ require! {
             text-overflow: ellipsis
             overflow: hidden
             white-space: nowrap
-            margin-top: 40px
 create-item = ({ store, web3t }, item)-->
     data = Object.keys(item)
     network = data.0
@@ -300,25 +303,26 @@ module.exports = ({ store, web3t } )->
         store.connected-wallet.status.queried = yes      
         navigate store, web3t, "connectwallets"   
     .pug.manage-connected-wallets
-        .account-body.pug(style=account-body-style)
-            .pug.closed(on-click=close)
-                icon \X, 20   
-            .account-body-inner.pug
-                .pug.title(style=color)
-                    .pug
-                        .pug #{site}
-                        h6.pug You have #{connected-number} network(s) connected to this site.   
-                .pug.settings
-                    .pug.section
-                        if connected-number <= 0
-                            .pug
-                                .pug Velas is not connected this site.\nTo connect site to a web3t, find the connect button on their site.\n\nOr you can manually connect current site.
-                                .extra-button.pug(on-click=go-to-manual-connect style=button-style) Manually connect
-                        else
-                            .list.pug
-                                chosenNetworks
-                                    |> obj-to-pairs
-                                    |> map (-> {"#{it.0}":it.1})
-                                    |> map create-item { store, web3t }
+        .cover.pug
+            .account-body.pug(style=account-body-style)
+                .pug.closed(on-click=close)
+                    icon \X, 20   
+                .account-body-inner.pug
+                    .pug.title(style=color)
+                        .pug
+                            .pug #{site}
+                            h6.pug You have #{connected-number} network(s) connected to this site.   
+                    .pug.settings
+                        .pug.section
+                            if connected-number <= 0
+                                .pug
+                                    .pug Velas is not connected this site.\nTo connect site to a web3t, find the connect button on their site.\n\nOr you can manually connect current site.
+                                    .extra-button.pug(on-click=go-to-manual-connect style=button-style) Manually connect
+                            else
+                                .list.pug
+                                    chosenNetworks
+                                        |> obj-to-pairs
+                                        |> map (-> {"#{it.0}":it.1})
+                                        |> map create-item { store, web3t }
                     if connected-number > 0
                         .extra-button.pug(on-click=go-to-manual-connect style=button-style) Manually connect
