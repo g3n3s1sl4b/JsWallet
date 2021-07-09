@@ -1,4 +1,4 @@
-import { Page } from '../types';
+import { ElementHandle, Page } from '../types';
 import { BaseScreen } from './base';
 
 export class WalletsScreen extends BaseScreen {
@@ -21,4 +21,22 @@ export class WalletsScreen extends BaseScreen {
       requiredCurrencyIsALreadySelected = await this.page.isVisible(tokenNameSelector);
     }
   }
+
+  async getAmountOfTokensFromOfWalletItemElement(walletElement: ElementHandle<SVGElement | HTMLElement>): Promise<string> {
+    const amountOfTokens = await (await walletElement.$('.info .token.price'))?.getAttribute('title');
+    if (!amountOfTokens) throw new Error('Cannot get amount of tokens');
+    return amountOfTokens;
+  }
+
+  async getTokenNameOfWalletItemElement(walletElement: ElementHandle<SVGElement | HTMLElement>): Promise<string> {
+    const tokenName = (await (await walletElement.$('.info .token.price'))?.textContent())?.trim();
+    if (!tokenName) throw new Error('Cannot get token name');
+    return tokenName;
+  }
+
+  async updateBalances(): Promise<void> {
+    await this.page.click('.balance .button.lock');
+    await this.waitForWalletsDataLoaded();
+  }
+
 }
