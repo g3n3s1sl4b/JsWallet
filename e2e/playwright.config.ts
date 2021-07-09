@@ -24,7 +24,7 @@ const config: PlaywrightTestConfig = {
           devtools: false,
         },
         screenshot: 'only-on-failure',
-        slowMo: 100,
+        slowMo: globalConfig.pw.slowMo,
         viewport: { width: 1900, height: 1080 },
         video: 'retain-on-failure'
       },
