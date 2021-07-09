@@ -55,6 +55,7 @@ module.exports = (store, web3t, wallets, wallet)->
         <- web3t.refresh
         store.current.wallet-index = 0
     expand = (e)->
+        return if store.current.send.swap is yes
         e.stop-propagation!
         wallet-is-disabled = isNaN(wallet.balance)
         is-loading = store.current.refreshing is yes
