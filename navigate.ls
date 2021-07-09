@@ -48,7 +48,6 @@ module.exports = (store, web3t, page, ask-pin, cb) !->
                 store.pages.splice(-(store.pages.length - index), 1)
             store.pages.push(page) 
     store.pages = [\wallets] if page is \wallets
-    store.pages = [\connectwallets] if page is \connectwallets
     prev = store.current.page
     store.current.page = \loading
     store.current.loading = yes
