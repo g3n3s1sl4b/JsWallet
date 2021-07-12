@@ -28,7 +28,7 @@ test.describe('Settings', () => {
     await page.click('" Copy"');
     await page.type('[type="password"]', '111222');
     await page.click('#prompt-confirm');
-    await page.click('.tokens-drop li:nth-of-type(1)');
+    await page.click('.tokens-drop span:text(" Velas")');
     await page.click('#prompt-confirm');
     await page.click('#notification-close');
 

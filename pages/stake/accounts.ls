@@ -25,6 +25,7 @@ require! {
     \moment
     \../confirmation.ls : { prompt2, prompt-stake-account-amount, alert, confirm, notify }
     \../../components/pagination.ls
+    \./error-funcs.ls : { get-error-message }
 }
 as-callback = (p, cb)->
     p.catch (err) -> cb err
@@ -224,10 +225,24 @@ staking-accounts-content = (store, web3t)->
             store.staking.chosen-account = item
             navigate store, web3t, \poolchoosing
             cb null
+        withdraw = ->
+            agree <- confirm store, lang.areYouSureToWithdraw
+            return if agree is no
+            { balanceRaw, rent, address, account } = item
+            amount = account.lamports `plus` rent
+            err, result <- as-callback web3t.velas.NativeStaking.withdraw(address, amount)
+            err-message = get-error-message(err, result)
+            return alert store, err-message if err-message?
+            <- set-timeout _, 1000
+            <- notify store, lang.fundsWithdrawn
+            store.staking.getAccountsFromCashe = no
+            navigate store, web3t, \validators
         stake-data = item?account?data?parsed?info?stake
         $button =
             | item.status is \inactive =>
                 button { store, text: lang.to_delegate, on-click: choose, type: \secondary , icon : \arrowRight }
+            | (+deactivationEpoch isnt +max-epoch) and (+store.staking.current-epoch >= +deactivationEpoch) =>
+                button { store, text: lang.withdraw, on-click: withdraw, type: \secondary , icon : \arrowLeft }
             | _ => 
                 disabled = item.status in <[ deactivating ]>
                 if stake-data? and stake-data.delegation?

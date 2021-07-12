@@ -66,7 +66,6 @@ module.exports = (store, web3t, wallets, wallet)->
     active = if index is store.current.wallet-index then \active else ''
     big = 
         | index is store.current.wallet-index => \big
-        | wallets.length < 3 => \big
         | _ => ""
     balance = round5(wallet.balance) + ' ' + wallet.coin.token.to-upper-case!
     balance-usd = wallet.balance `times` usd-rate

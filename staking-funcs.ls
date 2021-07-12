@@ -57,7 +57,7 @@ load-validators-from-cache = ({store, web3t}, cb)->
     last-time = store.staking.last-time ? new Date().getTime()
     now = new Date().getTime()
     if now `minus` last-time <= DEADLINE and store.staking.cachedValidators? and store.staking.cachedValidators.length
-        console.log "get validators from cache"
+        #console.log "get validators from cache"
         cache-result = store.staking.cachedValidators  
         return cb null, cache-result  
     err, validators <- as-callback web3t.velas.NativeStaking.getStakingValidators()
@@ -72,7 +72,7 @@ query-pools-web3t = ({store, web3t, on-progress}, on-finish) ->
     return on-finish err if err?
     validators = [] if err?
     store.staking.totalValidators = validators.length
-    console.log "Got validators" validators.length
+    #console.log "Got validators" validators.length
     store.staking.pools-are-loading = yes
     fill-pools { store, web3t, on-progress}, on-finish, validators
 query-pools = ({store, web3t, on-progress}, on-finish) ->
@@ -95,7 +95,7 @@ fill-delegator = (store, web3t, [acc, ...accounts])!->
 query-accounts = (store, web3t, on-progress, on-finish) ->
     accountIndex = store.current.accountIndex
     if (store.staking.getAccountsFromCashe is yes) and store.staking.accountsCached[accountIndex]? and store.staking.accountsCached[accountIndex].length > 0
-        console.log "get accounts from cache"
+        #console.log "get accounts from cache"
         store.staking.all-accounts-loaded = yes
         store.staking.accounts-are-loading = no
         return on-finish null, store.staking.accountsCached[accountIndex]
@@ -114,7 +114,6 @@ query-accounts-web3t = (store, web3t, on-progress, on-finish) ->
     err, accs <- as-callback web3t.velas.NativeStaking.getOwnStakingAccounts(parsedProgramAccounts) 
     accs = [] if err?
     store.staking.totalOwnStakingAccounts = accs.length
-    console.log "accs" accs 
     return on-finish err if err?
     store.staking.accounts-are-loading = yes
     fill-accounts { store, web3t, on-progress, on-finish }, accs

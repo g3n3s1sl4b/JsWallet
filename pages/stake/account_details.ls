@@ -163,7 +163,7 @@ require! {
             -moz-transition: breathe 3s ease-in infinite
             -web-kit-transition: breathe 3s ease-in infinite
             height: auto
-            min-height: 200px
+            min-height: 100px
             max-height: 400px
             .stake-pointer
                 background: rgb(37, 87, 127)
@@ -699,7 +699,7 @@ Rewards = (props)->
         err, $rewards <- fetchEpochRewards(account.address, activationEpoch)
         setLoading(no)
         setRewards($rewards)
-        store.staking.chosenAccount.rewards = rewards
+        store.staking.chosenAccount.rewards = $rewards
         return ), []
     .pug.section.rewards
         .title.pug

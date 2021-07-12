@@ -896,6 +896,11 @@ validators.init = ({ store, web3t }, cb)!->
             return cb null
     else
         store.staking.pools-network = store.current.network
+        
+    err, epochInfo <- as-callback web3t.velas.NativeStaking.getCurrentEpochInfo()
+    console.error err if err?
+    { epoch, blockHeight, slotIndex, slotsInEpoch, transactionCount } = epochInfo
+    store.staking.current-epoch = epochInfo.epoch
     #<- web3t.refresh
     #err, voteAccounts <- as-callback web3t.velas.NativeStaking.getVoteAccounts()
     #console.log "Vote accounts" err, voteAccounts

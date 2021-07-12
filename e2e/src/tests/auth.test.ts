@@ -23,11 +23,11 @@ test.describe('Auth', () => {
     test('Create wallet', async ({ page }) => {
       await auth.language.select('en');
       await auth.welcome.create();
-      await auth.passwordForNewAcc.fillAndConfirm('111222');
+      await auth.pinForNewAcc.fillAndConfirm('111222');
 
       const seedWords = await auth.newSeed.getArrayWithSeed({ log: true });
 
-      await auth.newSeed.clickNext();
+      await auth.newSeed.next();
       await auth.wordByWordSeedInputForm.fill(seedWords);
       await auth.terms.accept();
 
@@ -49,7 +49,7 @@ test.describe('Auth', () => {
       await auth.language.select('en');
       await auth.welcome.restore();
       await auth.restoreFrom.seed('24');
-      await auth.passwordForNewAcc.fillAndConfirm('111222');
+      await auth.pinForNewAcc.fillAndConfirm('111222');
       await auth.wordByWordSeedInputForm.fill(data.wallets.login.seed);
 
       assert.isTrue(await page.isVisible('.menu-item'));
@@ -61,7 +61,7 @@ test.describe('Auth', () => {
       await auth.language.select('en');
       await auth.welcome.restore();
       await auth.restoreFrom.seed('12');
-      await auth.passwordForNewAcc.fillAndConfirm('111222');
+      await auth.pinForNewAcc.fillAndConfirm('111222');
       const seed12Words: string[] = { ...data.wallets.login.seed };
       seed12Words.length = 12;
       await auth.wordByWordSeedInputForm.fill(seed12Words);
@@ -80,12 +80,12 @@ test.describe('Auth', () => {
     });
 
     test('Can\'t log in with incorrect password', async ({ page }) => {
-      await auth.passwordForLoggedOutAcc.typeAndConfirm('111111');
+      await auth.pinForLoggedOutAcc.typeAndConfirm('111111');
       assert.isTrue(await page.isVisible('.wrong'));
     });
 
     test('Log in with pin', async () => {
-      await auth.passwordForLoggedOutAcc.typeAndConfirm('111222');
+      await auth.pinForLoggedOutAcc.typeAndConfirm('111222');
 
       assert.isTrue(await walletsScreen.isLoggedIn());
       assert.equal(await walletsScreen.getWalletAddress(), accountAddress24Words, 'Account address on UI does not equal expected');

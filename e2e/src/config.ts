@@ -7,4 +7,8 @@ export const config = {
   env: process.env.ENV as Env || env,
   logLevel: process.env.LOG_LEVEL || 'warn',
   CI: process.env.CI === 'true' ? true : false,
+  retries: process.env.CI ? 1 : 0,
+  pw: {
+    slowMo: 200,
+  },
 };
