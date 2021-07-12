@@ -114,14 +114,18 @@ export class Auth extends BaseScreen {
   }
 
   wordByWordSeedInputForm = {
-    fill: async (seedWords: string[]): Promise<void> => {
+    fill: async (seedWords: string[], params: { fast: boolean } = { fast: false }): Promise<void> => {
       const elementWithWordNumberSelector = '.words [placeholder*="word #"]';
       for (let i = 0; i < seedWords.length; i++) {
         // example of "placeholder" attribute value: "word #1"
         const placeholderValue = await this.page.getAttribute(elementWithWordNumberSelector, 'placeholder');
         // cut text "word #" and leave only number at the end of string
         const requestedWordNumber = Number(placeholderValue?.slice(6));
-        await this.page.type(`.words [placeholder*="word #${requestedWordNumber}"]`, seedWords[requestedWordNumber - 1]);
+        if (params.fast) {
+          await this.page.fill(`.words [placeholder*="word #${requestedWordNumber}"]`, seedWords[requestedWordNumber - 1]);
+        } else {
+          await this.page.type(`.words [placeholder*="word #${requestedWordNumber}"]`, seedWords[requestedWordNumber - 1]);
+        }
         await this.page.click('" Next"');
       }
     }

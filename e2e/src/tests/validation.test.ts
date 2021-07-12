@@ -36,8 +36,7 @@ test.describe('Validation', () => {
     await page.waitForSelector('#send-confirm[disabled]');
     assert.isTrue(await page.isVisible('[title="Not Enough Funds"]'));
 
-    //remove step after bug fix
-    //keeps showing error after clicking use-max if the field was not cleared
+    //need to clear the field because actions are too fast and test fails
     await page.fill('div.amount-field .textfield[label="Send"]', '');
 
     await page.click('#send-max');
