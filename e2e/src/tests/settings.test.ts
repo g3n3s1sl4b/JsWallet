@@ -14,7 +14,7 @@ test.describe('Settings', () => {
     setupPage(page);
     walletsScreen = new WalletsScreen(page);
     auth = new Auth(page);
-    await page.goto(getWalletURL());
+    await page.goto(getWalletURL({testnet: true}));
     await auth.loginByRestoringSeed(data.wallets.login.seed);
   });
 
@@ -47,20 +47,20 @@ test.describe('Settings', () => {
     assert.equal(await walletsScreen.getWalletAddress(), 'VEzaTJxJ4938MyHRDP5YSSUYAriPkvFbha', 'Account 2 address on UI does not equal expected');
   });
 
-  test.describe('Switch testnet', () => {
+  test.describe.only('Switch testnet', () => {
     test('Enable/Disable', async ({ page }) => {
       await walletsScreen.waitForWalletsDataLoaded();
       await walletsScreen.selectWallet('Bitcoin');
-      assert.equal(await walletsScreen.getWalletAddress(), '1PV8RPEL8kNBnQytq2881TE3bSZJbJazDw', 'Mainnet BTC address on UI does not equal expected');
+      assert.equal(await walletsScreen.getWalletAddress(), 'n415iSKJwmoSZXTWYb6VqNSNTSA1YMwL8U', 'Mainnet BTC address on UI does not equal expected');
       await walletsScreen.openMenu('settings');
-      assert.isFalse(await page.isVisible('#menu-testnet'));
+      assert.isTrue(await page.isVisible('#menu-testnet'));
 
       await walletsScreen.openMenu('settings');
       await page.click('.active-network');
-      assert.isTrue(await page.isVisible('#menu-testnet'));
+      assert.isFalse(await page.isVisible('#menu-testnet'));
       await walletsScreen.openMenu('wallets');
       await walletsScreen.waitForWalletsDataLoaded();
-      assert.equal(await walletsScreen.getWalletAddress(), 'n415iSKJwmoSZXTWYb6VqNSNTSA1YMwL8U', 'Testnet BTC address on UI does not equal expected');
+      assert.equal(await walletsScreen.getWalletAddress(), '1PV8RPEL8kNBnQytq2881TE3bSZJbJazDw', 'Testnet BTC address on UI does not equal expected');
     });
   });
 });
