@@ -37,6 +37,16 @@ test.describe('Settings', () => {
     assert.equal(copiedKey, '0xb1d4dcae5b7666408a5f6c229f97bac6856cbc4d5e2a639d535c27411a91d7b0')
   });
 
+  test('Switch account index', async ({ page }) => {
+    await walletsScreen.openMenu('settings');
+    await page.click('.button.right');
+    await walletsScreen.openMenu('wallets');
+    
+    await walletsScreen.waitForWalletsDataLoaded();
+    //await page.pause();
+    assert.equal(await walletsScreen.getWalletAddress(), 'VEzaTJxJ4938MyHRDP5YSSUYAriPkvFbha', 'Account 2 address on UI does not equal expected');
+  });
+
   test.describe('Switch testnet', () => {
     test('Enable/Disable', async ({ page }) => {
       await walletsScreen.waitForWalletsDataLoaded();
