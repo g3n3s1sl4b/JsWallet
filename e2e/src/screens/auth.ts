@@ -8,7 +8,7 @@ export class Auth extends BaseScreen {
   constructor(public page: Page) {
     super(page);
   };
- 
+
   customSeedInput = {
     fillAndConfirm: async (seedPhrase: string | string[]): Promise<void> => {
       if (typeof seedPhrase !== 'string') seedPhrase = seedPhrase.join(' ');
@@ -27,7 +27,7 @@ export class Auth extends BaseScreen {
       return;
     }
 
-    const passwordInput = await this.page.isVisible('[placeholder="Password or PIN"]', { timeout: 2000 });
+    const passwordInput = await this.page.isVisible('[placeholder="Password or PIN"]', { timeout: 1000 });
     if (passwordInput) {
       log.info(`You try to log in. And login was already performed in this context. Adding new account...`);
       await auth.pinForLoggedOutAcc.newAccount();
