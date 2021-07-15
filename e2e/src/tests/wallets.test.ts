@@ -54,5 +54,13 @@ test.describe('Wallets screen', () => {
     assert.isFalse(await walletsScreen.isWalletInWalletsList('Litecoin'));
   });
 
-});
+  test('Switch account', async ({ page }) => {
+    await auth.loginByRestoringSeed(data.wallets.login.seed);
+    await walletsScreen.waitForWalletsDataLoaded();
 
+    await page.click('.switch-account');
+    await page.click('" Account 2"');
+    assert.equal(await walletsScreen.getWalletAddress(), 'VEzaTJxJ4938MyHRDP5YSSUYAriPkvFbha', 'Account 2 address on UI does not equal expected');
+    
+  });
+});

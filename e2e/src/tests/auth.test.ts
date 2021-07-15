@@ -72,6 +72,19 @@ test.describe('Auth', () => {
     });
   });
 
+  test.describe('Can\t restore with invalid seed', () => {
+    test.only('Can\'t restore with incorrect seed phrase', async ({ page }) => {
+      await auth.language.select('en');
+      await auth.welcome.restore();
+      await auth.restoreFrom.seed('24');
+      await auth.pinForNewAcc.fillAndConfirm('111222');
+      await auth.wordByWordSeedInputForm.fill(Array(24).fill("sad"), {fast: true});
+
+      assert.isTrue(await page.isVisible('.confirmation-body'), 'No alert for incorrect seed phrase on UI');
+      assert.isFalse(await page.isVisible('.menu-item'), 'Restored with incorrect seed phrase');
+    });
+  });
+
   test.describe('Log in', () => {
     test.beforeEach(async ({ page }) => {
       walletsScreen = new WalletsScreen(page);
