@@ -25,16 +25,13 @@ export abstract class BaseScreen {
   };
 
   async isLoggedIn(): Promise<boolean> {
-    this.page.setDefaultTimeout(2000);
     try {
-      await this.page.waitForSelector('.balance');
+      await this.page.waitForSelector('.balance', {timeout: 1000});
       log.info(`User is logged in`);
       return true;
     } catch (e) {
       log.info(`User is not logged in`);
       return false;
-    } finally {
-      this.page.setDefaultTimeout(config.defaultWaitTimeout);
     }
   }
 
@@ -43,6 +40,7 @@ export abstract class BaseScreen {
   }
 
   async openMenu(item: MenuItem): Promise<void> {
+    // add new type property to correspond html classname (staking menu item has class "delegate")
     let menuItemName: MenuItem | 'delegate' = item;
     if (item === 'staking') menuItemName = 'delegate';
     await this.page.click(`#menu-${menuItemName}`);

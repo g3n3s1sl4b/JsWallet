@@ -53,6 +53,4 @@ test.describe('Wallets screen', () => {
     await walletsScreen.hideWallet();
     assert.isFalse(await walletsScreen.isWalletInWalletsList('Litecoin'));
   });
-
 });
-

@@ -26,7 +26,13 @@ const config: PlaywrightTestConfig = {
         screenshot: 'only-on-failure',
         slowMo: globalConfig.pw.slowMo,
         viewport: { width: 1900, height: 1080 },
-        video: 'retain-on-failure'
+        video: {
+          mode: 'retain-on-failure',
+          size: {
+            width: 1920,
+            height: 1080,
+          }
+        }
       },
       // testDir: '',
     },
