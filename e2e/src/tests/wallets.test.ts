@@ -17,7 +17,7 @@ test.describe('Wallets screen', () => {
   });
 
   test.describe('Transactions', () => {
-    test.only('Transactions list is displayed', async ({ page }) => {
+    test('Transactions list is displayed', async ({ page }) => {
       // arrange
       await auth.loginByRestoringSeed(data.wallets.fundsReceiver.seed);
 

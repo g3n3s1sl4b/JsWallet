@@ -79,7 +79,7 @@ test.describe('Auth', () => {
       await auth.wordByWordSeedInputForm.fill(Array(24).fill("sad"), {fast: true});
 
       assert.isTrue(await page.isVisible('" Seed phrase checksum not match. Please try again."'), 'No alert for incorrect seed phrase on UI');
-      assert.isFalse(await walletsScreen.isLoggedIn(), 'Restored with incorrect seed phrase');
+      assert.isFalse(await auth.isLoggedIn(), 'Restored with incorrect seed phrase');
     });
   });
 
