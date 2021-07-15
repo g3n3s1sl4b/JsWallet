@@ -17,12 +17,12 @@ test.describe('Wallets screen', () => {
   });
 
   test.describe('Transactions', () => {
-    test('Transactions list is displayed', async ({ page }) => {
+    test.only('Transactions list is displayed', async ({ page }) => {
       // arrange
       await auth.loginByRestoringSeed(data.wallets.fundsReceiver.seed);
 
       await walletsScreen.selectWallet('Velas Native');
-      await page.waitForSelector('.history-area div[datatesting="transaction"]', { timeout: 10000 });
+      await page.waitForSelector('.history-area div[datatesting="transaction"]', { timeout: 15000 });
       const transactions = await page.$$('.history-area div[datatesting="transaction"]');
       assert.isAbove(transactions.length, 10, 'Amount of transactions in the list is less than 10');
       const senderAddressSelector = '.history-area div[datatesting="transaction"] .address-holder a:text(" Dawj15q13fqzh4baHqmD2kbrRCyiFfkE6gkPcUZ21KUS")';

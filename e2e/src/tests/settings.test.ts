@@ -47,7 +47,7 @@ test.describe('Settings', () => {
     assert.equal(await walletsScreen.getWalletAddress(), 'VEzaTJxJ4938MyHRDP5YSSUYAriPkvFbha', 'Account 2 address on UI does not equal expected');
   });
 
-  test.describe.only('Switch testnet', () => {
+  test.describe('Switch testnet', () => {
     test('Enable/Disable', async ({ page }) => {
       await walletsScreen.waitForWalletsDataLoaded();
       await walletsScreen.selectWallet('Bitcoin');

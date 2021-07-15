@@ -70,18 +70,16 @@ test.describe('Auth', () => {
       assert.isTrue(await page.isVisible('.balance'));
       assert.equal(await walletsScreen.getWalletAddress(), accountAddress12Words, 'Account address on UI does not equal expected');
     });
-  });
 
-  test.describe('Can\t restore with invalid seed', () => {
-    test.only('Can\'t restore with incorrect seed phrase', async ({ page }) => {
+    test('Can\'t restore with incorrect seed phrase', async ({ page }) => {
       await auth.language.select('en');
       await auth.welcome.restore();
       await auth.restoreFrom.seed('24');
       await auth.pinForNewAcc.fillAndConfirm('111222');
       await auth.wordByWordSeedInputForm.fill(Array(24).fill("sad"), {fast: true});
 
-      assert.isTrue(await page.isVisible('.confirmation-body'), 'No alert for incorrect seed phrase on UI');
-      assert.isFalse(await page.isVisible('.menu-item'), 'Restored with incorrect seed phrase');
+      assert.isTrue(await page.isVisible('" Seed phrase checksum not match. Please try again."'), 'No alert for incorrect seed phrase on UI');
+      assert.isFalse(await walletsScreen.isLoggedIn(), 'Restored with incorrect seed phrase');
     });
   });
 
