@@ -8,15 +8,6 @@ export abstract class BaseScreen {
   context: BrowserContext;
   browser: Browser;
 
-  selectors = {
-    address: 'div.wallet-detailed a[data-original]',
-    menu: {
-      settings: '#menu-settings',
-      staking: '#menu-delegate',
-      wallets: '#menu-wallets'
-    },
-  }
-
   constructor(public page: Page) {
     this.context = this.page.context();
     const browser = this.context.browser();
