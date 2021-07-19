@@ -22,7 +22,7 @@ test.describe('Wallets screen', () => {
       await auth.loginByRestoringSeed(data.wallets.fundsReceiver.seed);
 
       await walletsScreen.selectWallet('Velas Native');
-      await page.waitForSelector('.history-area div[datatesting="transaction"]', { timeout: 10000 });
+      await page.waitForSelector('.history-area div[datatesting="transaction"]', { timeout: 15000 });
       const transactions = await page.$$('.history-area div[datatesting="transaction"]');
       assert.isAbove(transactions.length, 10, 'Amount of transactions in the list is less than 10');
       const senderAddressSelector = '.history-area div[datatesting="transaction"] .address-holder a:text(" Dawj15q13fqzh4baHqmD2kbrRCyiFfkE6gkPcUZ21KUS")';
@@ -52,5 +52,14 @@ test.describe('Wallets screen', () => {
     // remove litecoin
     await walletsScreen.hideWallet();
     assert.isFalse(await walletsScreen.isWalletInWalletsList('Litecoin'));
+  });
+
+  test('Switch account', async ({ page }) => {
+    await auth.loginByRestoringSeed(data.wallets.login.seed);
+    await walletsScreen.waitForWalletsDataLoaded();
+
+    await page.click('.switch-account');
+    await page.click('" Account 2"');
+    assert.equal(await walletsScreen.getWalletAddress(), 'VEzaTJxJ4938MyHRDP5YSSUYAriPkvFbha', 'Account 2 address on UI does not equal expected');
   });
 });
