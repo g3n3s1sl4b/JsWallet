@@ -61,6 +61,5 @@ test.describe('Wallets screen', () => {
     await page.click('.switch-account');
     await page.click('" Account 2"');
     assert.equal(await walletsScreen.getWalletAddress(), 'VEzaTJxJ4938MyHRDP5YSSUYAriPkvFbha', 'Account 2 address on UI does not equal expected');
-    
   });
 });

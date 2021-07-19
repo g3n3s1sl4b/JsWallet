@@ -60,7 +60,7 @@ test.describe('Navigation', () => {
           break;
       }
       await page.click('.close');
-      await auth.isLoggedIn();
+      await walletsScreen.waitForWalletsDataLoaded();
     }
   });
 });
