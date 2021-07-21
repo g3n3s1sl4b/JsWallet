@@ -14,20 +14,20 @@ test.describe('Validation', () => {
     auth = new Auth(page);
     walletsScreen = new WalletsScreen(page);
     await page.goto(getWalletURL({ testnet: true }));
-    await auth.loginByRestoringSeed(data.wallets.withFunds.seed);
+    await auth.loginByRestoringSeed(data.wallets.txSender.seed);
     await walletsScreen.waitForWalletsDataLoaded();
   });
 
-  test('Show Invalid Address error', async ({ page }) => {
+  test('VLX Native: Show Invalid Address error', async ({ page }) => {
     await page.click('#wallets-send');
     await page.fill('#send-recipient', 'invalid data');
-    assert.isTrue(await page.isVisible('[title="Given address is not valid Velas address"]'));
+    await page.waitForSelector('[title="Given address is not valid Velas address"]');
 
     await page.fill('#send-recipient', 'VAP73ARS1UXPr3jDHSzNZdss6dAudsg15U');
     assert.isFalse(await page.isVisible('[title="Given address is not valid Velas address"]'));
   });
 
-  test('Show Not Enough Funds error', async ({ page }) => {
+  test('VLX Native: Show Not Enough Funds error', async ({ page }) => {
     await page.click('#wallets-send');
     await page.fill('#send-recipient', 'VAP73ARS1UXPr3jDHSzNZdss6dAudsg15U');
 
@@ -41,6 +41,6 @@ test.describe('Validation', () => {
 
     await page.click('#send-max');
     await page.waitForTimeout(1000);
-    assert.isFalse(await page.isVisible('[title="Not Enough Funds"]'));
+    await page.waitForSelector('[title="Not Enough Funds"]');
   });
 });

@@ -35,7 +35,7 @@ test.describe('Staking', () => {
 
       await page.click('" Create Account"');
       await page.fill('.input-area input', String(stakingAmount));
-      await page.click('#prompt-confirm');
+      await stakingScreen.confirmPrompt();
       await page.waitForSelector('" Account created and funds deposited"', { timeout: 10000 });
       await page.click('#notification-close');
 

@@ -27,9 +27,9 @@ test.describe('Settings', () => {
     await walletsScreen.openMenu('settings');
     await page.click('" Copy"');
     await page.type('[type="password"]', '111222');
-    await page.click('#prompt-confirm');
+    await walletsScreen.confirmPrompt();
     await page.click('.tokens-drop span:text(" Velas")');
-    await page.click('#prompt-confirm');
+    await walletsScreen.confirmPrompt();
     await page.click('#notification-close');
 
     const copiedKey = await page.evaluate(async () => await navigator.clipboard.readText());
