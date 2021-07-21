@@ -62,4 +62,12 @@ test.describe('Wallets screen', () => {
     await page.click('" Account 2"');
     assert.equal(await walletsScreen.getWalletAddress(), 'VEzaTJxJ4938MyHRDP5YSSUYAriPkvFbha', 'Account 2 address on UI does not equal expected');
   });
+
+  test('Show QR', async ( {page} ) => {
+    await auth.loginByRestoringSeed(data.wallets.login.seed);
+    await walletsScreen.waitForWalletsDataLoaded();
+
+    await page.hover('.wallet-detailed .address-holder .copy');
+    await page.waitForSelector('.qrcode');
+  });
 });

@@ -4,6 +4,7 @@ import { setupPage } from '../pw-helpers/setup-page';
 import { Auth } from '../screens/auth';
 import { WalletsScreen } from '../screens/wallets';
 import { data, getWalletURL } from '../test-data';
+import { log } from '../tools/logger';
 
 let walletsScreen: WalletsScreen;
 let auth: Auth;
@@ -60,7 +61,17 @@ test.describe('Navigation', () => {
           break;
       }
       await page.click('.close');
-      await walletsScreen.waitForWalletsDataLoaded();
+      assert.isTrue(await auth.isLoggedIn());
     }
+  });
+
+  test('Redirects to support page from menu', async ({ page, context } ) => {
+    const [newPage] = await Promise.all([
+      context.waitForEvent('page'),
+      page.click('#menu-support')
+    ])
+
+    await newPage.waitForLoadState();
+    assert.isTrue(await newPage.url().includes("https://support.velas.com"));
   });
 });
