@@ -13,16 +13,20 @@ export const data = {
       address: 'Dawj15q13fqzh4baHqmD2kbrRCyiFfkE6gkPcUZ21KUS',
       seed: 'with funds',
     },
+    txSender: {
+      address: '2DKco1JBu1zshWDLmCp34AVgE6YkAu9BPmgbbgRuCoGm',
+      seed: 'swap shock angry lucky clip heart chair point humble release west heart market fix pledge gift north panther muffin badge leisure client awake bunker',
+    },
     fundsReceiver: {
       address: 'FJWtmzRwURdnrgn5ZFWvYNfHvXMtHK1WS7VHpbnfG73s',
       seed: 'funds receiver',
     },
-    login: {
-      seed: ["decade", "cargo", "toe", "library", "cycle", "furnace", "idea", "tourist", "fuel", "chimney", "fury", "actual", "cash", "scheme", "race", "reason", "finger", "pulp", "nature", "family", "language", "spring", "kidney", "ancient"],
-    },
     payer: {
       publicKey: '9kMFdW1VENdVpMyG9NNadNTzwXghknj3iU7CUwYFP1GC',
       seed: 'delay swift sick mixture vibrant element review arm snap true broccoli industry expect thought panel curve inhale rally dish close trade damp skin below',
+    },
+    login: {
+      seed: ["decade", "cargo", "toe", "library", "cycle", "furnace", "idea", "tourist", "fuel", "chimney", "fury", "actual", "cash", "scheme", "race", "reason", "finger", "pulp", "nature", "family", "language", "spring", "kidney", "ancient"],
     },
     staking: {
       staker: {

@@ -15,6 +15,10 @@ export abstract class BaseScreen {
     this.browser = browser;
   };
 
+  async confirmPrompt(): Promise<void> {
+    await this.page.click('#prompt-confirm');
+  }
+
   async isLoggedIn(): Promise<boolean> {
     try {
       await this.page.waitForSelector('.balance', {timeout: 1000});
@@ -26,10 +30,6 @@ export abstract class BaseScreen {
     }
   }
 
-  async waitForWalletsDataLoaded(): Promise<void> {
-    await this.page.waitForSelector('.wallet-item .top-left [class=" img"]', { state: 'visible' });
-  }
-
   async openMenu(item: MenuItem): Promise<void> {
     // add new type property to correspond html classname (staking menu item has class "delegate")
     let menuItemName: MenuItem | 'delegate' = item;
@@ -38,7 +38,7 @@ export abstract class BaseScreen {
 
     // wait for wallets data loaded
     if (menuItemName === 'wallets') {
-      await this.waitForWalletsDataLoaded();
+      await this.page.waitForSelector('.wallet-item .top-left [class=" img"]', { state: 'visible' });
     }
   }
 }

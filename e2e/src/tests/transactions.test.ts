@@ -16,12 +16,12 @@ test.describe('Transactions', () => {
     auth = new Auth(page);
     walletsScreen = new WalletsScreen(page);
     await page.goto(getWalletURL({ testnet: true }));
-    await auth.loginByRestoringSeed(data.wallets.withFunds.seed);
+    await auth.loginByRestoringSeed(data.wallets.txSender.seed);
   });
 
   test('Send VLX native', async ({ page }) => {
     const receiverInitialBalance = await velasNativeChain.getBalance(data.wallets.fundsReceiver.address);
-    const senderInitialBalance = await velasNativeChain.getBalance(data.wallets.withFunds.address);
+    const senderInitialBalance = await velasNativeChain.getBalance(data.wallets.txSender.address);
     const transactionAmount = 0.0001;
 
     await walletsScreen.selectWallet('Velas Native');
@@ -35,7 +35,7 @@ test.describe('Transactions', () => {
     await page.waitForSelector('"  has been sent"');
     await page.waitForSelector('"  in progress.."', { timeout: 15000 });
 
-    await page.waitForSelector('"  has been sent"', { timeout: 30000 });
+    await page.waitForSelector('"  has been sent"', { timeout: 40000 });
     // TODO: change previous line to the next one after fix https://velasnetwork.atlassian.net/browse/VLWA-481
     // await page.waitForSelector('"  has been confirmed"', { timeout: 20000 });
 
@@ -55,7 +55,7 @@ test.describe('Transactions', () => {
     const receiverFinalBalance = await velasNativeChain.getBalance(data.wallets.fundsReceiver.address);
     assert.equal(receiverFinalBalance.VLX.toFixed(6), (receiverInitialBalance.VLX + transactionAmount).toFixed(6));
 
-    const senderFinalBalance = await velasNativeChain.getBalance(data.wallets.withFunds.address);
+    const senderFinalBalance = await velasNativeChain.getBalance(data.wallets.txSender.address);
     assert.isBelow(senderFinalBalance.VLX, senderInitialBalance.VLX - transactionAmount, 'Final sender balance is not below the initial sender balance');
   });
 });

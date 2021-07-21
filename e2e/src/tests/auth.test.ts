@@ -71,7 +71,7 @@ test.describe('Auth', () => {
       assert.equal(await walletsScreen.getWalletAddress(), accountAddress12Words, 'Account address on UI does not equal expected');
     });
 
-    test('Can\'t restore with incorrect seed phrase', async ({ page }) => {
+    test('Can\'t restore with incorrect 24-word seed phrase', async ({ page }) => {
       await auth.language.select('en');
       await auth.welcome.restore();
       await auth.restoreFrom.seed('24');
