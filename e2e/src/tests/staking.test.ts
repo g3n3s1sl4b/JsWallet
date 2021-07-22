@@ -24,6 +24,8 @@ test.describe('Staking', () => {
   });
 
   test.describe('Actions', () => {
+    // tests in this suite depend on each other
+
     const stakingAmount = 1;
 
     test('Create staking account', async ({ page }) => {
@@ -41,7 +43,7 @@ test.describe('Staking', () => {
 
       // for some reason new stake does not appear in the list immediately
       const finalAmountOfStakingAccounts = await stakingScreen.waitForStakesAmountUpdated(initialAmountOfStakingAccounts, 'to_delegate');
-      assert.equal(finalAmountOfStakingAccounts, initialAmountOfStakingAccounts + stakingAmount);
+      assert.equal(finalAmountOfStakingAccounts, initialAmountOfStakingAccounts + 1);
 
       const newlyAddedStakingAccountAddress = (await stakingScreen.getStakingAccountsUpdate(stakingAccountAddresses))?.added;
       if (!newlyAddedStakingAccountAddress) throw new Error('No new staking account appears in the list');

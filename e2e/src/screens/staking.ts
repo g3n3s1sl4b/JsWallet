@@ -18,21 +18,25 @@ export class StakingScreen extends BaseScreen {
 
   async waitForLoaded(): Promise<void> {
     try {
-      await this.page.waitForSelector('" Loading..."', { timeout: 2000 });
+      await this.page.waitForSelector('" Loading..."', { timeout: 1000 });
     } catch (e) {
       log.debug('No loading after opening staking. Looks like it\'s already fully loaded.');
     }
-    await this.page.waitForSelector('.validator-item', { timeout: 12000 });
+    await this.page.waitForSelector('.validator-item', { timeout: 13000 });
     // wait staking account item or make sure there are no accounts
-    await this.page.waitForSelector(`${this.stakingAccountAddress}, #staking-accounts .amount:text(" (0) ")`, { timeout: 10000 });
-    await this.page.waitForTimeout(1000);
+    try {
+      await this.page.waitForSelector(this.stakingAccountAddress, { timeout: 10000 });
+    } catch {
+      await this.page.waitForSelector('#staking-accounts .amount:text(" (0) ")', { timeout: 1000 });
+    }
+    await this.page.waitForTimeout(500);
   }
 
   async waitForStakesAmountUpdated(initialStakesAmount: number, stakeType: Stake | 'all' = 'all'): Promise<number> {
     let finalAmountOfStakingAccounts = await this.getAmountOfStakes(stakeType);
     while (finalAmountOfStakingAccounts === initialStakesAmount) {
       log.warn('Amount of stake accounts still the same. Wait and refresh the staking data...');
-      await this.page.waitForTimeout(5000);
+      await this.page.waitForTimeout(4000);
       await this.refresh();
       finalAmountOfStakingAccounts = await this.getAmountOfStakes(stakeType);
     }

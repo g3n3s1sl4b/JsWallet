@@ -9,6 +9,6 @@ export const config = {
   CI: process.env.CI === 'true' ? true : false,
   retries: process.env.CI ? 1 : 0,
   pw: {
-    slowMo: 200,
+    slowMo: 100,
   },
 };
