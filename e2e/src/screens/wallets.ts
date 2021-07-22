@@ -28,9 +28,7 @@ export class WalletsScreen extends BaseScreen {
 
   async getWalletsBalances(): Promise<Balances> {
     await this.waitForWalletsDataLoaded();
-
     const walletElements = await this.page.$$('.wallet-item');
-
     const balances: Balances = {
       'Velas': null,
       'Velas EVM': null,
@@ -47,7 +45,6 @@ export class WalletsScreen extends BaseScreen {
       if (!await this.isWalletInWalletsList(tokenName)) continue;
 
       const amountOfTokens = await this.getAmountOfTokensFromOfWalletItemElement(walletElement);
-
       balances[tokenName] = amountOfTokens;
     }
     log.info(balances);
@@ -58,13 +55,13 @@ export class WalletsScreen extends BaseScreen {
     return this.page.isVisible(`.balance.title:text(" ${tokenName}")`);
   }
 
-  async getAmountOfTokensFromOfWalletItemElement(walletElement: ElementHandle<SVGElement | HTMLElement>): Promise<string> {
+  private async getAmountOfTokensFromOfWalletItemElement(walletElement: ElementHandle<SVGElement | HTMLElement>): Promise<string> {
     const amountOfTokens = await (await walletElement.$('.info .token.price'))?.getAttribute('title');
     if (!amountOfTokens) throw new Error('Cannot get amount of tokens');
     return amountOfTokens;
   }
 
-  async getTokenNameOfWalletItemElement(walletElement: ElementHandle<SVGElement | HTMLElement>): Promise<string> {
+  private async getTokenNameOfWalletItemElement(walletElement: ElementHandle<SVGElement | HTMLElement>): Promise<string> {
     const tokenName = (await (await walletElement.$('.balance.title'))?.textContent())?.trim();
     if (!tokenName) throw new Error('Cannot get token name');
     return tokenName;
@@ -82,7 +79,7 @@ export class WalletsScreen extends BaseScreen {
   }
 
   async waitForWalletsDataLoaded(): Promise<void> {
-    await this.page.waitForSelector('.wallet-item .top-left [class=" img"]', { state: 'visible' });
+    await this.page.waitForSelector('.wallet-item .top-left [class=" img"]', { state: 'visible', timeout: 10000 });
   }
 
   addWalletsPopup = {
