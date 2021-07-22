@@ -13,7 +13,7 @@ test.describe('Navigation', () => {
     setupPage(page);
     walletsScreen = new WalletsScreen(page);
     auth = new Auth(page);
-    await page.goto(getWalletURL({testnet: true}));
+    await page.goto(getWalletURL({ testnet: true }));
     await auth.loginByRestoringSeed(data.wallets.login.seed);
   });
 
@@ -21,8 +21,8 @@ test.describe('Navigation', () => {
     await walletsScreen.waitForWalletsDataLoaded();
 
     const screens = ['settings', 'search', 'staking', 'swap', 'send'];
-  
-    for (let i =0; i < screens.length; i++){
+
+    for (let i = 0; i < screens.length; i++) {
       const screen = screens[i];
 
       //check that navigation doesn't get broken by locking screen
@@ -64,13 +64,13 @@ test.describe('Navigation', () => {
     }
   });
 
-  test('Redirects to support page from menu', async ({ page, context } ) => {
+  test('Redirects to support page from menu', async ({ page, context }) => {
     const [newPage] = await Promise.all([
       context.waitForEvent('page'),
       page.click('#menu-support')
     ])
 
     await newPage.waitForLoadState();
-    assert.isTrue(await newPage.url().includes("https://support.velas.com"));
+    assert.isTrue(newPage.url().includes("https://support.velas.com"));
   });
 });

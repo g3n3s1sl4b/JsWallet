@@ -31,7 +31,7 @@ test.describe('Staking', () => {
     test('Create staking account', async ({ page }) => {
       const VLXNativeAddress = '59vpQgPoDEhux1G84jk6dbbARQqfUwYtohLU4fgdxFKG';
 
-      const initialAmountOfStakingAccounts = await stakingScreen.getAmountOfStakes('to_delegate');
+      const initialAmountOfStakingAccounts = await stakingScreen.getAmountOfStakes('Delegate');
       const stakingAccountAddresses = await stakingScreen.getStakingAccountsAddresses();
       const initialWalletBalance = Number((await velasNative.getBalance(VLXNativeAddress)).VLX.toFixed(0));
 
@@ -42,7 +42,7 @@ test.describe('Staking', () => {
       await page.click('#notification-close');
 
       // for some reason new stake does not appear in the list immediately
-      const finalAmountOfStakingAccounts = await stakingScreen.waitForStakesAmountUpdated(initialAmountOfStakingAccounts, 'to_delegate');
+      const finalAmountOfStakingAccounts = await stakingScreen.waitForStakesAmountUpdated(initialAmountOfStakingAccounts, 'Delegate');
       assert.equal(finalAmountOfStakingAccounts, initialAmountOfStakingAccounts + 1);
 
       const newlyAddedStakingAccountAddress = (await stakingScreen.getStakingAccountsUpdate(stakingAccountAddresses))?.added;
@@ -58,8 +58,8 @@ test.describe('Staking', () => {
     });
 
     test('Delegate stake', async ({ page }) => {
-      const initialAmountOfDelegatedStakes = await stakingScreen.getAmountOfStakes('to_undelegate');
-      const stakeAccountAddress = await stakingScreen.getFirstStakingAccountAddressFromTheList('to_delegate');
+      const initialAmountOfDelegatedStakes = await stakingScreen.getAmountOfStakes('Undelegate');
+      const stakeAccountAddress = await stakingScreen.getFirstStakingAccountAddressFromTheList('Delegate');
 
       await stakingScreen.clickDelegate();
       assert.isFalse(await page.isVisible('#choosen-pull'));
@@ -68,7 +68,7 @@ test.describe('Staking', () => {
       const alertText = await (await page.waitForSelector('.confirmation .text', { timeout: 10000 })).textContent();
       assert.include(alertText, 'Funds delegated to');
       await page.click('" Ok"');
-      const finalAmountOfDelegatedStakes = await stakingScreen.waitForStakesAmountUpdated(initialAmountOfDelegatedStakes, 'to_undelegate');
+      const finalAmountOfDelegatedStakes = await stakingScreen.waitForStakesAmountUpdated(initialAmountOfDelegatedStakes, 'Undelegate');
       assert.equal(finalAmountOfDelegatedStakes, initialAmountOfDelegatedStakes + 1);
 
       const stakeAccOnBlockchain = await velasNative.getStakeAccount(stakeAccountAddress);
@@ -78,17 +78,17 @@ test.describe('Staking', () => {
     });
 
     test('Undelegate stake', async ({ page }) => {
-      const initialToUndelegateStakesAmount = await stakingScreen.getAmountOfStakes('to_undelegate');
-      const initialToDelegateStakesAmount = await stakingScreen.getAmountOfStakes('to_delegate');
-      const stakeAccountAddress = await stakingScreen.getFirstStakingAccountAddressFromTheList('to_delegate');
+      const initialToUndelegateStakesAmount = await stakingScreen.getAmountOfStakes('Undelegate');
+      const initialToDelegateStakesAmount = await stakingScreen.getAmountOfStakes('Delegate');
+      const stakeAccountAddress = await stakingScreen.getFirstStakingAccountAddressFromTheList('Delegate');
 
       await stakingScreen.clickUndelegate();
       await page.click('" Confirm"');
       await page.waitForSelector('" Funds undelegated successfully"');
       await page.click('" Ok"');
-      const finalToUndelegateStakesAmount = await stakingScreen.waitForStakesAmountUpdated(initialToUndelegateStakesAmount, 'to_undelegate');
+      const finalToUndelegateStakesAmount = await stakingScreen.waitForStakesAmountUpdated(initialToUndelegateStakesAmount, 'Undelegate');
       assert.equal(finalToUndelegateStakesAmount, initialToUndelegateStakesAmount - 1, 'Amount of stakes to undelegate has not changed after undelegation');
-      assert.equal(await stakingScreen.getAmountOfStakes('to_delegate'), initialToDelegateStakesAmount + 1, 'Amount of stakes to withdraw has not changed after undelegation');
+      assert.equal(await stakingScreen.getAmountOfStakes('Delegate'), initialToDelegateStakesAmount + 1, 'Amount of stakes to withdraw has not changed after undelegation');
 
       const stakeAccOnBlockchain = await velasNative.getStakeAccount(stakeAccountAddress);
       assert.equal(stakeAccOnBlockchain.active, 0);
@@ -99,9 +99,9 @@ test.describe('Staking', () => {
     test('Withdraw stake', async ({ page }) => {
       const stakingAccountAddresses = await stakingScreen.getStakingAccountsAddresses();
       const initialAmountOfStakingAccounts = await stakingScreen.getAmountOfStakes('all');
-      const stakeAccountAddress = await stakingScreen.getFirstStakingAccountAddressFromTheList('to_delegate');
+      const stakeAccountAddress = await stakingScreen.getFirstStakingAccountAddressFromTheList('Delegate');
 
-      await stakingScreen.selectAccount('to_delegate');
+      await stakingScreen.selectAccount('Delegate');
       await page.click('button span:text(" Withdraw")');
       await page.click('" Confirm"');
       await page.waitForSelector('" Funds withdrawn successfully"');

@@ -45,7 +45,7 @@ export class Auth extends BaseScreen {
   }
 
   newSeed = {
-    getArrayWithSeed: async (params: { log?: boolean }): Promise<string[]> => {
+    getSeedWords: async (params: { log?: boolean }): Promise<string[]> => {
       const wordsElements = await this.page.$$('div.words .word span:nth-child(2)');
       const seedWords: string[] = [];
 
@@ -121,10 +121,11 @@ export class Auth extends BaseScreen {
         const placeholderValue = await this.page.getAttribute(elementWithWordNumberSelector, 'placeholder');
         // cut text "word #" and leave only number at the end of string
         const requestedWordNumber = Number(placeholderValue?.slice(6));
+        const inputToFillSelector = `.words [placeholder*="word #${requestedWordNumber}"]`;
         if (params.fast) {
-          await this.page.fill(`.words [placeholder*="word #${requestedWordNumber}"]`, seedWords[requestedWordNumber - 1]);
+          await this.page.fill(inputToFillSelector, seedWords[requestedWordNumber - 1]);
         } else {
-          await this.page.type(`.words [placeholder*="word #${requestedWordNumber}"]`, seedWords[requestedWordNumber - 1]);
+          await this.page.type(inputToFillSelector, seedWords[requestedWordNumber - 1]);
         }
         await this.page.click('" Next"');
       }

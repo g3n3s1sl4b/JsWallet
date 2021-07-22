@@ -43,7 +43,6 @@ test.describe('Settings', () => {
     await walletsScreen.openMenu('wallets');
     
     await walletsScreen.waitForWalletsDataLoaded();
-    //await page.pause();
     assert.equal(await walletsScreen.getWalletAddress(), 'VEzaTJxJ4938MyHRDP5YSSUYAriPkvFbha', 'Account 2 address on UI does not equal expected');
   });
 

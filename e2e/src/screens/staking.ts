@@ -4,7 +4,7 @@ import { log } from '../tools/logger';
 import { Page } from '../types';
 import { BaseScreen } from './base';
 
-type Stake = 'to_undelegate' | 'to_withdraw' | 'to_delegate';
+type Stake = 'Delegate' |  'Undelegate' | 'Withdraw';
 
 export class StakingScreen extends BaseScreen {
   constructor(public page: Page) {
@@ -66,13 +66,13 @@ export class StakingScreen extends BaseScreen {
       let buttonText: string;
 
       switch (type) {
-        case 'to_delegate':
+        case 'Delegate':
           buttonText = 'Delegate';
           break;
-        case 'to_undelegate':
+        case 'Undelegate':
           buttonText = 'Undelegate';
           break;
-        case 'to_withdraw':
+        case 'Withdraw':
           buttonText = 'Withdraw';
           break;
       }
@@ -99,13 +99,13 @@ export class StakingScreen extends BaseScreen {
     if (type === 'all') return (await this.page.$$('#staking-accounts [datacolumn="Staker Address"]')).length;
     let stakeItemSelector: string;
     switch (type) {
-      case 'to_delegate':
+      case 'Delegate':
         stakeItemSelector = this.delegateButton;
         break;
-      case 'to_undelegate':
+      case 'Undelegate':
         stakeItemSelector = this.undelegateButton;
         break;
-      case 'to_withdraw':
+      case 'Withdraw':
         stakeItemSelector = this.withdrawButton;
         break;
     }
@@ -141,7 +141,7 @@ export class StakingScreen extends BaseScreen {
 
   async selectAccount(type: Stake): Promise<void> {
     // "loading" classname corresponds to Undelegate and Withdraw stakes
-    const selector = `#staking-accounts tr.${type === 'to_delegate' ? 'inactive' : 'loading'} .inner-address-holder div a`;
+    const selector = `#staking-accounts tr.${type === 'Delegate' ? 'inactive' : 'loading'} .inner-address-holder div a`;
     await this.page.click(selector);
   }
 

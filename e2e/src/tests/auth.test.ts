@@ -24,7 +24,7 @@ test.describe('Auth', () => {
       await auth.welcome.create();
       await auth.pinForNewAcc.fillAndConfirm('111222');
 
-      const seedWords = await auth.newSeed.getArrayWithSeed({ log: true });
+      const seedWords = await auth.newSeed.getSeedWords({ log: true });
 
       await auth.newSeed.next();
       await auth.wordByWordSeedInputForm.fill(seedWords);
