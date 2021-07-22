@@ -48,10 +48,9 @@ export class WalletsScreen extends BaseScreen {
 
       const amountOfTokens = await this.getAmountOfTokensFromOfWalletItemElement(walletElement);
 
-      log.warn(`${tokenName} ----- ${amountOfTokens}`);
       balances[tokenName] = amountOfTokens;
     }
-    log.warn(balances);
+    log.info(balances);
     return balances;
   }
 

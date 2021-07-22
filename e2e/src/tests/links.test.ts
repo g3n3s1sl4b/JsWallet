@@ -19,23 +19,22 @@ test.describe('Links', () => {
 
   test('Download links are correct', async ({ page }) => {
     //find selectors by id or class when ids added to the page
-    const appleLink = await page.getAttribute('.downloadwalletlist a:nth-of-type(1)', 'href') as string;
-    const androidLink = await page.getAttribute('.downloadwalletlist a:nth-of-type(2)', 'href') as string;
-    assert.isTrue(appleLink.includes('https://apps.apple.com/'));
-    assert.isTrue(androidLink.includes('https://play.google.com/'));
-
+    const appleLink = await page.getAttribute('.downloadwalletlist a:nth-of-type(1)', 'href');
+    const androidLink = await page.getAttribute('.downloadwalletlist a:nth-of-type(2)', 'href');
+    assert.isTrue(appleLink?.includes('https://apps.apple.com/'));
+    assert.isTrue(androidLink?.includes('https://play.google.com/'));
+    
     //find selectors by id or class when ids added to the page
     await page.click('.downloadwalletlist :nth-child(3)');
     await page.waitForSelector('.platforms');
-
+    
     const donwloadLinks = await page.$$('a');
-    for (let i=0; i<donwloadLinks.length; i++){
+    for (let i=0; i < donwloadLinks.length; i++){
       const linkElement = donwloadLinks[i];
-      const downloadLink =  await linkElement.getAttribute('href') as string;
-      log.info(downloadLink);
+      const downloadLink =  await linkElement.getAttribute('href');
       //delete condition after bugfix VLWA-257
       if (downloadLink !== 'undefined'){
-        assert.isTrue(downloadLink.includes('https://github.com/velas/JsWalletDesktop'), await linkElement.textContent() + " doesn't lead to correct destination");
+        assert.isTrue(downloadLink?.includes('https://github.com/velas/JsWalletDesktop'), `${await linkElement.textContent()} doesn't lead to correct destination`);
       }
     }
   });

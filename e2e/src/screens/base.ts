@@ -1,4 +1,3 @@
-import { config } from '../config';
 import { log } from '../tools/logger';
 import { Browser, BrowserContext, Page } from '../types';
 
@@ -21,7 +20,7 @@ export abstract class BaseScreen {
 
   async isLoggedIn(): Promise<boolean> {
     try {
-      await this.page.waitForSelector('.balance', {timeout: 1000});
+      await this.page.waitForSelector('.balance', { timeout: 500 });
       log.info(`User is logged in`);
       return true;
     } catch (e) {

@@ -41,7 +41,7 @@ jobs:
       #   run: npx playwright install chrome
 
       - name: run tests
-        run: npm test
+        run: CI=true LOG_LEVEL=info npm test
 
       - name: create html report from junit
         if: always()

@@ -4,7 +4,6 @@ import { setupPage } from '../pw-helpers/setup-page';
 import { Auth } from '../screens/auth';
 import { WalletsScreen } from '../screens/wallets';
 import { data, getWalletURL } from '../test-data';
-import { log } from '../tools/logger';
 
 let walletsScreen: WalletsScreen;
 let auth: Auth;
