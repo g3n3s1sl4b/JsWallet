@@ -10,7 +10,6 @@ test.describe('Auth', () => {
   let auth: Auth;
   let walletsScreen: WalletsScreen;
   const accountAddress24Words = 'VCtQbbgQHnXfEAsYgbhWuWhyftzYRk6h6a';
-  const accountAddress12Words = 'V2BrnFYpvAx6RTkjb1Db7AU7JFtnDrv19Q';
 
   test.beforeEach(async ({ page }) => {
     setupPage(page);
@@ -25,7 +24,7 @@ test.describe('Auth', () => {
       await auth.welcome.create();
       await auth.pinForNewAcc.fillAndConfirm('111222');
 
-      const seedWords = await auth.newSeed.getArrayWithSeed({ log: true });
+      const seedWords = await auth.newSeed.getSeedWords({ log: true });
 
       await auth.newSeed.next();
       await auth.wordByWordSeedInputForm.fill(seedWords);
@@ -50,7 +49,7 @@ test.describe('Auth', () => {
       await auth.welcome.restore();
       await auth.restoreFrom.seed('24');
       await auth.pinForNewAcc.fillAndConfirm('111222');
-      await auth.wordByWordSeedInputForm.fill(data.wallets.login.seed);
+      await auth.wordByWordSeedInputForm.fill(data.wallets.login.seed, { fast: true });
 
       assert.isTrue(await page.isVisible('.menu-item'));
       assert.isTrue(await page.isVisible('.balance'));
@@ -58,6 +57,8 @@ test.describe('Auth', () => {
     });
 
     test('12-words seed phrase', async ({ page }) => {
+      const accountAddress12Words = 'V2BrnFYpvAx6RTkjb1Db7AU7JFtnDrv19Q';
+
       await auth.language.select('en');
       await auth.welcome.restore();
       await auth.restoreFrom.seed('12');
@@ -69,6 +70,17 @@ test.describe('Auth', () => {
       assert.isTrue(await page.isVisible('.menu-item'));
       assert.isTrue(await page.isVisible('.balance'));
       assert.equal(await walletsScreen.getWalletAddress(), accountAddress12Words, 'Account address on UI does not equal expected');
+    });
+
+    test('Can\'t restore with incorrect 24-word seed phrase', async ({ page }) => {
+      await auth.language.select('en');
+      await auth.welcome.restore();
+      await auth.restoreFrom.seed('24');
+      await auth.pinForNewAcc.fillAndConfirm('111222');
+      await auth.wordByWordSeedInputForm.fill(Array(24).fill("sad"), { fast: true });
+
+      assert.isTrue(await page.isVisible('" Seed phrase checksum not match. Please try again."'), 'No alert for incorrect seed phrase on UI');
+      assert.isFalse(await auth.isLoggedIn(), 'Restored with incorrect seed phrase');
     });
   });
 

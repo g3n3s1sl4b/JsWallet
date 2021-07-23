@@ -8,7 +8,7 @@ export class Auth extends BaseScreen {
   constructor(public page: Page) {
     super(page);
   };
- 
+
   customSeedInput = {
     fillAndConfirm: async (seedPhrase: string | string[]): Promise<void> => {
       if (typeof seedPhrase !== 'string') seedPhrase = seedPhrase.join(' ');
@@ -27,7 +27,7 @@ export class Auth extends BaseScreen {
       return;
     }
 
-    const passwordInput = await this.page.isVisible('[placeholder="Password or PIN"]', { timeout: 2000 });
+    const passwordInput = await this.page.isVisible('[placeholder="Password or PIN"]', { timeout: 1000 });
     if (passwordInput) {
       log.info(`You try to log in. And login was already performed in this context. Adding new account...`);
       await auth.pinForLoggedOutAcc.newAccount();
@@ -45,7 +45,7 @@ export class Auth extends BaseScreen {
   }
 
   newSeed = {
-    getArrayWithSeed: async (params: { log?: boolean }): Promise<string[]> => {
+    getSeedWords: async (params: { log?: boolean }): Promise<string[]> => {
       const wordsElements = await this.page.$$('div.words .word span:nth-child(2)');
       const seedWords: string[] = [];
 
@@ -114,14 +114,19 @@ export class Auth extends BaseScreen {
   }
 
   wordByWordSeedInputForm = {
-    fill: async (seedWords: string[]): Promise<void> => {
+    fill: async (seedWords: string[], params: { fast: boolean } = { fast: false }): Promise<void> => {
       const elementWithWordNumberSelector = '.words [placeholder*="word #"]';
       for (let i = 0; i < seedWords.length; i++) {
         // example of "placeholder" attribute value: "word #1"
         const placeholderValue = await this.page.getAttribute(elementWithWordNumberSelector, 'placeholder');
         // cut text "word #" and leave only number at the end of string
         const requestedWordNumber = Number(placeholderValue?.slice(6));
-        await this.page.type(`.words [placeholder*="word #${requestedWordNumber}"]`, seedWords[requestedWordNumber - 1]);
+        const inputToFillSelector = `.words [placeholder*="word #${requestedWordNumber}"]`;
+        if (params.fast) {
+          await this.page.fill(inputToFillSelector, seedWords[requestedWordNumber - 1]);
+        } else {
+          await this.page.type(inputToFillSelector, seedWords[requestedWordNumber - 1]);
+        }
         await this.page.click('" Next"');
       }
     }
