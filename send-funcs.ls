@@ -69,7 +69,12 @@ module.exports = (store, web3t)->
         agree <- confirm store, parts.0
         return cb null if not agree
         err, tx <- push-tx { token, tx-type, network, ...tx-data }
-        return cb err if err?
+        if err? 
+            if err.indexOf("Insufficient priority. Code:-26. Please try to increase fee") then
+                store.current.send.error = err
+                <- set-timeout _, 2000
+                store.current.send.error = ""    
+            return cb err   
         err <- create-pending-tx { store, token, network, tx, amount-send, amount-send-fee, send.to, from: wallet.address }
         cb err, tx
     perform-send-safe = (cb)->
