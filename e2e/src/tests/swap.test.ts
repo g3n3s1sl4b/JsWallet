@@ -38,7 +38,7 @@ test.describe('Swap: ', () => {
       await page.waitForTimeout(1000);
       currentTx = (await velasTestnet.getConfirmedTransactionsForAddress(data.wallets.swap.address)).signatures[0];
     }
-    log.debug(currentTx);
+    log.debud(currentTx);
 
     await walletsScreen.waitForWalletsDataLoaded();
 
@@ -47,6 +47,5 @@ test.describe('Swap: ', () => {
     
     const nativeReceiverFinalBalance = await velasNativeChain.getBalance(data.wallets.swap.address);
     assert.equal(Number(nativeReceiverFinalBalance.VLX).toFixed(6), Number(nativeReceiverInitialBalance.VLX + transactionAmount).toFixed(6));
-
   });
 });

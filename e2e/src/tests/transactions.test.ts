@@ -31,26 +31,17 @@ test.describe('Transactions >', () => {
     await page.click('#send-confirm');
     await page.click('#confirmation-confirm');
 
-    await page.waitForSelector('" Transaction"');
-    await page.waitForSelector('"  has been sent"');
-    await page.waitForSelector('"  in progress.."', { timeout: 15000 });
+    const txSignatureLink = String(await page.getAttribute('.sent .text a', 'href'));
+    const txSignature = txSignatureLink.replace('https://native.velas.com/tx/', '');
+    if (!txSignature) throw new Error('Cannot get transaction signature from tx link');
 
-    await page.waitForSelector('"  has been sent"', { timeout: 40000 });
-    // TODO: change previous line to the next one after fix https://velasnetwork.atlassian.net/browse/VLWA-481
-    // await page.waitForSelector('"  has been confirmed"', { timeout: 20000 });
+    const tx = await velasNativeChain.waitForConfirmedTransaction(txSignature);
+    assert.exists(tx);
 
-    // expand tx info
     await page.click('[datatesting="transaction"] div.more');
-
-    const txSignatureElementSelector = '[datatesting="transaction"] .tx-middle .txhash a[data-original]';
-    const txSignature = (await page.getAttribute(txSignatureElementSelector, 'data-original'))?.trim();
-    if (!txSignature) throw new Error(`Cannot get transaction signature from element with selector '${txSignatureElementSelector}'`);
-
     const receiverAddress = (await page.getAttribute('[datatesting="transaction"] .address-holder a[data-original]', 'data-original'))?.trim();
     assert.equal(receiverAddress, data.wallets.fundsReceiver.address);
 
-    const tx = await velasNativeChain.getTransaction(txSignature);
-    assert.exists(tx);
 
     const receiverFinalBalance = await velasNativeChain.getBalance(data.wallets.fundsReceiver.address);
     assert.equal(receiverFinalBalance.VLX.toFixed(6), (receiverInitialBalance.VLX + transactionAmount).toFixed(6));
