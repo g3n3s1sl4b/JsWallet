@@ -23,19 +23,24 @@ test.describe('Swap: ', () => {
 
   test('VLX > Native', async ({ page }) => {
     await walletsScreen.waitForWalletsDataLoaded();
-    const vlxSenderInitialBalance = '';
+    const vlxSenderInitialBalance = (await walletsScreen.getWalletsBalances())['Velas'];
     const nativeReceiverInitialBalance = await velasNativeChain.getBalance(data.wallets.swap.nativeAddress);
     const transactionAmount = 0.0001;
 
     const swap = await walletsScreen.swapTokens('Velas', 'Velas Native', transactionAmount);
 
-    let lastTx = await velasTestnet.getConfirmedTransactionsForAddress(data.wallets.swap.vlxAddress)[0];
+    let lastTx = (await velasTestnet.getConfirmedTransactionsForAddress(data.wallets.swap.vlxAddress))[0];
+
     while (swap !== lastTx){
       await page.waitForTimeout(1000);
-      lastTx = await velasTestnet.getConfirmedTransactionsForAddress(data.wallets.swap.vlxAddress)[0];
+      lastTx = (await velasTestnet.getConfirmedTransactionsForAddress(data.wallets.swap.vlxAddress))[0];
     }
 
-    const vlxSenderFinalBalance = '';
+    const vlxSenderFinalBalance = (await walletsScreen.getWalletsBalances())['Velas'];
+    assert.isBelow(Number(vlxSenderFinalBalance), Number(vlxSenderInitialBalance) - transactionAmount);
+    
     const nativeReceiverFinalBalance = await velasNativeChain.getBalance(data.wallets.swap.nativeAddress);
+    assert.equal(Number(nativeReceiverFinalBalance.VLX).toFixed(6), Number(nativeReceiverInitialBalance.VLX + transactionAmount).toFixed(6));
+
   });
 });
