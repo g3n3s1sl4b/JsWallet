@@ -38,7 +38,7 @@ test.describe('Swap: ', () => {
       await page.waitForTimeout(1000);
       currentTx = (await velasTestnet.getConfirmedTransactionsForAddress(data.wallets.swap.address)).signatures[0];
     }
-    log.debud(currentTx);
+    log.debug(currentTx);
 
     await walletsScreen.waitForWalletsDataLoaded();
 

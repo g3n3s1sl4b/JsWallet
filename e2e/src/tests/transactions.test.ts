@@ -42,7 +42,6 @@ test.describe('Transactions >', () => {
     const receiverAddress = (await page.getAttribute('[datatesting="transaction"] .address-holder a[data-original]', 'data-original'))?.trim();
     assert.equal(receiverAddress, data.wallets.fundsReceiver.address);
 
-
     const receiverFinalBalance = await velasNativeChain.getBalance(data.wallets.fundsReceiver.address);
     assert.equal(receiverFinalBalance.VLX.toFixed(6), (receiverInitialBalance.VLX + transactionAmount).toFixed(6));
 
