@@ -21,17 +21,18 @@ export class StakingScreen extends BaseScreen {
 
   async waitForLoaded(): Promise<void> {
     try {
-      await this.page.waitForSelector('" Loading..."', { timeout: 1000 });
+      const loadingSelector = '" Loading..."';
+      await this.page.waitForSelector(loadingSelector, { timeout: 500 });
+      while (await this.page.isVisible(loadingSelector)) {
+        await this.page.waitForTimeout(500);
+      }
     } catch (e) {
       log.debug('No loading after opening staking. Looks like it\'s already fully loaded.');
     }
     await this.page.waitForSelector('.validator-item', { timeout: 13000 });
+
     // wait staking account item or make sure there are no accounts
-    try {
-      await this.page.waitForSelector(this.stakingAccountAddress, { timeout: 10000 });
-    } catch {
-      await this.page.waitForSelector('#staking-accounts .amount:text(" (0) ")', { timeout: 1000 });
-    }
+    await this.page.waitForSelector(`${this.stakingAccountAddress}, #staking-accounts .amount:text(" (0) ")`);
     await this.page.waitForTimeout(500);
   }
 
