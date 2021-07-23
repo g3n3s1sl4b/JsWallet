@@ -24,11 +24,12 @@ test.describe('Wallets screen >', () => {
       await auth.loginByRestoringSeed(data.wallets.fundsReceiver.seed);
 
       await walletsScreen.selectWallet('Velas Native');
-      await page.waitForSelector('.history-area div[datatesting="transaction"]', { timeout: 15000 });
+      await page.waitForSelector('.history-area div[datatesting="transaction"]', { timeout: 20000 });
       const transactions = await page.$$('.history-area div[datatesting="transaction"]');
       assert.isAbove(transactions.length, 10, 'Amount of transactions in the list is less than 10');
-      const senderAddressSelector = '.history-area div[datatesting="transaction"] .address-holder a:text(" Dawj15q13fqzh4baHqmD2kbrRCyiFfkE6gkPcUZ21KUS")';
-      assert.isTrue(await page.isVisible(senderAddressSelector));
+
+      const senderAddressSelector = `.history-area div[datatesting="transaction"] .address-holder a[href="https://native.velas.com/address/${data.wallets.txSender.address}?cluster=testnet"]`;
+      assert.ok(await page.waitForSelector(senderAddressSelector));
     });
   });
 
