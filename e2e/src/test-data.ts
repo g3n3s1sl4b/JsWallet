@@ -39,8 +39,7 @@ export const data = {
       }
     },
     swap: {
-      nativeAddress: '22VainsYdNmnre8XS91XoUipQ2YLNd4oPyobKvvN1zsu',
-      vlxAddress: 'V6xPs5fD2qMvKtXLDBASVrrnBbuovrrZNe',
+     address: '22VainsYdNmnre8XS91XoUipQ2YLNd4oPyobKvvN1zsu',
       seed: 'spin swamp chronic catalog lake retire vessel will truly assault rib few grocery able maple catalog dinner nice dance coast jelly swallow interest nothing'
     }
   }

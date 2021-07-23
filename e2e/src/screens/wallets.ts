@@ -105,7 +105,7 @@ export class WalletsScreen extends BaseScreen {
     }
   }
 
-  async swapTokens(swapFromToken: Currency, swapToToken: Currency, transactionAmount: number): Promise<string> {
+  async swapTokens(swapFromToken: Currency, swapToToken: Currency, transactionAmount: number): Promise<void> {
     if (swapFromToken === swapToToken){
       throw TypeError('You can\'t swap to the same token you are swapping from');
     }
@@ -121,20 +121,11 @@ export class WalletsScreen extends BaseScreen {
 
     await this.swap.click();
 
+    await this.swap.fill(String(transactionAmount));
+
     await this.swap.chooseDestinationNetwork(swapToToken);
 
-    await this.swap.confirm(String(transactionAmount));
-
-    const txHashSignatureLink = await this.page.getAttribute('.sent .text a', 'href');
-    if (!txHashSignatureLink) throw new Error('Couldn\'t read tx link');
-
-    let txHashSignature = '';
-    if (swapFromToken === 'Velas Native') {
-      txHashSignature = txHashSignatureLink.replace('https://native.velas.com/tx/', '');
-    } else {
-      txHashSignature = txHashSignatureLink.replace('https://explorer.testnet.velas.com/tx/', '');
-    }
-    return txHashSignature;
+    await this.swap.confirm();
   }
 
   private swap = {
@@ -142,9 +133,8 @@ export class WalletsScreen extends BaseScreen {
       await this.page.click('.with-swap #wallet-swap');
       await this.page.waitForSelector('.network-slider');
     },
-    fill: async() => {
-      await this.page.click('.with-swap #wallet-swap');
-      await this.page.waitForSelector('.network-slider');
+    fill: async(transactionAmount: string) => {
+      await this.page.fill('div.amount-field .input-area input[label="Send"]', transactionAmount);
     },
     chooseDestinationNetwork: async(swapToToken: Currency) => {
       let chosenNetwork = await this.page.getAttribute('.change-network', 'value');
@@ -153,8 +143,7 @@ export class WalletsScreen extends BaseScreen {
         chosenNetwork = await this.page.getAttribute('.change-network', 'value');
       }
     },
-    confirm: async(transactionAmount: string) => {
-      await this.page.fill('div.amount-field .input-area input[label="Send"]', transactionAmount);
+    confirm: async() => {
       await this.page.click('#send-confirm');
       await this.page.click('#confirmation-confirm', {timeout: 10000});
     },
