@@ -1,18 +1,18 @@
 import { test } from '@playwright/test';
+import { VelasNative } from '@velas/velas-chain-test-wrapper';
 import { assert } from '../assert';
 import { setupPage } from '../pw-helpers/setup-page';
 import { Auth } from '../screens/auth';
 import { StakingScreen } from '../screens/staking';
 import { WalletsScreen } from '../screens/wallets';
 import { data, getWalletURL } from '../test-data';
-import { VelasNative } from '@velas/velas-chain-test-wrapper';
 
 let auth: Auth;
 let walletsScreen: WalletsScreen;
 let stakingScreen: StakingScreen;
 const velasNative = new VelasNative();
 
-test.describe('Staking', () => {
+test.describe('Staking >', () => {
   test.beforeEach(async ({ page }) => {
     setupPage(page);
     auth = new Auth(page);
@@ -23,7 +23,7 @@ test.describe('Staking', () => {
     await walletsScreen.openMenu('staking');
   });
 
-  test.describe('Actions', () => {
+  test.describe('Actions >', () => {
     // tests in this suite depend on each other
 
     const stakingAmount = 1;

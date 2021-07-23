@@ -8,7 +8,7 @@ import { setupPage } from '../pw-helpers/setup-page';
 let walletsScreen: WalletsScreen;
 let auth: Auth;
 
-test.describe('Validation', () => {
+test.describe('Validation >', () => {
   test.beforeEach(async ({ page }) => {
     setupPage(page);
     auth = new Auth(page);
@@ -32,11 +32,11 @@ test.describe('Validation', () => {
     await page.fill('#send-recipient', 'VAP73ARS1UXPr3jDHSzNZdss6dAudsg15U');
 
     await page.fill('div.amount-field .textfield[label="Send"]', '99999999');
-    //if send button is disabled, we know balance check has been finished
+    // if send button is disabled, we know balance check has been finished
     await page.waitForSelector('#send-confirm[disabled]');
     assert.isTrue(await page.isVisible('[title="Not Enough Funds"]'));
 
-    //need to clear the field because actions are too fast and test fails
+    // need to clear the field because actions are too fast and test fails
     await page.fill('div.amount-field .textfield[label="Send"]', '');
 
     await page.click('#send-max');

@@ -12,26 +12,24 @@ jobs:
       run:
         working-directory: ./e2e
     steps:
-      - name: setup web3t
-        working-directory: ./
-        run: cd .. && cd web3t && git pull && npm i
-
       - uses: actions/checkout@v2
 
-      - name: mkdir for web3t
+      - uses: actions/checkout@v2
+        with:
+          repository: velas/web3t
+          path: .compiled-ssr/web3t
+          ref: testnet
+
+      - name: delete wallet build cache
         working-directory: ./
-        run: mkdir -p .compiled-ssr/web3t/
+        run: rm -rf ./.compiled
 
-      - name: copy web3t
-        working-directory: ../
-        run: cp -pr web3t/ JsWallet/.compiled-ssr/web3t/
-        # sleep required for wallet start
-
+      # sleep required for wallet start
       - name: run wallet
         working-directory: ./
         run: |
           npm run wallet-start &
-          sleep 15 &&
+          sleep 16 &&
           echo '- - - - - Wallet started - - - - -'
 
       - name: install modules required for testrun
@@ -40,7 +38,7 @@ jobs:
       # - name: install required browsers
       #   run: npx playwright install chrome
 
-      - name: clean previous results
+      - name: clean previous test results
         run: rm -rf ./test-results/
 
       - name: run tests
@@ -48,7 +46,7 @@ jobs:
 
       - name: create html report from junit
         if: always()
-        run: junit2html test-results/test-results.xml test-results/report.html
+        run: junit2html test-results/test-results.xml test-results/report.html || echo "Can't create HTML report. Please check junit2html lib error"
 
       - name: upload artifacts
         if: always()
@@ -57,7 +55,6 @@ jobs:
           name: test-results
           path: |
             e2e/test-results/
-
 
 
 # RUN ON UBUNTU

@@ -307,8 +307,8 @@ module.exports = (store, web3t, wallets, wallet)-->
                             .pug expand
                 button { store, on-click=send-click, text: \send , icon: \send , type: \secondary }
                 button { store, on-click=receive-click, text: \receive , icon: \get  , type : \primary }
-                if token in <[ vlx vlx_native vlx2 vlx_evm vlx_erc20 ]> then
-                    button {    store, on-click=swap-click, text: \swap , icon: \swap  , id: "wallet-swap", makeDisabled=no, classes="wallet-swap" }
+                if token in <[ vlx vlx_native vlx2 vlx_evm vlx_erc20 vlx_bep20 ]> then
+                    button { store, on-click=swap-click, text: \swap , icon: \swap  , id: "wallet-swap", makeDisabled=no, classes="wallet-swap" }
         .wallet-middle.pug(style=border)
             address-holder { store, wallet, type: \bg }
             if token not in <[ btc vlx vlx_native vlx2 ]>

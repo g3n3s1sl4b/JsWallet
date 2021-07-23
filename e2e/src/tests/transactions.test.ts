@@ -10,7 +10,7 @@ let auth: Auth;
 let walletsScreen: WalletsScreen;
 const velasNativeChain = new VelasNative();
 
-test.describe('Transactions', () => {
+test.describe('Transactions >', () => {
   test.beforeEach(async ({ page }) => {
     setupPage(page);
     auth = new Auth(page);
@@ -44,7 +44,7 @@ test.describe('Transactions', () => {
 
     const txSignatureElementSelector = '[datatesting="transaction"] .tx-middle .txhash a[data-original]';
     const txSignature = (await page.getAttribute(txSignatureElementSelector, 'data-original'))?.trim();
-    if (!txSignature) throw new Error(`Cannot get transaction signature from element with selector '${txSignatureElementSelector}'`)
+    if (!txSignature) throw new Error(`Cannot get transaction signature from element with selector '${txSignatureElementSelector}'`);
 
     const receiverAddress = (await page.getAttribute('[datatesting="transaction"] .address-holder a[data-original]', 'data-original'))?.trim();
     assert.equal(receiverAddress, data.wallets.fundsReceiver.address);

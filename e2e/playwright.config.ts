@@ -6,11 +6,12 @@ const windowSize = { width: 1900, height: 1080 };
 const config: PlaywrightTestConfig = {
   globalSetup: 'src/pw-helpers/before-hook.ts',
   // globalTeardown: '',
-  maxFailures: 4,
+  maxFailures: 5,
   retries: globalConfig.retries,
   timeout: 120000,
   workers: 1,
   // reporter: 'list',
+  // repeatEach: 5,
   reporter: [['list'], ['junit', { outputFile: 'test-results/test-results.xml' }]],
   projects: [
     {
@@ -22,17 +23,17 @@ const config: PlaywrightTestConfig = {
         launchOptions: {
           args: ['--disable-dev-shm-usage', '--disable-gpu', '--no-sandbox', `--window-size=${windowSize.width},${windowSize.height}`],
           devtools: false,
+          slowMo: globalConfig.pw.slowMo,
         },
         screenshot: 'only-on-failure',
-        slowMo: globalConfig.pw.slowMo,
         viewport: { width: 1900, height: 1080 },
         video: {
           mode: 'retain-on-failure',
           size: {
             width: 1920,
             height: 1080,
-          }
-        }
+          },
+        },
       },
       // testDir: '',
     },

@@ -42,13 +42,11 @@ module.exports = (store, web3t)->
     default-button-style = { color }
     send-tx = ({ to, wallet, network, amount-send, amount-send-fee, data, coin, tx-type, gas, gas-price, swap }, cb)->
         { token } = send.coin
-        current-network = store.current.network
-        #TODO: remove chain-id here and add rpc call into provider    
-        is-erc20 = (['vlx_erc20', 'eth', 'etc', 'sprkl', 'vlx2'].index-of(token)) >= 0   
-        chain-id = if current-network is \testnet and is-erc20 then 3 else 1   
+        current-network = store.current.network 
         chosen-network = store.current.send.chosen-network
         receiver = store.current.send.contract-address ? to    
         recipient =
+            | chosen-network? and chosen-network.id is \legacy and token is \vlx_bep20 => receiver   
             | chosen-network? and chosen-network.id is \legacy => to-eth-address(receiver)     
             | _ => receiver
         tx-obj =
@@ -64,7 +62,6 @@ module.exports = (store, web3t)->
             gas-price: gas-price
             fee-type: fee-type
             swap: swap
-        tx-obj <<<< { chain-id } if is-erc20 
         console.log "Prepared tx-obj" tx-obj
         err, tx-data <- create-transaction tx-obj
         return cb err if err?
@@ -125,11 +122,36 @@ module.exports = (store, web3t)->
         wallet = store.current.send.wallet  
         contract-address = store.current.send.contract-address     
         data = ""
+        send.swap = yes 
         network-type = store.current.network
+        
+        /* Swap from BEP20 to legacy */
+        if token is \vlx_bep20 and chosen-network.id is \legacy
+            value = store.current.send.amountSend
+            FOREIGN_BRIDGE_BNB_TO_LEGACY_ADDRESS = \0x719C8490730ADBBA514eec7173515a4A572dA736     
+            send-to = FOREIGN_BRIDGE_BNB_TO_LEGACY_ADDRESS  
+            value = to-hex (value `times` (10^18))
+            TOKEN_ADDRESS = \0x77622C2F95846dDaB1300F46685CC953C17A78df  
+            network = wallet.network 
+            data = web3t.velas.ERC677BridgeToken.transferAndCall.get-data(send-to, value, send.to)
+            send.data = data
+            send.contract-address = web3t.velas.ERC20BridgeToken.address  
+            send.amount = 0
+            send.amount-send = 0
+            
+        /* Swap from LEGACY to BEP20 */
+        if token is \vlx2 and chosen-network.id is \vlx_bep20            
+            /* Check for actual home bridge address for swap from evm to bep20 */    
+            if chosen-network.HomeBridge isnt \0x97B7eb15cA5bFa82515f6964a3EAa1fE71DFB7A7
+                return cb "Wrong home bridge address"  
+            store.current.send.contract-address = chosen-network.HomeBridge    
+            receiver = store.current.send.to 
+            network = wallet.network                               
+            data = web3t.velas.HomeERC677BridgeLegacyToErc.relayTokens.get-data(receiver)
+
+        
         /* Swap from ERC20 to LEGACY (VLX) */    
         if token is \vlx_erc20 and chosen-network.id is \legacy
-            console.log "Swap from ERC20 to LEGACY (VLX)" 
-            send.swap = yes    
             value = store.current.send.amountSend
             send-to = web3t.velas.ForeignBridgeNativeToErc.address 
             value = to-hex (value `times` (10^18))

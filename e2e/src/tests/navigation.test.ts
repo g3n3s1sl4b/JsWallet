@@ -8,7 +8,7 @@ import { data, getWalletURL } from '../test-data';
 let walletsScreen: WalletsScreen;
 let auth: Auth;
 
-test.describe('Navigation', () => {
+test.describe('Navigation >', () => {
   test.beforeEach(async ({ page }) => {
     setupPage(page);
     walletsScreen = new WalletsScreen(page);
@@ -25,9 +25,9 @@ test.describe('Navigation', () => {
     for (let i = 0; i < screens.length; i++) {
       const screen = screens[i];
 
-      //check that navigation doesn't get broken by locking screen
+      // check that navigation doesn't get broken by locking screen
 
-      //uncomment after bugfix VLWA-514
+      // uncomment after bugfix VLWA-514
       // await page.click('.menu-item.bottom');
       // await auth.pinForLoggedOutAcc.typeAndConfirm('111222');
       // assert.isTrue(await auth.isLoggedIn());
@@ -67,10 +67,10 @@ test.describe('Navigation', () => {
   test('Redirects to support page from menu', async ({ page, context }) => {
     const [newPage] = await Promise.all([
       context.waitForEvent('page'),
-      page.click('#menu-support')
-    ])
+      page.click('#menu-support'),
+    ]);
 
     await newPage.waitForLoadState();
-    assert.isTrue(newPage.url().includes("https://support.velas.com"));
+    assert.isTrue(newPage.url().includes('https://support.velas.com'));
   });
 });

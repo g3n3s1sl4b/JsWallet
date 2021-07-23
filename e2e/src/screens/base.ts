@@ -5,14 +5,15 @@ type MenuItem = 'wallets' | 'staking' | 'search' | 'settings' | 'support';
 
 export abstract class BaseScreen {
   context: BrowserContext;
+
   browser: Browser;
 
   constructor(public page: Page) {
     this.context = this.page.context();
     const browser = this.context.browser();
-    if (!browser) throw new Error(`Browser was closed`);
+    if (!browser) throw new Error('Browser was closed');
     this.browser = browser;
-  };
+  }
 
   async confirmPrompt(): Promise<void> {
     await this.page.click('#prompt-confirm');
@@ -21,10 +22,10 @@ export abstract class BaseScreen {
   async isLoggedIn(): Promise<boolean> {
     try {
       await this.page.waitForSelector('.balance', { timeout: 500 });
-      log.info(`User is logged in`);
+      log.info('User is logged in');
       return true;
     } catch (e) {
-      log.info(`User is not logged in`);
+      log.info('User is not logged in');
       return false;
     }
   }

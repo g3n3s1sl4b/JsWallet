@@ -14,8 +14,11 @@ require! {
     \../web3t/plugins/usdt_erc20.json : usdt_erc20
     \../web3t/plugins/vlx-coin.ls : vlx_evm
     \../web3t/plugins/vlx_erc20-coin.ls : vlx_erc20
+    \../web3t/plugins/bnb-coin.ls : bnb 
+    \../web3t/plugins/vlx_bep20-coin.ls : vlx_bep20
+      
 }
-current-configs = { eth, syx, syx2, usdt, usdt_erc20, ltc, vlx_erc20, vlx_evm}
+current-configs = { eth, syx, syx2, usdt, usdt_erc20, ltc, vlx_erc20, vlx_evm, bnb, vlx_bep20}
 required-fields = <[ type token enabled ]>
 not-in = (arr, arr2)->
     arr |> any -> arr2.index-of(it) is -1

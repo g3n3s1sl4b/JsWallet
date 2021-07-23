@@ -1,7 +1,7 @@
-import { config } from "./config";
+import { config } from './config';
 
 export const data = {
-  
+
   walletURLs: {
     local: 'localhost:8080/main-index.html',
     devnet: '',
@@ -26,7 +26,7 @@ export const data = {
       seed: 'delay swift sick mixture vibrant element review arm snap true broccoli industry expect thought panel curve inhale rally dish close trade damp skin below',
     },
     login: {
-      seed: ["decade", "cargo", "toe", "library", "cycle", "furnace", "idea", "tourist", "fuel", "chimney", "fury", "actual", "cash", "scheme", "race", "reason", "finger", "pulp", "nature", "family", "language", "spring", "kidney", "ancient"],
+      seed: ['decade', 'cargo', 'toe', 'library', 'cycle', 'furnace', 'idea', 'tourist', 'fuel', 'chimney', 'fury', 'actual', 'cash', 'scheme', 'race', 'reason', 'finger', 'pulp', 'nature', 'family', 'language', 'spring', 'kidney', 'ancient'],
     },
     staking: {
       staker: {
@@ -36,12 +36,12 @@ export const data = {
       withoutStakeAccount: {
         publicKey: '5Rv7YBtPikC15gHrfpdYBhn1nhpieqrGusbrKhAshYXW',
         seed: 'chase excite tomato luxury trash foster swamp scene dismiss one huge save lottery awesome throw hungry three correct door rib rib repair modify grass',
-      }
-    }
-  }
+      },
+    },
+  },
 };
 
 export function getWalletURL(params: { testnet: boolean } = { testnet: false }) {
   const url = data.walletURLs[config.env];
-  return params.testnet ? url + '?network=testnet' : url;
+  return params.testnet ? `${url}?network=testnet` : url;
 }

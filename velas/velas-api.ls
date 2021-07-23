@@ -16,6 +16,8 @@ abis =
     HomeBridgeNativeToErc  : require("../../web3t/contracts/HomeBridgeNativeToErc.json").abi 
     ForeignBridgeNativeToErc : require("../../web3t/contracts/ForeignBridgeNativeToErc.json").abi 
     ERC20BridgeToken: require("../../web3t/contracts/ERC20BridgeToken.json").abi    
+    ERC677BridgeToken: require("../../web3t/contracts/ERC20BridgeToken.json").abi
+    HomeERC677Bridge: require("../../web3t/contracts/HomeBridgeNativeToErc.json").abi 
 module.exports = (store)->
     web3 = velas-web3 store
     network = store.current.network
@@ -27,7 +29,9 @@ module.exports = (store)->
     homeBridgeAddress = addresses[network].HomeBridge if addresses[network]?HomeBridge?
     foreignBridgeAddress = addresses[network].ForeignBridge if addresses[network]?ForeignBridge?
     ERC20BridgeToken = addresses[network].ERC20BridgeToken if addresses[network]?ERC20BridgeToken?
+    ERC677BridgeTokenAddress = addresses[network].ERC677BridgeToken if addresses[network]?ERC677BridgeToken?
     EvmToNativeBridgeAddress = addresses[network].EvmToNative if addresses[network]?EvmToNative?
+    HomeERC677BridgeAddress = addresses[network].HomeERC677Bridge if addresses[network]?HomeERC677Bridge?
     web3Solana = velas-solana-web3 store
     networks =
         mainnet: \https://api.velas.com
@@ -48,4 +52,6 @@ module.exports = (store)->
         HomeBridgeNativeToErc : web3.eth.contract(abis.HomeBridgeNativeToErc).at(homeBridgeAddress) if homeBridgeAddress?
         ForeignBridgeNativeToErc : web3.eth.contract(abis.ForeignBridgeNativeToErc).at(foreignBridgeAddress) if foreignBridgeAddress?
         ERC20BridgeToken : web3.eth.contract(abis.ERC20BridgeToken).at(ERC20BridgeToken) if ERC20BridgeToken?
+        ERC677BridgeToken : web3.eth.contract(abis.ERC677BridgeToken).at(ERC677BridgeTokenAddress) if ERC677BridgeTokenAddress?
+        HomeERC677BridgeLegacyToErc : web3.eth.contract(abis.HomeERC677Bridge).at(HomeERC677BridgeAddress) if HomeERC677BridgeAddress?
     api
