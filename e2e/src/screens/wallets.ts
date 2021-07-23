@@ -105,7 +105,7 @@ export class WalletsScreen extends BaseScreen {
     }
   }
 
-  async swapTokens(swapFromToken: Currency, swapToToken: Currency, transactionAmount: number): Promise<void> {
+  async swapTokens(swapFromToken: Currency, swapToToken: Currency, transactionAmount: number): Promise<string> {
     if (swapFromToken === swapToToken){
       throw TypeError('You can\'t swap to the same token you are swapping from');
     }
@@ -124,6 +124,17 @@ export class WalletsScreen extends BaseScreen {
     await this.swap.chooseDestinationNetwork(swapToToken);
 
     await this.swap.confirm(String(transactionAmount));
+
+    const txHashSignatureLink = await this.page.getAttribute('.sent .text a', 'href');
+    if (!txHashSignatureLink) throw new Error('Couldn\'t read tx link');
+
+    let txHashSignature = '';
+    if (swapFromToken === 'Velas Native') {
+      txHashSignature = txHashSignatureLink.replace('https://native.velas.com/tx/', '');
+    } else {
+      txHashSignature = txHashSignatureLink.replace('https://explorer.testnet.velas.com/tx/', '');
+    }
+    return txHashSignature;
   }
 
   private swap = {
