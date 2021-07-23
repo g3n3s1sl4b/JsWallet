@@ -10,7 +10,7 @@ let auth: Auth;
 const velasNativeChain = new VelasNative();
 let walletsScreen: WalletsScreen;
 
-test.describe('Wallets screen', () => {
+test.describe('Wallets screen >', () => {
   test.beforeEach(async ({ page }) => {
     setupPage(page);
     auth = new Auth(page);
@@ -18,7 +18,7 @@ test.describe('Wallets screen', () => {
     await page.goto(getWalletURL({ testnet: true }));
   });
 
-  test.describe('Transactions', () => {
+  test.describe('Transactions >', () => {
     test('Transactions list is displayed', async ({ page }) => {
       // arrange
       await auth.loginByRestoringSeed(data.wallets.fundsReceiver.seed);
@@ -73,7 +73,7 @@ test.describe('Wallets screen', () => {
     await page.waitForSelector('.qrcode');
   });
 
-  test.describe('Balance', () => {
+  test.describe('Balance >', () => {
     test.beforeEach(async () => {
       await auth.loginByRestoringSeed(data.wallets.withFunds.seed);
       await walletsScreen.waitForWalletsDataLoaded();
@@ -83,7 +83,7 @@ test.describe('Wallets screen', () => {
       const balances = await walletsScreen.getWalletsBalances();
 
       const wallets = Object.keys(balances) as Currency[];
-      
+
       for (let i = 0; i < wallets.length; i++) {
         const currency = wallets[i];
         const VLXNativeBalanceOnBlockchain = (await velasNativeChain.getBalance(data.wallets.withFunds.address)).VLX;

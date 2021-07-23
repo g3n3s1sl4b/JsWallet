@@ -1,3 +1,3 @@
 import chai from 'chai';
 
-export const assert = chai.assert;
+export const { assert } = chai;

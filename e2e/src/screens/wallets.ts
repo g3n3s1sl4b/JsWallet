@@ -8,7 +8,7 @@ export type Balances = Record<Currency, string | null>;
 export class WalletsScreen extends BaseScreen {
   constructor(public page: Page) {
     super(page);
-  };
+  }
 
   async getWalletAddress(): Promise<string> {
     return (await this.page.getAttribute('div.wallet-detailed a[data-original]', 'data-original'))?.trim() || '';
@@ -30,11 +30,11 @@ export class WalletsScreen extends BaseScreen {
     await this.waitForWalletsDataLoaded();
     const walletElements = await this.page.$$('.wallet-item');
     const balances: Balances = {
-      'Velas': null,
+      Velas: null,
       'Velas EVM': null,
       'Velas Native': null,
-      'Bitcoin': null,
-      'Litecoin': null,
+      Bitcoin: null,
+      Litecoin: null,
     };
 
     for (let i = 0; i < walletElements.length; i++) {
@@ -80,6 +80,7 @@ export class WalletsScreen extends BaseScreen {
 
   async waitForWalletsDataLoaded(): Promise<void> {
     await this.page.waitForSelector('.wallet-item .top-left [class=" img"]', { state: 'visible', timeout: 10000 });
+    await this.page.waitForTimeout(100);
   }
 
   addWalletsPopup = {
@@ -96,8 +97,7 @@ export class WalletsScreen extends BaseScreen {
           await addButton?.click();
         }
       }
-    }
+    },
 
   }
-
 }

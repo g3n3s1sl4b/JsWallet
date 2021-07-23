@@ -4,16 +4,19 @@ import { log } from '../tools/logger';
 import { Page } from '../types';
 import { BaseScreen } from './base';
 
-type Stake = 'Delegate' |  'Undelegate' | 'Withdraw';
+type Stake = 'Delegate' | 'Undelegate' | 'Withdraw';
 
 export class StakingScreen extends BaseScreen {
   constructor(public page: Page) {
     super(page);
-  };
+  }
 
   delegateButton = '#staking-accounts tr.inactive span:text(" Delegate")';
+
   undelegateButton = '#staking-accounts .action-undelegate span:text(" Undelegate")';
+
   withdrawButton = '#staking-accounts tr.loading span:text(" Withdraw")';
+
   stakingAccountAddress = '#staking-accounts [datacolumn="Staker Address"]';
 
   async waitForLoaded(): Promise<void> {
@@ -52,13 +55,13 @@ export class StakingScreen extends BaseScreen {
     try {
       await this.page.click(this.delegateButton);
     } catch (e) {
-      throw new Error(`No stakes available to delegate. Please undelegate first\n${e}`)
+      throw new Error(`No stakes available to delegate. Please undelegate first\n${e}`);
     }
   }
 
   async getFirstStakingAccountAddressFromTheList(type: Stake): Promise<string> {
     await this.waitForLoaded();
-    const accountsElementsList = await this.page.$$(`#staking-accounts tr`);
+    const accountsElementsList = await this.page.$$('#staking-accounts tr');
     const errorText = `No accounts in the list of required type – "${type}"`;
 
     for (let i = 0; i < accountsElementsList.length; i++) {
@@ -90,7 +93,7 @@ export class StakingScreen extends BaseScreen {
     try {
       await this.page.click(this.undelegateButton);
     } catch (e) {
-      throw new Error(`No stakes available to undelegate. Please delegate first\n${e}`)
+      throw new Error(`No stakes available to undelegate. Please delegate first\n${e}`);
     }
   }
 
@@ -116,7 +119,7 @@ export class StakingScreen extends BaseScreen {
     await this.waitForLoaded();
     const stakesAccountsElements = await this.page.$$(this.stakingAccountAddress);
     const stakingAccountAddresses = await Promise.all(
-      stakesAccountsElements.map(async (el) => await el.getAttribute('title') as string)
+      stakesAccountsElements.map(async (el) => await el.getAttribute('title') as string),
     );
     return stakingAccountAddresses;
   }
@@ -124,10 +127,10 @@ export class StakingScreen extends BaseScreen {
   /**
    * Function requires only initial stake accounts addresses list. Final list could be passed or will be got during function invocation.
    * Returns difference between states with specifying if stake account was added or removed from stake accounts list
-   * 
-   * @param initialAccountsList 
-   * @param finalAccountsList 
-   * @returns added or removed accounts list
+   *
+   * @param initialAccountsList
+   * @param finalAccountsList
+   * @return added or removed accounts list
    */
   async getStakingAccountsUpdate(initialAccountsAddressesList: string[], finalAccountsAddressesList?: string[]): Promise<{
     added?: string,
@@ -146,7 +149,7 @@ export class StakingScreen extends BaseScreen {
   }
 
   async showOnPage(amount: 5 | 10 | 20): Promise<void> {
-    await this.page.click(`#accounts-selector div.to-show`);
+    await this.page.click('#accounts-selector div.to-show');
     await this.page.click(`div:text(" ${amount}")`);
   }
 
@@ -173,5 +176,4 @@ export class StakingScreen extends BaseScreen {
     }
     log.info(`Withdrawed staking account: ${address}`);
   }
-
 }

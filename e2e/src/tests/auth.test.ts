@@ -6,7 +6,7 @@ import { WalletsScreen } from '../screens/wallets';
 import { data, getWalletURL } from '../test-data';
 import { log } from '../tools/logger';
 
-test.describe('Auth', () => {
+test.describe('Auth >', () => {
   let auth: Auth;
   let walletsScreen: WalletsScreen;
   const accountAddress24Words = 'VCtQbbgQHnXfEAsYgbhWuWhyftzYRk6h6a';
@@ -18,7 +18,7 @@ test.describe('Auth', () => {
     auth = new Auth(page);
   });
 
-  test.describe('Sign up', () => {
+  test.describe('Sign up >', () => {
     test('Create wallet', async ({ page }) => {
       await auth.language.select('en');
       await auth.welcome.create();
@@ -35,7 +35,7 @@ test.describe('Auth', () => {
     });
   });
 
-  test.describe('Restore with:', () => {
+  test.describe('Restore with >', () => {
     test.afterEach(async ({ context }) => {
       await context.close();
     });
@@ -77,14 +77,14 @@ test.describe('Auth', () => {
       await auth.welcome.restore();
       await auth.restoreFrom.seed('24');
       await auth.pinForNewAcc.fillAndConfirm('111222');
-      await auth.wordByWordSeedInputForm.fill(Array(24).fill("sad"), { fast: true });
+      await auth.wordByWordSeedInputForm.fill(Array(24).fill('sad'), { fast: true });
 
       assert.isTrue(await page.isVisible('" Seed phrase checksum not match. Please try again."'), 'No alert for incorrect seed phrase on UI');
       assert.isFalse(await auth.isLoggedIn(), 'Restored with incorrect seed phrase');
     });
   });
 
-  test.describe('Log in', () => {
+  test.describe('Log in >', () => {
     test.beforeEach(async ({ page }) => {
       walletsScreen = new WalletsScreen(page);
       await auth.loginByRestoringSeed(data.wallets.login.seed);
@@ -104,22 +104,22 @@ test.describe('Auth', () => {
     });
   });
 
-  test.describe('Choose language on sign up', () => {
+  test.describe('Choose language on sign up >', () => {
     test('Change language', async ({ page }) => {
       const welcomeTexts = {
         fr: 'Bienvenu(e)!',
         en: 'Welcome!',
         kr: '어서 오십시오!',
         cn: '欢迎！',
-        //in: 'स्वागत हे!',
+        // in: 'स्वागत हे!',
         sp: '¡Bienvenido!',
         ua: 'Ласкаво просимо!',
         ru: 'Добро пожаловать!',
         ar: 'مرحبا!',
-        //id: 'Selamat datang!',
-        //ph: 'pagsalubong sa Pitaka',
-        //yr: 'Kaabo!',
-        //vn: 'Chào mừng!'
+        // id: 'Selamat datang!',
+        // ph: 'pagsalubong sa Pitaka',
+        // yr: 'Kaabo!',
+        // vn: 'Chào mừng!'
       };
       const languages = Object.keys(welcomeTexts) as Language[];
 

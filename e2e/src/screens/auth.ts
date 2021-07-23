@@ -7,12 +7,12 @@ export type Language = 'fr' | 'en' | 'kr' | 'cn' | 'sp' | 'ua' | 'ru' | 'ar';
 export class Auth extends BaseScreen {
   constructor(public page: Page) {
     super(page);
-  };
+  }
 
   customSeedInput = {
     fillAndConfirm: async (seedPhrase: string | string[]): Promise<void> => {
       if (typeof seedPhrase !== 'string') seedPhrase = seedPhrase.join(' ');
-      log.info(`Fill seed phrase: ${seedPhrase}`)
+      log.info(`Fill seed phrase: ${seedPhrase}`);
       await this.page.fill('#seedphrase-custom', seedPhrase);
       await this.page.click('#seed-phrase-next');
     },
@@ -23,13 +23,13 @@ export class Auth extends BaseScreen {
 
     const isLoggedIn = await this.isLoggedIn();
     if (isLoggedIn) {
-      log.info(`User is already logged in`);
+      log.info('User is already logged in');
       return;
     }
 
     const passwordInput = await this.page.isVisible('[placeholder="Password or PIN"]', { timeout: 1000 });
     if (passwordInput) {
-      log.info(`You try to log in. And login was already performed in this context. Adding new account...`);
+      log.info('You try to log in. And login was already performed in this context. Adding new account...');
       await auth.pinForLoggedOutAcc.newAccount();
     }
 
@@ -63,7 +63,7 @@ export class Auth extends BaseScreen {
 
     next: async (): Promise<void> => {
       await this.page.click('#seed-next');
-    }
+    },
   }
 
   pinForLoggedOutAcc = {
@@ -82,7 +82,7 @@ export class Auth extends BaseScreen {
     fillAndConfirm: async (password: string): Promise<void> => {
       await this.page.fill('[type="password"]', password);
       await this.page.click('button.setup');
-    }
+    },
   }
 
   restoreFrom = {
@@ -94,7 +94,7 @@ export class Auth extends BaseScreen {
   language = {
     select: async (language: Language): Promise<void> => {
       await this.page.click(`#lang-${language}`);
-    }
+    },
   }
 
   terms = {
@@ -129,6 +129,6 @@ export class Auth extends BaseScreen {
         }
         await this.page.click('" Next"');
       }
-    }
+    },
   }
 }
