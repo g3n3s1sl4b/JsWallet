@@ -34,11 +34,11 @@ test.describe('Swap: ', () => {
     let currentTx = previousTx;
 
     while (previousTx === currentTx){
-      log.warn('No new transactions in the chain, wait and retry...');
+      log.debug('No new transactions in the chain, wait and retry...');
       await page.waitForTimeout(1000);
       currentTx = (await velasTestnet.getConfirmedTransactionsForAddress(data.wallets.swap.address)).signatures[0];
     }
-    log.warn(currentTx);
+    log.debug(currentTx);
 
     await walletsScreen.waitForWalletsDataLoaded();
 
