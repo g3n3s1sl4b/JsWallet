@@ -1,11 +1,13 @@
 import { test } from '@playwright/test';
 import { VelasNative } from '@velas/velas-chain-test-wrapper';
+import { max } from 'moment';
 import { assert } from '../assert';
 import { setupPage } from '../pw-helpers/setup-page';
 import { Auth } from '../screens/auth';
 import { StakingScreen } from '../screens/staking';
 import { WalletsScreen } from '../screens/wallets';
 import { data, getWalletURL } from '../test-data';
+import { log } from '../tools/logger';
 
 let auth: Auth;
 let walletsScreen: WalletsScreen;
@@ -55,6 +57,18 @@ test.describe('Staking >', () => {
       // check newly created staking account on blockchain
       await stakingScreen.makeSureStakingAccIsCreatedAndNotDelegated(newlyAddedStakingAccountAddress);
       assert.equal((await velasNative.getBalance(newlyAddedStakingAccountAddress)).VLX.toFixed(0), String(stakingAmount));
+    });
+
+    test('Use max', async ({ page }) => {
+      const VLXNativeAddress = '59vpQgPoDEhux1G84jk6dbbARQqfUwYtohLU4fgdxFKG';
+      const initialWalletBalance = Number((await velasNative.getBalance(VLXNativeAddress)).VLX.toFixed(0));
+
+      await page.click('" Create Account"');
+      await page.click('#send-max');
+      const maxAmount = await page.getAttribute('.input-area input', 'value');
+      assert.equal(Number(maxAmount?.replace(',', '')), initialWalletBalance - 1);
+      log.debug("Max is: " + maxAmount);
+      log.debug("Balance is: " + initialWalletBalance);
     });
 
     test('Delegate stake', async ({ page }) => {
