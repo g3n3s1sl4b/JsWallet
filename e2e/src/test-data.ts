@@ -36,9 +36,13 @@ export const data = {
       withoutStakeAccount: {
         publicKey: '5Rv7YBtPikC15gHrfpdYBhn1nhpieqrGusbrKhAshYXW',
         seed: 'chase excite tomato luxury trash foster swamp scene dismiss one huge save lottery awesome throw hungry three correct door rib rib repair modify grass',
-      },
+      }
     },
-  },
+    swap: {
+     address: '22VainsYdNmnre8XS91XoUipQ2YLNd4oPyobKvvN1zsu',
+      seed: 'spin swamp chronic catalog lake retire vessel will truly assault rib few grocery able maple catalog dinner nice dance coast jelly swallow interest nothing'
+    }
+  }
 };
 
 export function getWalletURL(params: { testnet: boolean } = { testnet: false }) {
