@@ -20,6 +20,9 @@ module.exports = (store, web3t, wallets, wallet)->
         #event.stop-propagation!
         return alert "Not yet loaded" if not wallet?
         return alert "Not yet loaded" if not web3t[wallet.coin.token]?
+        wallet-is-disabled = isNaN(wallet.balance)
+        is-loading = store.current.refreshing is yes
+        return if wallet-is-disabled or is-loading
         { send-transaction } = web3t[wallet.coin.token]
         to = ""
         value = 0
@@ -34,6 +37,9 @@ module.exports = (store, web3t, wallets, wallet)->
         store.current.invoice <<<< { wallet.coin, wallet, network }
         navigate store, web3t, \invoice
     swap = (store, wallet, event)-->
+        wallet-is-disabled = isNaN(wallet.balance)
+        is-loading = store.current.refreshing is yes
+        return if wallet-is-disabled or is-loading
         cb = console.log
         store.current.send.contract-address = null
         store.current.send.is-swap = yes
@@ -56,9 +62,6 @@ module.exports = (store, web3t, wallets, wallet)->
         store.current.wallet-index = 0
     expand = (e)->
         e.stop-propagation!
-        wallet-is-disabled = isNaN(wallet.balance)
-        is-loading = store.current.refreshing is yes
-        return if wallet-is-disabled or is-loading 
         return send(wallet, {}) if store.current.wallet-index is index
         store.current.wallet-index = index
         store.current.filter = { token: wallet.coin.token}
