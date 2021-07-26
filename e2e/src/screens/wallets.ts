@@ -25,7 +25,7 @@ export class WalletsScreen extends BaseScreen {
     let requiredCurrencyIsALreadySelected = await this.page.isVisible(tokenNameSelector);
     while (!requiredCurrencyIsALreadySelected) {
       await this.page.click(`.balance.title:text(" ${tokenName}")`);
-      await this.page.waitForTimeout(3000);
+      await this.page.waitForTimeout(1000);
       requiredCurrencyIsALreadySelected = await this.page.isVisible(tokenNameSelector);
     }
     log.debug(`${tokenName} was selected`);
