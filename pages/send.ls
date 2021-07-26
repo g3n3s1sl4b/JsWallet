@@ -636,7 +636,6 @@ module.exports.init = ({ store, web3t }, cb)->
     { wallet } = send-funcs store, web3t
     store.current.send.fee-coin-image = 
         | wallet.network.tx-fee-in? =>
-            console.log "wallet.network.tx-fee-in" wallet.network.tx-fee-in
             tx-fee-in-wallet = wallets |> find (-> it.coin.token is wallet.network.tx-fee-in)
             if not tx-fee-in-wallet then
                 store.current.send.error = "Please add #{((wallet.network.tx-fee-in ? "").to-upper-case!)} wallet in order to calculate transaction fee"
