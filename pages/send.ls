@@ -645,7 +645,7 @@ module.exports.init = ({ store, web3t }, cb)->
     if wallet.network.txBridgeFeeIn? and (wallet.coin.token isnt wallet.network.txBridgeFeeIn) then
         bridge-fee-token = wallet.network.txBridgeFeeIn
         second-wallet = wallets |> find (-> it.coin.token is bridge-fee-token)
-        store.current.send.fee-coin-image = second-wallet.coin.image
+        store.current.send.fee-coin-image = second-wallet?coin?image if second-wallet?coin?image?
     return cb null if current-wallet.address is wallet.address
     return cb null if not wallet?
     return cb null if not web3t[wallet.coin.token]?   
