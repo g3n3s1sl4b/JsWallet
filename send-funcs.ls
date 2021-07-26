@@ -77,6 +77,7 @@ module.exports = (store, web3t)->
             return cb err   
         err <- create-pending-tx { store, token, network, tx, amount-send, amount-send-fee, send.to, from: wallet.address }
         cb err, tx
+        
     perform-send-safe = (cb)->
         err, to <- resolve-address { store, address: send.to, coin: send.coin, network: send.network }
         _coin = if send.coin.token is \vlx2 then \vlx else send.coin.token   
@@ -88,8 +89,10 @@ module.exports = (store, web3t)->
         send.error = err if err?
         return cb err if err?
         send-tx { wallet, ...send }, cb
+        
     perform-send-unsafe = (cb)->
         send-tx { wallet, ...send }, cb
+        
     check-enough = (cb)->
         try
             amount = wallet.balance `minus` send.amount-send `minus` (wallet.pending-sent ? 0) `minus` send.amount-send-fee
@@ -97,6 +100,7 @@ module.exports = (store, web3t)->
             cb null
         catch err
             cb err
+            
     send-money = ->
         return if wallet.balance is \...
         return if send.sending is yes
@@ -113,10 +117,12 @@ module.exports = (store, web3t)->
             | send.network.api.url => "#{send.network.api.url}/tx/#{data}"
         navigate store, web3t, \sent
         <- web3t.refresh
+        
     send-escrow = ->
         name = send.to
         amount-ethers = send.amount-send
         err <- send-to { name, amount-ethers }
+        
     execute-contract-data = (cb)->
         return cb null if not store.current.send.chosen-network?
         chosen-network = store.current.send.chosen-network
@@ -128,30 +134,44 @@ module.exports = (store, web3t)->
         contract-address = store.current.send.contract-address     
         data = ""
         send.swap = yes 
-        network-type = store.current.network
         
         /* Swap from BEP20 to legacy */
         if token is \vlx_bep20 and chosen-network.id is \legacy
-            value = store.current.send.amountSend
-            FOREIGN_BRIDGE_BNB_TO_LEGACY_ADDRESS = \0x719C8490730ADBBA514eec7173515a4A572dA736     
-            send-to = FOREIGN_BRIDGE_BNB_TO_LEGACY_ADDRESS  
+        
+            { wallets } = store.current.account
+            chosen-network-wallet = wallets |> find (-> it.coin.token is \vlx2)
+            return cb "[Swap error]: wallet #{chosen-network.id} is not found!" if not chosen-network-wallet? 
+            LEGACY_TOKEN_BRIDGE = chosen-network-wallet.network.ERC20BridgeToken
+            FOREIGN_BRIDGE = wallet.network.ForeignBridge       
+          
+            if store.current.network is \testnet and FOREIGN_BRIDGE isnt \0x719C8490730ADBBA514eec7173515a4A572dA736    
+                return cb "Wrong Foreign bridge address"
+           
+            value = store.current.send.amountSend 
             value = to-hex (value `times` (10^18))
-            TOKEN_ADDRESS = \0x77622C2F95846dDaB1300F46685CC953C17A78df  
-            network = wallet.network 
-            data = web3t.velas.ERC677BridgeToken.transferAndCall.get-data(send-to, value, send.to)
-            send.data = data
-            send.contract-address = web3t.velas.ERC20BridgeToken.address  
+            data = web3t.velas.ERC677BridgeToken.transferAndCall.get-data(FOREIGN_BRIDGE, value, send.to)
+            send.data = data            
+            
+            if store.current.network is \testnet and LEGACY_TOKEN_BRIDGE isnt \0xfEFF2e74eC612A288Ae55fe9F6e40c52817a1B6C    
+                return cb "Wrong ERC20 Bridge Token address"
+            
+            send.contract-address = LEGACY_TOKEN_BRIDGE 
             send.amount = 0
             send.amount-send = 0
             
         /* Swap from LEGACY to BEP20 */
-        if token is \vlx2 and chosen-network.id is \vlx_bep20            
+        if token is \vlx2 and chosen-network.id is \vlx_bep20
+            { wallets } = store.current.account
+            chosen-network-wallet = wallets |> find (-> it.coin.token is chosen-network.id)
+            return cb "[Swap error]: wallet #{chosen-network.id} is not found!" if not chosen-network-wallet? 
+            HomeBridge = chosen-network-wallet.network.HomeBridge   
+                   
             /* Check for actual home bridge address for swap from evm to bep20 */    
-            if chosen-network.HomeBridge isnt \0x97B7eb15cA5bFa82515f6964a3EAa1fE71DFB7A7
+            if store.current.network is \testnet and HomeBridge isnt \0x97B7eb15cA5bFa82515f6964a3EAa1fE71DFB7A7
                 return cb "Wrong home bridge address"  
-            store.current.send.contract-address = chosen-network.HomeBridge    
+            
+            store.current.send.contract-address = HomeBridge    
             receiver = store.current.send.to 
-            network = wallet.network                               
             data = web3t.velas.HomeERC677BridgeLegacyToErc.relayTokens.get-data(receiver)
 
         
@@ -167,54 +187,57 @@ module.exports = (store, web3t)->
             # */ 
             minPerTxRaw = web3t.velas.HomeBridgeNativeToErc.minPerTx!
             minPerTx = minPerTxRaw `div` (10 ^ network.decimals)
-            console.log "home minPerTxRaw" minPerTxRaw     
             #/*
             # * Get maxPerTx from HomeBridge  (not Foreign?)  
             # */
             maxPerTxRaw = web3t.velas.HomeBridgeNativeToErc.maxPerTx!
             maxPerTx = maxPerTxRaw `div` (10 ^ network.decimals)
-            console.log "Home maxPerTxRaw" maxPerTxRaw      
             homeFeeRaw = web3t.velas.ForeignBridgeNativeToErc.getHomeFee! 
             homeFee = homeFeeRaw `div` (10 ^ network.decimals)
             contract-home-fee = send.amountSend `times` homeFee
             minAmountPerTx = minPerTx `plus` contract-home-fee 
-            console.log "minAmountPerTx" minAmountPerTx
-            #
+            
             if +send.amountSend < +(minAmountPerTx) then
                 return cb "Min amount per transaction is #{minAmountPerTx} VLX"
             if +send.amountSend > +maxPerTx then
                 return cb "Max amount per transaction is #{maxPerTx} VLX"  
-            #    
+              
             data = web3t.velas.ERC20BridgeToken.transferAndCall.get-data(send-to, value, to-eth-address(send.to))
             send.data = data
             send.contract-address = web3t.velas.ERC20BridgeToken.address  
             send.amount = 0
             send.amount-send = 0
+            
+            
         /* Swap from LEGACY (VLX) to ERC20 */ 
-        if token is \vlx2 and chosen-network.id is \vlx_erc20 then 
-            store.current.send.contract-address = chosen-network.HomeBridge    
+        if token is \vlx2 and chosen-network.id is \vlx_erc20 then
+        
+            { wallets } = store.current.account
+            chosen-network-wallet = wallets |> find (-> it.coin.token is chosen-network.id)
+            return cb "[Swap error]: wallet #{chosen-network.id} is not found!" if not chosen-network-wallet? 
+            HomeBridge = chosen-network-wallet.network.HomeBridge
+             
+            store.current.send.contract-address = HomeBridge    
             receiver = store.current.send.to 
             network = wallet.network    
             minPerTxRaw = web3t.velas.HomeBridgeNativeToErc.minPerTx!
             minPerTx = minPerTxRaw `div` (10 ^ network.decimals)
             maxPerTxRaw = web3t.velas.HomeBridgeNativeToErc.maxPerTx! 
             maxPerTx = maxPerTxRaw `div` (10 ^ network.decimals)    
-            console.log "maxPerTxRaw" maxPerTxRaw
             homeFeeRaw = web3t.velas.HomeBridgeNativeToErc.getHomeFee! 
             homeFee = homeFeeRaw `div` (10 ^ network.decimals)
-            console.log "relay tokens to receiver" receiver    
             data = web3t.velas.HomeBridgeNativeToErc.relayTokens.get-data(receiver)
             amount-to-send = send.amount-send-fee `plus` send.amount-send   
             contract-home-fee = send.amountSend `times` homeFee
-            console.log "contract-home-fee" contract-home-fee    
             ONE_PERCENT = minPerTx `times` "0.01"    
             minAmountPerTx = minPerTx `plus` contract-home-fee `plus` ONE_PERCENT `plus` "2"    
             if +send.amountSend < +(minAmountPerTx) then
                 return cb "Min amount per transaction is #{minAmountPerTx} VLX"
             if +send.amountSend > +maxPerTx then
                 return cb "Max amount per transaction is #{maxPerTx} VLX" 
-        /**
-            * Swap into native */   
+            send.data = data    
+        
+        /* Swap into native */   
         if chosen-network.id is \native then
             console.log "Swap into native"
             $recipient = ""
