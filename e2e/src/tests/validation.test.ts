@@ -38,9 +38,9 @@ test.describe('Validation >', () => {
 
     // need to clear the field because actions are too fast and test fails
     await page.fill('div.amount-field .textfield[label="Send"]', '');
-
+    
     await page.click('#send-max');
-    await page.waitForTimeout(1000);
-    await page.waitForSelector('[title="Not Enough Funds"]');
+    await page.waitForTimeout(1000);    
+    assert.isFalse(await page.isVisible('[title="Not Enough Funds"]'));
   });
 });

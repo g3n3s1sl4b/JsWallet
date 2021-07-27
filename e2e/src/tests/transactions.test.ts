@@ -17,6 +17,7 @@ test.describe('Transactions >', () => {
     walletsScreen = new WalletsScreen(page);
     await page.goto(getWalletURL({ testnet: true }));
     await auth.loginByRestoringSeed(data.wallets.txSender.seed);
+    await walletsScreen.waitForWalletsDataLoaded();
   });
 
   test('Send VLX native', async ({ page }) => {
@@ -67,9 +68,7 @@ test.describe('Transactions >', () => {
     assert.isTrue(txSignatureLink.includes('https://ropsten.etherscan.io/'));
   });
 
-  test('Send BTC', async ({ page }) => {
-    await walletsScreen.waitForWalletsDataLoaded();
-    
+  test('Send BTC', async ({ page }) => {    
     const transactionAmount = 0.00001;
 
     await walletsScreen.selectWallet('Bitcoin');
