@@ -67,7 +67,7 @@ test.describe('Transactions >', () => {
     assert.isTrue(txSignatureLink.includes('https://ropsten.etherscan.io/'));
   });
 
-  test.only('Send BTC', async ({ page }) => {
+  test('Send BTC', async ({ page }) => {
     await walletsScreen.waitForWalletsDataLoaded();
     
     const transactionAmount = 0.00001;
