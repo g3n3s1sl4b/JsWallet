@@ -22,11 +22,8 @@ require! {
 }
 current-configs = { eth, syx, syx2, usdt, usdt_erc20, ltc, vlx_erc20, vlx_evm, bnb, vlx_bep20, huobi, vlx_huobi }
 plugin-pairs = {
-    huobi: \vlx_huobi
     vlx_huobi: \huobi
-    bnb: \vlx_bep20
     vlx_bep20: \bnb
-    eth: \vlx_erc20
     vlx_erc20: \eth    
      
 }    
