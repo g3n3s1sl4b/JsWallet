@@ -31,31 +31,73 @@ test.describe('Transactions >', () => {
     await page.click('#send-confirm');
     await page.click('#confirmation-confirm');
 
-    await page.waitForSelector('" Transaction"');
-    await page.waitForSelector('"  has been sent"');
-    await page.waitForSelector('"  in progress.."', { timeout: 15000 });
+    const txSignatureLink = String(await page.getAttribute('.sent .text a', 'href'));
+    const txSignature = txSignatureLink.replace('https://native.velas.com/tx/', '');
+    if (!txSignature) throw new Error('Cannot get transaction signature from tx link');
 
-    await page.waitForSelector('"  has been sent"', { timeout: 40000 });
-    // TODO: change previous line to the next one after fix https://velasnetwork.atlassian.net/browse/VLWA-481
-    // await page.waitForSelector('"  has been confirmed"', { timeout: 20000 });
+    const tx = await velasNativeChain.waitForConfirmedTransaction(txSignature);
+    assert.exists(tx);
 
-    // expand tx info
     await page.click('[datatesting="transaction"] div.more');
-
-    const txSignatureElementSelector = '[datatesting="transaction"] .tx-middle .txhash a[data-original]';
-    const txSignature = (await page.getAttribute(txSignatureElementSelector, 'data-original'))?.trim();
-    if (!txSignature) throw new Error(`Cannot get transaction signature from element with selector '${txSignatureElementSelector}'`);
-
     const receiverAddress = (await page.getAttribute('[datatesting="transaction"] .address-holder a[data-original]', 'data-original'))?.trim();
     assert.equal(receiverAddress, data.wallets.fundsReceiver.address);
-
-    const tx = await velasNativeChain.getTransaction(txSignature);
-    assert.exists(tx);
 
     const receiverFinalBalance = await velasNativeChain.getBalance(data.wallets.fundsReceiver.address);
     assert.equal(receiverFinalBalance.VLX.toFixed(6), (receiverInitialBalance.VLX + transactionAmount).toFixed(6));
 
     const senderFinalBalance = await velasNativeChain.getBalance(data.wallets.txSender.address);
     assert.isBelow(senderFinalBalance.VLX, senderInitialBalance.VLX - transactionAmount, 'Final sender balance is not below the initial sender balance');
+  });
+
+  test('Send ETH', async ({ page }) => {
+    await walletsScreen.addWalletsPopup.open();
+    await walletsScreen.addWalletsPopup.add('Ethereum');
+    await walletsScreen.waitForWalletsDataLoaded();
+    
+    const transactionAmount = 0.00001;
+
+    await walletsScreen.selectWallet('Ethereum');
+    await page.click('#wallets-send');
+    await page.fill('#send-recipient', '0xb322f01cb6a191974e7291600a4dc1b46f00f752'); //accound with index 2
+    await page.type('div.amount-field input[label="Send"]', String(transactionAmount));
+    await page.click('#send-confirm');
+    await page.click('#confirmation-confirm');
+
+    const txSignatureLink = String(await page.getAttribute('.sent .text a', 'href'));
+    assert.isTrue(txSignatureLink.includes('https://ropsten.etherscan.io/'));
+  });
+
+  test('Send BTC', async ({ page }) => {
+    await walletsScreen.waitForWalletsDataLoaded();
+    
+    const transactionAmount = 0.00001;
+
+    await walletsScreen.selectWallet('Bitcoin');
+    await page.click('#wallets-send');
+    await page.fill('#send-recipient', 'mvvFj8fbFpL61S2HyhvcqEHjT2ThB1f78j'); //accound with index 2
+    await page.type('div.amount-field input[label="Send"]', String(transactionAmount));
+    await page.click('#send-confirm');
+    await page.click('#confirmation-confirm');
+
+    const txSignatureLink = String(await page.getAttribute('.sent .text a', 'href'));
+    assert.isTrue(txSignatureLink.includes('https://bitpay.com/insight/#/BTC/testnet/'));
+  });
+
+  test('Send LTC', async ({ page }) => {
+    await walletsScreen.addWalletsPopup.open();
+    await walletsScreen.addWalletsPopup.add('Litecoin');
+    await walletsScreen.waitForWalletsDataLoaded();
+    
+    const transactionAmount = 0.00001;
+
+    await walletsScreen.selectWallet('Litecoin');
+    await page.click('#wallets-send');
+    await page.fill('#send-recipient', 'mvvFj8fbFpL61S2HyhvcqEHjT2ThB1f78j'); //accound with index 2
+    await page.type('div.amount-field input[label="Send"]', String(transactionAmount));
+    await page.click('#send-confirm');
+    await page.click('#confirmation-confirm');
+
+    const txSignatureLink = String(await page.getAttribute('.sent .text a', 'href'));
+    assert.isTrue(txSignatureLink.includes('https://testnet.litecore.io/'));
   });
 });
