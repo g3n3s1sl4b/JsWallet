@@ -38,11 +38,14 @@ test.describe('Settings >', () => {
   });
 
   test('Switch account index', async ({ page }) => {
+    await walletsScreen.waitForWalletsDataLoaded();
     await walletsScreen.openMenu('settings');
     await page.click('.button.right');
-    await walletsScreen.openMenu('wallets');
+    await page.waitForSelector('.amount:not(.placeholder)');
 
+    await walletsScreen.openMenu('wallets');
     await walletsScreen.waitForWalletsDataLoaded();
+
     assert.equal(await walletsScreen.getWalletAddress(), 'VEzaTJxJ4938MyHRDP5YSSUYAriPkvFbha', 'Account 2 address on UI does not equal expected');
   });
 
