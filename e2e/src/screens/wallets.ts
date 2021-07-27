@@ -18,7 +18,7 @@ export class WalletsScreen extends BaseScreen {
     return (await this.page.getAttribute('div.wallet-detailed a[data-original]', 'data-original'))?.trim() || '';
   }
 
-  async selectWallet(tokenName: Currency ): Promise<void> {
+  async selectWallet(tokenName: Currency): Promise<void> {
     await this.waitForWalletsDataLoaded();
     const tokenNameSelector = `div.big.wallet-item .balance.title:text-matches("^ ${tokenName}$")`;
     // some time is required to load wallets and switch between them; so custom waiter is implemented
