@@ -49,7 +49,7 @@ export const data = {
   }
 };
 
-export function getWalletURL(params: { testnet: boolean } = { testnet: false }) {
-  const url = data.walletURLs[config.env];
+export function getWalletURL(params: { testnet: boolean } = { testnet: false }, { env: Env } = { env: config.env }) {
+  const url = data.walletURLs[Env];
   return params.testnet ? `${url}?network=testnet` : url;
 }

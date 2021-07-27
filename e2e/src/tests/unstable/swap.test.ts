@@ -1,12 +1,12 @@
 import { test } from '@playwright/test';
-import { assert } from '../assert';
-import { setupPage } from '../pw-helpers/setup-page';
-import { Auth } from '../screens/auth';
-import { WalletsScreen } from '../screens/wallets';
-import { data, getWalletURL } from '../test-data';
-import { log } from '../tools/logger';
+import { assert } from '../../assert';
+import { setupPage } from '../../pw-helpers/setup-page';
+import { Auth } from '../../screens/auth';
+import { WalletsScreen } from '../../screens/wallets';
+import { data, getWalletURL } from '../../test-data';
+import { log } from '../../tools/logger';
 import { VelasNative } from '@velas/velas-chain-test-wrapper';
-import velasTestnet from '../api/velas-testnet/rpc';
+import velasTestnet from '../../api/velas-testnet/rpc';
 import { velasNative } from '@velas/velas-chain-test-wrapper/lib/velas-native';
 
 let auth: Auth;
