@@ -36,6 +36,10 @@ export const data = {
       withoutStakeAccount: {
         publicKey: '5Rv7YBtPikC15gHrfpdYBhn1nhpieqrGusbrKhAshYXW',
         seed: 'chase excite tomato luxury trash foster swamp scene dismiss one huge save lottery awesome throw hungry three correct door rib rib repair modify grass',
+      },
+      withActiveStake: {
+        address: 'D25HT9pVmScZjz3DfNUFRb6Ci786DxSsjqyEYGA7nm1f',
+        seed: 'eye still focus olive brass know echo element industry tumble gloom harvest lens allow genuine fee crash raise approve scrub cattle magic either portion',
       }
     },
     swap: {

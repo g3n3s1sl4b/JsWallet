@@ -1,9 +1,9 @@
 import { test } from '@playwright/test';
-import { assert } from '../assert';
-import { Auth } from '../screens/auth';
-import { WalletsScreen } from '../screens/wallets';
-import { data, getWalletURL } from '../test-data';
-import { setupPage } from '../pw-helpers/setup-page';
+import { assert } from '../../assert';
+import { Auth } from '../../screens/auth';
+import { WalletsScreen } from '../../screens/wallets';
+import { data, getWalletURL } from '../../test-data';
+import { setupPage } from '../../pw-helpers/setup-page';
 
 let walletsScreen: WalletsScreen;
 let auth: Auth;
@@ -40,7 +40,7 @@ test.describe('Validation >', () => {
     await page.fill('div.amount-field .textfield[label="Send"]', '');
     
     await page.click('#send-max');
-    await page.waitForTimeout(1000);    
+    await page.waitForTimeout(1000);
     assert.isFalse(await page.isVisible('[title="Not Enough Funds"]'));
   });
 });
