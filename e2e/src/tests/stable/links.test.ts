@@ -1,7 +1,7 @@
 import { test } from '@playwright/test';
-import { assert } from '../assert';
-import { setupPage } from '../pw-helpers/setup-page';
-import { getWalletURL } from '../test-data';
+import { assert } from '../../assert';
+import { setupPage } from '../../pw-helpers/setup-page';
+import { getWalletURL } from '../../test-data';
 
 test.describe('Links >', () => {
   test.beforeEach(async ({ page }) => {

@@ -14,11 +14,13 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - uses: actions/checkout@v2
-        with:
-          repository: velas/web3t
-          path: .compiled-ssr/web3t
-          ref: testnet
+      - name: pull web3t
+        working-directory: ../web3t
+        run: git pull
+
+      - name: copy web3 to wallet
+        working-directory: ../
+        run: rm -rf JsWallet/.compiled-ssr/web3t/.git/objects/ && mkdir -p JsWallet/.compiled-ssr/web3t/ && cp -pr web3t/ JsWallet/.compiled-ssr/web3t/
 
       - name: delete wallet build cache
         working-directory: ./
@@ -41,12 +43,16 @@ jobs:
       - name: clean previous test results
         run: rm -rf ./test-results/
 
-      - name: run tests
-        run: CI=true LOG_LEVEL=info npm test
+      - name: run tests-unstable
+        run: CI=true LOG_LEVEL=info npm run test-unstable
 
+      - name: run tests-stable
+        run: CI=true LOG_LEVEL=info npm run test-stable
+
+        # report creation will fail if tests fail
       - name: create html report from junit
         if: always()
-        run: junit2html test-results/test-results.xml test-results/report.html || echo "Can't create HTML report. Please check junit2html lib error"
+        run: junit2html test-results/test-results.xml test-results/report.html
 
       - name: upload artifacts
         if: always()

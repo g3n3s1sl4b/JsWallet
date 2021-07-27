@@ -149,6 +149,27 @@ export class StakingScreen extends BaseScreen {
     await this.page.click(selector);
   }
 
+  async selectAccountByAddress(address: string): Promise<void> {
+    await this.waitForLoaded();
+    const accountsElementsList = await this.page.$$('#staking-accounts tr');
+
+    for (let i = 0; i < accountsElementsList.length; i++) {
+      const accountElement = accountsElementsList[i];
+
+      const accountAddress = await (await accountElement.$('td[title]'))?.getAttribute('title');
+      if (typeof accountAddress !== 'string') throw new Error(`Invalid account address: "${accountAddress}"`);
+      if (accountAddress === address) {
+        await this.page.click(`#staking-accounts tr [title="${address}"] .inner-address-holder`);
+        return;
+      }
+    }
+
+    const stakingAccountsAddresses = await this.getStakingAccountsAddresses();
+    throw new Error(`No staking accounts with address ${address} in the staking accounts list.
+    Available adresses:
+    ${stakingAccountsAddresses}`);
+  }
+
   async showOnPage(amount: 5 | 10 | 20): Promise<void> {
     await this.page.click('#accounts-selector div.to-show');
     await this.page.click(`div:text(" ${amount}")`);

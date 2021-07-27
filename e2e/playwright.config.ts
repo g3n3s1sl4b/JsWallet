@@ -6,7 +6,7 @@ const windowSize = { width: 1900, height: 1080 };
 const config: PlaywrightTestConfig = {
   globalSetup: 'src/pw-helpers/before-hook.ts',
   // globalTeardown: '',
-  maxFailures: 5,
+  maxFailures: globalConfig.CI ? 5 : 1,
   retries: globalConfig.retries,
   timeout: 120000,
   workers: 1,
@@ -21,7 +21,7 @@ const config: PlaywrightTestConfig = {
         channel: 'chrome',
         headless: globalConfig.CI,
         launchOptions: {
-          args: ['--disable-dev-shm-usage', '--disable-gpu', '--no-sandbox', `--window-size=${windowSize.width},${windowSize.height}`],
+          args: ['--disable-dev-shm-usage', '--disable-gpu', '--no-sandbox', `--window-size=${windowSize.width},${windowSize.height}`, '--disable-features=TranslateUI'],
           devtools: false,
           slowMo: globalConfig.pw.slowMo,
         },

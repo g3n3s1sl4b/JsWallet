@@ -1,9 +1,9 @@
 import { test } from '@playwright/test';
-import { assert } from '../assert';
-import { setupPage } from '../pw-helpers/setup-page';
-import { Auth } from '../screens/auth';
-import { WalletsScreen } from '../screens/wallets';
-import { data, getWalletURL } from '../test-data';
+import { assert } from '../../assert';
+import { setupPage } from '../../pw-helpers/setup-page';
+import { Auth } from '../../screens/auth';
+import { WalletsScreen } from '../../screens/wallets';
+import { data, getWalletURL } from '../../test-data';
 
 let walletsScreen: WalletsScreen;
 let auth: Auth;
