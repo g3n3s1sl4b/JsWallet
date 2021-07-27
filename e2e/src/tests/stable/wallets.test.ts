@@ -1,10 +1,10 @@
 import { test } from '@playwright/test';
 import { VelasNative } from '@velas/velas-chain-test-wrapper';
-import { assert } from '../assert';
-import { setupPage } from '../pw-helpers/setup-page';
-import { Auth } from '../screens/auth';
-import { Currency, WalletsScreen } from '../screens/wallets';
-import { data, getWalletURL } from '../test-data';
+import { assert } from '../../assert';
+import { setupPage } from '../../pw-helpers/setup-page';
+import { Auth } from '../../screens/auth';
+import { Currency, WalletsScreen } from '../../screens/wallets';
+import { data, getWalletURL } from '../../test-data';
 
 let auth: Auth;
 const velasNativeChain = new VelasNative();
@@ -80,6 +80,7 @@ test.describe('Wallets screen >', () => {
       await walletsScreen.waitForWalletsDataLoaded();
     });
 
+    // extract "VLX Native balance update" to separate test
     test('Check VLX, VLX Native and Bitcoin balances', async () => {
       const balances = await walletsScreen.getWalletsBalances();
 

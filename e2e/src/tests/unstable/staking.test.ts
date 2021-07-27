@@ -1,11 +1,11 @@
 import { test } from '@playwright/test';
 import { VelasNative } from '@velas/velas-chain-test-wrapper';
-import { assert } from '../assert';
-import { setupPage } from '../pw-helpers/setup-page';
-import { Auth } from '../screens/auth';
-import { StakingScreen } from '../screens/staking';
-import { WalletsScreen } from '../screens/wallets';
-import { data, getWalletURL } from '../test-data';
+import { assert } from '../../assert';
+import { setupPage } from '../../pw-helpers/setup-page';
+import { Auth } from '../../screens/auth';
+import { StakingScreen } from '../../screens/staking';
+import { WalletsScreen } from '../../screens/wallets';
+import { data, getWalletURL } from '../../test-data';
 
 let auth: Auth;
 let walletsScreen: WalletsScreen;
@@ -26,11 +26,15 @@ test.describe('Staking >', () => {
   test.describe('Actions >', () => {
     // tests in this suite depend on each other
 
-    const stakingAmount = 1;
+    const stakingAmount = 5;
 
     test('Create staking account', async ({ page }) => {
-      const VLXNativeAddress = '59vpQgPoDEhux1G84jk6dbbARQqfUwYtohLU4fgdxFKG';
+      const stakingAccountAddressesList = await stakingScreen.getStakingAccountsAddresses();
+      if (stakingAccountAddressesList.length) throw new Error(`This test suite cannot be passed because staking accounts list should be empty.
+      Please delete all staking accounts for account with seed "${data.wallets.staking.staker.seed}"`);
+      // TODO: implement auto deletion
 
+      const VLXNativeAddress = '59vpQgPoDEhux1G84jk6dbbARQqfUwYtohLU4fgdxFKG';
       const initialAmountOfStakingAccounts = await stakingScreen.getAmountOfStakes('Delegate');
       const stakingAccountAddresses = await stakingScreen.getStakingAccountsAddresses();
       const initialWalletBalance = Number((await velasNative.getBalance(VLXNativeAddress)).VLX.toFixed(0));
@@ -96,28 +100,51 @@ test.describe('Staking >', () => {
       assert.equal(stakeAccOnBlockchain.state, 'inactive');
     });
 
-    test('Withdraw stake', async ({ page }) => {
-      const stakingAccountAddresses = await stakingScreen.getStakingAccountsAddresses();
-      const initialAmountOfStakingAccounts = await stakingScreen.getAmountOfStakes('all');
-      const stakeAccountAddress = await stakingScreen.getFirstStakingAccountAddressFromTheList('Delegate');
+    test.describe('Delegate, withdraw, split', () => {
+      test('Split stake', async ({ page }) => {
+        const initialAmountOfStakingAccounts = await stakingScreen.getAmountOfStakes('Delegate');
+        const stakingAccountAddresses = await stakingScreen.getStakingAccountsAddresses();
 
-      await stakingScreen.selectAccount('Delegate');
-      await page.click('button span:text(" Withdraw")');
-      await page.click('" Confirm"');
-      await page.waitForSelector('" Funds withdrawn successfully"');
-      await page.click('" Ok"');
-      const finalAmountOfStakingAccounts = await stakingScreen.waitForStakesAmountUpdated(initialAmountOfStakingAccounts, 'all');
+        await stakingScreen.selectAccount('Delegate');
+        await page.click('button.action-split');
+        await page.fill('.input-area input', '1');
+        await page.click('#prompt-confirm');
+        await page.waitForSelector('" Account created and funds are splitted successfully"');
+        await page.click('#notification-close')
 
-      assert.equal(finalAmountOfStakingAccounts, initialAmountOfStakingAccounts - 1);
+        const finalAmountOfStakingAccounts = await stakingScreen.waitForStakesAmountUpdated(initialAmountOfStakingAccounts, 'Delegate');
+        assert.equal(finalAmountOfStakingAccounts, initialAmountOfStakingAccounts + 1);
 
-      await stakingScreen.makeSureStakingAccountDoesNotExist(stakeAccountAddress);
-      const withdrawedStakeAccountAddress = (await stakingScreen.getStakingAccountsUpdate(stakingAccountAddresses))?.removed;
-      assert.equal(withdrawedStakeAccountAddress, stakeAccountAddress);
+        // postcondition – withdraw splitted account
+        const addedAfterSplitAccountAddress = (await stakingScreen.getStakingAccountsUpdate(stakingAccountAddresses))?.added;
+        if (!addedAfterSplitAccountAddress) throw new Error('No staking accounts appears. But it was expected after staking');
+        // await stakingScreen.selectAccount('Delegate');
+        await stakingScreen.selectAccountByAddress(addedAfterSplitAccountAddress);
+        await page.click('button span:text(" Withdraw")');
+        await page.click('" Confirm"');
+        await page.waitForSelector('" Funds withdrawn successfully"');
+        await page.click('" Ok"');
+      });
+
+      test('Withdraw stake', async ({ page }) => {
+        const stakingAccountAddresses = await stakingScreen.getStakingAccountsAddresses();
+        const initialAmountOfStakingAccounts = await stakingScreen.getAmountOfStakes('all');
+        const stakeAccountAddress = await stakingScreen.getFirstStakingAccountAddressFromTheList('Delegate');
+  
+        await stakingScreen.selectAccount('Delegate');
+        await page.click('button span:text(" Withdraw")');
+        await page.click('" Confirm"');
+        await page.waitForSelector('" Funds withdrawn successfully"');
+        await page.click('" Ok"');
+        const finalAmountOfStakingAccounts = await stakingScreen.waitForStakesAmountUpdated(initialAmountOfStakingAccounts, 'all');
+  
+        assert.equal(finalAmountOfStakingAccounts, initialAmountOfStakingAccounts - 1);
+  
+        await stakingScreen.makeSureStakingAccountDoesNotExist(stakeAccountAddress);
+        const withdrawedStakeAccountAddress = (await stakingScreen.getStakingAccountsUpdate(stakingAccountAddresses))?.removed;
+        assert.equal(withdrawedStakeAccountAddress, stakeAccountAddress);
+      });
     });
-
-    // test('Split stake', async ({ page }) => {
-    //   await page.waitForTimeout(1);
-    // });
   });
 
   // test.describe('Validators', () => {
@@ -126,10 +153,7 @@ test.describe('Staking >', () => {
   //   });
   // });
 
-  // test.describe('Delegate, withdrap, split', () => {
-  //   test('1', async ({ page }) => {
-  //   });
-  // });
+
 
   // test.describe('Swap', () => {
   //   test('1', async ({ page }) => {
