@@ -49,8 +49,7 @@ test.describe('Transactions >', () => {
     assert.isBelow(senderFinalBalance.VLX, senderInitialBalance.VLX - transactionAmount, 'Final sender balance is not below the initial sender balance');
   });
 
-  test.only('Send ETH', async ({ page }) => {
-    await page.pause()
+  test('Send ETH', async ({ page }) => {
     await walletsScreen.addWalletsPopup.open();
     await walletsScreen.addWalletsPopup.add('Ethereum');
     await walletsScreen.waitForWalletsDataLoaded();
@@ -59,12 +58,46 @@ test.describe('Transactions >', () => {
 
     await walletsScreen.selectWallet('Ethereum');
     await page.click('#wallets-send');
-    await page.fill('#send-recipient', '0xb322f01cb6a191974e7291600a4dc1b46f00f752');
+    await page.fill('#send-recipient', '0xb322f01cb6a191974e7291600a4dc1b46f00f752'); //accound with index 2
     await page.type('div.amount-field input[label="Send"]', String(transactionAmount));
     await page.click('#send-confirm');
     await page.click('#confirmation-confirm');
 
     const txSignatureLink = String(await page.getAttribute('.sent .text a', 'href'));
     assert.isTrue(txSignatureLink.includes('https://ropsten.etherscan.io/'));
+  });
+
+  test.only('Send BTC', async ({ page }) => {
+    await walletsScreen.waitForWalletsDataLoaded();
+    
+    const transactionAmount = 0.00001;
+
+    await walletsScreen.selectWallet('Bitcoin');
+    await page.click('#wallets-send');
+    await page.fill('#send-recipient', 'mvvFj8fbFpL61S2HyhvcqEHjT2ThB1f78j'); //accound with index 2
+    await page.type('div.amount-field input[label="Send"]', String(transactionAmount));
+    await page.click('#send-confirm');
+    await page.click('#confirmation-confirm');
+
+    const txSignatureLink = String(await page.getAttribute('.sent .text a', 'href'));
+    assert.isTrue(txSignatureLink.includes('https://bitpay.com/insight/#/BTC/testnet/'));
+  });
+
+  test('Send LTC', async ({ page }) => {
+    await walletsScreen.addWalletsPopup.open();
+    await walletsScreen.addWalletsPopup.add('Litecoin');
+    await walletsScreen.waitForWalletsDataLoaded();
+    
+    const transactionAmount = 0.00001;
+
+    await walletsScreen.selectWallet('Litecoin');
+    await page.click('#wallets-send');
+    await page.fill('#send-recipient', 'mvvFj8fbFpL61S2HyhvcqEHjT2ThB1f78j'); //accound with index 2
+    await page.type('div.amount-field input[label="Send"]', String(transactionAmount));
+    await page.click('#send-confirm');
+    await page.click('#confirmation-confirm');
+
+    const txSignatureLink = String(await page.getAttribute('.sent .text a', 'href'));
+    assert.isTrue(txSignatureLink.includes('https://testnet.litecore.io/'));
   });
 });
