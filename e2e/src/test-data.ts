@@ -1,7 +1,4 @@
-import { config } from './config';
-
 export const data = {
-
   walletURLs: {
     local: 'localhost:8080/main-index.html',
     devnet: '',
@@ -49,7 +46,3 @@ export const data = {
   }
 };
 
-export function getWalletURL(params: { testnet: boolean } = { testnet: false }, { env: Env } = { env: config.env }) {
-  const url = data.walletURLs[Env];
-  return params.testnet ? `${url}?network=testnet` : url;
-}

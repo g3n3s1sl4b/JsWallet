@@ -1,19 +1,20 @@
 import { test } from '@playwright/test';
 import { assert } from '../../assert';
+import { getWalletURL } from '../../config';
 import { setupPage } from '../../pw-helpers/setup-page';
 import { Auth } from '../../screens/auth';
 import { WalletsScreen } from '../../screens/wallets';
-import { data, getWalletURL } from '../../test-data';
+import { data } from '../../test-data';
 
 let auth: Auth;
 let walletsScreen: WalletsScreen;
 
-test.describe('ETH transactions >', () => {
+test.describe('Transactions >', () => {
   test.beforeEach(async ({ page }) => {
     setupPage(page);
     auth = new Auth(page);
     walletsScreen = new WalletsScreen(page);
-    await page.goto(getWalletURL({ testnet: true }, {env: 'testnet'}));
+    await page.goto(getWalletURL({environment: 'testnet'}));
     await auth.loginByRestoringSeed(data.wallets.txSender.seed);
     await walletsScreen.waitForWalletsDataLoaded();
   });

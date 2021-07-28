@@ -1,11 +1,12 @@
 import { test } from '@playwright/test';
 import { VelasNative } from '@velas/velas-chain-test-wrapper';
 import { assert } from '../../assert';
+import { getWalletURL } from '../../config';
 import { setupPage } from '../../pw-helpers/setup-page';
 import { Auth } from '../../screens/auth';
 import { StakingScreen } from '../../screens/staking';
 import { WalletsScreen } from '../../screens/wallets';
-import { data, getWalletURL } from '../../test-data';
+import { data } from '../../test-data';
 
 let auth: Auth;
 let walletsScreen: WalletsScreen;
@@ -18,7 +19,7 @@ test.describe('Staking >', () => {
     auth = new Auth(page);
     walletsScreen = new WalletsScreen(page);
     stakingScreen = new StakingScreen(page);
-    await page.goto(getWalletURL({ testnet: true }));
+    await page.goto(getWalletURL());
     await auth.loginByRestoringSeed(data.wallets.staking.staker.seed);
     await walletsScreen.openMenu('staking');
   });
@@ -62,8 +63,7 @@ test.describe('Staking >', () => {
     });
 
     test('Use max', async ({ page }) => {
-      const VLXNativeAddress = '59vpQgPoDEhux1G84jk6dbbARQqfUwYtohLU4fgdxFKG';
-      const initialWalletBalance = Number((await velasNative.getBalance(VLXNativeAddress)).VLX.toFixed(0));
+      const initialWalletBalance = Number((await velasNative.getBalance('59vpQgPoDEhux1G84jk6dbbARQqfUwYtohLU4fgdxFKG')).VLX.toFixed(0));
 
       await page.click('" Create Account"');
       await page.click('#send-max');
@@ -162,19 +162,4 @@ test.describe('Staking >', () => {
   //     '.validator-item'
   //   });
   // });
-
-
-
-  // test.describe('Swap', () => {
-  //   test('1', async ({ page }) => {
-  //   });
-  // });
 });
-
-// page.on('response', async (response) => {
-//   console.log('<<', response.status(), response.url());
-//   promisesList.push(response.body());
-//   const body = (await response.body()).toString();
-//   log.info(body);
-//   log.warn('-----------------------');
-// });

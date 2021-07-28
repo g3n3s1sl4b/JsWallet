@@ -3,11 +3,12 @@ import { assert } from '../../assert';
 import { setupPage } from '../../pw-helpers/setup-page';
 import { Auth } from '../../screens/auth';
 import { WalletsScreen } from '../../screens/wallets';
-import { data, getWalletURL } from '../../test-data';
+import { data } from '../../test-data';
 import { log } from '../../tools/logger';
 import { VelasNative } from '@velas/velas-chain-test-wrapper';
 import velasTestnet from '../../api/velas-testnet/rpc';
 import { velasNative } from '@velas/velas-chain-test-wrapper/lib/velas-native';
+import { getWalletURL } from '../../config';
 
 let auth: Auth;
 let walletsScreen: WalletsScreen;
@@ -18,7 +19,7 @@ test.describe('Swap: ', () => {
     setupPage(page);
     walletsScreen = new WalletsScreen(page);
     auth = new Auth(page);
-    await page.goto(getWalletURL({ testnet: true }));
+    await page.goto(getWalletURL());
     await auth.loginByRestoringSeed(data.wallets.swap.seed);
     await walletsScreen.waitForWalletsDataLoaded();
   });

@@ -2,8 +2,9 @@ import { test } from '@playwright/test';
 import { assert } from '../../assert';
 import { Auth } from '../../screens/auth';
 import { WalletsScreen } from '../../screens/wallets';
-import { data, getWalletURL } from '../../test-data';
+import { data } from '../../test-data';
 import { setupPage } from '../../pw-helpers/setup-page';
+import { getWalletURL } from '../../config';
 
 let walletsScreen: WalletsScreen;
 let auth: Auth;
@@ -13,7 +14,7 @@ test.describe('Validation >', () => {
     setupPage(page);
     auth = new Auth(page);
     walletsScreen = new WalletsScreen(page);
-    await page.goto(getWalletURL({ testnet: true }));
+    await page.goto(getWalletURL());
     await auth.loginByRestoringSeed(data.wallets.txSender.seed);
     await walletsScreen.waitForWalletsDataLoaded();
   });
