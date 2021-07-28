@@ -110,56 +110,56 @@ test.describe('Staking >', () => {
       assert.equal(stakeAccOnBlockchain.state, 'inactive');
     });
 
-    test.describe('Delegate, withdraw, split', () => {
-      test('Split stake', async ({ page }) => {
-        const initialAmountOfStakingAccounts = await stakingScreen.getAmountOfStakes('Delegate');
-        const stakingAccountAddresses = await stakingScreen.getStakingAccountsAddresses();
+    test('Split stake', async ({ page }) => {
+      const initialAmountOfStakingAccounts = await stakingScreen.getAmountOfStakes('Delegate');
+      const stakingAccountAddresses = await stakingScreen.getStakingAccountsAddresses();
 
-        await stakingScreen.selectAccount('Delegate');
-        await page.click('button.action-split');
-        await page.fill('.input-area input', '1');
-        await page.click('#prompt-confirm');
-        await page.waitForSelector('" Account created and funds are splitted successfully"');
-        await page.click('#notification-close')
+      await stakingScreen.selectAccount('Delegate');
+      await page.click('button.action-split');
+      await page.fill('.input-area input', '1');
+      await page.click('#prompt-confirm');
+      await page.waitForSelector('" Account created and funds are splitted successfully"');
+      await page.click('#notification-close')
 
-        const finalAmountOfStakingAccounts = await stakingScreen.waitForStakesAmountUpdated(initialAmountOfStakingAccounts, 'Delegate');
-        assert.equal(finalAmountOfStakingAccounts, initialAmountOfStakingAccounts + 1);
+      const finalAmountOfStakingAccounts = await stakingScreen.waitForStakesAmountUpdated(initialAmountOfStakingAccounts, 'Delegate');
+      assert.equal(finalAmountOfStakingAccounts, initialAmountOfStakingAccounts + 1);
 
-        // postcondition – withdraw splitted account
-        const addedAfterSplitAccountAddress = (await stakingScreen.getStakingAccountsUpdate(stakingAccountAddresses))?.added;
-        if (!addedAfterSplitAccountAddress) throw new Error('No staking accounts appears. But it was expected after staking');
-        // await stakingScreen.selectAccount('Delegate');
-        await stakingScreen.selectAccountByAddress(addedAfterSplitAccountAddress);
-        await page.click('button span:text(" Withdraw")');
-        await page.click('" Confirm"');
-        await page.waitForSelector('" Funds withdrawn successfully"');
-        await page.click('" Ok"');
-      });
+      // postcondition – withdraw splitted account
+      const addedAfterSplitAccountAddress = (await stakingScreen.getStakingAccountsUpdate(stakingAccountAddresses))?.added;
+      if (!addedAfterSplitAccountAddress) throw new Error('No staking accounts appears. But it was expected after staking');
+      // await stakingScreen.selectAccount('Delegate');
+      await stakingScreen.selectAccountByAddress(addedAfterSplitAccountAddress);
+      await page.click('button span:text(" Withdraw")');
+      await page.click('" Confirm"');
+      await page.waitForSelector('" Funds withdrawn successfully"');
+      await page.click('" Ok"');
+    });
 
-      test('Withdraw stake', async ({ page }) => {
-        const stakingAccountAddresses = await stakingScreen.getStakingAccountsAddresses();
-        const initialAmountOfStakingAccounts = await stakingScreen.getAmountOfStakes('all');
-        const stakeAccountAddress = await stakingScreen.getFirstStakingAccountAddressFromTheList('Delegate');
-  
-        await stakingScreen.selectAccount('Delegate');
-        await page.click('button span:text(" Withdraw")');
-        await page.click('" Confirm"');
-        await page.waitForSelector('" Funds withdrawn successfully"');
-        await page.click('" Ok"');
-        const finalAmountOfStakingAccounts = await stakingScreen.waitForStakesAmountUpdated(initialAmountOfStakingAccounts, 'all');
-  
-        assert.equal(finalAmountOfStakingAccounts, initialAmountOfStakingAccounts - 1);
-  
-        await stakingScreen.makeSureStakingAccountDoesNotExist(stakeAccountAddress);
-        const withdrawedStakeAccountAddress = (await stakingScreen.getStakingAccountsUpdate(stakingAccountAddresses))?.removed;
-        assert.equal(withdrawedStakeAccountAddress, stakeAccountAddress);
-      });
+    test('Withdraw stake', async ({ page }) => {
+      const stakingAccountAddresses = await stakingScreen.getStakingAccountsAddresses();
+      const initialAmountOfStakingAccounts = await stakingScreen.getAmountOfStakes('all');
+      const stakeAccountAddress = await stakingScreen.getFirstStakingAccountAddressFromTheList('Delegate');
+
+      await stakingScreen.selectAccount('Delegate');
+      await page.click('button span:text(" Withdraw")');
+      await page.click('" Confirm"');
+      await page.waitForSelector('" Funds withdrawn successfully"');
+      await page.click('" Ok"');
+      const finalAmountOfStakingAccounts = await stakingScreen.waitForStakesAmountUpdated(initialAmountOfStakingAccounts, 'all');
+
+      assert.equal(finalAmountOfStakingAccounts, initialAmountOfStakingAccounts - 1);
+
+      await stakingScreen.makeSureStakingAccountDoesNotExist(stakeAccountAddress);
+      const withdrawedStakeAccountAddress = (await stakingScreen.getStakingAccountsUpdate(stakingAccountAddresses))?.removed;
+      assert.equal(withdrawedStakeAccountAddress, stakeAccountAddress);
+    });
+
+    test('Validators list', async ({ page }) => {
+      await stakingScreen.waitForLoaded();
+      assert.isTrue(await page.isVisible('.validator-item .identicon'), 'No validator icon in validators list');
+      assert.isTrue(await page.isVisible('.validator-item .browse'), 'No icon with link to explorer in validators list');
+      assert.isTrue(await page.isVisible('.validator-item .copy'), 'No copy address icon in validators list');
+      assert.isTrue(await page.isVisible('.validator-item .with-stake'), 'No my-stake column in validators list');
     });
   });
-
-  // test.describe('Validators', () => {
-  //   test('1', async ({ page }) => {
-  //     '.validator-item'
-  //   });
-  // });
 });
