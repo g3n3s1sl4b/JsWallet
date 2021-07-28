@@ -72,7 +72,7 @@ test.describe('Wallets screen >', () => {
       await page.waitForSelector('.qrcode');
     });
 
-    test.only('Copy wallet address from "Receive" page', async ({ context, page }) => {
+    test('Copy wallet address from "Receive" page', async ({ context, page }) => {
       await context.grantPermissions(['clipboard-read', 'clipboard-write']);
       // clear clipboard
       await page.evaluate(async () => await navigator.clipboard.writeText(''));
