@@ -538,7 +538,7 @@ send = ({ store, web3t })->
                 form-group \sender, lang.from, icon-style, ->
                     .address.pug(style=border-style)
                         address-holder { store, wallet }
-                .pug.slider.network.form-group
+                .pug.network.form-group
                     network-slider { web3t, wallet, store}
                 form-group \receiver, lang.to, icon-style, ->
                     .pug
