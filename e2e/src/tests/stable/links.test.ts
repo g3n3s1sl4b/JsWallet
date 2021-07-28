@@ -1,12 +1,12 @@
 import { test } from '@playwright/test';
 import { assert } from '../../assert';
+import { getWalletURL } from '../../config';
 import { setupPage } from '../../pw-helpers/setup-page';
-import { getWalletURL } from '../../test-data';
 
 test.describe('Links >', () => {
   test.beforeEach(async ({ page }) => {
     setupPage(page);
-    await page.goto(getWalletURL({ testnet: true }));
+    await page.goto(getWalletURL());
   });
 
   test('Download links are correct', async ({ page }) => {

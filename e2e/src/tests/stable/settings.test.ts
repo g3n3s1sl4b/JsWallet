@@ -1,9 +1,10 @@
 import { test } from '@playwright/test';
 import { assert } from '../../assert';
+import { getWalletURL } from '../../config';
 import { setupPage } from '../../pw-helpers/setup-page';
 import { Auth, Language } from '../../screens/auth';
 import { WalletsScreen } from '../../screens/wallets';
-import { data, getWalletURL } from '../../test-data';
+import { data } from '../../test-data';
 import { log } from '../../tools/logger';
 
 let walletsScreen: WalletsScreen;
@@ -14,7 +15,7 @@ test.describe('Settings >', () => {
     setupPage(page);
     walletsScreen = new WalletsScreen(page);
     auth = new Auth(page);
-    await page.goto(getWalletURL({ testnet: true }));
+    await page.goto(getWalletURL());
     await auth.loginByRestoringSeed(data.wallets.login.seed);
   });
 
@@ -38,11 +39,14 @@ test.describe('Settings >', () => {
   });
 
   test('Switch account index', async ({ page }) => {
+    await walletsScreen.waitForWalletsDataLoaded();
     await walletsScreen.openMenu('settings');
     await page.click('.button.right');
-    await walletsScreen.openMenu('wallets');
+    await page.waitForSelector('.amount:not(.placeholder)');
 
+    await walletsScreen.openMenu('wallets');
     await walletsScreen.waitForWalletsDataLoaded();
+
     assert.equal(await walletsScreen.getWalletAddress(), 'VEzaTJxJ4938MyHRDP5YSSUYAriPkvFbha', 'Account 2 address on UI does not equal expected');
   });
 

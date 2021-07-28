@@ -1,9 +1,10 @@
 import { test } from '@playwright/test';
 import { assert } from '../../assert';
+import { getWalletURL } from '../../config';
 import { setupPage } from '../../pw-helpers/setup-page';
 import { Auth, Language } from '../../screens/auth';
 import { WalletsScreen } from '../../screens/wallets';
-import { data, getWalletURL } from '../../test-data';
+import { data } from '../../test-data';
 import { log } from '../../tools/logger';
 
 test.describe('Auth >', () => {

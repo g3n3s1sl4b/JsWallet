@@ -1,10 +1,11 @@
 import { test } from '@playwright/test';
 import { VelasNative } from '@velas/velas-chain-test-wrapper';
 import { assert } from '../../assert';
+import { getWalletURL } from '../../config';
 import { setupPage } from '../../pw-helpers/setup-page';
 import { Auth } from '../../screens/auth';
 import { Currency, WalletsScreen } from '../../screens/wallets';
-import { data, getWalletURL } from '../../test-data';
+import { data } from '../../test-data';
 
 let auth: Auth;
 const velasNativeChain = new VelasNative();
@@ -15,7 +16,7 @@ test.describe('Wallets screen >', () => {
     setupPage(page);
     auth = new Auth(page);
     walletsScreen = new WalletsScreen(page);
-    await page.goto(getWalletURL({ testnet: true }));
+    await page.goto(getWalletURL());
   });
 
   test.describe('Transactions >', () => {

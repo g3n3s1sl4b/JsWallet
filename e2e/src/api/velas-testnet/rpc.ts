@@ -29,6 +29,9 @@ export class VelasTestnet {
     const transactions: ConfirmedTransaction[] = response.data.result;
     const signatures: string[] = [];
 
+    if (!response.data.result) throw new Error(`Cannot get transactions for address ${address}\n${response.data.error.message}`);
+    if (!transactions.length) throw new Error(`No transactions for address ${address}`);
+
     transactions.forEach(tx => {
       signatures.push(tx.signature);
     });

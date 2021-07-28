@@ -1,4 +1,4 @@
-import { getWalletURL } from '../test-data';
+import { getWalletURL } from '../config';
 import { log } from '../tools/logger';
 
 export default () => {
