@@ -1,3 +1,6 @@
+import { config } from "../config";
+import { data } from "../test-data";
+
 export const helpers = {
   getArraysDiff: (a1: any[], a2: any[]) => {
     const a: any[] = []; const diff = [];
@@ -19,5 +22,10 @@ export const helpers = {
     }
 
     return diff;
+  },
+
+  getWalletURL(params: { testnet: boolean } = { testnet: false }, { env: Env } = { env: config.env }) {
+    const url = data.walletURLs[Env];
+    return params.testnet ? `${url}?network=testnet` : url;
   },
 };

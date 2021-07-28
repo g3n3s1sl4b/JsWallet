@@ -1,7 +1,4 @@
-import { config } from './config';
-
 export const data = {
-
   walletURLs: {
     local: 'localhost:8080/main-index.html',
     devnet: '',
@@ -42,10 +39,10 @@ export const data = {
         seed: 'eye still focus olive brass know echo element industry tumble gloom harvest lens allow genuine fee crash raise approve scrub cattle magic either portion',
       }
     },
-  },
+    swap: {
+     address: '22VainsYdNmnre8XS91XoUipQ2YLNd4oPyobKvvN1zsu',
+      seed: 'spin swamp chronic catalog lake retire vessel will truly assault rib few grocery able maple catalog dinner nice dance coast jelly swallow interest nothing'
+    }
+  }
 };
 
-export function getWalletURL(params: { testnet: boolean } = { testnet: false }) {
-  const url = data.walletURLs[config.env];
-  return params.testnet ? `${url}?network=testnet` : url;
-}
