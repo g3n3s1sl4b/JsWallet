@@ -1,3 +1,4 @@
+import { config } from '../config';
 import { log } from '../tools/logger';
 import { Browser, BrowserContext, Page } from '../types';
 
@@ -40,5 +41,19 @@ export abstract class BaseScreen {
     if (menuItemName === 'wallets') {
       await this.page.waitForSelector('.wallet-item .top-left [class=" img"]', { state: 'visible' });
     }
+  }
+
+  async waitForSelectorDisappears(selector: string, { timeout = config.defaultWaitTimeout }): Promise<void> {
+    let isElementVisible = await this.page.isVisible(selector);
+    let totalWaitTime = 0;
+    const oneIterationWaitTime = 100;
+
+    while (totalWaitTime < timeout && isElementVisible) {
+      await this.page.waitForTimeout(oneIterationWaitTime);
+      totalWaitTime += oneIterationWaitTime;
+      isElementVisible = await this.page.isVisible(selector);
+    }
+    
+    if (isElementVisible) throw new Error(`Element with selector "${selector}" has not disappeared in ${totalWaitTime / 1000} seconds`);
   }
 }
