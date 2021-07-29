@@ -50,7 +50,7 @@ test.describe('Auth >', () => {
       await auth.welcome.restore();
       await auth.restoreFrom.seed('24');
       await auth.pinForNewAcc.fillAndConfirm('111222');
-      await auth.wordByWordSeedInputForm.fill(data.wallets.login.seed, { fast: true });
+      await auth.wordByWordSeedInputForm.fill(data.wallets.login.seedArr, { fast: true });
 
       assert.isTrue(await page.isVisible('.menu-item'));
       assert.isTrue(await page.isVisible('.balance'));
@@ -64,7 +64,7 @@ test.describe('Auth >', () => {
       await auth.welcome.restore();
       await auth.restoreFrom.seed('12');
       await auth.pinForNewAcc.fillAndConfirm('111222');
-      const seed12Words: string[] = { ...data.wallets.login.seed };
+      const seed12Words: string[] = { ...data.wallets.login.seedArr };
       seed12Words.length = 12;
       await auth.wordByWordSeedInputForm.fill(seed12Words);
 
