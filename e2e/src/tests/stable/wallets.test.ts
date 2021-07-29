@@ -34,45 +34,63 @@ test.describe('Wallets screen >', () => {
     });
   });
 
-  test('Lock and unlock', async ({ page }) => {
-    await auth.loginByRestoringSeed(data.wallets.login.seed);
-    await page.click('.menu-item.bottom');
-    assert.isTrue(await page.isVisible('input[type="password"]'));
-    assert.isFalse(await page.isVisible('.menu-item.bottom'));
+  test.describe(' > ', () => {
+    test.beforeEach(async () => {
+      await auth.loginByRestoringSeed(data.wallets.login.seed);
+      await walletsScreen.waitForWalletsDataLoaded();
+    });
 
-    await auth.pinForLoggedOutAcc.typeAndConfirm('111222');
-    assert.isTrue(await auth.isLoggedIn());
-  });
+    test('Lock and unlock', async ({ page }) => {
+      await page.click('.menu-item.bottom');
+      assert.isTrue(await page.isVisible('input[type="password"]'));
+      assert.isFalse(await page.isVisible('.menu-item.bottom'));
 
-  test('Add and hide litecoin wallet', async () => {
-    await auth.loginByRestoringSeed(data.wallets.login.seed);
+      await auth.pinForLoggedOutAcc.typeAndConfirm('111222');
+      assert.isTrue(await auth.isLoggedIn());
+    });
 
-    // add litecoin
-    await walletsScreen.addWalletsPopup.open();
-    await walletsScreen.addWalletsPopup.add('Litecoin');
-    await walletsScreen.selectWallet('Litecoin');
-    assert.isTrue(await walletsScreen.isWalletInWalletsList('Litecoin'));
+    test('Add and hide litecoin wallet', async () => {
+      // add litecoin
+      await walletsScreen.addWalletsPopup.open();
+      await walletsScreen.addWalletsPopup.add('Litecoin');
+      await walletsScreen.selectWallet('Litecoin');
+      assert.isTrue(await walletsScreen.isWalletInWalletsList('Litecoin'));
 
-    // remove litecoin
-    await walletsScreen.hideWallet();
-    assert.isFalse(await walletsScreen.isWalletInWalletsList('Litecoin'));
-  });
+      // remove litecoin
+      await walletsScreen.hideWallet();
+      assert.isFalse(await walletsScreen.isWalletInWalletsList('Litecoin'));
+    });
 
-  test('Switch account', async ({ page }) => {
-    await auth.loginByRestoringSeed(data.wallets.login.seed);
-    await walletsScreen.waitForWalletsDataLoaded();
+    test('Switch account', async ({ page }) => {
+      await page.click('.switch-account');
+      await page.click('" Account 2"');
+      assert.equal(await walletsScreen.getWalletAddress(), 'VEzaTJxJ4938MyHRDP5YSSUYAriPkvFbha', 'Account 2 address on UI does not equal expected');
+    });
 
-    await page.click('.switch-account');
-    await page.click('" Account 2"');
-    assert.equal(await walletsScreen.getWalletAddress(), 'VEzaTJxJ4938MyHRDP5YSSUYAriPkvFbha', 'Account 2 address on UI does not equal expected');
-  });
+    test('Show QR', async ({ page }) => {
+      await page.hover('.wallet-detailed .address-holder .copy');
+      await page.waitForSelector('.qrcode');
+    });
 
-  test('Show QR', async ({ page }) => {
-    await auth.loginByRestoringSeed(data.wallets.login.seed);
-    await walletsScreen.waitForWalletsDataLoaded();
+    test('Copy wallet address from "Receive" page', async ({ context, page }) => {
+      await context.grantPermissions(['clipboard-read', 'clipboard-write']);
+      // clear clipboard
+      await page.evaluate(async () => await navigator.clipboard.writeText(''));
 
-    await page.hover('.wallet-detailed .address-holder .copy');
-    await page.waitForSelector('.qrcode');
+      await page.click('#wallets-receive');
+      await page.waitForSelector('.ill-qr img');
+      // qr code is displayed
+      assert.isTrue(await page.isVisible('.receive-body canvas'));
+
+      // copy to clipboard
+      await page.click('.address-holder .copy');
+      const copiedText = await page.evaluate(async () => await navigator.clipboard.readText());
+      assert.equal(copiedText, 'VCtQbbgQHnXfEAsYgbhWuWhyftzYRk6h6a');
+
+      // back to wallets list
+      await page.click('" Cancel"');
+      await walletsScreen.waitForWalletsDataLoaded();
+    });
   });
 
   test.describe('Balance >', () => {
