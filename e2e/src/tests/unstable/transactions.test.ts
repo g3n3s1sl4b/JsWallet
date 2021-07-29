@@ -51,7 +51,10 @@ test.describe('Transactions >', () => {
     assert.isBelow(senderFinalBalance.VLX, senderInitialBalance.VLX - transactionAmount, 'Final sender balance is not below the initial sender balance');
   });
 
-  test('Send BTC', async ({ page }) => {    
+  test('Send BTC', async ({ page }) => {
+    // TODO: txSender BTC balance is empty
+    test.skip();
+
     const transactionAmount = 0.00001;
 
     await walletsScreen.selectWallet('Bitcoin');
