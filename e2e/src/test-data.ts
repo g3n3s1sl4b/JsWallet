@@ -23,7 +23,8 @@ export const data = {
       seed: 'delay swift sick mixture vibrant element review arm snap true broccoli industry expect thought panel curve inhale rally dish close trade damp skin below',
     },
     login: {
-      seed: ['decade', 'cargo', 'toe', 'library', 'cycle', 'furnace', 'idea', 'tourist', 'fuel', 'chimney', 'fury', 'actual', 'cash', 'scheme', 'race', 'reason', 'finger', 'pulp', 'nature', 'family', 'language', 'spring', 'kidney', 'ancient'],
+      seed: 'decade cargo toe library cycle furnace idea tourist fuel chimney fury actual cash scheme race reason finger pulp nature family language spring kidney ancient',
+      seedArr: ['decade', 'cargo', 'toe', 'library', 'cycle', 'furnace', 'idea', 'tourist', 'fuel', 'chimney', 'fury', 'actual', 'cash', 'scheme', 'race', 'reason', 'finger', 'pulp', 'nature', 'family', 'language', 'spring', 'kidney', 'ancient'],
     },
     staking: {
       staker: {
