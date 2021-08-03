@@ -65,6 +65,10 @@ test.describe('Staking >', () => {
     test('Use max', async ({ page }) => {
       const initialWalletBalance = Number((await velasNative.getBalance('59vpQgPoDEhux1G84jk6dbbARQqfUwYtohLU4fgdxFKG')).VLX.toFixed(0));
 
+      // balace used in 'use max' is not updated automatically, remove after bug-fix VLWA-552
+      await walletsScreen.refresh();
+      await page.waitForSelector('.amount:not(.placeholder)');
+
       await page.click('" Create Account"');
       await page.click('#send-max');
       const maxAmount = await page.getAttribute('.input-area input', 'value');

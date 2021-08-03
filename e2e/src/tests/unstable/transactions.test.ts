@@ -52,9 +52,6 @@ test.describe('Transactions >', () => {
   });
 
   test('Send BTC', async ({ page }) => {
-    // TODO: txSender BTC balance is empty
-    test.skip();
-
     const transactionAmount = 0.00001;
 
     await walletsScreen.selectWallet('Bitcoin');
