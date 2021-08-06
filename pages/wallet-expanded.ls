@@ -1,7 +1,7 @@
 require! {
     \react
     \../tools.ls : { money }
-    \prelude-ls : { each, find, filter, foldl, map }
+    \prelude-ls : { each, find, filter, foldl, map, obj-to-pairs }
     \../wallet-funcs.ls
     \../get-lang.ls
     \../math.ls : { plus }
@@ -197,6 +197,13 @@ module.exports = (store, web3t, wallets, wallet)-->
             |> round-human
     total-sent = get-total \OUT, wallet.address
     total-received = get-total \IN, wallet.address
+    
+    available-networks = 
+        (wallet.network.networks ? []) 
+            |> obj-to-pairs
+            |> map (-> it.1 )
+            |> filter (-> it.disabled isnt yes)
+    
     wallet-style=
         color: style.app.text3
         background: style.app.wallet
@@ -234,7 +241,7 @@ module.exports = (store, web3t, wallets, wallet)-->
                             .pug.pending
                                 span.pug -#{ pending }
             address-holder { store, wallet, type: \bg }
-            if (wallet.network.networks? and Object.keys(wallet.network.networks).length > 0) then
+            if (available-networks.length > 0) then
                 .buttons.pug
                     .with-swap.pug
                         button { store, on-click=send-click, text: \send , icon: \send , type: \secondary, id: "wallets-send", makeDisabled=send-swap-disabled }
