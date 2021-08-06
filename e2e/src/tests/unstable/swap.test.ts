@@ -41,7 +41,7 @@ test.describe('Swap: ', () => {
       currentTx = (await velasTestnet.getConfirmedTransactionsForAddress(data.wallets.swap.address)).signatures[0];
     }
     log.debug(currentTx);
-
+    
     await walletsScreen.waitForWalletsDataLoaded();
 
     const vlxSenderFinalBalance = (await walletsScreen.getWalletsBalances())['Velas'];
@@ -52,9 +52,6 @@ test.describe('Swap: ', () => {
   });
 
   test('Native > VLX', async ({ page }) => {
-    // TODO: test is not stable
-    test.fixme();
-
     const nativeSenderInitialBalance = await velasNativeChain.getBalance(data.wallets.swap.address);
     const vlxReceiverInitialBalance = (await walletsScreen.getWalletsBalances())['Velas'];
 
@@ -65,9 +62,9 @@ test.describe('Swap: ', () => {
     const txSignatureLink = String(await page.getAttribute('.sent .text a', 'href'));
     const txSignature = txSignatureLink.replace('https://native.velas.com/tx/', '');
     log.debug(txSignature);
+    await velasNative.waitForConfirmedTransaction(txSignature);
 
     await walletsScreen.openMenu('wallets');
-    await velasNative.waitForConfirmedTransaction(txSignature);
     await walletsScreen.waitForWalletsDataLoaded();
 
     const nativeSenderFinalBalance = await velasNativeChain.getBalance(data.wallets.swap.address);

@@ -21,7 +21,7 @@ test.describe('Validation >', () => {
 
   test('VLX Native: Show Invalid Address error', async ({ page }) => {
     await page.click('#wallets-send');
-    await page.fill('#send-recipient', 'invalid data');
+    await page.type('#send-recipient', 'invalid data');
     await page.waitForSelector('[title="Given address is not valid Velas address"]');
 
     await page.fill('#send-recipient', 'VAP73ARS1UXPr3jDHSzNZdss6dAudsg15U');
