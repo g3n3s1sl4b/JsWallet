@@ -17,10 +17,12 @@ require! {
     \../web3t/plugins/bnb-coin.ls : bnb 
     \../web3t/plugins/vlx_bep20-coin.ls : vlx_bep20
     \../web3t/plugins/huobi-coin.ls : huobi  
-    \../web3t/plugins/vlx-huobi-coin.ls : vlx_huobi   
+    \../web3t/plugins/vlx-huobi-coin.ls : vlx_huobi 
+    \../web3t/plugins/vlx-usdt-coin.ls : vlx_usdt  
+    \../web3t/plugins/vlx-eth-coin.ls : vlx_eth  
       
 }
-current-configs = { eth, syx, syx2, usdt, usdt_erc20, ltc, vlx_erc20, vlx_evm, bnb, vlx_bep20, huobi, vlx_huobi }
+current-configs = { eth, syx, syx2, usdt, usdt_erc20, ltc, vlx_erc20, vlx_evm, bnb, vlx_bep20, huobi, vlx_huobi, vlx_usdt, vlx_eth }
 plugin-pairs = {
     vlx_huobi: \huobi
     vlx_bep20: \bnb

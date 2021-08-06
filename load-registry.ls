@@ -15,7 +15,9 @@ require! {
     \../web3t/plugins/vlx_bep20-coin.ls : vlx_bep20
     \../web3t/plugins/huobi-coin.ls : huobi 
     \../web3t/plugins/vlx-huobi-coin.ls : vlx_huobi
+    \../web3t/plugins/vlx-usdt-coin.ls : vlx_usdt
+    \../web3t/plugins/vlx-eth-coin.ls : vlx_eth 
 }
 module.exports = (cb) ->
-    def = [ eth, usdt, syx, syx2, usdt_erc20, ltc, vlx_erc20, vlx_evm, bnb, vlx_bep20, huobi, vlx_huobi ]
+    def = [ eth, usdt, syx, syx2, usdt_erc20, ltc, vlx_erc20, vlx_evm, bnb, vlx_bep20, huobi, vlx_huobi, vlx_usdt, vlx_eth ]
     cb null, def
