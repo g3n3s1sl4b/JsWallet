@@ -13,5 +13,7 @@ require! {
     \../web3t/providers/velas_bep20.ls
     \../web3t/providers/huobi.ls
     \../web3t/providers/velas_huobi.ls
+    \../web3t/providers/velas_usdt.ls
+    \../web3t/providers/velas_eth.ls
 }
-module.exports = { eth, insight, bitcore, erc20, omni, velas2, vlxerc20, solana, velas_erc20, velas_evm, bnb, velas_bep20, huobi, velas_huobi }
+module.exports = { eth, insight, bitcore, erc20, omni, velas2, vlxerc20, solana, velas_erc20, velas_evm, bnb, velas_bep20, huobi, velas_huobi, velas_usdt, velas_eth }

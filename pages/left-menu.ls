@@ -254,8 +254,7 @@ module.exports = (store, web3t)->
     settings = if store.current.page is \settings then \active else \not-active
     filestorage = if store.current.page is \filestorage then \active else \not-active
     staking = if store.current.page is \staking then \active else \not-active
-    staking-active = if store.current.page is \staking then \active else \not-active
-    delegate-active = if store.current.page is \choosestaker then \active else \not-active
+    staking-active = if store.current.page is \validators then \active else \not-active
     info-active = if store.current.page is \info then \active else \not-active
     resources = if store.current.page is \resources then \active else \not-active
     faq = if store.current.page is \faq then \active else \not-active
@@ -370,7 +369,7 @@ module.exports = (store, web3t)->
                     span.arrow_box.pug #{lang.your-wallets}
                     img.pug(src="#{icons.wallet}" style=wallet-icon)
             if store.preference.settings-visible is yes
-                .menu-item.pug(on-click=goto-choose-staker style=icon-style class="#{delegate-active}" id="menu-delegate")
+                .menu-item.pug(on-click=goto-choose-staker style=icon-style class="#{staking-active}" id="menu-delegate")
                     span.arrow_box.pug #{lang.staking}
                     img.pug(src="#{icons.staking}"style=icon-color)
             if store.preference.settings-visible is yes
