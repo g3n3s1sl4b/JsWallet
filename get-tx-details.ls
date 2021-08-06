@@ -15,7 +15,9 @@ module.exports = (store, web3t)->
             |> filter -> it.1 is send.to
             |> map -> it.0
             |> -> it ? send.to
-    token-display = if send.coin.token == \vlx2 then \vlx else send.coin.token
+    wallet = store.current.send.wallet
+    swap = store.current.send.swap
+    token-display = (wallet.coin.nickname ? send.coin.token).to-upper-case!
     funtype =
         if +send.amount-send > 0 then "Send #{send.amount-send} #{token-display} to #{contract} contract" else "Execute the #{contract} contract"
     text-parts-contract =
@@ -24,4 +26,12 @@ module.exports = (store, web3t)->
     text-parts-regular =
         * "Send #{round-human send.amount-send, {decimals: decimalsConfig}} #{token-display} to #{send.to}"
         * "You are allowed to spend your resources on execution #{round-number send.amount-send-fee, {decimals: decimalsConfig}} #{token-display}."
-    if is-data then text-parts-contract else text-parts-regular
+    text-parts-swap =
+        * "Swap #{round-human send.amount-send, {decimals: decimalsConfig}} #{token-display} to #{send.to}"
+        * "You are allowed to spend your resources on execution #{round-number send.amount-send-fee, {decimals: decimalsConfig}} #{token-display}."
+    
+    text =
+        | is-data => text-parts-contract
+        | swap is yes => text-parts-swap 
+        | _ => text-parts-regular
+    text
