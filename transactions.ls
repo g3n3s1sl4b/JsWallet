@@ -38,7 +38,6 @@ check-transaction-task = (bg-store, web3, network, token, ptx)-> (store, cb)->
         store.transactions.all
             |> find -> it.token is token and it.tx is ptx.0
     return cb null if not tx?
-    console.log ptx.0, tx?pending
     tx.checked = tx.checked ? 0
     tx.checked += 1
     return cb null if not tx?

@@ -322,7 +322,7 @@ module.exports = (store, web3t)->
         if store.current.switch-account
             .pug.switch-menu(style=filter-body)
                 .pug.middle.account
-                    [1 to length] |> map create-account-position
+                    [0 to length] |> map create-account-position
                 .pug.middle(style=border-top)
                     .pug.table-row-menu
                         .col.buttons.folder-menu.pug(on-click=create-account)

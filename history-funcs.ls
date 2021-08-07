@@ -117,5 +117,4 @@ module.exports = (store, web3t)->
         <- web3t.refresh
     transaction-info = (config)-> (event)->
         err, info <- get-transaction-info config
-        console.log err, info
     { go-back, switch-type-in, transaction-info, remove-type-from-filter, remove-filter-raram, switch-sender, switch-receiver, switch-type-out, store.coins, is-active, switch-filter, arrow, arrow-lg, sign, delete-pending-tx, amount-beautify, ago }
