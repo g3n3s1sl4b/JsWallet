@@ -8,7 +8,8 @@ common = (store)->
     vlx2 = require \../web3t/plugins/vlx2-coin.ls
     btc  = require \../web3t/plugins/btc-coin.ls
     native  = require \../web3t/plugins/sol-coin.ls
-    coins = [vlx2, native, btc]
+    eth  = require \../web3t/plugins/eth-coin.ls
+    coins = [vlx2, native, btc, eth]
     if store.url-params.gbx?
         coins.push gobyte
     coins

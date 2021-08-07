@@ -4,6 +4,7 @@ require! {
     \./providers.ls
     \../web3t/plugins/btc-coin.ls : btc
     \../web3t/plugins/eth-coin.ls : eth
+    \../web3t/plugins/eth-legacy-coin.ls : eth_legacy
     \../web3t/plugins/symblox.ls : syx
     \../web3t/plugins/symblox-v2.ls : syx2
     \../web3t/plugins/ltc-coin.ls : ltc
@@ -19,5 +20,5 @@ require! {
     \../web3t/plugins/vlx-eth-coin.ls : vlx_eth 
 }
 module.exports = (cb) ->
-    def = [ eth, usdt, syx, syx2, usdt_erc20, ltc, vlx_erc20, vlx_evm, bnb, vlx_bep20, huobi, vlx_huobi, vlx_usdt, vlx_eth ]
+    def = [ eth, eth_legacy, usdt, syx, syx2, usdt_erc20, ltc, vlx_erc20, vlx_evm, bnb, vlx_bep20, huobi, vlx_huobi, vlx_usdt, vlx_eth ]
     cb null, def

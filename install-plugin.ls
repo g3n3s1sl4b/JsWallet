@@ -7,6 +7,7 @@ require! {
     \./json-parse.ls
     \./providers.ls
     \../web3t/plugins/eth-coin.ls : eth
+    \../web3t/plugins/eth-legacy-coin.ls : eth_legacy
     \../web3t/plugins/symblox.ls : syx
     \../web3t/plugins/symblox-v2.ls : syx2
     \../web3t/plugins/ltc-coin.ls : ltc
@@ -22,7 +23,7 @@ require! {
     \../web3t/plugins/vlx-eth-coin.ls : vlx_eth  
       
 }
-current-configs = { eth, syx, syx2, usdt, usdt_erc20, ltc, vlx_erc20, vlx_evm, bnb, vlx_bep20, huobi, vlx_huobi, vlx_usdt, vlx_eth }
+current-configs = { eth_legacy, syx, syx2, usdt, usdt_erc20, ltc, vlx_erc20, vlx_evm, bnb, vlx_bep20, huobi, vlx_huobi, vlx_usdt, vlx_eth }
 plugin-pairs = {
     vlx_huobi: \huobi
     vlx_bep20: \bnb
