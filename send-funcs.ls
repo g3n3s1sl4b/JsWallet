@@ -80,7 +80,6 @@ module.exports = (store, web3t)->
             gas-price: gas-price
             fee-type: fee-type
             swap: swap
-        console.log "Prepared tx-obj" tx-obj
         err, tx-data <- create-transaction tx-obj
         return cb err if err?
         parts = get-tx-details store
@@ -106,7 +105,6 @@ module.exports = (store, web3t)->
         send.to = resolved
         send.error = err if err?
         return cb err if err?
-        console.log "send TX! :)"    
         send-tx { wallet, ...send }, cb
         
     perform-send-unsafe = (cb)->
@@ -453,12 +451,10 @@ module.exports = (store, web3t)->
             minPerTxRaw = contract.minPerTx!
             { network } = wallet        
             minPerTx = minPerTxRaw `div` (10 ^ network.decimals)                
-            console.log "minPerTx" minPerTx
             if +send.amountSend < +(minPerTx) then
                 return cb "Min amount per transaction is #{minPerTx} ETH"
             maxPerTxRaw = contract.maxPerTx!
             maxPerTx = maxPerTxRaw `div` (10 ^ network.decimals)                
-            console.log "maxPerTx" maxPerTx
             if +send.amountSend > +(maxPerTx) then
                 return cb "Max amount per transaction is #{maxPerTx} ETH"
             
