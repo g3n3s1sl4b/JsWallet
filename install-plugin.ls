@@ -20,10 +20,11 @@ require! {
     \../web3t/plugins/huobi-coin.ls : huobi  
     \../web3t/plugins/vlx-huobi-coin.ls : vlx_huobi 
     \../web3t/plugins/vlx-usdt-coin.ls : vlx_usdt  
-    \../web3t/plugins/vlx-eth-coin.ls : vlx_eth  
+    \../web3t/plugins/vlx-eth-coin.ls : vlx_eth
+    \../web3t/plugins/usdt_erc20_legacy-coin.json : usdt_erc20_legacy
       
 }
-current-configs = { eth_legacy, syx, syx2, usdt, usdt_erc20, ltc, vlx_erc20, vlx_evm, bnb, vlx_bep20, huobi, vlx_huobi, vlx_usdt, vlx_eth }
+current-configs = { eth_legacy, syx, syx2, usdt, usdt_erc20, ltc, vlx_erc20, vlx_evm, bnb, vlx_bep20, huobi, vlx_huobi, vlx_usdt, vlx_eth, usdt_erc20_legacy }
 plugin-pairs = {
     vlx_huobi: \huobi
     vlx_bep20: \bnb
