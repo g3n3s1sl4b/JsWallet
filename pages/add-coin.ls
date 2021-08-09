@@ -90,7 +90,12 @@ require! {
             .section
                 position: relative
                 min-height: 200px
+                .legacy-tokens.title
+                    margin-top: 20px
+                    opacity: 0.2
                 .list
+                    display: flex;
+                    flex-wrap: wrap;
                     height: 80%
                     padding: 10px
                     margin: auto 10px
@@ -104,7 +109,6 @@ require! {
                         border-radius: var(--border-btn)
                         padding: 10px
                         text-align: left
-                        float: left
                         box-sizing: border-box
                         @media (max-width: 580px)
                             width: 100%
@@ -117,7 +121,6 @@ require! {
                             display: inline-block
                             vertical-align: middle
                             height: 40px
-                            line-height: 40px
                             box-sizing: border-box
                         input
                             margin: 0 5px
@@ -134,6 +137,7 @@ require! {
                             margin-left: 10px
                             color: gray
                             width: calc(100% - 90px)
+                            height: auto
                         button
                             width: 40px
                             height: 40px
@@ -153,6 +157,9 @@ require! {
                                 transition: .5s
                             >*
                                 vertical-align: middle
+                &.legacy-tokens
+                    margin-top: 10px
+
 create-item = ({ store, web3t }, item)-->
     add = ->
         store.current.add-coin = no
@@ -253,6 +260,14 @@ module.exports = ({ store, web3t } )->
         border: "0"
 #    add-by-address store, web3t
 #    add-by-vlxaddress store, web3t
+
+    legacy = <[ usdt_erc20_legacy eth_legacy vlx2 ]>
+    plugins-legacy =
+        store.registry
+            |> filter (-> it.token in legacy)
+    plugins =
+        store.registry
+            |> filter (-> it.token not in legacy)
     .pug.manage-account
         .account-body.pug(style=account-body-style)
             .pug.title(style=color)
@@ -265,16 +280,29 @@ module.exports = ({ store, web3t } )->
                     .pug.icon
                         icon \Search, 15
             .pug.settings
-                .pug.section
-                    .list.pug
-                        if store.registry.length > -1
-                            store.registry
-                                |> filter (it)->
-                                    it[network]?
-                                |> filter (it)->
-                                    (it[network]?disabled is no) or (not it[network]?disabled?)
-                                |> filter filter-item store
-                                |> map create-item { store, web3t }
-                        else
-                            .loading.pug
-                                loading2 \black
+                if store.registry.length > 0
+                    .pug.section
+                        .list.pug
+                            if plugins.length > 0
+                                plugins
+                                    |> filter (it)->
+                                        it[network]?
+                                    |> filter (it)->
+                                        (it[network]?disabled is no) or (not it[network]?disabled?)
+                                    |> filter filter-item store
+                                    |> map create-item { store, web3t }
+
+                        if plugins-legacy.length > 0
+                            .pug
+                                .pug.legacy-tokens.title Legacy
+                                .list.pug.legacy-tokens
+                                    plugins-legacy
+                                        |> filter (it)->
+                                            it[network]?
+                                        |> filter (it)->
+                                            (it[network]?disabled is no) or (not it[network]?disabled?)
+                                        |> filter filter-item store
+                                        |> map create-item { store, web3t }
+                else
+                    .loading.pug
+                        loading2 \black
