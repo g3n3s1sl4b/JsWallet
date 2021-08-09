@@ -447,7 +447,7 @@ module.exports = (store, web3t)->
             contract = web3.eth.contract(abis.HomeBridgeNativeToErc).at(HOME_BRIDGE)
             
             store.current.send.contract-address = HOME_BRIDGE
-            receiver = to-eth-address(send.to)
+            receiver = send.to
             minPerTxRaw = contract.minPerTx!
             { network } = wallet        
             minPerTx = minPerTxRaw `div` (10 ^ network.decimals)                
@@ -487,7 +487,7 @@ module.exports = (store, web3t)->
             #if +send.amountSend > +maxPerTx then
             #    return cb "Max amount per transaction is #{maxPerTx} ETH"  
               
-            data = web3t.velas.ERC20BridgeToken.transferAndCall.get-data("0xb1FAB785Cb5F2d9782519942921e9afCDf2C60e0", value, send.to)
+            data = web3t.velas.ERC20BridgeToken.transferAndCall.get-data("0xA5D512085006867974405679f2c9476F4F7Fa903", value, send.to)
             send.data = data
             send.contract-address = "0xb1FAB785Cb5F2d9782519942921e9afCDf2C60e0"  
             send.amount = 0
