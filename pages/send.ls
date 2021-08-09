@@ -481,6 +481,7 @@ send = ({ store, web3t })->
     token-display = (wallet.coin.nickname ? "").to-upper-case!
     fee-token-display = 
         | fee-token in <[ VLX2 VLX_EVM VLX_NATIVE ]> => \VLX
+        | fee-token in <[ ETH_LEGACY ]> => \ETH
         | bridge-fee-token? => bridge-fee-token
         | wallet.network.tx-fee-in? => wallet.network.tx-fee-in
         | _ => fee-token
