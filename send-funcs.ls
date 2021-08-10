@@ -157,7 +157,7 @@ module.exports = (store, web3t)->
                 
         value = store.current.send.amountSend 
         value = (value `times` (10^6))  
-        receiver = to-eth-address(send.to) 
+        receiver = send.to
         
         web3 = new Web3(new Web3.providers.HttpProvider(wallet?network?api?web3Provider))
         web3.eth.provider-url = wallet?network?api?web3Provider
