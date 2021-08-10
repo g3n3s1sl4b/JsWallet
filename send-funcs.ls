@@ -460,36 +460,33 @@ module.exports = (store, web3t)->
             
             data = contract.relayTokens.get-data(receiver)
             send.data = data 
-            
-        /* TODO: ALMOST DONE. DOUBLE CHECK  */
+
+        /* DONE! */
         /* Swap from ETHEREUM (VELAS) to ETH  */ 
         if token is \vlx_eth and chosen-network.id is \eth then
         
             value = store.current.send.amountSend
-            send-to = web3t.velas.ForeignBridgeNativeToErc.address 
-            value = to-hex (value `times` (10^18))
+            value = (value `times` (10^18))
             network = wallet.network    
 
-            # * Get minPerTx from HomeBridge  (not Foreign?)  
-            minPerTxRaw = web3t.velas.HomeBridgeNativeToErc.minPerTx!
-            minPerTx = minPerTxRaw `div` (10 ^ network.decimals)
+            web3 = new Web3(new Web3.providers.HttpProvider(wallet.network.api.web3Provider))
+            web3.eth.provider-url = wallet.network.api.web3Provider
+            contract = web3.eth.contract(abis.ERC20BridgeToken).at("0xA5D512085006867974405679f2c9476F4F7Fa903")
 
-            # * Get maxPerTx from HomeBridge  (not Foreign?)  
-            maxPerTxRaw = web3t.velas.HomeBridgeNativeToErc.maxPerTx!
+            minPerTxRaw = contract.minPerTx!
+            minPerTx = minPerTxRaw `div` (10 ^ network.decimals)
+            if +send.amountSend < +(minPerTx) then
+                return cb "Min amount per transaction is #{minPerTx} ETH"
+
+            maxPerTxRaw = contract.maxPerTx!
             maxPerTx = maxPerTxRaw `div` (10 ^ network.decimals)
-            homeFeeRaw = web3t.velas.ForeignBridgeNativeToErc.getHomeFee! 
-            homeFee = homeFeeRaw `div` (10 ^ network.decimals)
-            contract-home-fee = send.amountSend `times` homeFee
-            minAmountPerTx = minPerTx `plus` contract-home-fee 
-            
-            #if +send.amountSend < +(minAmountPerTx) then
-            #    return cb "Min amount per transaction is #{minAmountPerTx} ETH"
-            #if +send.amountSend > +maxPerTx then
-            #    return cb "Max amount per transaction is #{maxPerTx} ETH"  
-              
-            data = web3t.velas.ERC20BridgeToken.transferAndCall.get-data("0xA5D512085006867974405679f2c9476F4F7Fa903", value, send.to)
+            if +send.amountSend > +maxPerTx then
+                return cb "Max amount per transaction is #{maxPerTx} ETH"
+
+            contract = web3.eth.contract(abis.ERC20BridgeToken).at("0x3538C7f88aDbc8ad1F435f7EA70287e26b926344")
+            data = contract.transferAndCall.get-data("0xA5D512085006867974405679f2c9476F4F7Fa903", value, send.to)
             send.data = data
-            send.contract-address = "0xb1FAB785Cb5F2d9782519942921e9afCDf2C60e0"  
+            send.contract-address = "0x3538C7f88aDbc8ad1F435f7EA70287e26b926344"
             send.amount = 0
             send.amount-send = 0
 
