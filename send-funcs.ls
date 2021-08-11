@@ -494,7 +494,7 @@ module.exports = (store, web3t)->
         
         /* DONE */
         /* Swap from VLX ERC20 to COIN VLX */    
-        if token is \vlx_erc20 and chosen-network.id is \legacy
+        if token is \vlx_erc20 and chosen-network.id is \vlx_evm
             value = store.current.send.amountSend
             send-to = web3t.velas.ForeignBridgeNativeToErc.address 
             value = to-hex (value `times` (10^18))
@@ -520,7 +520,7 @@ module.exports = (store, web3t)->
             if +send.amountSend > +maxPerTx then
                 return cb "Max amount per transaction is #{maxPerTx} VLX"  
               
-            data = web3t.velas.ERC20BridgeToken.transferAndCall.get-data(send-to, value, to-eth-address(send.to))
+            data = web3t.velas.ERC20BridgeToken.transferAndCall.get-data(send-to, value, send.to)
             send.data = data
             send.contract-address = web3t.velas.ERC20BridgeToken.address  
             send.amount = 0
@@ -528,8 +528,8 @@ module.exports = (store, web3t)->
             
         
         /* DONE */    
-        /* Swap from COIN VLX to VLX ERC20 */ 
-        if token is \vlx2 and chosen-network.id is \vlx_erc20 then
+        /* Swap from COIN VLX to VLX ERC20 */
+        if (token is \vlx_evm or token is \vlx2) and chosen-network.id is \vlx_erc20 then
         
             { wallets } = store.current.account
             chosen-network-wallet = wallets |> find (-> it.coin.token is chosen-network.id)
