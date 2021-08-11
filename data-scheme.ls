@@ -289,6 +289,7 @@ store =
         submenu: no
         language-menu: no
         wallet-index: 0
+        group-index: 0
         edit-account-name: ""
         account-index: 1
         manage-account: no

@@ -1,7 +1,7 @@
 require! {
     \react
     \../tools.ls : { money }
-    \prelude-ls : { each, find, filter, foldl, map, obj-to-pairs }
+    \prelude-ls : { each, find, filter, foldl, map, obj-to-pairs, group-by, keys }
     \../wallet-funcs.ls
     \../get-lang.ls
     \../math.ls : { plus }
@@ -156,7 +156,15 @@ require! {
                 width: inherit
 cb = console~log
 module.exports = (store, web3t, wallets, wallet)-->
-    { uninstall, wallet, balance, balance-usd, pending, send, receive, swap, usd-rate } = wallet-funcs store, web3t, wallets, wallet
+    wallets-groups =
+        ^^wallets
+            |> filter ({coin, network}) -> ((coin.name + coin.token).to-lower-case!.index-of store.current.search.to-lower-case!) != -1 and (network.disabled isnt yes)
+            |> group-by (.network.group)
+            |> keys
+
+    group-name = wallet.network.group
+
+    { uninstall, wallet, balance, balance-usd, pending, send, receive, swap, usd-rate } = wallet-funcs store, web3t, wallets, wallet, wallets-groups, group-name
     lang = get-lang store
     style = get-primary-info store
     label-uninstall =
@@ -228,7 +236,7 @@ module.exports = (store, web3t, wallets, wallet)-->
                 .wallet-header-part.right.pug
                     .pug
                         span.title.pug(class="#{placeholder}") #{name}
-                        if wallet.coin.token not in <[ btc vlx vlx_native vlx2 eth ]>
+                        if wallet.coin.token not in <[ btc vlx vlx_native vlx2 eth vlx_evm ]>
                             span.pug.uninstall(on-click=uninstall style=uninstall-style) #{label-uninstall}
                     .balance.pug(class="#{placeholder}")
                         .pug.token-balance(title="#{wallet.balance}")
