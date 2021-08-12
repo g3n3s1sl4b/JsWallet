@@ -8,9 +8,12 @@ require! {
     \./math.ls : { times }
     \mobx : { transaction }
 }
-module.exports = (store, web3t, wallets, wallet)->
+module.exports = (store, web3t, wallets, wallet, wallets-groups, group-name)->
     return null if not store? or not web3t? or not wallets? or not wallet?coin?token?
     index = wallets.index-of wallet
+    group-index =
+        | wallets-groups? => wallets-groups.index-of group-name
+        | _ => 0
     #type = 
     #    | index is 0 => \top
     #    | index + 1 is wallets.length => \bottom
@@ -53,22 +56,24 @@ module.exports = (store, web3t, wallets, wallet)->
     usd-rate = wallet?usd-rate ? ".."
     uninstall = (e)->
         e.stop-propagation!
-        wallet-index = 
-            store.current.account.wallets.index-of(wallet)
-        return if wallet-index is -1
+        wallet-index =
+            store.current.account.wallets.index-of(wallet) and group-index is store.current.group-index
+        return if wallet-index is -1 or group-index is -1
         store.current.account.wallets.splice wallet-index, 1
         <- web3t.uninstall wallet.coin.token
         <- web3t.refresh
         store.current.wallet-index = 0
+        store.current.group-index = 0
     expand = (e)->
         e.stop-propagation!
-        return send(wallet, {}) if store.current.wallet-index is index
+        return send(wallet, {}) if store.current.wallet-index is index and group-index is store.current.group-index
         store.current.wallet-index = index
+        store.current.group-index = group-index
         store.current.filter = { token: wallet.coin.token}
         apply-transactions store
-    active = if index is store.current.wallet-index then \active else ''
+    active = if index is store.current.wallet-index and group-index is store.current.group-index then \active else ''
     big = 
-        | index is store.current.wallet-index => \big
+        | index is store.current.wallet-index and group-index is store.current.group-index=> \big
         | _ => ""
     balance = round5(wallet.balance) + ' ' + wallet.coin.token.to-upper-case!
     balance-usd = wallet.balance `times` usd-rate
