@@ -467,6 +467,8 @@ switch-network = (store, web3t)->
     change-network = ->
         value = it.target.value is \true
         web3t.use networks-reverted[not value]
+        store.current.wallet-index = 0
+        store.current.group-index = 0
     value= networks[store.current.network]
     isChecked = store.current.network is "testnet"
     label.active-network.pug

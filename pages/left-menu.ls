@@ -349,6 +349,8 @@ module.exports = (store, web3t)->
         color: style.app.text
     goto-mainnet = ->
         web3t.use \mainnet
+        store.current.wallet-index = 0
+        store.current.group-index = 0    
     goto-wallet = ->
         navigate store, web3t, \wallets
     version = (store, web3t)->
