@@ -153,6 +153,10 @@ module.exports = (store, web3t)->
         web3 = velas-web3 store
         { ERC20_TOKEN_ADDRESS, FOREIGN_BRIDGEABLE_TOKEN_ADDRESS } = wallet.network
         
+        ERC20_TOKEN_ADDRESS = "0xb404c51bbc10dcbe948077f18a4b8e553d160084" 
+        HOME_BRIDGE_ADDRESS = "0x4a114C7a9e6581eB716085655DecBB416776ec7c"   
+        FOREIGN_BRIDGEABLE_TOKEN_ADDRESS = "0xF30aC574c31270173A201027B12c3bC9734C9C26" 
+        FOREIGN_BRIDGE_ADDRESS = "0x90f69A6134fD1cf45170AC55a895138da69B40aD"
         UINT_MAX_NUMBER = 4294967295 
                 
         value = store.current.send.amountSend 
@@ -398,7 +402,7 @@ module.exports = (store, web3t)->
                      
             | _ => dummy   
         err, data <- func(token, chosen-network)
-
+        return cb err if err?
 
 
         /* Swap from HECO to legacy */
