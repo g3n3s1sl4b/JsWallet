@@ -14,12 +14,14 @@ require! {
     \../components/address-holder.ls
 }
 .wallet-group
-    margin-bottom: 20px
-
+    @import scheme
     .group-name
         text-align: left
-        padding: 0 12px 5px 10px
-        opacity: 0.15
+        padding: 5px 12px 5px 10px
+        background: var(--bg-primary-light)
+        color: #7f818a
+        text-transform: uppercase
+        font-size: 12px
 
     .wallet
         @import scheme
