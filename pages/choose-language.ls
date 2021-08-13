@@ -37,7 +37,15 @@ require! {
     .title
         color: #ebf6f8
         font-size: 22px
-        margin-bottom: 20px
+        
+    .version
+        letter-spacing: 1px
+        font-size: 8px
+        padding: 6px
+        color: #89829d
+        border-radius: 8px
+        line-height: 5px
+        margin: 5px auto
     .downloadwalletlist
         padding: 30px 0 30px
         position: fixed
@@ -255,6 +263,7 @@ language = (store, web3t)->
             .pug.logo
                 img.pug(src="#{style.branding.logo}")
                 .title.pug(style=text-style) #{style.branding.title}
+                span.pug.version.low #{store.version}
             .welcome.pug(style=text-style) #{lang.language}
             .pug.langs
                 ul.pug
