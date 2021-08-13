@@ -574,8 +574,8 @@ module.exports = (store, web3t)->
             data = web3t.velas.EvmToNativeBridge.transferToNative.get-data(eth-address)           
             store.current.send.contract-address = web3t.velas.EvmToNativeBridge.address
         
-        if not data? then
-            return cb "Transaction data must be not empty"
+        #if not data? then
+            #return cb "Transaction data must be not empty"
         send.data = data
         cb null   
     before-send-anyway = ->
