@@ -62,9 +62,10 @@ test.describe('Wallets screen >', () => {
     });
 
     test('Switch account', async ({ page }) => {
+      await walletsScreen.selectWallet('Velas Native')
       await page.click('.switch-account');
       await page.click('" Account 2"');
-      assert.equal(await walletsScreen.getWalletAddress(), 'VEzaTJxJ4938MyHRDP5YSSUYAriPkvFbha', 'Account 2 address on UI does not equal expected');
+      assert.equal(await walletsScreen.getWalletAddress(), 'BfGhk12f68mBGz5hZqm4bDSDaTBFfNZmegppzVcVdGDW', 'Account 2 address on UI does not equal expected');
     });
 
     test('Show QR', async ({ page }) => {
@@ -77,6 +78,7 @@ test.describe('Wallets screen >', () => {
       // clear clipboard
       await page.evaluate(async () => await navigator.clipboard.writeText(''));
 
+      await walletsScreen.selectWallet('Velas Native');
       await page.click('#wallets-receive');
       await page.waitForSelector('.ill-qr img');
       // qr code is displayed
@@ -85,7 +87,7 @@ test.describe('Wallets screen >', () => {
       // copy to clipboard
       await page.click('.address-holder .copy');
       const copiedText = await page.evaluate(async () => await navigator.clipboard.readText());
-      assert.equal(copiedText, 'VCtQbbgQHnXfEAsYgbhWuWhyftzYRk6h6a');
+      assert.equal(copiedText, 'G3N4212jLtDNCkfuWuUHsyG2aiwMWQLkeKDETZbo4KG');
 
       // back to wallets list
       await page.click('" Cancel"');
@@ -100,7 +102,7 @@ test.describe('Wallets screen >', () => {
     });
 
     // extract "VLX Native balance update" to separate test
-    test('Check VLX, VLX Native and Bitcoin balances', async () => {
+    test('Check VLX Legacy, VLX Native and Bitcoin balances', async () => {
       const balances = await walletsScreen.getWalletsBalances();
 
       const wallets = Object.keys(balances) as Currency[];
@@ -115,8 +117,8 @@ test.describe('Wallets screen >', () => {
         if (amountOfTokens === null) continue;
 
         switch (wallets[i]) {
-          case 'Velas':
-            assert.equal(amountOfTokens, '1');
+          case 'Velas Legacy':
+            assert.equal(amountOfTokens, '0.999958');
             break;
           case 'Velas Native':
             assert.equal(amountOfTokens, String(VLXNativeBalanceOnBlockchain));
@@ -135,7 +137,7 @@ test.describe('Wallets screen >', () => {
             assert.equal(amountOfTokens, '0.03484302');
             break;
           case 'Velas EVM':
-            assert.equal(amountOfTokens, '0.13');
+            assert.equal(amountOfTokens, '13');
             break;
         }
       }

@@ -19,7 +19,7 @@ Refer to `config.ts` file
 e.g. `npx playwright test src/tests/auth.test.ts`
 
 Run all tests:
-`npm test`
+`npx playwright test`
 
 Before running tests locally, build and run wallet: `npm run wallet-start`.
 

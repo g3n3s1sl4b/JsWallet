@@ -47,6 +47,9 @@ jobs:
       - name: clean previous test results
         run: rm -rf ./test-results/
 
+      - name: blockchain health check
+        run: CI=true LOG_LEVEL=info npm run blockchain-health-check
+
       - name: run tests-unstable
         run: CI=true LOG_LEVEL=info npm run test-unstable
 
