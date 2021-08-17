@@ -1,6 +1,6 @@
 require! {
     \react
-    \prelude-ls : { map, filter }
+    \prelude-ls : { map, filter, group-by, keys, obj-to-pairs }
     \./loading2.ls
     \../web3.ls
     \../get-primary-info.ls
@@ -43,6 +43,7 @@ require! {
         overflow: hidden
         box-shadow: 17px 10px 13px #0000001f, -6px 10px 13px #00000024
         >.title
+            background-color: var(--bgspare)
             position: absolute
             z-index: 999
             top: 0
@@ -101,62 +102,71 @@ require! {
                     margin: auto 10px
                     @media (max-width: 580px)
                         padding: 10px 0
-                    .item
-                        width: 49%
-                        margin-bottom: 10px
-                        display: inline-block
-                        background: #642dbd
-                        border-radius: var(--border-btn)
-                        padding: 10px
-                        text-align: left
-                        box-sizing: border-box
-                        @media (max-width: 580px)
-                            width: 100%
-                            float: none
-                        &:nth-child(odd)
-                            margin-right: 10px
-                            @media (max-width: 580px)
-                                margin-right: 0
-                        >*
+                    .wallet-group
+                        width: 100%   
+                        text-align: left 
+                        .group-name
+                            text-align: left
+                            padding: 5px 12px 5px 10px
+                            color: #7f818a
+                            text-transform: uppercase
+                            font-size: 12px
+                        .item
+                            width: calc(49% - 10px)
+                            margin: 5px 5px 10px
                             display: inline-block
-                            vertical-align: middle
-                            height: 40px
-                            box-sizing: border-box
-                        input
-                            margin: 0 5px
+                            background: #642dbd
                             border-radius: var(--border-btn)
-                            width: calc(100% - 90px)
-                            border: 0
-                            padding: 5px 10px
-                            outline: none
-                            font-size: 15px
-                        img
-                            width: 40px
-                            border-radius: 0px
-                        .title
-                            margin-left: 10px
-                            color: gray
-                            width: calc(100% - 90px)
-                            height: auto
-                        button
-                            width: 40px
-                            height: 40px
-                            line-height: 45px
-                            border-radius: var(--border-btn)
-                            border: 0 !important
+                            padding: 10px
+                            text-align: left
                             box-sizing: border-box
-                            padding: 0
-                            margin: 0
-                            cursor: pointer
-                            color: black
-                            background: transparent
-                            outline: none
-                            &:hover
-                                color: white
-                                opacity: .6
-                                transition: .5s
+                            @media (max-width: 580px)
+                                width: 100%
+                                float: none
+                            &:nth-child(odd)
+                                margin-right: 10px
+                                @media (max-width: 580px)
+                                    margin-right: 0
                             >*
+                                display: inline-block
                                 vertical-align: middle
+                                height: 40px
+                                box-sizing: border-box
+                            input
+                                margin: 0 5px
+                                border-radius: var(--border-btn)
+                                width: calc(100% - 90px)
+                                border: 0
+                                padding: 5px 10px
+                                outline: none
+                                font-size: 15px
+                            img
+                                width: 40px
+                                border-radius: 0px
+                            .title
+                                margin-left: 10px
+                                color: gray
+                                width: calc(100% - 90px)
+                                height: auto
+                            button
+                                width: 40px
+                                height: 40px
+                                line-height: 45px
+                                border-radius: var(--border-btn)
+                                border: 0 !important
+                                box-sizing: border-box
+                                padding: 0
+                                margin: 0
+                                cursor: pointer
+                                color: black
+                                background: transparent
+                                outline: none
+                                &:hover
+                                    color: white
+                                    opacity: .6
+                                    transition: .5s
+                                >*
+                                    vertical-align: middle
                 &.legacy-tokens
                     margin-top: 10px
 
@@ -241,7 +251,7 @@ add-by-vlxaddress = (store, web3t)->
             icon \Plus, 20
 module.exports = ({ store, web3t } )->
     return null if store.current.add-coin isnt yes
-    network = store.current.network   
+    current-network = store.current.network   
     close = ->
         store.current.add-coin = no
     filter-registery = (event)->
@@ -262,12 +272,26 @@ module.exports = ({ store, web3t } )->
 #    add-by-vlxaddress store, web3t
 
     legacy = <[ usdt_erc20_legacy eth_legacy vlx2 ]>
-    plugins-legacy =
-        store.registry
-            |> filter (-> it.token in legacy)
-    plugins =
-        store.registry
-            |> filter (-> it.token not in legacy)
+    plugins = store.registry
+    
+    wallets-groups =
+        store.current.account.wallets
+            |> filter ({coin, network}) -> (network.disabled isnt yes)
+            |> group-by (.network.group)
+
+    groups = wallets-groups |> keys 
+    
+    create-group = ({ store, web3t }, item)--> 
+        group-name =
+            | item?0? => item.0
+            | _ => ''
+        wallets = item.1
+        
+        .wallet-group.pug
+            .pug.group-name #{group-name}         
+            wallets |> map create-item { store, web3t }  
+    
+    
     .pug.manage-account
         .account-body.pug(style=account-body-style)
             .pug.title(style=color)
@@ -286,23 +310,14 @@ module.exports = ({ store, web3t } )->
                             if plugins.length > 0
                                 plugins
                                     |> filter (it)->
-                                        it[network]?
+                                        it[current-network]?
                                     |> filter (it)->
-                                        (it[network]?disabled is no) or (not it[network]?disabled?)
+                                        (it[current-network]?disabled is no) or (not it[current-network]?disabled?)
                                     |> filter filter-item store
-                                    |> map create-item { store, web3t }
+                                    |> group-by (-> it[current-network].group)
+                                    |> obj-to-pairs
+                                    |> map create-group { store, web3t }
 
-                        if plugins-legacy.length > 0
-                            .pug
-                                .pug.legacy-tokens.title Legacy
-                                .list.pug.legacy-tokens
-                                    plugins-legacy
-                                        |> filter (it)->
-                                            it[network]?
-                                        |> filter (it)->
-                                            (it[network]?disabled is no) or (not it[network]?disabled?)
-                                        |> filter filter-item store
-                                        |> map create-item { store, web3t }
                 else
                     .loading.pug
                         loading2 \black
