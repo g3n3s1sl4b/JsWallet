@@ -18,16 +18,17 @@ module.exports = (store, web3t)->
     wallet = store.current.send.wallet
     swap = store.current.send.swap
     token-display = (wallet.coin.nickname ? send.coin.token).to-upper-case!
+    amount-send = round-human send.amount-send, {decimals: decimalsConfig}
     funtype =
-        if +send.amount-send > 0 then "Send #{send.amount-send} #{token-display} to #{contract} contract" else "Execute the #{contract} contract"
+        if +send.amount-send > 0 then "Send #{amount-send} #{token-display} to #{contract} contract" else "Execute the #{contract} contract"
     text-parts-contract =
         * funtype
         * "You are allowed to spend your resources on execution #{round-number send.amount-send-fee, {decimals: decimalsConfig}} #{token-display}."
     text-parts-regular =
-        * "Send #{round-human send.amount-send, {decimals: decimalsConfig}} #{token-display} to #{send.to}"
+        * "Send #{amount-send} #{token-display} to #{send.to}"
         * "You are allowed to spend your resources on execution #{round-number send.amount-send-fee, {decimals: decimalsConfig}} #{token-display}."
     text-parts-swap =
-        * "Swap #{round-human send.amount-send, {decimals: decimalsConfig}} #{token-display} to #{send.to}"
+        * "Swap #{amount-send} #{token-display} to #{send.to}"
         * "You are allowed to spend your resources on execution #{round-number send.amount-send-fee, {decimals: decimalsConfig}} #{token-display}."
     
     text =
