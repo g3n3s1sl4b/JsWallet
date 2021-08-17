@@ -64,7 +64,6 @@ module.exports = (store, web3t, wallets, wallet, wallets-groups, group-name)->
         <- web3t.refresh
         store.current.wallet-index = 0
         store.current.group-index = 0
-        #store.current?filter?token = \vlx_native
     expand = (e)->
         e.stop-propagation!
         return send(wallet, {}) if store.current.wallet-index is index and group-index is store.current.group-index
