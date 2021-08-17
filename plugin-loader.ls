@@ -22,13 +22,11 @@ export get-coins = (store, cb)->
             |> filter (-> it[network]? and (it.type is \coin) and (it.enabled is yes) and (not (it[network]?disabled is yes)))
     err, items <- get-install-list
     return cb err if err?
-    console.log "items" items
     installed =
         items
             |> filter (.type is \coin)
             |> filter (.enabled isnt no)
             |> sort-by (.wallet-index)
             #|> reverse
-    console.log "items2" items
     all =  base ++ installed
     cb null, all
