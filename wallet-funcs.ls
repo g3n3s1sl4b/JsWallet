@@ -1,5 +1,4 @@
 require! {
-    \prelude-ls : { each, find }
     \./web3.ls
     \./round5.ls
     \./get-primary-info.ls
@@ -57,7 +56,8 @@ module.exports = (store, web3t, wallets, wallet, wallets-groups, group-name)->
     uninstall = (e)->
         e.stop-propagation!
         wallet-index =
-            store.current.account.wallets.index-of(wallet) and group-index is store.current.group-index
+            store.current.account.wallets.index-of(wallet) 
+        group-index = store.current.group-index
         return if wallet-index is -1 or group-index is -1
         store.current.account.wallets.splice wallet-index, 1
         <- web3t.uninstall wallet.coin.token

@@ -279,6 +279,7 @@ mobile = ({ store, web3t })->
             |> obj-to-pairs
             |> map (.1)
     group-wallets = groups-wallets[group-index]
+    return null if not group-wallets?
     wallet-detail = group-wallets |> find (-> group-wallets.index-of(it) is store.current.wallet-index)
     return null if not wallet-detail?
 

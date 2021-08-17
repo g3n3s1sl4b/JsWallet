@@ -1,7 +1,7 @@
 require! {
     \react
     \../tools.ls : { money }
-    \prelude-ls : { each, find, filter, foldl, map, obj-to-pairs, group-by, keys }
+    \prelude-ls : { each, filter, foldl, map, obj-to-pairs, group-by, keys }
     \../wallet-funcs.ls
     \../get-lang.ls
     \../math.ls : { plus }
@@ -156,6 +156,7 @@ require! {
                 width: inherit
 cb = console~log
 module.exports = (store, web3t, wallets, wallet)-->
+    return null if not wallets? or not wallet?
     wallets-groups =
         ^^wallets
             |> filter ({coin, network}) -> ((coin.name + coin.token).to-lower-case!.index-of store.current.search.to-lower-case!) != -1 and (network.disabled isnt yes)
