@@ -33,6 +33,26 @@ require! {
             opacity: 0
         to
             opacity: 1
+    @keyframes appearSixtyHeight
+        from
+            height: 0
+        to
+            height: 60px
+    @-o-keyframes appearSixtyHeight
+        from
+            height: 0
+        to
+            height: 60px
+    @-moz-keyframes appearSixtyHeight
+        from
+            height: 0
+        to
+            height: 60px
+    @-webkit-keyframes appearSixtyHeight
+        from
+            height: 0
+        to
+            height: 60px
     @import scheme
     position: fixed
     z-index: 99999999
