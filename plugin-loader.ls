@@ -26,7 +26,7 @@ export get-coins = (store, cb)->
         items
             |> filter (.type is \coin)
             |> filter (.enabled isnt no)
-            |> sort-by (.wallet-index)
+            #|> sort-by (.wallet-index)
             #|> reverse
     all =  base ++ installed
     cb null, all
