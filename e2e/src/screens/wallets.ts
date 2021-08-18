@@ -2,7 +2,7 @@ import { log } from '../tools/logger';
 import { ElementHandle, Page } from '../types';
 import { BaseScreen } from './base';
 
-export type Currency = 'Bitcoin' | 'Velas' | 'Velas Native' | 'Velas EVM' | 'Litecoin' | 'Ethereum';
+export type Currency = 'Bitcoin' | 'Velas Legacy' | 'Velas Native' | 'Velas EVM' | 'Litecoin' | 'Ethereum' | 'Ethereum Legacy';
 export type Balances = Record<Currency, string | null>;
 
 export class WalletsScreen extends BaseScreen {
@@ -29,18 +29,20 @@ export class WalletsScreen extends BaseScreen {
       requiredCurrencyIsALreadySelected = await this.page.isVisible(tokenNameSelector);
     }
     log.debug(`${tokenName} was selected`);
+    await this.waitForWalletsDataLoaded();
   }
 
   async getWalletsBalances(): Promise<Balances> {
     await this.waitForWalletsDataLoaded();
     const walletElements = await this.page.$$('.wallet-item');
     const balances: Balances = {
-      Velas: null,
+      'Velas Legacy': null,
       'Velas EVM': null,
       'Velas Native': null,
       Bitcoin: null,
       Litecoin: null,
-      Ethereum: null
+      Ethereum: null,
+      'Ethereum Legacy': null
     };
 
     for (let i = 0; i < walletElements.length; i++) {
@@ -111,15 +113,8 @@ export class WalletsScreen extends BaseScreen {
       throw TypeError('You can\'t swap to the same token you are swapping from');
     }
 
-    if (swapFromToken === 'Velas EVM' || swapToToken === 'Velas EVM'){
-      await this.addWalletsPopup.open();
-      await this.addWalletsPopup.add('Velas EVM');
-    }
-
-    if (swapFromToken !== 'Velas'){
-      await this.selectWallet(swapFromToken);
-    }
-
+    await this.selectWallet(swapFromToken);
+  
     await this.swap.click();
 
     await this.swap.fill(String(transactionAmount));
@@ -139,9 +134,12 @@ export class WalletsScreen extends BaseScreen {
     },
     chooseDestinationNetwork: async(swapToToken: Currency) => {
       let chosenNetwork = await this.page.getAttribute('.change-network', 'value');
+      let switchCount = 0;
       while (chosenNetwork !== swapToToken.toUpperCase()){
         await this.page.click('.network-slider .right');
         chosenNetwork = await this.page.getAttribute('.change-network', 'value');
+        switchCount++;
+        if (switchCount > 10) throw new Error(`Cannot switch to destination currency "${swapToToken}" inside swap menu`);
       }
     },
     confirm: async() => {

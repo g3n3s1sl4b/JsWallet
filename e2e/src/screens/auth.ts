@@ -41,7 +41,7 @@ export class Auth extends BaseScreen {
 
     await this.page.waitForSelector('.menu-item');
     await this.page.waitForSelector('.balance');
-    log.info('Successfully logged in');
+    log.info(`Successfully logged in with seed "${seedPhrase}"`);
   }
 
   newSeed = {

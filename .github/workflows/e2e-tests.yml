@@ -18,6 +18,10 @@ jobs:
         working-directory: ../web3t
         run: git pull
 
+      - name: install web3t modules
+        working-directory: ../web3t
+        run: npm i
+
       - name: copy web3 to wallet
         working-directory: ../
         run: rm -rf JsWallet/.compiled-ssr/web3t/.git/objects/ && mkdir -p JsWallet/.compiled-ssr/web3t/ && cp -pr web3t/ JsWallet/.compiled-ssr/web3t/
@@ -42,6 +46,9 @@ jobs:
 
       - name: clean previous test results
         run: rm -rf ./test-results/
+
+      - name: blockchain health check
+        run: CI=true LOG_LEVEL=info npm run blockchain-health-check
 
       - name: run tests-unstable
         run: CI=true LOG_LEVEL=info npm run test-unstable
