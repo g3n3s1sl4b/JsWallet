@@ -207,11 +207,12 @@ module.exports = (store, web3t, wallets, wallet)-->
     total-sent = get-total \OUT, wallet.address
     total-received = get-total \IN, wallet.address
     
+    installed-networks = store.coins |> map (.token)
     available-networks = 
         (wallet.network.networks ? []) 
             |> obj-to-pairs
             |> map (-> it.1 )
-            |> filter (-> it.disabled isnt yes)
+            |> filter (-> it.disabled isnt yes and it.referTo in installed-networks)    
     
     wallet-style=
         color: style.app.text3

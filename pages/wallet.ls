@@ -313,12 +313,13 @@ module.exports = (store, web3t, wallets, wallet)-->
                 button { store, on-click=receive-click, text: \receive , icon: \get, type : \primary }
                 if token in <[ vlx vlx_native vlx2 vlx_evm vlx_erc20 vlx_bep20 ]> then
                     button { store, on-click=swap-click, text: \swap , icon: \swap, id: "wallet-swap", makeDisabled=send-swap-disabled, classes="wallet-swap" }
-        .wallet-middle.pug(style=border)
-            address-holder { store, wallet, type: \bg }
-            if token not in <[ btc vlx vlx_native vlx2 eth vlx_evm ]>
-                .pug.uninstall(on-click=uninstall style=wallet-style) #{label-uninstall}
-        .wallet-middle.title-balance.pug(style=border)
-            .name.pug(class="#{placeholder}" title="#{usd-rate}") $#{ round-human(usd-rate)}
-            .name.per.pug(class="#{placeholder}")
-                span.pug #{lang.per}
-                | #{ token-display }
+        if no
+            .wallet-middle.pug(style=border)
+                address-holder { store, wallet, type: \bg }
+                if token not in <[ btc vlx vlx_native vlx2 eth vlx_evm ]>
+                    .pug.uninstall(on-click=uninstall style=wallet-style) #{label-uninstall}
+            .wallet-middle.title-balance.pug(style=border)
+                .name.pug(class="#{placeholder}" title="#{usd-rate}") $#{ round-human(usd-rate)}
+                .name.per.pug(class="#{placeholder}")
+                    span.pug #{lang.per}
+                    | #{ token-display }

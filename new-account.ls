@@ -15,7 +15,8 @@ module.exports = (store, mnemonic="", cb)->
         balance = \...
         balance-usd = \...
         usd-rate = \...
-        wallet <<< { coin, network, balance, balance-usd, usd-rate, mnemonic }
+        market-history-prices = null
+        wallet <<< { coin, network, balance, balance-usd, usd-rate, mnemonic, market-history-prices }
         cb null, wallet
     generate-coin-wallets = ([coin, ...rest], cb)->
         return cb null, [] if not coin?
