@@ -7,7 +7,7 @@ require! {
     \protect
     \./navigate.ls
     \./use-network.ls
-    \./api.ls : { get-balance, get-transaction-info }
+    \./api.ls : { get-balance, get-transaction-info, get-market-history-prices }
     \./install-plugin.ls : { build-install, build-uninstall, build-install-by-name, build-quick-install }
     \./refresh-account.ls : { background-refresh-account, set-account }
     \web3 : \Web3
@@ -134,13 +134,18 @@ build-get-transaction-receipt = (store, cweb3, coin)-> (tx, cb)->
     { wallet } = coin
     get-transaction-info { coin.token, network, tx }, cb
     
+build-get-market-history-prices = (store, cweb3, coin)-> (cb)->
+    network = coin[store.current.network]
+    get-market-history-prices { network }, cb
+    
 build-api = (store, cweb3, coin)->
     get-transaction-receipt = build-get-transaction-receipt store, cweb3, coin
     send-transaction = build-send-transaction store, cweb3, coin
+    get-market-history-prices = build-get-market-history-prices cweb3, store
     get-balance = build-get-balance store, coin
     get-address = build-get-address store, coin
     get-usd-amount = build-get-usd-amount store, coin
-    methods = { get-address, send-transaction, get-balance, get-usd-amount, get-transaction-receipt }
+    methods = { get-address, send-transaction, get-balance, get-usd-amount, get-transaction-receipt, get-market-history-prices }
     build-network-specific store, methods, coin
     
 build-use = (web3, store)->  (network)->
