@@ -30,9 +30,9 @@ test.describe('Staking >', () => {
     const stakingAmount = 5;
 
     test('Create staking account', async ({ page }) => {
-      const stakingAccountAddressesList = await stakingScreen.getStakingAccountsAddresses();
-      if (stakingAccountAddressesList.length) throw new Error(`This test suite cannot be passed because staking accounts list should be empty.
-      Please delete all staking accounts for account with seed "${data.wallets.staking.staker.seed}"`);
+      // const stakingAccountAddressesList = await stakingScreen.getStakingAccountsAddresses();
+      // if (stakingAccountAddressesList.length) throw new Error(`This test suite cannot be passed because staking accounts list should be empty.
+      // Please delete all staking accounts for account with seed "${data.wallets.staking.staker.seed}"`);
       // TODO: implement auto deletion
 
       const VLXNativeAddress = '59vpQgPoDEhux1G84jk6dbbARQqfUwYtohLU4fgdxFKG';
