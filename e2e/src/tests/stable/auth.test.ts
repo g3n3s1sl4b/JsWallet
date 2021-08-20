@@ -10,7 +10,7 @@ import { log } from '../../tools/logger';
 test.describe('Auth >', () => {
   let auth: Auth;
   let walletsScreen: WalletsScreen;
-  const accountAddress24Words = 'VCtQbbgQHnXfEAsYgbhWuWhyftzYRk6h6a';
+  const accountAddress24Words = 'G3N4212jLtDNCkfuWuUHsyG2aiwMWQLkeKDETZbo4KG';
 
   test.beforeEach(async ({ page }) => {
     setupPage(page);
@@ -43,22 +43,25 @@ test.describe('Auth >', () => {
 
     test('custom seed phrase', async () => {
       await auth.loginByRestoringSeed(data.wallets.login.seed);
+
+      await walletsScreen.selectWallet('Velas Native');
+      assert.equal(await walletsScreen.getWalletAddress(), accountAddress24Words, 'Account address on UI does not equal expected');
+
     });
 
-    test('24-words seed phrase', async ({ page }) => {
+    test('24-words seed phrase', async () => {
       await auth.language.select('en');
       await auth.welcome.restore();
       await auth.restoreFrom.seed('24');
       await auth.pinForNewAcc.fillAndConfirm('111222');
       await auth.wordByWordSeedInputForm.fill(data.wallets.login.seedArr, { fast: true });
 
-      assert.isTrue(await page.isVisible('.menu-item'));
-      assert.isTrue(await page.isVisible('.balance'));
+      await walletsScreen.selectWallet('Velas Native');
       assert.equal(await walletsScreen.getWalletAddress(), accountAddress24Words, 'Account address on UI does not equal expected');
     });
 
-    test('12-words seed phrase', async ({ page }) => {
-      const accountAddress12Words = 'V2BrnFYpvAx6RTkjb1Db7AU7JFtnDrv19Q';
+    test('12-words seed phrase', async () => {
+      const accountAddress12Words = '4NmVCBCCh1cnMTCGTKCgUeYV5Eyk3CmeHUSgMJz7Dwdr';
 
       await auth.language.select('en');
       await auth.welcome.restore();
@@ -68,8 +71,7 @@ test.describe('Auth >', () => {
       seed12Words.length = 12;
       await auth.wordByWordSeedInputForm.fill(seed12Words);
 
-      assert.isTrue(await page.isVisible('.menu-item'));
-      assert.isTrue(await page.isVisible('.balance'));
+      await walletsScreen.selectWallet('Velas Native');
       assert.equal(await walletsScreen.getWalletAddress(), accountAddress12Words, 'Account address on UI does not equal expected');
     });
 
@@ -100,7 +102,7 @@ test.describe('Auth >', () => {
     test('Log in with pin', async () => {
       await auth.pinForLoggedOutAcc.typeAndConfirm('111222');
 
-      assert.isTrue(await walletsScreen.isLoggedIn());
+      await walletsScreen.selectWallet('Velas Native');
       assert.equal(await walletsScreen.getWalletAddress(), accountAddress24Words, 'Account address on UI does not equal expected');
     });
   });

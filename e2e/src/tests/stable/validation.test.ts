@@ -16,32 +16,32 @@ test.describe('Validation >', () => {
     walletsScreen = new WalletsScreen(page);
     await page.goto(getWalletURL());
     await auth.loginByRestoringSeed(data.wallets.txSender.seed);
-    await walletsScreen.waitForWalletsDataLoaded();
+    await walletsScreen.selectWallet('Velas Native');
   });
 
   test('VLX Native: Show Invalid Address error', async ({ page }) => {
     await page.click('#wallets-send');
     await page.type('#send-recipient', 'invalid data');
-    await page.waitForSelector('[title="Given address is not valid Velas address"]');
+    await page.waitForSelector('text=/(?=.*not)(?=.*valid)(?=.*address)/i');
 
-    await page.fill('#send-recipient', 'VAP73ARS1UXPr3jDHSzNZdss6dAudsg15U');
-    assert.isFalse(await page.isVisible('[title="Given address is not valid Velas address"]'));
+    await page.fill('#send-recipient', 'BfGhk12f68mBGz5hZqm4bDSDaTBFfNZmegppzVcVdGDW');
+    await walletsScreen.waitForSelectorDisappears('text=/(?=.*not)(?=.*valid)(?=.*address)/i', {timeout: 3000});
+    assert.isFalse(await page.isVisible('text=/(?=.*not)(?=.*valid)(?=.*address)/i'));
   });
 
   test('VLX Native: Show Not Enough Funds error', async ({ page }) => {
     await page.click('#wallets-send');
-    await page.fill('#send-recipient', 'VAP73ARS1UXPr3jDHSzNZdss6dAudsg15U');
+    await page.fill('#send-recipient', 'BfGhk12f68mBGz5hZqm4bDSDaTBFfNZmegppzVcVdGDW');
 
     await page.fill('div.amount-field .textfield[label="Send"]', '99999999');
     // if send button is disabled, we know balance check has been finished
     await page.waitForSelector('#send-confirm[disabled]');
-    assert.isTrue(await page.isVisible('[title="Not Enough Funds"]'));
+    assert.isTrue(await page.isVisible('text=/not enough/i'));
 
     // need to clear the field because actions are too fast and test fails
     await page.fill('div.amount-field .textfield[label="Send"]', '');
     
     await page.click('#send-max');
-    await page.waitForTimeout(1000);
-    assert.isFalse(await page.isVisible('[title="Not Enough Funds"]'));
+    await walletsScreen.waitForSelectorDisappears('text=/not enough/i', {timeout: 3000});
   });
 });

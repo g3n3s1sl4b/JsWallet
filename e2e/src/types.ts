@@ -1,5 +1,5 @@
 export {
   Browser, BrowserContext, ElementHandle, Page,
-} from 'playwright-chromium';
+} from 'playwright';
 export { assert } from './assert';
 export type Environment = 'devnet' | 'testnet' | 'mainnet' | 'local';
