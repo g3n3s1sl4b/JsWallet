@@ -11,11 +11,12 @@ require! {
     \../web3t/providers/solana.ls
     \../web3t/providers/velas_erc20.ls
     \../web3t/providers/bnb.ls
-    \../web3t/providers/velas_bep20.ls
+    \../web3t/providers/velas_busd.ls
+    \../web3t/providers/busd.ls
     \../web3t/providers/huobi.ls
     \../web3t/providers/velas_huobi.ls
     \../web3t/providers/velas_usdt.ls
     \../web3t/providers/velas_eth.ls
     \../web3t/providers/usdt_erc20_legacy.ls
 }
-module.exports = { eth, eth_legacy, insight, bitcore, erc20, omni, velas2, vlxerc20, solana, velas_erc20, velas_evm, bnb, velas_bep20, huobi, velas_huobi, velas_usdt, velas_eth, usdt_erc20_legacy }
+module.exports = { eth, eth_legacy, insight, bitcore, erc20, omni, velas2, vlxerc20, solana, velas_erc20, velas_evm, bnb, velas_busd, busd, huobi, velas_huobi, velas_usdt, velas_eth, usdt_erc20_legacy }
