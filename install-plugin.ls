@@ -22,14 +22,18 @@ require! {
     \../web3t/plugins/vlx-huobi-coin.ls : vlx_huobi 
     \../web3t/plugins/vlx-usdt-coin.ls : vlx_usdt  
     \../web3t/plugins/vlx-eth-coin.ls : vlx_eth
+    \../web3t/plugins/usdc-coin.ls : usdc  
+    \../web3t/plugins/vlx_usdc-coin.ls : vlx_usdc  
     \../web3t/plugins/usdt_erc20_legacy-coin.json : usdt_erc20_legacy
+    \../web3t/plugins/bsc-vlx-coin.ls : bsc_vlx  
       
 }
-current-configs = { vlx_eth, eth_legacy, syx, syx2, usdt, usdt_erc20, ltc, vlx_erc20, bnb, vlx_busd, busd, huobi, vlx_huobi, vlx_usdt,  usdt_erc20_legacy }
+current-configs = { vlx_eth, eth_legacy, syx, syx2, usdt, usdt_erc20, ltc, vlx_erc20, bnb, vlx_busd, busd, huobi, vlx_huobi, vlx_usdt,  usdt_erc20_legacy, usdc, vlx_usdc, bsc_vlx }
 plugin-pairs = {
     vlx_huobi: \huobi
     vlx_busd: \bnb
-    vlx_erc20: \eth    
+    vlx_erc20: \eth 
+    vlx_usdc: \usdc   
      
 }    
 required-fields = <[ type token enabled ]>
