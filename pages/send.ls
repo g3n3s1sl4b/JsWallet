@@ -21,7 +21,7 @@ require! {
     \../components/amount-field.ls
     \../components/amount-fiat-field.ls
     \../components/sliders/network-slider.ls
-    \../math.ls : { times }
+    \../math.ls : { times, div }
     \ethereumjs-util : {BN}
     \../velas/addresses.ls
     \../contracts.ls
@@ -38,9 +38,10 @@ require! {
     max-width: none !important
     height: 100vh
     display: flex !important
-    flex-direction: column
-    justify-content: center
+    flex-direction: column  
     align-items: center
+    @media(min-height:900px)
+        justify-content: center    
     @media(max-width:800px)
         margin-left: 0 !important
     .icon-svg
@@ -411,7 +412,7 @@ form-group = (classes, title, style, content)->
         label.pug.control-label(style=style) #{title}
         content!
 send = ({ store, web3t })->
-    { token, name, fee-token, bridge-fee-token, network, send, wallet, pending, recipient-change, amount-change, amount-usd-change, amount-eur-change, use-max-amount, show-data, show-label, history, cancel, send-anyway, before-send-anyway, choose-auto, round5edit, round5, is-data, encode-decode, change-amount, invoice } = send-funcs store, web3t
+    { token, name, homeFee, homeFeeUsd, fee-token, bridge-fee-token, network, send, wallet, pending, recipient-change, amount-change, amount-usd-change, amount-eur-change, use-max-amount, show-data, show-label, history, cancel, send-anyway, before-send-anyway, choose-auto, round5edit, round5, is-data, encode-decode, change-amount, invoice } = send-funcs store, web3t
     return send-contract { store, web3t } if send.details is no
     theme = get-primary-info(store)
     send.sending = false
@@ -589,13 +590,23 @@ send = ({ store, web3t })->
                                     img.label-coin.pug(src="#{fee-coin-image}")
                                     span.pug(title="#{send.amount-send-fee}") #{fee-token-display}
                                 .pug.usd $ #{round-human send.amount-send-fee-usd}
+                        if send.homeFeePercent? and send.homeFeePercent > 0 
+                            tr.pug.orange.home-fee
+                                td.pug 
+                                    | #{lang.home-fee} 
+                                    | (#{send.homeFeePercent}%)
+                                td.pug
+                                    span.pug(title="#{homeFee}") #{round-human homeFee}
+                                        img.label-coin.pug(src="#{send.coin.image}")
+                                        span.pug(title="#{homeFee}") #{token-display}
+                                    .pug.usd $ #{round-human homeFeeUsd}
             .pug.button-container
                 .pug.buttons
                     button { store, text: \send , on-click: send-func , loading: send.sending, type: \primary, error: send.error, makeDisabled: makeDisabled, id: "send-confirm" }
                     button { store, text: \cancel , on-click: cancel, icon: \close2, id: "send-cancel" }
 module.exports = send
 module.exports.init = ({ store, web3t }, cb)->
-    { wallet } = send-funcs store, web3t
+    { wallet, getHomeFee } = send-funcs store, web3t
     return cb null if not wallet?
     return cb null if send.sending is yes
     store.current.send.foreign-network-fee = 0
@@ -628,7 +639,11 @@ module.exports.init = ({ store, web3t }, cb)->
             store.current.send.chosenNetwork = default-network 
             store.current.send.to = token-networks.get-default-recipient-address(store)  
         else
-            console.error "networks prop in #{store.current.send.token} wallet is defined but is empty"    
+            console.error "networks prop in #{store.current.send.token} wallet is defined but is empty" 
+    
+    homeFee = getHomeFee!
+    homeFeePercent = homeFee `div` 1 
+    store.current.send.homeFeePercent = homeFeePercent `times` 100
     { wallets } = wallets-funcs store, web3t
     current-wallet =
         wallets |> find (-> it.coin.token is wallet.coin.token)
@@ -642,10 +657,10 @@ module.exports.init = ({ store, web3t }, cb)->
                 store.current.send.error = "Please add #{((wallet.network.tx-fee-in ? "").to-upper-case!)} wallet in order to calculate transaction fee"
             tx-fee-in-wallet?coin?image ? ""   
         | _ => wallet.coin.image   
-    if wallet.network.txBridgeFeeIn? and (wallet.coin.token isnt wallet.network.txBridgeFeeIn) then
-        bridge-fee-token = wallet.network.txBridgeFeeIn
-        second-wallet = wallets |> find (-> it.coin.token is bridge-fee-token)
-        store.current.send.fee-coin-image = second-wallet?coin?image if second-wallet?coin?image?
+    #if wallet.network.txBridgeFeeIn? and (wallet.coin.token isnt wallet.network.txBridgeFeeIn) then
+        #bridge-fee-token = wallet.network.txBridgeFeeIn
+        #second-wallet = wallets |> find (-> it.coin.token is bridge-fee-token)
+        #store.current.send.fee-coin-image = second-wallet?coin?image if second-wallet?coin?image?
     return cb null if current-wallet.address is wallet.address
     return cb null if not wallet?
     return cb null if not web3t[wallet.coin.token]?   
