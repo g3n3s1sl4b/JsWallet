@@ -32,6 +32,8 @@ create-send =->
     amount-send-fee-usd: \0
     amount-obtain: \0
     data: ""
+    homeFee: 0
+    homeFeePercent: 0
     is-swap: no 
     decoded-data: ""
     show-data-mode: \encoded
