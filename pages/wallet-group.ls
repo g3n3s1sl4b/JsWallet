@@ -22,6 +22,10 @@ require! {
         color: #7f818a
         text-transform: uppercase
         font-size: 12px
+        position: -webkit-sticky
+        position: sticky
+        top: 0
+        z-index: 1
 
     .wallet
         @import scheme
@@ -263,7 +267,7 @@ module.exports = (store, web3t, wallets, wallets-groups, wallets-group)-->
     wallets = wallets-group.1
 
     .wallet-group.pug
-        .pug.group-name #{group-name}
+        .pug.group-name #{group-name} Network
 
         wallets |> map (wallet)->
             res = wallet-funcs store, web3t, wallets, wallet
@@ -306,22 +310,4 @@ module.exports = (store, web3t, wallets, wallets-groups, wallets-group)-->
                                     span.pug #{ token-display }
                                 if +wallet.pending-sent >0
                                     .pug.pending
-                                        span.pug -#{ pending }
-                    .top-right.pug
-                        if no and store.current.device is \desktop
-                            span.pug.icon(on-click=expand)
-                                img.icon-svg-create.pug(src="#{icons.arrow-down}" style=icon-color)
-                                    .pug expand
-                        button { store, on-click=send-click, text: \send , icon: \send , type: \secondary, makeDisabled=send-swap-disabled }
-                        button { store, on-click=receive-click, text: \receive , icon: \get, type : \primary }
-                        if token in <[ vlx vlx_native vlx2 vlx_evm vlx_erc20 vlx_bep20 ]> then
-                            button { store, on-click=swap-click, text: \swap , icon: \swap, id: "wallet-swap", makeDisabled=send-swap-disabled, classes="wallet-swap" }
-                .wallet-middle.pug(style=border)
-                    address-holder { store, wallet, type: \bg }
-                    if token not in <[ btc vlx vlx_native vlx2 eth ]>
-                        .pug.uninstall(on-click=uninstall style=wallet-style) #{label-uninstall}
-                .wallet-middle.title-balance.pug(style=border)
-                    .name.pug(class="#{placeholder}" title="#{usd-rate}") $#{ round-human(usd-rate)}
-                    .name.per.pug(class="#{placeholder}")
-                        span.pug #{lang.per}
-                        | #{ token-display }
+                                        span.pug -#{ pending }               

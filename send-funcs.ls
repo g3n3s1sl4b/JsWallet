@@ -137,7 +137,7 @@ module.exports = (store, web3t)->
         return null if not data?
         notify-form-result send.id, null, data
         store.current.last-tx-url = | send.network.api.linktx => send.network.api.linktx.replace \:hash, data
-            | send.network.api.url => send.network.api.url + "/tx/" + data
+            | send.network.api.url => send.network.api.url + "/tx/#{data}"
         navigate store, web3t, \sent
         <- web3t.refresh
         
@@ -154,7 +154,7 @@ module.exports = (store, web3t)->
         return cb null if not (token is \usdc and chosen-network.id is \vlx_usdc)
 
         web3 = velas-web3 store
-        { FOREIGN_BRIDGE, FOREIGN_ERC20_TOKEN } = wallet.network  
+        { FOREIGN_BRIDGE, FOREIGN_BRIDGE_TOKEN } = wallet.network  
                         
         value = store.current.send.amountSend 
         value = (value `times` (10^6))  
@@ -163,7 +163,7 @@ module.exports = (store, web3t)->
         # Check for allowance 
         web3 = new Web3(new Web3.providers.HttpProvider(wallet.network.api.web3Provider))
         web3.eth.provider-url = wallet.network.api.web3Provider
-        contract = web3.eth.contract(abis.ForeignBridgeErcToErc).at(FOREIGN_ERC20_TOKEN)
+        contract = web3.eth.contract(abis.ForeignBridgeErcToErc).at(FOREIGN_BRIDGE_TOKEN)
         
         /*---*/       
                 
@@ -172,33 +172,13 @@ module.exports = (store, web3t)->
         receiver = send.to    
         
         /* Check for allowed amount for contract */
-        allowedRaw = contract.allowance(wallet.address, FOREIGN_BRIDGE);
-        allowed = allowedRaw `div` (10 ^ 0)  
-        
-        #if allowed < (send.amount-send `plus` (send.amount-send-fee `times` 2)) then
-            #return cb "You are now allowed to spend " + send.amount-send + " " + "USDT"
-        
+        err <- check-allowed-amount { contract, wallet, amount: send.amountSend }
+        return cb err if err?
+        #allowedRaw = contract.allowance(wallet.address, FOREIGN_BRIDGE);
+        #allowed = allowedRaw `div` (10 ^ 0)  
+
         { coin, gas, gas-price, amount-send, amount-send-fee, fee-type, network, tx-type } = send 
-        data = contract.approve.get-data(FOREIGN_BRIDGE, value) 
-        tx-obj =
-            account: { wallet.address, wallet.private-key, wallet.secret-key }
-            recipient: FOREIGN_ERC20_TOKEN
-            network: network
-            token: token
-            coin: coin
-            amount: 0
-            amount-fee: amount-send-fee
-            data: data
-            gas: gas
-            gas-price: gas-price
-            fee-type: fee-type
-        
-        err, tx-data <- create-transaction tx-obj
-        return cb err if err?
-            
-        err, tx <- push-tx { token, tx-type, network, ...tx-data }
-        return cb err if err?
-        
+             
         web3 = new Web3(new Web3.providers.HttpProvider(wallet?network?api?web3Provider))
         web3.eth.provider-url = wallet?network?api?web3Provider            
         contract = web3.eth.contract(abis.ForeignBridgeErcToErc).at(FOREIGN_BRIDGE)  
@@ -226,8 +206,8 @@ module.exports = (store, web3t)->
         return cb null if not (token is \vlx_usdc and chosen-network.id is \usdc)
 
         web3 = velas-web3 store
-        { HOME_BRIDGE_ADDRESS, HOME_BRIDGE_TOKEN } = wallet.network
-        return cb "HOME_BRIDGE_ADDRESS is not defined" if not HOME_BRIDGE_ADDRESS?
+        { HOME_BRIDGE, HOME_BRIDGE_TOKEN } = wallet.network
+        return cb "HOME_BRIDGE is not defined" if not HOME_BRIDGE?
         return cb "HOME_BRIDGE_TOKEN is not defined" if not HOME_BRIDGE_TOKEN?
                         
         value = store.current.send.amountSend 
@@ -236,22 +216,22 @@ module.exports = (store, web3t)->
         
         web3 = new Web3(new Web3.providers.HttpProvider(wallet?network?api?web3Provider))
         web3.eth.provider-url = wallet?network?api?web3Provider
-        contract = web3.eth.contract(abis.ERC20BridgeToken).at(HOME_BRIDGE_ADDRESS)    
+        contract = web3.eth.contract(abis.ERC20BridgeToken).at(HOME_BRIDGE)    
  
         { network } = wallet   
         try 
             minPerTxRaw = contract.minPerTx!  
             minPerTx = minPerTxRaw `div` (10 ^ 6)  
             if +send.amountSend < +(minPerTx) then
-                return cb "Min amount per transaction is #{minPerTx} USDT"
+                return cb "Min amount per transaction is #{minPerTx} USDC"
             maxPerTxRaw = contract.maxPerTx!
             maxPerTx = maxPerTxRaw `div` (10 ^ 6) 
             if +send.amountSend > +(maxPerTx) then
-                return cb "Max amount per transaction is #{maxPerTx} USDT"
+                return cb "Max amount per transaction is #{maxPerTx} USDC"
         catch err
             return cb err if err?    
         
-        data = contract.transferAndCall.get-data(HOME_BRIDGE_ADDRESS, value, send.to)
+        data = contract.transferAndCall.get-data(HOME_BRIDGE, value, send.to)
         store.current.send.contract-address = HOME_BRIDGE_TOKEN
         store.current.send.data = data  
         cb null, data
@@ -261,7 +241,7 @@ module.exports = (store, web3t)->
         return cb null if not (token is \vlx_busd and chosen-network.id is \busd)
 
         web3 = velas-web3 store
-        { HOME_BRIDGE_ADDRESS, HOME_BRIDGE_TOKEN } = wallet.network  
+        { HOME_BRIDGE, HOME_BRIDGE_TOKEN } = wallet.network  
                         
         value = store.current.send.amountSend 
         value = (value `times` (10^18))  
@@ -269,20 +249,20 @@ module.exports = (store, web3t)->
         
         web3 = new Web3(new Web3.providers.HttpProvider(wallet?network?api?web3Provider))
         web3.eth.provider-url = wallet?network?api?web3Provider
-        contract = web3.eth.contract(abis.ERC20BridgeToken).at(HOME_BRIDGE_ADDRESS)    
+        contract = web3.eth.contract(abis.ERC20BridgeToken).at(HOME_BRIDGE)    
  
         { network } = wallet   
         
         minPerTxRaw = contract.minPerTx!  
         minPerTx = minPerTxRaw `div` (10 ^ 18)  
         if +send.amountSend < +(minPerTx) then
-            return cb "Min amount per transaction is #{minPerTx} USDT"
+            return cb "Min amount per transaction is #{minPerTx} BUSD"
         maxPerTxRaw = contract.maxPerTx!
         maxPerTx = maxPerTxRaw `div` (10 ^ 18) 
         if +send.amountSend > +(maxPerTx) then
-            return cb "Max amount per transaction is #{maxPerTx} USDT"
+            return cb "Max amount per transaction is #{maxPerTx} BUSD"
         
-        data = contract.transferAndCall.get-data(HOME_BRIDGE_ADDRESS, value, send.to)
+        data = contract.transferAndCall.get-data(HOME_BRIDGE, value, send.to)
         store.current.send.contract-address = HOME_BRIDGE_TOKEN
         store.current.send.data = data
             
@@ -300,7 +280,10 @@ module.exports = (store, web3t)->
         web3 = new Web3(new Web3.providers.HttpProvider(wallet.network.api.web3Provider))
         web3.eth.provider-url = wallet.network.api.web3Provider
         contract = web3.eth.contract(abis.ForeignBridgeErcToErc).at(FOREIGN_ERC20_TOKEN)
-        
+        try
+            abi = [{"constant": true,"inputs":[],"name":"totalSupply","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"}]
+            totalSupply = web3.eth.contract(abi).at(FOREIGN_ERC20_TOKEN).totalSupply()
+        catch err
         /*---*/       
                 
         value = store.current.send.amountSend 
@@ -309,7 +292,7 @@ module.exports = (store, web3t)->
         
         
         /* Check for allowed amount for contract */
-        allowedRaw = contract.allowance(wallet.address, FOREIGN_BRIDGE);
+        allowedRaw = contract.allowance(wallet.address, FOREIGN_BRIDGE)
         allowed = allowedRaw `div` (10 ^ 0)  
         
         #if allowed < (send.amount-send `plus` (send.amount-send-fee `times` 2)) then
@@ -341,16 +324,50 @@ module.exports = (store, web3t)->
         minPerTxRaw = contract.minPerTx!         
         minPerTx = minPerTxRaw `div` (10 ^ 18)  
         if +send.amountSend < +(minPerTx) then
-            return cb "Min amount per transaction is #{minPerTx} USDT"
+            return cb "Min amount per transaction is #{minPerTx} BUSD"
         maxPerTxRaw = contract.maxPerTx!
         maxPerTx = maxPerTxRaw `div` (10 ^ 18)                
         if +send.amountSend > +(maxPerTx) then
-            return cb "Max amount per transaction is #{maxPerTx} USDT"
+            return cb "Max amount per transaction is #{maxPerTx} BUSD"
         
         data = contract.relayTokens.get-data(receiver, value)
         store.current.send.contract-address = FOREIGN_BRIDGE
         store.current.send.data = data    
         cb null, data    
+    checking-allowed = no   
+    /* Check for allowed amount for contract */
+    check-allowed-amount = ({contract, wallet, amount}, cb)->
+        return if checking-allowed        
+        { FOREIGN_BRIDGE, FOREIGN_BRIDGE_TOKEN } = wallet.network
+        allowedRaw = contract.allowance(wallet.address, FOREIGN_BRIDGE)
+        allowed = allowedRaw `div` (10 ^ 0)
+        return cb null if allowed >= amount
+        return cb null if +allowed is 0     
+        
+        UINT_MAX_NUMBER = 4294967295 `times` (10^6)
+        { coin, gas, gas-price, amount-send, amount-send-fee, fee-type, network, tx-type } = send 
+        data = contract.approve.get-data(FOREIGN_BRIDGE, UINT_MAX_NUMBER) 
+        tx-obj =
+            account: { wallet.address, wallet.private-key}
+            recipient: FOREIGN_BRIDGE_TOKEN
+            network: network
+            token: token
+            coin: coin
+            amount: 0
+            amount-fee: amount-send-fee
+            data: data
+            gas: 100000   
+            gas-price: gas-price
+            fee-type: fee-type
+        
+        err, tx-data <- create-transaction tx-obj
+        return cb err if err?
+        checking-allowed = yes   
+        err, tx <- push-tx { token, tx-type, network, ...tx-data }
+        return cb err if err?
+        checking-allowed = no 
+        cb null
+        
    
     /* 
     * Swap from USDT ETHEREUM to USDT VELAS 
@@ -359,52 +376,28 @@ module.exports = (store, web3t)->
         return cb null if not (token is \usdt_erc20 and chosen-network.id is \vlx_usdt)
 
         web3 = velas-web3 store
-        { FOREIGN_BRIDGE_ADDRESS, FOREIGN_BRIDGEABLE_TOKEN_ADDRESS } = wallet.network
-        current-network = store.current.network
- 
-        #FOREIGN_BRIDGEABLE_TOKEN_ADDRESS = "0xb404c51bbc10dcbe948077f18a4b8e553d160084" 
-        #FOREIGN_BRIDGE_ADDRESS = "0x4D34B0b309f6D1DA0a18eA61Ecb52720cA7D08F5"
-        UINT_MAX_NUMBER = 4294967295 
-                
+        { FOREIGN_BRIDGE, FOREIGN_BRIDGE_TOKEN } = wallet.network
+        return cb "FOREIGN_BRIDGE is not defined" if not FOREIGN_BRIDGE?
+        return cb "FOREIGN_BRIDGE_TOKEN is not defined" if not FOREIGN_BRIDGE_TOKEN?
+                        
         value = store.current.send.amountSend 
         value = (value `times` (10^6))  
         receiver = send.to
         
         web3 = new Web3(new Web3.providers.HttpProvider(wallet?network?api?web3Provider))
         web3.eth.provider-url = wallet?network?api?web3Provider
-        contract = web3.eth.contract(abis.ForeignBridgeErcToErc).at(FOREIGN_BRIDGEABLE_TOKEN_ADDRESS)    
+        contract = web3.eth.contract(abis.ForeignBridgeErcToErc).at(FOREIGN_BRIDGE_TOKEN) 
+        try
+            totalSupply = contract.totalSupply()
+        catch err   
         
         /* Check for allowed amount for contract */
-        allowedRaw = contract.allowance(wallet.address, FOREIGN_BRIDGE_ADDRESS);
-        allowed = allowedRaw `div` (10 ^ 0) 
-        allowed = round-human(allowed, {decimals: 2})
-        
-        #if allowed < send.amount-send then
-            #return cb "You are now allowed to spend " + allowed + " " + "USDT"
-        
-        { coin, gas, gas-price, amount-send, amount-send-fee, fee-type, network, tx-type } = send 
-        data = contract.approve.get-data(FOREIGN_BRIDGE_ADDRESS, value) 
-        tx-obj =
-            account: { wallet.address, wallet.private-key, wallet.secret-key }
-            recipient: FOREIGN_BRIDGEABLE_TOKEN_ADDRESS
-            network: network
-            token: token
-            coin: coin
-            amount: 0
-            amount-fee: amount-send-fee
-            data: data
-            gas: gas
-            gas-price: gas-price
-            fee-type: fee-type
-        
-        err, tx-data <- create-transaction tx-obj
+        err <- check-allowed-amount { contract, wallet, amount: send.amountSend }
         return cb err if err?
-            
-        err, tx <- push-tx { token, tx-type, network, ...tx-data }
-        return cb err if err?
-        
         { network } = wallet   
-        contract = web3.eth.contract(abis.ForeignBridgeErcToErc).at(FOREIGN_BRIDGE_ADDRESS)  
+        contract = web3.eth.contract(abis.ForeignBridgeErcToErc).at(FOREIGN_BRIDGE)  
+        
+        
         
         minPerTxRaw = contract.minPerTx!  
         minPerTx = minPerTxRaw `div` (10 ^ 6)  
@@ -416,10 +409,8 @@ module.exports = (store, web3t)->
             return cb "Max amount per transaction is #{maxPerTx} USDT"
         
         data = contract.relayTokens.get-data(receiver, value)
-        store.current.send.contract-address = FOREIGN_BRIDGE_ADDRESS
-        store.current.send.data = data
-        send.amount = 0
-        send.amount-send = 0    
+        store.current.send.contract-address = FOREIGN_BRIDGE
+        store.current.send.data = data   
         cb null, data 
         
     
@@ -431,10 +422,7 @@ module.exports = (store, web3t)->
         return cb null if not (token is \vlx_usdt and chosen-network.id is \usdt_erc20)
 
         web3 = velas-web3 store
-        { HOME_BRIDGE_ADDRESS, HOME_BRIDGE_TOKEN } = wallet.network
-        
-        HOME_BRIDGE_ADDRESS = "0xb6A42fc8BcB09cf3Ad44A63495f6f562028c99b8"
-        HOME_BRIDGE_TOKEN = "0x90f69A6134fD1cf45170AC55a895138da69B40aD"   
+        { HOME_BRIDGE, HOME_BRIDGE_TOKEN } = wallet.network  
                         
         value = store.current.send.amountSend 
         value = (value `times` (10^6))  
@@ -442,7 +430,12 @@ module.exports = (store, web3t)->
         
         web3 = new Web3(new Web3.providers.HttpProvider(wallet?network?api?web3Provider))
         web3.eth.provider-url = wallet?network?api?web3Provider
-        contract = web3.eth.contract(abis.ERC20BridgeToken).at(HOME_BRIDGE_ADDRESS)    
+        contract = web3.eth.contract(abis.ERC20BridgeToken).at(HOME_BRIDGE)  
+        
+        contract2 = web3.eth.contract(abis.ForeignBridgeErcToErc).at(HOME_BRIDGE) 
+        try
+            totalSupply = contract2.totalSupply()
+        catch err    
  
         { network } = wallet   
         
@@ -455,7 +448,7 @@ module.exports = (store, web3t)->
         if +send.amountSend > +(maxPerTx) then
             return cb "Max amount per transaction is #{maxPerTx} USDT"
         
-        data = contract.transferAndCall.get-data(HOME_BRIDGE_ADDRESS, value, send.to)
+        data = contract.transferAndCall.get-data(HOME_BRIDGE, value, send.to)
         store.current.send.contract-address = HOME_BRIDGE_TOKEN
         store.current.send.data = data
             
@@ -526,15 +519,11 @@ module.exports = (store, web3t)->
             maxPerTx = maxPerTxRaw `div` (10 ^ network.decimals)    
             homeFeeRaw = contract.getHomeFee! 
             homeFee = homeFeeRaw `div` (10 ^ network.decimals)
-            console.log "homeFee" homeFee
             
             data = contract.relayTokens.get-data(receiver)
-            amount-to-send = send.amount-send-fee `plus` send.amount-send   
-            contract-home-fee = send.amountSend `times` homeFee
-            ONE_PERCENT = minPerTx `times` "0.01"    
-            minAmountPerTx = minPerTx `plus` contract-home-fee `plus` ONE_PERCENT `plus` "2"    
-            if +send.amountSend < +(minAmountPerTx) then
-                return cb "Min amount per transaction is #{minAmountPerTx} VLX"
+            
+            if +send.amountSend < +(minPerTx) then
+                return cb "Min amount per transaction is #{minPerTx} VLX"
             if +send.amountSend > +maxPerTx then
                 return cb "Max amount per transaction is #{maxPerTx} VLX" 
             send.data = data
@@ -600,15 +589,12 @@ module.exports = (store, web3t)->
             maxPerTx = maxPerTxRaw `div` (10 ^ network.decimals)    
             homeFeeRaw = contract.getHomeFee! 
             homeFee = homeFeeRaw `div` (10 ^ network.decimals)
-            console.log "homeFee" homeFee
             
             data = contract.relayTokens.get-data(receiver)
             amount-to-send = send.amount-send-fee `plus` send.amount-send   
-            contract-home-fee = send.amountSend `times` homeFee
-            ONE_PERCENT = minPerTx `times` "0.01"    
-            minAmountPerTx = minPerTx `plus` contract-home-fee `plus` ONE_PERCENT `plus` "2"    
-            if +send.amountSend < +(minAmountPerTx) then
-                return cb "Min amount per transaction is #{minAmountPerTx} VLX"
+            #contract-home-fee = send.amountSend `times` homeFee
+            if +send.amountSend < +(minPerTx) then
+                return cb "Min amount per transaction is #{minPerTx} VLX"
             if +send.amountSend > +maxPerTx then
                 return cb "Max amount per transaction is #{maxPerTx} VLX" 
             send.data = data
@@ -733,7 +719,15 @@ module.exports = (store, web3t)->
             send-to = web3t.velas.ForeignBridgeNativeToErc.address 
             value = to-hex (value `times` (10^18))
             token-address = web3t.velas.ERC20BridgeToken.address   
-            network = wallet.network    
+            network = wallet.network   
+            
+            try
+                web3 = new Web3(new Web3.providers.HttpProvider(wallet.network.api.web3Provider))
+                web3.eth.provider-url = wallet.network.api.web3Provider
+                abi = [{"constant": true,"inputs":[],"name":"totalSupply","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"}]
+                totalSupply = web3.eth.contract(abi).at(token-address).totalSupply()
+            catch err
+             
             #/*
             # * Get minPerTx from HomeBridge  (not Foreign?)  
             # */ 
@@ -761,8 +755,6 @@ module.exports = (store, web3t)->
             data = web3t.velas.ERC20BridgeToken.transferAndCall.get-data(send-to, value, sending-to)
             send.data = data
             send.contract-address = web3t.velas.ERC20BridgeToken.address  
-            send.amount = 0
-            send.amount-send = 0
             
         
         /* DONE */    
@@ -772,9 +764,9 @@ module.exports = (store, web3t)->
             { wallets } = store.current.account
             chosen-network-wallet = wallets |> find (-> it.coin.token is chosen-network.id)
             return cb "[Swap error]: wallet #{chosen-network.id} is not found!" if not chosen-network-wallet? 
-            HomeBridge = chosen-network-wallet.network.HomeBridge
-             
-            store.current.send.contract-address = HomeBridge    
+            
+            { HOME_BRIDGE, FOREIGN_BRIDGE } = wallet.network 
+            
             receiver = store.current.send.to 
             network = wallet.network    
             minPerTxRaw = web3t.velas.HomeBridgeNativeToErc.minPerTx!
@@ -785,14 +777,13 @@ module.exports = (store, web3t)->
             homeFee = homeFeeRaw `div` (10 ^ network.decimals)
             data = web3t.velas.HomeBridgeNativeToErc.relayTokens.get-data(receiver)
             amount-to-send = send.amount-send-fee `plus` send.amount-send   
-            contract-home-fee = send.amountSend `times` homeFee
-            ONE_PERCENT = minPerTx `times` "0.01"    
-            minAmountPerTx = minPerTx `plus` contract-home-fee `plus` ONE_PERCENT `plus` "2"    
-            if +send.amountSend < +(minAmountPerTx) then
-                return cb "Min amount per transaction is #{minAmountPerTx} VLX"
+                
+            if +send.amountSend < +(minPerTx) then
+                return cb "Min amount per transaction is #{minPerTx} VLX"
             if +send.amountSend > +maxPerTx then
                 return cb "Max amount per transaction is #{maxPerTx} VLX" 
             send.data = data 
+            store.current.send.contract-address = FOREIGN_BRIDGE  
             
         
         /* DONE */
@@ -931,11 +922,14 @@ module.exports = (store, web3t)->
         cb null 
     flag = no   
     use-max = (cb)!->
-        min-fee = send.wallet.network.txFeeOptions.cheap       
+        #txFeeIn = wallet?network?txFeeIn   
+        #min-fee = 
+        #    | txFeeIn? and txFeeIn isnt wallet?coin?token => 0
+        #    | _ => send.wallet.network.txFeeOptions.cheap
         amount-send = wallet.balance `minus` (wallet.pending-sent ? 0)
-        amount-send = amount-send `minus` min-fee if not flag 
-        amount-send = 0 if amount-send < 0 
-        flag = yes   
+        #amount-send = amount-send 
+        #amount-send = 0 if amount-send < 0 
+        #flag = yes   
         <- change-amount-send store, amount-send, no
     use-max-try-catch = (cb)->
         try
@@ -947,7 +941,33 @@ module.exports = (store, web3t)->
         alert "#{err}" if err?
     export has-send-error = ->  
         error = store.current.send.error.toString!
-        error? and error.length > 0 and error.toLowerCase! isnt "not enough funds"    
+        error? and error.length > 0 and error.toLowerCase! isnt "not enough funds"
+        
+    homeFee = store.current.send.amount-send `times` (store.current.send.homeFeePercent `div` 100 )         
+                     
+    homeFeeUsd = homeFee `times` wallet.usdRate    
+        
+    getHomeFee = -> 
+        chosen-network = store.current.send.chosen-network
+        return 0 if not chosen-network?
+        token = store.current.send.coin.token
+        wallet = store.current.send.wallet
+        abi = [{"constant":true,"inputs":[],"name":"getHomeFee","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"}]
+        web3 = new Web3(new Web3.providers.HttpProvider(wallet?network?api?web3Provider))
+        addr = wallet?network?HOME_BRIDGE ? wallet?network?FOREIGN_BRIDGE
+        contract = web3.eth.contract(abi).at(addr)
+        try
+            homeFee = contract.getHomeFee!
+            homeFeePercent = homeFee `div` (10 ^ wallet?network.decimals) 
+            return homeFeePercent
+        catch err
+            console.log "[getHomeFeeError]: " err
+            return 0
+    
+    #export execute-contract-data    
+    export getHomeFee
+    export homeFee
+    export homeFeeUsd    
     export change-amount
     export send
     export wallet
