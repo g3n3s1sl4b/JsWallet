@@ -173,7 +173,8 @@ require! {
 create-item = ({ store, web3t }, item)-->
     add = ->
         store.current.add-coin = no
-        <- web3t.install-quick item
+        err <- web3t.install-quick item
+        console.error "[add] err" err if err?   
     title = "#{item.name}"
     style = get-primary-info store
     button-style =
@@ -249,6 +250,8 @@ add-by-vlxaddress = (store, web3t)->
         input.search.pug(placeholder="V...." value="#{store.contract-vlxaddress}" on-change=coin-contract style=input-style)
         button.pug(on-click=add style=button-style)
             icon \Plus, 20
+            
+            
 module.exports = ({ store, web3t } )->
     return null if store.current.add-coin isnt yes
     current-network = store.current.network   
@@ -268,10 +271,7 @@ module.exports = ({ store, web3t } )->
         color: style.app.text
         background: style.app.input
         border: "0"
-#    add-by-address store, web3t
-#    add-by-vlxaddress store, web3t
 
-    legacy = <[ usdt_erc20_legacy eth_legacy vlx2 ]>
     plugins = store.registry
     
     wallets-groups =
@@ -288,7 +288,7 @@ module.exports = ({ store, web3t } )->
         wallets = item.1
         
         .wallet-group.pug
-            .pug.group-name #{group-name}         
+            .pug.group-name #{group-name} Network         
             wallets |> map create-item { store, web3t }  
     
     
