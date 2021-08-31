@@ -18,9 +18,10 @@ require! {
         to
             opacity: 1
             transform: scale3d(1, 1, 1)
-    position: absolute
+    position: fixed 
     width: 100%
     top: 0
+    bottom: 0    
     z-index: 999
     padding-top: 5%
     box-sizing: border-box
