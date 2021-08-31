@@ -636,9 +636,7 @@ module.exports = (store, web3t)->
             contract = web3.eth.contract(abis.ForeignBridgeNativeToErc).at(FOREIGN_BRIDGE_TOKEN)  
             data = contract.transfer.get-data(FOREIGN_BRIDGE, value, send.to)
             send.data = data
-            send.contract-address = FOREIGN_BRIDGE_TOKEN 
-            send.amount = 0
-            send.amount-send = 0    
+            send.contract-address = FOREIGN_BRIDGE_TOKEN   
         
         /* DONE! */
         /* Swap from ETH to ETHEREUM (VELAS) */ 
@@ -707,8 +705,6 @@ module.exports = (store, web3t)->
             data = contract.transferAndCall.get-data(FOREIGN_BRIDGE, value, send.to)
             send.data = data
             send.contract-address = BRIDGEABLE_TOKEN
-            send.amount = 0
-            send.amount-send = 0
 
         
         
