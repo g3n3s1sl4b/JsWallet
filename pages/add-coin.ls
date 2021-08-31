@@ -319,6 +319,4 @@ module.exports = ({ store, web3t } )->
                                     |> obj-to-pairs
                                     |> map create-group { store, web3t }
 
-                else
-                    .loading.pug
-                        loading2 \black
+                
