@@ -765,7 +765,7 @@ module.exports = (store, web3t)->
             chosen-network-wallet = wallets |> find (-> it.coin.token is chosen-network.id)
             return cb "[Swap error]: wallet #{chosen-network.id} is not found!" if not chosen-network-wallet? 
             
-            { HOME_BRIDGE, FOREIGN_BRIDGE } = wallet.network 
+            { HOME_BRIDGE } = wallet.network 
             
             receiver = store.current.send.to 
             network = wallet.network    
