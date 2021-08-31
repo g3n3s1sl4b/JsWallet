@@ -783,7 +783,7 @@ module.exports = (store, web3t)->
             if +send.amountSend > +maxPerTx then
                 return cb "Max amount per transaction is #{maxPerTx} VLX" 
             send.data = data 
-            store.current.send.contract-address = FOREIGN_BRIDGE  
+            store.current.send.contract-address = HOME_BRIDGE  
             
         
         /* DONE */
