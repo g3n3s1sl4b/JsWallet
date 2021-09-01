@@ -151,16 +151,13 @@ require! {
                 >*
                     display: inline-block
                 >.img
-                    line-height: $card-top-height
-                    vertical-align: top
-                    margin-right: 10px
-                    width: 40px
+                    margin-top: 5px
+                    height: 32px
                     >img
-                        vertical-align: top
                         max-width: 50px
-                        $s: 35px
                         border-radius: 0
-                        height: $s
+                        width: 100%
+                        height: 100%
                         @media screen and (min-width: 801px)
                             padding-top: 4px
                 >.info
@@ -202,7 +199,7 @@ require! {
                         font-size: 13px
                 .first-block
                     margin-right: 20px
-                    width: 110px
+                    width: 120px
                     white-space: nowrap
                     text-overflow: ellipsis
                     overflow: hidden
@@ -424,7 +421,7 @@ require! {
         .title
             color: white
             text-transform: uppercase
-            font-size: 13px
+            font-size: 11px
             font-weight: 500
             white-space: nowrap
             text-overflow: ellipsis
@@ -626,6 +623,13 @@ wallet-group = (store, web3t, wallets, wallets-groups, wallets-group)-->
             }
             legend =
                 display: false
+                
+            installed-networks = store.coins |> map (.token)
+            available-networks = 
+                (wallet.network.networks ? []) 
+                    |> obj-to-pairs
+                    |> map (-> it.1 )
+                    |> filter (-> it.disabled isnt yes and it.referTo in installed-networks)
 
             /* Render */
             .wallet.pug.wallet-item(class="#{big} #{disabled-class}" key="#{token}")
@@ -656,7 +660,7 @@ wallet-group = (store, web3t, wallets, wallets-groups, wallets-group)-->
                     .buttons.pug
                         button { store, on-click=send-click, text: \send , icon: \send , type: \secondary, makeDisabled=send-swap-disabled }
                         button { store, on-click=receive-click, text: \receive , icon: \get, type : \primary }
-                        if token in <[ vlx vlx_native vlx2 vlx_evm vlx_erc20 vlx_bep20 ]> then
+                        if (available-networks.length > 0) then
                             button { store, on-click=swap-click, text: \swap , icon: \swap, id: "wallet-swap", makeDisabled=send-swap-disabled, classes="button-swap" }
                 
                 
