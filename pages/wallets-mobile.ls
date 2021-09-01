@@ -439,6 +439,11 @@ require! {
             height: auto
             border: 0 !important
             .address-holder
+                .browse
+                    display: none
+                .copy
+                    padding: 10px
+                    margin: 0
                 div
                     a
                         padding: 0 10px 0 20px
