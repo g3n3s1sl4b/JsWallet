@@ -651,7 +651,7 @@ wallet-group = (store, web3t, wallets, wallets-groups, wallets-group)-->
                         
                 .wallet-middle.pug(style=border)
                     address-holder { store, wallet, type: \bg }
-                    if token not in <[ btc vlx vlx_native vlx2 eth ]>
+                    if token not in <[ btc vlx vlx_native vlx2 eth vlx_evm ]>
                         .pug.uninstall(on-click=uninstall style=wallet-style) #{label-uninstall}
                     .buttons.pug
                         button { store, on-click=send-click, text: \send , icon: \send , type: \secondary, makeDisabled=send-swap-disabled }
