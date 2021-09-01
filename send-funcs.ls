@@ -173,7 +173,7 @@ module.exports = (store, web3t)->
         
         /* Check for allowed amount for contract */
         allowedRaw = contract.allowance(wallet.address, FOREIGN_BRIDGE)
-        allowed = allowedRaw `div` (10 ^ 0)
+        allowed = allowedRaw `div` (10 ^ wallet.network.decimals)
         err <- check-allowed-amount { contract, wallet, amount: send.amountSend, allowed, bridge: FOREIGN_BRIDGE, bridgeToken: FOREIGN_BRIDGE_TOKEN }
         return cb err if err?     
 
@@ -383,8 +383,8 @@ module.exports = (store, web3t)->
         if +send.amountSend > +(maxPerTx) then
             return cb "Max amount per transaction is #{maxPerTx} USDT"
         
-        data = contract.relayTokens.get-data(receiver, value)
-        store.current.send.contract-address = FOREIGN_BRIDGE
+        data = contract.transfer.get-data(FOREIGN_BRIDGE, value)
+        store.current.send.contract-address = FOREIGN_BRIDGE_TOKEN
         store.current.send.data = data   
         cb null, data 
         
