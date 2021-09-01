@@ -172,10 +172,10 @@ module.exports = (store, web3t)->
         receiver = send.to    
         
         /* Check for allowed amount for contract */
-        err <- check-allowed-amount { contract, wallet, amount: send.amountSend }
-        return cb err if err?
-        #allowedRaw = contract.allowance(wallet.address, FOREIGN_BRIDGE);
-        #allowed = allowedRaw `div` (10 ^ 0)  
+        allowedRaw = contract.allowance(wallet.address, FOREIGN_BRIDGE)
+        allowed = allowedRaw `div` (10 ^ 0)
+        err <- check-allowed-amount { contract, wallet, amount: send.amountSend, allowed, bridge: FOREIGN_BRIDGE, bridgeToken: FOREIGN_BRIDGE_TOKEN }
+        return cb err if err?     
 
         { coin, gas, gas-price, amount-send, amount-send-fee, fee-type, network, tx-type } = send 
              
@@ -275,52 +275,23 @@ module.exports = (store, web3t)->
         chosen-network-wallet = wallets |> find (-> it.coin.token is chosen-network.id)
         return cb "[Swap error]: wallet #{chosen-network.id} is not found!" if not chosen-network-wallet? 
         
-        { FOREIGN_BRIDGE, FOREIGN_ERC20_TOKEN } = wallet.network        
+        { FOREIGN_BRIDGE, FOREIGN_BRIDGE_TOKEN } = wallet.network        
         
         web3 = new Web3(new Web3.providers.HttpProvider(wallet.network.api.web3Provider))
         web3.eth.provider-url = wallet.network.api.web3Provider
-        contract = web3.eth.contract(abis.ForeignBridgeErcToErc).at(FOREIGN_ERC20_TOKEN)
-        try
-            abi = [{"constant": true,"inputs":[],"name":"totalSupply","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"}]
-            totalSupply = web3.eth.contract(abi).at(FOREIGN_ERC20_TOKEN).totalSupply()
-        catch err
-        /*---*/       
+        contract = web3.eth.contract(abis.ForeignBridgeErcToErc).at(FOREIGN_BRIDGE_TOKEN)    
                 
         value = store.current.send.amountSend 
         value = (value `times` (10^18))  
         receiver = send.to
         
-        
         /* Check for allowed amount for contract */
         allowedRaw = contract.allowance(wallet.address, FOREIGN_BRIDGE)
-        allowed = allowedRaw `div` (10 ^ 0)  
-        
-        #if allowed < (send.amount-send `plus` (send.amount-send-fee `times` 2)) then
-            #return cb "You are now allowed to spend " + send.amount-send + " " + "USDT"
-        
-        { coin, gas, gas-price, amount-send, amount-send-fee, fee-type, network, tx-type } = send 
-        data = contract.approve.get-data(FOREIGN_BRIDGE, value) 
-        tx-obj =
-            account: { wallet.address, wallet.private-key, wallet.secret-key }
-            recipient: FOREIGN_ERC20_TOKEN
-            network: network
-            token: token
-            coin: coin
-            amount: 0
-            amount-fee: amount-send-fee
-            data: data
-            gas: gas
-            gas-price: gas-price
-            fee-type: fee-type
-        
-        err, tx-data <- create-transaction tx-obj
+        allowed = allowedRaw `div` (10 ^ 0)
+        err <- check-allowed-amount { contract, wallet, amount: send.amountSend, allowed, bridge: FOREIGN_BRIDGE, bridgeToken: FOREIGN_BRIDGE_TOKEN  }
         return cb err if err?
-            
-        err, tx <- push-tx { token, tx-type, network, ...tx-data }
-        return cb err if err?
-        
-        contract = web3.eth.contract(abis.ForeignBridgeErcToErc).at(FOREIGN_BRIDGE)  
-        
+ 
+        contract = web3.eth.contract(abis.ForeignBridgeErcToErc).at(FOREIGN_BRIDGE)         
         minPerTxRaw = contract.minPerTx!         
         minPerTx = minPerTxRaw `div` (10 ^ 18)  
         if +send.amountSend < +(minPerTx) then
@@ -336,28 +307,32 @@ module.exports = (store, web3t)->
         cb null, data    
     checking-allowed = no   
     /* Check for allowed amount for contract */
-    check-allowed-amount = ({contract, wallet, amount}, cb)->
-        return if checking-allowed        
-        { FOREIGN_BRIDGE, FOREIGN_BRIDGE_TOKEN } = wallet.network
-        allowedRaw = contract.allowance(wallet.address, FOREIGN_BRIDGE)
-        allowed = allowedRaw `div` (10 ^ 0)
+    check-allowed-amount = ({ contract, wallet, amount, allowed, bridge, bridgeToken }, cb)->
+        return if checking-allowed 
+        return cb "bridge is not defined" if not bridge? 
+        return cb "bridgeToken is not defined" if not bridgeToken? 
+
         return cb null if allowed >= amount
-        return cb null if +allowed is 0     
         
-        UINT_MAX_NUMBER = 4294967295 `times` (10^6)
+        token = (wallet?coin?token ? "").to-upper-case!    
+        
+        agree <- confirm store, "In order to proceed you need to confirm transaction to approve sending #{amount} #{token}"
+        return cb "Canceled by user" if not agree   
+        
+        UINT_MAX_NUMBER = 4294967295 `times` (10 ^ wallet.network.decimals)
         { coin, gas, gas-price, amount-send, amount-send-fee, fee-type, network, tx-type } = send 
-        data = contract.approve.get-data(FOREIGN_BRIDGE, UINT_MAX_NUMBER) 
+        data = contract.approve.get-data(bridge, UINT_MAX_NUMBER) 
         tx-obj =
             account: { wallet.address, wallet.private-key}
-            recipient: FOREIGN_BRIDGE_TOKEN
+            recipient: bridgeToken
             network: network
             token: token
             coin: coin
-            amount: 0
-            amount-fee: amount-send-fee
+            amount: "0"
+            amount-fee: "0.002"    
             data: data
-            gas: 100000   
-            gas-price: gas-price
+            gas: 50000
+            gas-price: gas-price   
             fee-type: fee-type
         
         err, tx-data <- create-transaction tx-obj
@@ -392,13 +367,13 @@ module.exports = (store, web3t)->
         catch err   
         
         /* Check for allowed amount for contract */
-        err <- check-allowed-amount { contract, wallet, amount: send.amountSend }
-        return cb err if err?
+        allowedRaw = contract.allowance(wallet.address, FOREIGN_BRIDGE)
+        allowed = allowedRaw `div` (10 ^ 0)
+        err <- check-allowed-amount { contract, wallet, amount: send.amountSend, allowed, bridge: FOREIGN_BRIDGE, bridgeToken: FOREIGN_BRIDGE_TOKEN }       
+        return cb err if err?   
         { network } = wallet   
         contract = web3.eth.contract(abis.ForeignBridgeErcToErc).at(FOREIGN_BRIDGE)  
-        
-        
-        
+     
         minPerTxRaw = contract.minPerTx!  
         minPerTx = minPerTxRaw `div` (10 ^ 6)  
         if +send.amountSend < +(minPerTx) then
@@ -636,7 +611,9 @@ module.exports = (store, web3t)->
             contract = web3.eth.contract(abis.ForeignBridgeNativeToErc).at(FOREIGN_BRIDGE_TOKEN)  
             data = contract.transfer.get-data(FOREIGN_BRIDGE, value, send.to)
             send.data = data
-            send.contract-address = FOREIGN_BRIDGE_TOKEN   
+            send.contract-address = FOREIGN_BRIDGE_TOKEN 
+            #send.amount = 0
+            #send.amount-send = 0    
         
         /* DONE! */
         /* Swap from ETH to ETHEREUM (VELAS) */ 
@@ -960,7 +937,7 @@ module.exports = (store, web3t)->
             console.log "[getHomeFeeError]: " err
             return 0
     
-    #export execute-contract-data    
+    export execute-contract-data    
     export getHomeFee
     export homeFee
     export homeFeeUsd    
