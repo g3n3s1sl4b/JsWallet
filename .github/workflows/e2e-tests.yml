@@ -29,6 +29,10 @@ jobs:
       #   working-directory: ./.compiled-ssr/web3t
       #   run: npm i
 
+      - name: where I am
+        working-directory: ../web3t
+        run: npm i
+
       - name: install web3t modules
         working-directory: ../web3t
         run: npm i
