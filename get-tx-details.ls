@@ -29,7 +29,8 @@ module.exports = (store, web3t)->
             receiverGroup =
                 | receiver-token is \vlx_native => "Velas Native"
                 | _ => wallet-receiver?network?group
-            homeFee = store.current.send.homeFee
+            homeFeePercent = store.current.send.homeFeePercent
+            homeFee = store.current.send.amount-send `times` store.current.send.homeFeePercent 
             amount-receive = round-human (send.amount-send `minus` homeFee), {decimals: decimalsConfig}
             "Please confirm that you would like to send #{amount-send} #{token-display} from #{walletGroup} to receive #{amount-receive} #{token-display} on #{receiverGroup}." 
         |  +send.amount-send > 0 => 
