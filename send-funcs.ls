@@ -90,6 +90,7 @@ module.exports = (store, web3t)->
             if (err.toString()).indexOf("Insufficient priority. Code:-26. Please try to increase fee") then
                 store.current.send.error = err
                 <- set-timeout _, 2000
+                console.log "in2 seconds remove error"    
                 store.current.send.error = ""    
             return cb err   
         err <- create-pending-tx { store, token, recipient, network, tx, amount-send, amount-send-fee, send.to, from: wallet.address }
@@ -771,10 +772,10 @@ module.exports = (store, web3t)->
         send.data = data
         cb null   
     before-send-anyway = ->
-        cb = console.log     
+        cb = console.log    
+        (document.query-selector \.textfield).blur!
         err <- execute-contract-data!
-        store.current.send.error = err.toString() if err?    
-        return cb err if err?    
+        return store.current.send.error = err.toString() if err?    
         send-money!  
     send-anyway = ->
         send-money!
@@ -824,9 +825,11 @@ module.exports = (store, web3t)->
             wallets |> find (-> it.coin.token is token)
         { balance, usdRate } = wallet 
         send.amount-send-usd = value
-        #return no if +value is 0    
-        amount-usd-change.timer = clear-timeout amount-usd-change.timer
-        amount-usd-change.timer = set-timeout (-> perform-amount-usd-change value), 500
+        #return no if +value is 0 
+        perform-amount-usd-change value
+        /* Removed timeout delay here */   
+        #amount-usd-change.timer = clear-timeout amount-usd-change.timer
+        #amount-usd-change.timer = set-timeout (-> perform-amount-usd-change value), 500
     encode-decode = ->
         send.show-data-mode =
             | send.show-data-mode is \decoded => \encoded
@@ -931,20 +934,23 @@ module.exports = (store, web3t)->
         web3 = new Web3(new Web3.providers.HttpProvider(wallet?network?api?web3Provider))
         wallet-to = store.current.account.wallets |> find (-> it.coin.token is chosen-network.refer-to)     
         return "-1" if not wallet-to? 
-        { HOME_BRIDGE } = wallet-to.network
-        throw new Error "no HOME_BRIDGE defined for #{chosen-network.refer-to} token" if not HOME_BRIDGE?  
-        contract = web3.eth.contract(abi).at(HOME_BRIDGE)        
+        { HOME_BRIDGE, FOREIGN_BRIDGE } = wallet-to.network
+        addr =
+            | chosen-network.id in <[ usdt_erc20 ]> => FOREIGN_BRIDGE
+            | _ => HOME_BRIDGE  
+        web3 = new Web3(new Web3.providers.HttpProvider(wallet-to.network.api.web3Provider))
+        web3.eth.provider-url = wallet-to.network.api.web3Provider 
+        contract = web3.eth.contract(abi).at(addr)        
           
         try
             getHomeFee = 
-                | chosen-network.id in <[ vlx_huobi ]> =>
+                | chosen-network.id in <[ vlx_huobi usdt_erc20 ]> =>
                     contract.getForeignFee
                 | _ =>  
                     contract.getHomeFee       
             homeFee = getHomeFee!
-            homeFeePercent = homeFee `div` (10 ^ wallet?network.decimals) 
+            homeFeePercent = homeFee `div` (10 ^ wallet-to?network.decimals) 
             store.current.send.homeFeePercent = homeFeePercent  
-            #console.log "homeFeePercent" homeFeePercent  
             return homeFeePercent
         catch err
             #console.log "[getHomeFeeError]: " err
