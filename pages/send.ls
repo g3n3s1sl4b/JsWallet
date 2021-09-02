@@ -412,7 +412,7 @@ form-group = (classes, title, style, content)->
         label.pug.control-label(style=style) #{title}
         content!
 send = ({ store, web3t })->
-    { token, name, homeFee, homeFeeUsd, fee-token, bridge-fee-token, network, send, wallet, pending, recipient-change, amount-change, amount-usd-change, amount-eur-change, use-max-amount, show-data, show-label, history, cancel, send-anyway, before-send-anyway, choose-auto, round5edit, round5, is-data, encode-decode, change-amount, invoice } = send-funcs store, web3t
+    { execute-contract-data, token, name, homeFee, homeFeeUsd, fee-token, bridge-fee-token, network, send, wallet, pending, recipient-change, amount-change, amount-usd-change, amount-eur-change, use-max-amount, show-data, show-label, history, cancel, send-anyway, before-send-anyway, choose-auto, round5edit, round5, is-data, encode-decode, change-amount, invoice } = send-funcs store, web3t
     return send-contract { store, web3t } if send.details is no
     theme = get-primary-info(store)
     send.sending = false
@@ -504,6 +504,12 @@ send = ({ store, web3t })->
         address
     recipient = get-recipient(send.to)
     title = if store.current.send.is-swap isnt yes then lang.send else \Swap
+    homeFeePercent = send.homeFeePercent `times` 100
+    
+    /*TODO: remove this prop in prod*/
+    address-to-disabled = (token is \usdt_erc20 and store.current.send?chosen-network?id is \vlx_usdt) and store.current.network is \mainnet
+    
+    /* Render */
     .pug.content
         .pug.title(style=border-header)
             .pug.header(class="#{show-class}") #{title}
@@ -545,7 +551,7 @@ send = ({ store, web3t })->
                 form-group \receiver, lang.to, icon-style, ->
                     .pug
                         identicon { store, address: send.to }
-                        input.pug(type='text' style=input-style on-change=recipient-change value="#{recipient}" placeholder="#{store.current.send-to-mask}" id="send-recipient" )
+                        input.pug(type='text' style=input-style on-change=recipient-change value="#{recipient}" placeholder="#{store.current.send-to-mask}" id="send-recipient" disabled=address-to-disabled )
                 form-group \send-amount, lang.amount, icon-style, ->
                     .pug
                         .pug.amount-field
@@ -594,7 +600,7 @@ send = ({ store, web3t })->
                             tr.pug.orange.home-fee
                                 td.pug 
                                     | #{lang.home-fee} 
-                                    | (#{send.homeFeePercent}%)
+                                    | (#{homeFeePercent}%)
                                 td.pug
                                     span.pug(title="#{homeFee}") #{round-human homeFee}
                                         img.label-coin.pug(src="#{send.coin.image}")
@@ -606,7 +612,7 @@ send = ({ store, web3t })->
                     button { store, text: \cancel , on-click: cancel, icon: \close2, id: "send-cancel" }
 module.exports = send
 module.exports.init = ({ store, web3t }, cb)->
-    { wallet, getHomeFee } = send-funcs store, web3t
+    { execute-contract-data, wallet, getHomeFee } = send-funcs store, web3t
     return cb null if not wallet?
     return cb null if send.sending is yes
     store.current.send.foreign-network-fee = 0
@@ -640,10 +646,10 @@ module.exports.init = ({ store, web3t }, cb)->
             store.current.send.to = token-networks.get-default-recipient-address(store)  
         else
             console.error "networks prop in #{store.current.send.token} wallet is defined but is empty" 
-    
+    #err <- execute-contract-data
+    #return cb err if err?
     homeFee = getHomeFee!
-    homeFeePercent = homeFee `div` 1 
-    store.current.send.homeFeePercent = homeFeePercent `times` 100
+    
     { wallets } = wallets-funcs store, web3t
     current-wallet =
         wallets |> find (-> it.coin.token is wallet.coin.token)

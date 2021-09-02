@@ -383,7 +383,12 @@ module.exports = (store, web3t)->
         if +send.amountSend > +(maxPerTx) then
             return cb "Max amount per transaction is #{maxPerTx} USDT"
         
-        data = contract.transfer.get-data(FOREIGN_BRIDGE, value)
+        current-network = store.current.network    
+        
+        data = 
+            | current-network is \mainnet => contract.transfer.get-data(FOREIGN_BRIDGE, value)
+            | _ => contract.relayTokens.get-data(receiver, value)   
+        
         store.current.send.contract-address = FOREIGN_BRIDGE_TOKEN
         store.current.send.data = data   
         cb null, data 
@@ -491,9 +496,7 @@ module.exports = (store, web3t)->
             minPerTxRaw = contract.minPerTx!
             minPerTx = minPerTxRaw `div` (10 ^ network.decimals)
             maxPerTxRaw = contract.maxPerTx! 
-            maxPerTx = maxPerTxRaw `div` (10 ^ network.decimals)    
-            homeFeeRaw = contract.getHomeFee! 
-            homeFee = homeFeeRaw `div` (10 ^ network.decimals)
+            maxPerTx = maxPerTxRaw `div` (10 ^ network.decimals)     
             
             data = contract.relayTokens.get-data(receiver)
             
@@ -518,23 +521,21 @@ module.exports = (store, web3t)->
             contract = web3.eth.contract(abis.ForeignBridgeNativeToErc).at(FOREIGN_BRIDGE)
             
             { network } = wallet  
-            #/*
-            # * Get minPerTx from HomeBridge  (not Foreign?)  
-            # */ 
+            /*  Get minPerTx from HomeBridge */  
             minPerTxRaw = contract.minPerTx!
             minPerTx = minPerTxRaw `div` (10 ^ network.decimals)
-            #/*
-            # * Get maxPerTx from HomeBridge  (not Foreign?)  
-            # */
+            
+            /* Get maxPerTx from HomeBridge */
             maxPerTxRaw = contract.maxPerTx!
             maxPerTx = maxPerTxRaw `div` (10 ^ network.decimals)
-            homeFeeRaw = contract.getHomeFee! 
-            homeFee = homeFeeRaw `div` (10 ^ network.decimals)
-            contract-home-fee = send.amountSend `times` homeFee
-            minAmountPerTx = minPerTx `plus` contract-home-fee 
             
-            if +send.amountSend < +(minAmountPerTx) then
-                return cb "Min amount per transaction is #{minAmountPerTx} VLX"
+            #homeFeeRaw = contract.getHomeFee! 
+            #homeFee = homeFeeRaw `div` (10 ^ network.decimals)
+            #console.log "vlx_huobi homeFee" homeFee    
+            #contract-home-fee = send.amountSend `times` homeFee
+            
+            if +send.amountSend < +(minPerTx) then
+                return cb "Min amount per transaction is #{minPerTx} VLX"
             if +send.amountSend > +maxPerTx then
                 return cb "Max amount per transaction is #{maxPerTx} VLX"
             
@@ -562,12 +563,13 @@ module.exports = (store, web3t)->
             minPerTx = minPerTxRaw `div` (10 ^ network.decimals)
             maxPerTxRaw = contract.maxPerTx! 
             maxPerTx = maxPerTxRaw `div` (10 ^ network.decimals)    
-            homeFeeRaw = contract.getHomeFee! 
-            homeFee = homeFeeRaw `div` (10 ^ network.decimals)
+            
+            #homeFeeRaw = contract.getHomeFee! 
+            #homeFee = homeFeeRaw `div` (10 ^ network.decimals)
             
             data = contract.relayTokens.get-data(receiver)
             amount-to-send = send.amount-send-fee `plus` send.amount-send   
-            #contract-home-fee = send.amountSend `times` homeFee
+            
             if +send.amountSend < +(minPerTx) then
                 return cb "Min amount per transaction is #{minPerTx} VLX"
             if +send.amountSend > +maxPerTx then
@@ -588,23 +590,20 @@ module.exports = (store, web3t)->
             contract = web3.eth.contract(abis.ForeignBridgeNativeToErc).at(FOREIGN_BRIDGE)
             
             { network } = wallet  
-            #/*
-            # * Get minPerTx from HomeBridge  (not Foreign?)  
-            # */ 
+             
+            /* Get minPerTx from HomeBridge */ 
             minPerTxRaw = contract.minPerTx!
             minPerTx = minPerTxRaw `div` (10 ^ network.decimals)
-            #/*
-            # * Get maxPerTx from HomeBridge  (not Foreign?)  
-            # */
+             
+            /* Get maxPerTx from HomeBridge */
             maxPerTxRaw = contract.maxPerTx!
             maxPerTx = maxPerTxRaw `div` (10 ^ network.decimals)
-            homeFeeRaw = contract.getHomeFee! 
-            homeFee = homeFeeRaw `div` (10 ^ network.decimals)
-            contract-home-fee = send.amountSend `times` homeFee
-            minAmountPerTx = minPerTx `plus` contract-home-fee 
             
-            if +send.amountSend < +(minAmountPerTx) then
-                return cb "Min amount per transaction is #{minAmountPerTx} VLX"
+            #homeFeeRaw = contract.getHomeFee! 
+            #homeFee = homeFeeRaw `div` (10 ^ network.decimals)
+            
+            if +send.amountSend < +(minPerTx) then
+                return cb "Min amount per transaction is #{minPerTx} VLX"
             if +send.amountSend > +maxPerTx then
                 return cb "Max amount per transaction is #{maxPerTx} VLX"
             
@@ -612,8 +611,7 @@ module.exports = (store, web3t)->
             data = contract.transfer.get-data(FOREIGN_BRIDGE, value, send.to)
             send.data = data
             send.contract-address = FOREIGN_BRIDGE_TOKEN 
-            #send.amount = 0
-            #send.amount-send = 0    
+  
         
         /* DONE! */
         /* Swap from ETH to ETHEREUM (VELAS) */ 
@@ -627,10 +625,6 @@ module.exports = (store, web3t)->
             value = to-hex (value `times` (10^18)) 
             
             { HOME_BRIDGE } = wallet.network
-
-            #HOME_BRIDGE = "0xb1FAB785Cb5F2d9782519942921e9afCDf2C60e0"
-            #FOREIGN_BRIDGE = "0xA5D512085006867974405679f2c9476F4F7Fa903"
-            #BRIDGEABLE_TOKEN = "0x3538C7f88aDbc8ad1F435f7EA70287e26b926344"
             
             web3 = new Web3(new Web3.providers.HttpProvider(wallet.network.api.web3Provider))
             web3.eth.provider-url = wallet.network.api.web3Provider
@@ -659,7 +653,7 @@ module.exports = (store, web3t)->
             value = (value `times` (10^18))
             network = wallet.network
             
-            { FOREIGN_BRIDGE, BRIDGEABLE_TOKEN } = wallet.network    
+            { FOREIGN_BRIDGE, FOREIGN_BRIDGE_TOKEN } = wallet.network    
 
             web3 = new Web3(new Web3.providers.HttpProvider(wallet.network.api.web3Provider))
             web3.eth.provider-url = wallet.network.api.web3Provider
@@ -678,10 +672,10 @@ module.exports = (store, web3t)->
             catch err
                 return cb err
 
-            contract = web3.eth.contract(abis.ERC20BridgeToken).at(BRIDGEABLE_TOKEN)
+            contract = web3.eth.contract(abis.ERC20BridgeToken).at(FOREIGN_BRIDGE_TOKEN)
             data = contract.transferAndCall.get-data(FOREIGN_BRIDGE, value, send.to)
             send.data = data
-            send.contract-address = BRIDGEABLE_TOKEN
+            send.contract-address = FOREIGN_BRIDGE_TOKEN
 
         
         
@@ -701,23 +695,21 @@ module.exports = (store, web3t)->
                 totalSupply = web3.eth.contract(abi).at(token-address).totalSupply()
             catch err
              
-            #/*
-            # * Get minPerTx from HomeBridge  (not Foreign?)  
-            # */ 
+            
+            /* Get minPerTx from HomeBridge */
             minPerTxRaw = web3t.velas.HomeBridgeNativeToErc.minPerTx!
             minPerTx = minPerTxRaw `div` (10 ^ network.decimals)
-            #/*
-            # * Get maxPerTx from HomeBridge  (not Foreign?)  
-            # */
+           
+            /* Get maxPerTx from HomeBridge */
             maxPerTxRaw = web3t.velas.HomeBridgeNativeToErc.maxPerTx!
             maxPerTx = maxPerTxRaw `div` (10 ^ network.decimals)
-            homeFeeRaw = web3t.velas.ForeignBridgeNativeToErc.getHomeFee! 
-            homeFee = homeFeeRaw `div` (10 ^ network.decimals)
-            contract-home-fee = send.amountSend `times` homeFee
-            minAmountPerTx = minPerTx `plus` contract-home-fee 
             
-            if +send.amountSend < +(minAmountPerTx) then
-                return cb "Min amount per transaction is #{minAmountPerTx} VLX"
+            #homeFeeRaw = web3t.velas.ForeignBridgeNativeToErc.getHomeFee! 
+            #homeFee = homeFeeRaw `div` (10 ^ network.decimals)
+            #contract-home-fee = send.amountSend `times` homeFee
+            
+            if +send.amountSend < +(minPerTx) then
+                return cb "Min amount per transaction is #{minPerTx} VLX"
             if +send.amountSend > +maxPerTx then
                 return cb "Max amount per transaction is #{maxPerTx} VLX"
                            
@@ -746,8 +738,10 @@ module.exports = (store, web3t)->
             minPerTx = minPerTxRaw `div` (10 ^ network.decimals)
             maxPerTxRaw = web3t.velas.HomeBridgeNativeToErc.maxPerTx! 
             maxPerTx = maxPerTxRaw `div` (10 ^ network.decimals)    
-            homeFeeRaw = web3t.velas.HomeBridgeNativeToErc.getHomeFee! 
-            homeFee = homeFeeRaw `div` (10 ^ network.decimals)
+            
+            #homeFeeRaw = web3t.velas.HomeBridgeNativeToErc.getHomeFee! 
+            #homeFee = homeFeeRaw `div` (10 ^ network.decimals)
+            
             data = web3t.velas.HomeBridgeNativeToErc.relayTokens.get-data(receiver)
             amount-to-send = send.amount-send-fee `plus` send.amount-send   
                 
@@ -922,19 +916,39 @@ module.exports = (store, web3t)->
         
     getHomeFee = -> 
         chosen-network = store.current.send.chosen-network
-        return 0 if not chosen-network?
         token = store.current.send.coin.token
+        
+        if not chosen-network? 
+            or chosen-network.referTo in <[ vlx_native ]>        
+            or token is \vlx_native and chosen-network.referTo in <[ vlx vlx2 vlx_evm ]>
+            or token in <[ vlx vlx_evm ]> and chosen-network.referTo in <[ vlx_native vlx2 ]> 
+            or token is \vlx_native and chosen-network.referTo in <[ vlx vlx2 vlx_evm ]>   
+                store.current.send.homeFeePercent = 0 
+                return 0    
+        
         wallet = store.current.send.wallet
-        abi = [{"constant":true,"inputs":[],"name":"getHomeFee","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"}]
+        abi = [{"constant":true,"inputs":[],"name":"getHomeFee","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"getForeignFee","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"}]
         web3 = new Web3(new Web3.providers.HttpProvider(wallet?network?api?web3Provider))
-        addr = wallet?network?HOME_BRIDGE ? wallet?network?FOREIGN_BRIDGE
-        contract = web3.eth.contract(abi).at(addr)
+        wallet-to = store.current.account.wallets |> find (-> it.coin.token is chosen-network.refer-to)     
+        return "-1" if not wallet-to? 
+        { HOME_BRIDGE } = wallet-to.network
+        throw new Error "no HOME_BRIDGE defined for #{chosen-network.refer-to} token" if not HOME_BRIDGE?  
+        contract = web3.eth.contract(abi).at(HOME_BRIDGE)        
+          
         try
-            homeFee = contract.getHomeFee!
+            getHomeFee = 
+                | chosen-network.id in <[ vlx_huobi ]> =>
+                    contract.getForeignFee
+                | _ =>  
+                    contract.getHomeFee       
+            homeFee = getHomeFee!
             homeFeePercent = homeFee `div` (10 ^ wallet?network.decimals) 
+            store.current.send.homeFeePercent = homeFeePercent  
+            #console.log "homeFeePercent" homeFeePercent  
             return homeFeePercent
         catch err
-            console.log "[getHomeFeeError]: " err
+            #console.log "[getHomeFeeError]: " err
+            store.current.send.homeFeePercent = 0  
             return 0
     
     export execute-contract-data    

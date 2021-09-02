@@ -7,7 +7,8 @@ require! {
     \../../math.ls : { times }
     \../../icon.ls
     \../../icons.ls
-    \../../swaping/networks.ls : "token-networks"       
+    \../../swaping/networks.ls : "token-networks" 
+    \../../send-funcs.ls      
 }
 .network-slider
     .navigation-button
@@ -24,6 +25,7 @@ module.exports = ({ web3t, wallet, store, id })->
     #return null if not store.current.send.chosenNetwork?
     return null if not (store.current.send.isSwap? and store.current.send.isSwap is yes)
     return null if not wallet.network.networks? or Object.keys(wallet.network.networks).length is 0
+    { getHomeFee } = send-funcs store, web3t
     wallets = store.current.account.wallets |> map (-> [it.coin.token, it]) |> pairs-to-obj 
     available-networks = 
         wallet.network.networks 
@@ -63,6 +65,7 @@ module.exports = ({ web3t, wallet, store, id })->
         store.current.send.to = token-networks.get-default-recipient-address(store)
         store.current.send.error = ''
         store.current.send.data = null
+        getHomeFee!
     goback = go(-1)
     goForw = go(1)       
     .pug.network-slider

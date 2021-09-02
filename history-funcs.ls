@@ -48,11 +48,18 @@ module.exports = (store, web3t)->
         res
     amount-beautify = (amount, max)->
         str = (amount ? "")to-string!
-        data = str.match(/(.+[^0])(0+)$/)
+        #data = str.match(/(.+[^0])(0+)$/)
         $amount = round-human(str, {decimals: 4})
+        [int, dec] = $amount.split(".")
+        gray-style = 
+            opacity: 0.8
+            font-size: "90%"
+            font-weight: 600
         return
             .pug.balance
-                span.color.pug #{$amount}
+                span.color.pug #{int}
+            if dec? then
+               span.gray-color.pug(style=gray-style)\.#{dec}     
     is-active = (value)->
         types = store.current.filter-txs-types
         if value in types then \active else ''
