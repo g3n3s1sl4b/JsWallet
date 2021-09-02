@@ -33,6 +33,14 @@ jobs:
         working-directory: ../
         run: pwd
 
+      - name: where I am
+        working-directory: ../
+        run: ls
+
+      - name: where I am
+        working-directory: ../
+        run: cd JsWallet && ls
+
       - name: install web3t modules
         working-directory: ../web3t
         run: npm i
