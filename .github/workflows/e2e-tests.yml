@@ -26,18 +26,6 @@ jobs:
           # token: ${{ secrets.GITHUB_TOKEN }}
           ref: testnet
 
-      # - name: pull web3t
-      #   working-directory: ../web3t
-      #   run: git pull
-
-      # - name: install web3t modules
-      #   working-directory: ./.compiled-ssr/web3t
-      #   run: npm i
-
-      # - name: where I am
-      #   working-directory: ../
-      #   run: ls
-
       - name: install web3t modules
         working-directory: .compiled-ssr/web3t
         run: npm i
