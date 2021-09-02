@@ -14,9 +14,16 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: pull web3t
-        working-directory: ../web3t
-        run: git pull
+      - uses: actions/checkout@v2
+        with:
+          repository: velas/web3t
+          path: .compiled-ssr/web3t
+          # token: ${{ secrets.GITHUB_TOKEN }}
+          ref: testnet
+
+      # - name: pull web3t
+      #   working-directory: ../web3t
+      #   run: git pull
 
       - name: install web3t modules
         working-directory: ../web3t
