@@ -15,12 +15,14 @@ jobs:
 
       - name: checkout JsWallet
         uses: actions/checkout@v2
+        with:
+          path: JsWallet
 
       - name: checkout web3t
         uses: actions/checkout@v2
         with:
           repository: velas/web3t
-          path: ./.compiled-ssr/web3t
+          path: web3t
           # token: ${{ secrets.GITHUB_TOKEN }}
           ref: testnet
 
@@ -40,9 +42,9 @@ jobs:
         working-directory: .compiled-ssr/web3t
         run: npm i
 
-      # - name: copy web3 to wallet
-      #   working-directory: ../
-      #   run: rm -rf JsWallet/.compiled-ssr/web3t/.git/objects/ && mkdir -p JsWallet/.compiled-ssr/web3t/ && cp -pr web3t/ JsWallet/.compiled-ssr/web3t/
+      - name: copy web3 to wallet
+        working-directory: ../
+        run: rm -rf JsWallet/.compiled-ssr/web3t/.git/objects/ && mkdir -p JsWallet/.compiled-ssr/web3t/ && cp -pr web3t/ JsWallet/.compiled-ssr/web3t/
 
       - name: delete wallet build cache
         working-directory: ./
