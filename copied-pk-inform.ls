@@ -2,7 +2,7 @@ state = {
     timeout = null
 }
 module.exports = (store)-> (event)->
-    store.current.copied = event
+    store.current.copied = "Private key copied!"
     clear-timeout(state.timeout)
     remove-notification = ->
         store.current.copied = ""
