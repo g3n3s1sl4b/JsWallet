@@ -12,12 +12,15 @@ jobs:
       run:
         working-directory: ./e2e
     steps:
-      # - uses: actions/checkout@v2
 
-      - uses: actions/checkout@v2
+      - name: checkout JsWallet
+        uses: actions/checkout@v2
+
+      - name: checkout web3t
+        uses: actions/checkout@v2
         with:
           repository: velas/web3t
-          path: ./.compiled-ssr/web3t
+          path: ./JsWallet/.compiled-ssr/web3t
           # token: ${{ secrets.GITHUB_TOKEN }}
           ref: testnet
 
@@ -87,7 +90,6 @@ jobs:
           name: test-results
           path: |
             e2e/test-results/
-
 
 # RUN ON UBUNTU
 # name: e2e-tests
