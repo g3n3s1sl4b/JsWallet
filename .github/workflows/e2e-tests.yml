@@ -12,12 +12,12 @@ jobs:
       run:
         working-directory: ./e2e
     steps:
-      - uses: actions/checkout@v2
+      # - uses: actions/checkout@v2
 
       - uses: actions/checkout@v2
         with:
           repository: velas/web3t
-          path: /Users/administrator/actions-runner/_work/JsWallet/JsWallet/.compiled-ssr/web3t
+          path: .compiled-ssr/web3t
           # token: ${{ secrets.GITHUB_TOKEN }}
           ref: testnet
 
@@ -40,6 +40,10 @@ jobs:
       - name: where I am
         working-directory: ../
         run: cd JsWallet && ls
+
+      - name: where I am
+        working-directory: ../
+        run: cd JsWallet/.compiled-ssr/web3t && ls
 
       - name: install web3t modules
         working-directory: ../web3t
