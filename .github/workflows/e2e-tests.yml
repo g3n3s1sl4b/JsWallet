@@ -45,6 +45,10 @@ jobs:
         working-directory: ./
         run: rm -rf ./.compiled
 
+      - name: TEST
+        working-directory: ./
+        run: pwd
+
       # sleep required for wallet start
       - name: run wallet
         working-directory: ./
