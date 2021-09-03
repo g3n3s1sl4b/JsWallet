@@ -913,7 +913,7 @@ module.exports = (store, web3t)->
         error = store.current.send.error.toString!
         error? and error.length > 0 and error.toLowerCase! isnt "not enough funds"
         
-    homeFee = store.current.send.amount-send `times` (store.current.send.homeFeePercent `div` 100 )         
+    homeFee = store.current.send.amount-send `times` store.current.send.homeFeePercent       
                      
     homeFeeUsd = homeFee `times` wallet.usdRate    
         
@@ -930,32 +930,33 @@ module.exports = (store, web3t)->
                 return 0    
         
         wallet = store.current.send.wallet
-        abi = [{"constant":true,"inputs":[],"name":"getHomeFee","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"getForeignFee","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"}]
+        abi = [{"constant":true,"inputs":[],"name":"getHomeFee","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"getForeignFee","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"}, {"constant":true,"inputs":[],"name":"dailyLimit","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"}]
         web3 = new Web3(new Web3.providers.HttpProvider(wallet?network?api?web3Provider))
         wallet-to = store.current.account.wallets |> find (-> it.coin.token is chosen-network.refer-to)     
         return "-1" if not wallet-to? 
-        { HOME_BRIDGE, FOREIGN_BRIDGE } = wallet-to.network
+        { HOME_BRIDGE, HECO_SWAP__HOME_BRIDGE, BSC_SWAP__HOME_BRIDGE } = wallet.network
         addr =
-            | chosen-network.id in <[ usdt_erc20 ]> => FOREIGN_BRIDGE
+            | token is \vlx_evm and chosen-network.referTo is \vlx_huobi => HECO_SWAP__HOME_BRIDGE
+            | token is \vlx_evm and chosen-network.referTo is \bsc_vlx => BSC_SWAP__HOME_BRIDGE    
             | _ => HOME_BRIDGE  
-        web3 = new Web3(new Web3.providers.HttpProvider(wallet-to.network.api.web3Provider))
-        web3.eth.provider-url = wallet-to.network.api.web3Provider 
+        web3 = new Web3(new Web3.providers.HttpProvider(wallet.network.api.web3Provider))
+        web3.eth.provider-url = wallet.network.api.web3Provider 
         contract = web3.eth.contract(abi).at(addr)        
-          
-        try
-            getHomeFee = 
-                | chosen-network.id in <[ vlx_huobi usdt_erc20 ]> =>
-                    contract.getForeignFee
-                | _ =>  
-                    contract.getHomeFee       
-            homeFee = getHomeFee!
-            homeFeePercent = homeFee `div` (10 ^ wallet-to?network.decimals) 
+        homeFeePercent = 0  
+        try     
+            homeFee = contract.getHomeFee!
+            homeFeePercent = homeFee `div` (10 ^ wallet?network.decimals) 
             store.current.send.homeFeePercent = homeFeePercent  
-            return homeFeePercent
         catch err
             #console.log "[getHomeFeeError]: " err
             store.current.send.homeFeePercent = 0  
-            return 0
+            
+        #dailyLimit = contract.dailyLimit!
+        #dailyLimit = dailyLimit `div` (10 ^ wallet.network.decimals)
+        #console.log "dailyLimit" dailyLimit 
+        #store.current.send.homeDailyLimit = dailyLimit  
+        
+        return homeFeePercent   
     
     export execute-contract-data    
     export getHomeFee
