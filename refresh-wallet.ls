@@ -12,7 +12,7 @@ refresh-wallet = (web3, store, cb)->
         calc-wallet store, cb 
     task4 = task (cb)->
         get-market-coins-history store, cb 
-    <- run [ task1, task3, task4] .then
+    <- run [ task1, task3 ] .then
     store.current.refreshing = no
     cb null
 module.exports = refresh-wallet
