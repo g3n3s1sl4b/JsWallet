@@ -204,7 +204,7 @@ module.exports = (store, web3t)->
             | is-self-send is yes => contract.transfer.get-data(receiver, value)
             | _ => contract.relayTokens.get-data(receiver, value)
         
-        store.current.send.contract-address = FOREIGN_BRIDGE
+        store.current.send.contract-address = FOREIGN_BRIDGE_TOKEN
         store.current.send.data = data
                   
         cb null, data  
@@ -951,17 +951,15 @@ module.exports = (store, web3t)->
                 return 0    
         
         wallet = store.current.send.wallet
+        { network } = wallet 
         abi = [{"constant":true,"inputs":[],"name":"getHomeFee","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"getForeignFee","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"}, {"constant":true,"inputs":[],"name":"dailyLimit","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"}]
         web3 = new Web3(new Web3.providers.HttpProvider(wallet?network?api?web3Provider))
-        wallet-to = store.current.account.wallets |> find (-> it.coin.token is chosen-network.refer-to)     
-        return "-1" if not wallet-to? 
-        { HOME_BRIDGE, HECO_SWAP__HOME_BRIDGE, BSC_SWAP__HOME_BRIDGE } = wallet.network
+        web3.eth.provider-url = wallet.network.api.web3Provider
+        { HOME_BRIDGE, HECO_SWAP__HOME_BRIDGE, BSC_SWAP__HOME_BRIDGE } = wallet.network 
         addr =
             | token is \vlx_evm and chosen-network.referTo is \vlx_huobi => HECO_SWAP__HOME_BRIDGE
             | token is \vlx_evm and chosen-network.referTo is \bsc_vlx => BSC_SWAP__HOME_BRIDGE    
-            | _ => HOME_BRIDGE  
-        web3 = new Web3(new Web3.providers.HttpProvider(wallet.network.api.web3Provider))
-        web3.eth.provider-url = wallet.network.api.web3Provider 
+            | _ => HOME_BRIDGE         
         contract = web3.eth.contract(abi).at(addr)        
         homeFeePercent = 0  
         try     
