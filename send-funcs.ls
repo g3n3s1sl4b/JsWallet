@@ -651,11 +651,8 @@ module.exports = (store, web3t)->
             maxPerTxRaw = contract.maxPerTx!
             maxPerTx = maxPerTxRaw `div` (10 ^ network.decimals)                
             if +send.amountSend > +(maxPerTx) then
-                return cb "Max amount per transaction is #{maxPerTx} ETH"
-            
-            data = 
-                | is-self-send is yes => contract.transfer.get-data(receiver, value)
-                | _ => contract.relayTokens.get-data(receiver)
+                return cb "Max amount per transaction is #{maxPerTx} ETH"          
+            data = contract.relayTokens.get-data(receiver)
             #data = contract.relayTokens.get-data(receiver)
             send.data = data 
 
@@ -687,10 +684,8 @@ module.exports = (store, web3t)->
                 return cb err
 
             contract = web3.eth.contract(abis.ERC20BridgeToken).at(FOREIGN_BRIDGE_TOKEN)
-            data = 
-                | is-self-send is yes => contract.transfer.get-data(send.to, value)
-                | _ => contract.transferAndCall.get-data(FOREIGN_BRIDGE, value, send.to)
             #data = contract.transferAndCall.get-data(FOREIGN_BRIDGE, value, send.to)
+            data = contract.transferAndCall.get-data(FOREIGN_BRIDGE, value, send.to)
             send.data = data
             send.contract-address = FOREIGN_BRIDGE_TOKEN
 
@@ -764,9 +759,7 @@ module.exports = (store, web3t)->
             #homeFee = homeFeeRaw `div` (10 ^ network.decimals)     
             #data = web3t.velas.HomeBridgeNativeToErc.relayTokens.get-data(receiver)
             
-            data = 
-                | is-self-send is yes => web3t.velas.HomeBridgeNativeToErc.transfer.get-data(receiver, value)
-                | _ => web3t.velas.HomeBridgeNativeToErc.relayTokens.get-data(receiver)
+            data = web3t.velas.HomeBridgeNativeToErc.relayTokens.get-data(receiver)
             
             amount-to-send = send.amount-send-fee `plus` send.amount-send   
                 
@@ -977,8 +970,9 @@ module.exports = (store, web3t)->
             
         dailyLimit = contract.dailyLimit!
         dailyLimit = dailyLimit `div` (10 ^ wallet.network.decimals)
-        #console.log "dailyLimit" dailyLimit 
-        store.current.send.homeDailyLimit = dailyLimit  
+        
+        store.current.send.homeDailyLimit = dailyLimit     
+        store.current.network-details <<<< { dailyLimit, homeFeePercent }  
         
         return homeFeePercent   
     
