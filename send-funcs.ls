@@ -199,7 +199,11 @@ module.exports = (store, web3t)->
         if +send.amountSend > +(maxPerTx) then
             return cb "Max amount per transaction is #{maxPerTx} USDC"
         
-        data = contract.relayTokens.get-data(receiver, value)
+        #data = contract.relayTokens.get-data(receiver, value)
+        data = 
+            | is-self-send is yes => contract.transfer.get-data(receiver, value)
+            | _ => contract.relayTokens.get-data(receiver, value)
+        
         store.current.send.contract-address = FOREIGN_BRIDGE
         store.current.send.data = data
                   
@@ -308,7 +312,10 @@ module.exports = (store, web3t)->
         if +send.amountSend > +(maxPerTx) then
             return cb "Max amount per transaction is #{maxPerTx} BUSD"
         
-        data = contract.relayTokens.get-data(receiver, value)
+        data = 
+            | is-self-send is yes => contract.transfer.get-data(receiver, value)
+            | _ => contract.relayTokens.get-data(receiver, value) 
+        
         store.current.send.contract-address = FOREIGN_BRIDGE
         store.current.send.data = data    
         cb null, data    
@@ -730,9 +737,6 @@ module.exports = (store, web3t)->
                 | _ => send.to
               
             data = web3t.velas.ERC20BridgeToken.transferAndCall.get-data(send-to, value, sending-to)
-            data = 
-                 | is-self-send is yes => web3t.velas.ERC20BridgeToken.transfer.get-data(send.to, value)
-                 | _ => web3t.velas.ERC20BridgeToken.transferAndCall.get-data(send-to, value, sending-to)
             
             send.data = data
             send.contract-address = web3t.velas.ERC20BridgeToken.address  
