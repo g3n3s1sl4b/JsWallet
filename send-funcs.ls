@@ -80,6 +80,7 @@ module.exports = (store, web3t)->
             gas-price: gas-price
             fee-type: fee-type
             swap: swap
+        #console.log "pass to create-tx -->" { gas, gas-price }    
         err, tx-data <- create-transaction tx-obj
         return cb err if err?
         parts = get-tx-details store
@@ -146,6 +147,11 @@ module.exports = (store, web3t)->
         name = send.to
         amount-ethers = send.amount-send
         err <- send-to { name, amount-ethers }
+    
+    up = (str)->
+        (str ? "").trim!.to-upper-case!    
+    
+    is-self-send = up(wallet.address) is up(store.current.send.to)  
     
     /* DONE! */    
     /* 
@@ -315,7 +321,7 @@ module.exports = (store, web3t)->
 
         return cb null if allowed >= amount
         
-        token = (wallet?coin?token ? "").to-upper-case!    
+        token = (wallet?coin?nickname ? "").to-upper-case!    
         
         agree <- confirm store, "In order to proceed you need to confirm transaction to approve sending #{amount} #{token}"
         return cb "Canceled by user" if not agree   
@@ -387,7 +393,7 @@ module.exports = (store, web3t)->
         current-network = store.current.network    
         
         data = 
-            | current-network is \mainnet => contract.transfer.get-data(FOREIGN_BRIDGE, value)
+            | is-self-send is yes => contract.transfer.get-data(FOREIGN_BRIDGE, value)
             | _ => contract.relayTokens.get-data(receiver, value)   
         
         store.current.send.contract-address = FOREIGN_BRIDGE_TOKEN
@@ -568,7 +574,11 @@ module.exports = (store, web3t)->
             #homeFeeRaw = contract.getHomeFee! 
             #homeFee = homeFeeRaw `div` (10 ^ network.decimals)
             
-            data = contract.relayTokens.get-data(receiver)
+            data = 
+                | is-self-send is yes => contract.transfer.get-data(receiver, value)
+                | _ => contract.relayTokens.get-data(receiver)
+            
+            #data = contract.relayTokens.get-data(receiver)
             amount-to-send = send.amount-send-fee `plus` send.amount-send   
             
             if +send.amountSend < +(minPerTx) then
@@ -643,7 +653,10 @@ module.exports = (store, web3t)->
             if +send.amountSend > +(maxPerTx) then
                 return cb "Max amount per transaction is #{maxPerTx} ETH"
             
-            data = contract.relayTokens.get-data(receiver)
+            data = 
+                | is-self-send is yes => contract.transfer.get-data(receiver, value)
+                | _ => contract.relayTokens.get-data(receiver)
+            #data = contract.relayTokens.get-data(receiver)
             send.data = data 
 
         /* DONE! */
@@ -674,7 +687,10 @@ module.exports = (store, web3t)->
                 return cb err
 
             contract = web3.eth.contract(abis.ERC20BridgeToken).at(FOREIGN_BRIDGE_TOKEN)
-            data = contract.transferAndCall.get-data(FOREIGN_BRIDGE, value, send.to)
+            data = 
+                | is-self-send is yes => contract.transfer.get-data(send.to, value)
+                | _ => contract.transferAndCall.get-data(FOREIGN_BRIDGE, value, send.to)
+            #data = contract.transferAndCall.get-data(FOREIGN_BRIDGE, value, send.to)
             send.data = data
             send.contract-address = FOREIGN_BRIDGE_TOKEN
 
@@ -719,6 +735,10 @@ module.exports = (store, web3t)->
                 | _ => send.to
               
             data = web3t.velas.ERC20BridgeToken.transferAndCall.get-data(send-to, value, sending-to)
+            data = 
+                 | is-self-send is yes => web3t.velas.ERC20BridgeToken.transfer.get-data(send.to, value)
+                 | _ => web3t.velas.ERC20BridgeToken.transferAndCall.get-data(send-to, value, sending-to)
+            
             send.data = data
             send.contract-address = web3t.velas.ERC20BridgeToken.address  
             
@@ -741,9 +761,13 @@ module.exports = (store, web3t)->
             maxPerTx = maxPerTxRaw `div` (10 ^ network.decimals)    
             
             #homeFeeRaw = web3t.velas.HomeBridgeNativeToErc.getHomeFee! 
-            #homeFee = homeFeeRaw `div` (10 ^ network.decimals)
+            #homeFee = homeFeeRaw `div` (10 ^ network.decimals)     
+            #data = web3t.velas.HomeBridgeNativeToErc.relayTokens.get-data(receiver)
             
-            data = web3t.velas.HomeBridgeNativeToErc.relayTokens.get-data(receiver)
+            data = 
+                | is-self-send is yes => web3t.velas.HomeBridgeNativeToErc.transfer.get-data(receiver, value)
+                | _ => web3t.velas.HomeBridgeNativeToErc.relayTokens.get-data(receiver)
+            
             amount-to-send = send.amount-send-fee `plus` send.amount-send   
                 
             if +send.amountSend < +(minPerTx) then
@@ -951,10 +975,10 @@ module.exports = (store, web3t)->
             #console.log "[getHomeFeeError]: " err
             store.current.send.homeFeePercent = 0  
             
-        #dailyLimit = contract.dailyLimit!
-        #dailyLimit = dailyLimit `div` (10 ^ wallet.network.decimals)
+        dailyLimit = contract.dailyLimit!
+        dailyLimit = dailyLimit `div` (10 ^ wallet.network.decimals)
         #console.log "dailyLimit" dailyLimit 
-        #store.current.send.homeDailyLimit = dailyLimit  
+        store.current.send.homeDailyLimit = dailyLimit  
         
         return homeFeePercent   
     
