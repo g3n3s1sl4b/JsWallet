@@ -576,7 +576,7 @@ module.exports = (store, web3t)->
             chosen-network-wallet = wallets |> find (-> it.coin.token is chosen-network.id)
             return cb "[Swap error]: wallet #{chosen-network.id} is not found!" if not chosen-network-wallet?
             
-            { BSC_SWAP__HOME_BRIDGE } = wallet.network
+            { BSC_SWAP__HOME_BRIDGE, ERC20BridgeToken } = wallet.network
             
             web3 = new Web3(new Web3.providers.HttpProvider(wallet?network?api?web3Provider))
             web3.eth.provider-url = wallet?network?api?web3Provider
@@ -593,10 +593,14 @@ module.exports = (store, web3t)->
             #homeFee = homeFeeRaw `div` (10 ^ network.decimals)
             
             data = 
-                | is-self-send is yes => contract.transfer.get-data(receiver, value)
-                | _ => contract.relayTokens.get-data(receiver)
+               | is-self-send is yes => contract.transfer.get-data(BSC_SWAP__HOME_BRIDGE, value)
+               | _ => contract.relayTokens.get-data(receiver) 
+           
+            contract-address =
+               | is-self-send is yes => ERC20BridgeToken
+               | _ => BSC_SWAP__HOME_BRIDGE  
             
-            #data = contract.relayTokens.get-data(receiver)
+            data = contract.relayTokens.get-data(receiver)
             amount-to-send = send.amount-send-fee `plus` send.amount-send   
             
             if +send.amountSend < +(minPerTx) then
