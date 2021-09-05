@@ -199,12 +199,15 @@ module.exports = (store, web3t)->
         if +send.amountSend > +(maxPerTx) then
             return cb "Max amount per transaction is #{maxPerTx} USDC"
         
-        #data = contract.relayTokens.get-data(receiver, value)
         data = 
-            | is-self-send is yes => contract.transfer.get-data(receiver, value)
-            | _ => contract.relayTokens.get-data(receiver, value)
+           | is-self-send is yes => contract.transfer.get-data(FOREIGN_BRIDGE, value)
+           | _ => contract.relayTokens.get-data(receiver, value) 
+       
+        contract-address =
+           | is-self-send is yes => FOREIGN_BRIDGE_TOKEN
+           | _ => FOREIGN_BRIDGE     
         
-        store.current.send.contract-address = FOREIGN_BRIDGE_TOKEN
+        store.current.send.contract-address = contract-address
         store.current.send.data = data
                   
         cb null, data  
@@ -313,10 +316,14 @@ module.exports = (store, web3t)->
             return cb "Max amount per transaction is #{maxPerTx} BUSD"
         
         data = 
-            | is-self-send is yes => contract.transfer.get-data(receiver, value)
+            | is-self-send is yes => contract.transfer.get-data(FOREIGN_BRIDGE, value)
             | _ => contract.relayTokens.get-data(receiver, value) 
         
-        store.current.send.contract-address = FOREIGN_BRIDGE
+        contract-address =
+            | is-self-send is yes => FOREIGN_BRIDGE_TOKEN
+            | _ => FOREIGN_BRIDGE  
+        
+        store.current.send.contract-address = contract-address
         store.current.send.data = data    
         cb null, data    
     checking-allowed = no   
@@ -401,9 +408,13 @@ module.exports = (store, web3t)->
         
         data = 
             | is-self-send is yes => contract.transfer.get-data(FOREIGN_BRIDGE, value)
-            | _ => contract.relayTokens.get-data(receiver, value)   
+            | _ => contract.relayTokens.get-data(receiver, value)
+       
+        contract-address =
+           | is-self-send is yes => FOREIGN_BRIDGE_TOKEN
+           | _ => FOREIGN_BRIDGE    
         
-        store.current.send.contract-address = FOREIGN_BRIDGE_TOKEN
+        store.current.send.contract-address = contract-address
         store.current.send.data = data   
         cb null, data 
         
