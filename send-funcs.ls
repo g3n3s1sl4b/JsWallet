@@ -565,9 +565,18 @@ module.exports = (store, web3t)->
                 return cb "Max amount per transaction is #{maxPerTx} VLX"
             
             contract = web3.eth.contract(abis.ForeignBridgeNativeToErc).at(FOREIGN_BRIDGE_TOKEN)  
-            data = contract.transfer.get-data(FOREIGN_BRIDGE, value, send.to)
+            
+            #data = contract.transfer.get-data(FOREIGN_BRIDGE, value, send.to)
+            data = 
+                | is-self-send is yes => contract.transfer.get-data(FOREIGN_BRIDGE, value, send.to)
+                | _ => contract.relayTokens.get-data(send.to, value) 
+            
+            contract-address =
+                | is-self-send is yes => FOREIGN_BRIDGE_TOKEN
+                | _ => FOREIGN_BRIDGE
+            
             send.data = data
-            send.contract-address = FOREIGN_BRIDGE_TOKEN 
+            send.contract-address = contract-address
         
         /* DONE! */    
         /* Swap from VELAS EVM to HECO */
@@ -640,10 +649,19 @@ module.exports = (store, web3t)->
             if +send.amountSend > +maxPerTx then
                 return cb "Max amount per transaction is #{maxPerTx} VLX"
             
-            contract = web3.eth.contract(abis.ForeignBridgeNativeToErc).at(FOREIGN_BRIDGE_TOKEN)  
-            data = contract.transfer.get-data(FOREIGN_BRIDGE, value, send.to)
+            contract = web3.eth.contract(abis.ForeignBridgeNativeToErc).at(FOREIGN_BRIDGE_TOKEN) 
+            
+            data = 
+                | is-self-send is yes => contract.transfer.get-data(FOREIGN_BRIDGE, value, send.to)
+                | _ => contract.relayTokens.get-data(send.to, value) 
+            
+            contract-address =
+                | is-self-send is yes => FOREIGN_BRIDGE_TOKEN
+                | _ => FOREIGN_BRIDGE
+             
+            #data = contract.transfer.get-data(FOREIGN_BRIDGE, value, send.to)
             send.data = data
-            send.contract-address = FOREIGN_BRIDGE_TOKEN 
+            send.contract-address = contract-address
   
         
         /* DONE! */
