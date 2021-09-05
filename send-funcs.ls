@@ -537,9 +537,12 @@ module.exports = (store, web3t)->
         if token is \vlx_huobi and chosen-network.id is \vlx_evm
         
             value = store.current.send.amountSend
-            value = to-hex (value `times` (10^18))
+            value = value `times` (10^18)
             
             { FOREIGN_BRIDGE, FOREIGN_BRIDGE_TOKEN } = wallet.network
+            
+            return cb "FOREIGN_BRIDGE is not defined" if not FOREIGN_BRIDGE?
+            return cb "FOREIGN_BRIDGE_TOKEN is not defined" if not FOREIGN_BRIDGE_TOKEN?    
             
             web3 = new Web3(new Web3.providers.HttpProvider(wallet?network?api?web3Provider))
             web3.eth.provider-url = wallet?network?api?web3Provider
@@ -565,18 +568,13 @@ module.exports = (store, web3t)->
                 return cb "Max amount per transaction is #{maxPerTx} VLX"
             
             contract = web3.eth.contract(abis.ForeignBridgeNativeToErc).at(FOREIGN_BRIDGE_TOKEN)  
-            
-            #data = contract.transfer.get-data(FOREIGN_BRIDGE, value, send.to)
+
             data = 
-                | is-self-send is yes => contract.transfer.get-data(FOREIGN_BRIDGE, value, send.to)
-                | _ => contract.relayTokens.get-data(send.to, value) 
-            
-            contract-address =
-                | is-self-send is yes => FOREIGN_BRIDGE_TOKEN
-                | _ => FOREIGN_BRIDGE
+                | is-self-send is yes => contract.transfer.get-data(FOREIGN_BRIDGE, to-hex(value), send.to)
+                | _ => contract.transferAndCall.get-data(FOREIGN_BRIDGE, value, send.to)              
             
             send.data = data
-            send.contract-address = contract-address
+            send.contract-address = FOREIGN_BRIDGE_TOKEN
         
         /* DONE! */    
         /* Swap from VELAS EVM to HECO */
@@ -623,7 +621,7 @@ module.exports = (store, web3t)->
         if token is \bsc_vlx and chosen-network.id is \vlx_evm
         
             value = store.current.send.amountSend
-            value = to-hex (value `times` (10^18))
+            value = value `times` (10^18)
             
             { FOREIGN_BRIDGE, FOREIGN_BRIDGE_TOKEN } = wallet.network
             
@@ -652,16 +650,11 @@ module.exports = (store, web3t)->
             contract = web3.eth.contract(abis.ForeignBridgeNativeToErc).at(FOREIGN_BRIDGE_TOKEN) 
             
             data = 
-                | is-self-send is yes => contract.transfer.get-data(FOREIGN_BRIDGE, value, send.to)
-                | _ => contract.relayTokens.get-data(send.to, value) 
-            
-            contract-address =
-                | is-self-send is yes => FOREIGN_BRIDGE_TOKEN
-                | _ => FOREIGN_BRIDGE
-             
-            #data = contract.transfer.get-data(FOREIGN_BRIDGE, value, send.to)
+                | is-self-send is yes => contract.transfer.get-data(FOREIGN_BRIDGE, to-hex(value), send.to)
+                | _ => contract.transferAndCall.get-data(FOREIGN_BRIDGE, value, send.to)              
+
             send.data = data
-            send.contract-address = contract-address
+            send.contract-address = FOREIGN_BRIDGE_TOKEN
   
         
         /* DONE! */
