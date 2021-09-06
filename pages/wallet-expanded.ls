@@ -158,7 +158,7 @@ cb = console~log
 module.exports = (store, web3t, wallets, wallet)-->
     return null if not wallets? or not wallet?
     wallets-groups =
-        ^^wallets
+        (wallets ? [])
             |> filter ({coin, network}) -> ((coin.name + coin.token).to-lower-case!.index-of store.current.search.to-lower-case!) != -1 and (network.disabled isnt yes)
             |> group-by (.network.group)
             |> keys
@@ -180,16 +180,16 @@ module.exports = (store, web3t, wallets, wallet)-->
         | store.current.refreshing => "placeholder-coin"
         | _ => ""
         
-    wallet-is-disabled = isNaN(wallet.balance)
+    wallet-is-disabled = isNaN(wallet?balance)
     is-loading = store.current.refreshing is yes
     send-swap-disabled = wallet-is-disabled or is-loading
         
-    name = wallet.coin.name ? wallet.coin.token
+    name = wallet?coin?name ? wallet?coin?token
     receive-click = receive(wallet)
     send-click = send(wallet)
     swap-click = swap(store, wallet)
-    token = wallet.coin.token.to-upper-case!
-    tokenDisplay = (wallet.coin.nickname ? "").to-upper-case!
+    token = (wallet?coin?token ? "").to-upper-case!
+    tokenDisplay = (wallet?coin?nickname ? "").to-upper-case!
     style = get-primary-info store
     color1 =
         color: style.app.text
@@ -209,7 +209,7 @@ module.exports = (store, web3t, wallets, wallet)-->
     
     installed-networks = store.coins |> map (.token)
     available-networks = 
-        (wallet.network.networks ? []) 
+        (wallet?network?networks ? []) 
             |> obj-to-pairs
             |> map (-> it.1 )
             |> filter (-> it.disabled isnt yes and it.referTo in installed-networks)    
@@ -232,17 +232,14 @@ module.exports = (store, web3t, wallets, wallet)-->
     .wallet-detailed.pug(key="#{token}" style=wallet-style)
         .wallet-part.left.pug(style=text)
             .wallet-header.pug
-                if no
-                    .wallet-header-part.left.pug
-                        img.label-coin.pug(class="#{placeholder-coin}" src="#{wallet.coin.image}")
                 .wallet-header-part.right.pug
                     .pug
                         span.title.pug(class="#{placeholder}") #{name}
-                        if wallet.coin.token not in <[ btc vlx vlx_native vlx2 eth vlx_evm ]>
+                        if wallet?coin?token not in <[ btc vlx vlx_native vlx2 eth vlx_evm ]>
                             span.pug.uninstall(on-click=uninstall style=uninstall-style) #{label-uninstall}
                     .balance.pug(class="#{placeholder}")
-                        .pug.token-balance(title="#{wallet.balance}")
-                            span.pug #{ round-human wallet.balance }
+                        .pug.token-balance(title="#{wallet?balance}")
+                            span.pug #{ round-human wallet?balance }
                             span.pug #{ tokenDisplay }
                         .pug.usd-balance(class="#{placeholder}" title="#{balance-usd}")
                             span.pug #{ round-human balance-usd }
@@ -272,7 +269,7 @@ module.exports = (store, web3t, wallets, wallet)-->
                     .stats.pug
                         span.stats-style.pug
                             .pug.coin(style=text)
-                                img.label-coin.pug(class="#{placeholder-coin}" src="#{wallet.coin.image}")
+                                img.label-coin.pug(class="#{placeholder-coin}" src="#{wallet?coin?image}")
                                 .pug(class="#{placeholder}") #{ token-display }
                                 .pug.course(class="#{placeholder}" title="#{usd-rate}") $#{ round-human usd-rate}
                         wallet-stats store, web3t
