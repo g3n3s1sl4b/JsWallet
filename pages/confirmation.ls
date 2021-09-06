@@ -8,6 +8,7 @@ require! {
     \../components/button.ls
     \../copy.ls
     \../round5edit.ls
+    \../round-human.ls
     \../components/amount-field.ls
     \prelude-ls : { find, map }
     \../math.ls : { minus, div, plus, times }
@@ -279,6 +280,11 @@ confirmation-modal = (store)->
         color: style.app.text
     button-style=
         color: style.app.text
+    notification-style=
+        font-size: "12px"
+        opacity: "0.6"
+    text-style=
+        padding: "10px 10%"
     confirmation=
         background: style.app.background
         background-color: style.app.bgspare
@@ -289,6 +295,17 @@ confirmation-modal = (store)->
         .pug.confirmation-body(style=confirmation)
             .pug.header(style=confirmation-style) #{lang.confirmation}
             .pug.text(style=confirmation-style2) #{store.current.confirmation}
+            if store.current.send.swap is yes
+                refer-to = store.current.send?chosen-network?refer-to
+                minutes =
+                    | refer-to is \eth => 30
+                    | refer-to in <[ bsc_vlx busd ]> => 10
+                    | refer-to is \vlx_huobi => 10     
+                    | _ => 0
+                if minutes > 0 
+                    text = "Depending on the network congestions it may take a long time to finish swap. Average confirmation time is ~#{minutes} min."  
+                    .pug.notification(style=notification-style)
+                        p.pug(style=text-style)  #{text}
             .pug.buttons
                 button.pug.button(on-click=confirm style=button-style id="confirmation-confirm")
                     span.apply.pug
@@ -755,6 +772,80 @@ prompt-password-modal = (store)->
                     span.cancel.pug
                         img.icon-svg-cancel.pug(src="#{icons.close}")
                         | #{lang.cancel}
+                        
+$network-details-modal = (store)->
+    return null if store.current.current-network-details.show isnt yes 
+    cancel = ->
+        console.log "close"
+        store.current.current-network-details.show = no
+    
+    style = get-primary-info store
+    table-item-style-title=
+        flex: 1
+    confirmation-style =
+        background: style.app.background
+        background-color: style.app.bgspare
+        color: style.app.text
+        padding: "20px" 
+        text-align: "left"
+    close-button-style = 
+        float: "right"
+        padding: "5px"
+        background: "transparent"
+        border: "none"
+        cursor: "pointer"
+    table-item-style=
+        display: "flex"
+        flex-wrap: "wrap"
+    button-style=
+        color: style.app.text
+    bridge-fee-style =
+        color: "rgb(207, 149, 44)"
+    confirmation=
+        background: style.app.background
+        background-color: style.app.bgspare
+        color: style.app.text
+        border-bottom: "1px solid #{style.app.border}"
+    lang = get-lang store
+    { dailyLimit, homeFeePercent, minPerTx, maxPerTx, wallet } = store.current.current-network-details
+    { name, nickname } = wallet?coin
+    bridgeFeePercent = homeFeePercent `times` 100
+    dailyLimit = round-human(dailyLimit, {decimals: 2})
+    minPerTx   = round-human(minPerTx,   {decimals: 8})
+    maxPerTx   = round-human(maxPerTx,   {decimals: 2})
+    currency = (nickname ? "").to-upper-case!
+      
+    title = (name ? "").to-upper-case!
+    .pug.confirmation
+        .pug.confirmation-body(style=confirmation)
+            .pug.buttons
+                button.pug(on-click=cancel style=close-button-style id="prompt-close")
+                    span.cancel.pug
+                        img.icon-svg-cancel.pug(src="#{icons.close}")
+            .pug.header(style=style=confirmation-style) #{title}
+            .pug.table(style=style=confirmation-style)
+                .table-item.pug(style=table-item-style)
+                    .title.h5.pug(style=table-item-style-title) Remaining Daily Quota 
+                    .value.pug 
+                        | #{dailyLimit}
+                        | #{currency}
+                .table-item.pug(style=table-item-style)
+                    .title.h5.pug(style=table-item-style-title) Maximum Amount Per Transaction
+                    .value.pug 
+                        | #{maxPerTx}
+                        | #{currency}
+                .table-item.pug(style=table-item-style)
+                    .title.h5.pug(style=table-item-style-title) Minimum Amount Per Transaction
+                    .value.pug
+                        | #{minPerTx} 
+                        | #{currency}
+                if +homeFeePercent > 0
+                    .table-item.pug(style=table-item-style)
+                        .title.h5.pug(style=table-item-style-title) Bridge fee
+                        .value.pug(style=bridge-fee-style) #{bridgeFeePercent} %   
+            
+                        
+                        
 export confirmation-control = (store)->
     #for situation when we ask peen before action. this window should be hidden
     return null if store.current.page-pin?
@@ -767,6 +858,7 @@ export confirmation-control = (store)->
         alert-modal store
         notification-modal store
         prompt-choose-token-modal store
+        $network-details-modal store
 state=
     callback: null
 export swap-confirm = (store, text, cb)->
@@ -797,4 +889,7 @@ export prompt-choose-token = (store, text, cb)->
 export alert = (store, text, cb)->
     store.current.alert = text
     state.callback = cb
+export network-details-modal = ->
+    store.current.current-network-details.show = yes
+   
 window.confirm-state = state

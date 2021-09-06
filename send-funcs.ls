@@ -331,7 +331,8 @@ module.exports = (store, web3t)->
     checking-allowed = no   
     /* Check for allowed amount for contract */
     check-allowed-amount = ({ contract, wallet, amount, allowed, bridge, bridgeToken }, cb)->
-        return if checking-allowed 
+        return if checking-allowed
+        return cb null is-self-send is yes 
         return cb "bridge is not defined" if not bridge? 
         return cb "bridgeToken is not defined" if not bridgeToken? 
 
@@ -372,7 +373,7 @@ module.exports = (store, web3t)->
     */     
     eth_usdt-usdt_velas-swap = (token, chosen-network, cb)->     
         return cb null if not (token is \usdt_erc20 and chosen-network.id is \vlx_usdt)
-
+        #console.log "eth_usdt-usdt_velas-swap"   
         web3 = velas-web3 store
         { FOREIGN_BRIDGE, FOREIGN_BRIDGE_TOKEN } = wallet.network
         return cb "FOREIGN_BRIDGE is not defined" if not FOREIGN_BRIDGE?
@@ -969,7 +970,8 @@ module.exports = (store, web3t)->
                      
     homeFeeUsd = homeFee `times` wallet.usdRate    
         
-    getHomeFee = -> 
+    getBridgeInfo = (cb)-> 
+            
         chosen-network = store.current.send.chosen-network
         token = store.current.send.coin.token
         
@@ -979,11 +981,19 @@ module.exports = (store, web3t)->
             or token in <[ vlx vlx_evm ]> and chosen-network.referTo in <[ vlx_native vlx2 ]> 
             or token is \vlx_native and chosen-network.referTo in <[ vlx vlx2 vlx_evm ]>   
                 store.current.send.homeFeePercent = 0 
-                return 0    
+                return cb null    
         
         wallet = store.current.send.wallet
         { network } = wallet 
-        abi = [{"constant":true,"inputs":[],"name":"getHomeFee","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"getForeignFee","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"}, {"constant":true,"inputs":[],"name":"dailyLimit","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"}]
+        abi = 
+            * {"constant":true,"inputs":[],"name":"getHomeFee","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"}
+            * {"constant":true,"inputs":[],"name":"getForeignFee","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"}
+            * {"constant":true,"inputs":[],"name":"dailyLimit","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"}
+            * {"constant":true,"inputs":[],"name":"minPerTx","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"}    
+            * {"constant":true,"inputs":[],"name":"maxPerTx","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"}    
+            * {"constant":true,"inputs":[],"name":"executionDailyLimit","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"}    
+            * {"constant":true,"inputs":[],"name":"maxAvailablePerTx","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"}  
+        
         web3 = new Web3(new Web3.providers.HttpProvider(wallet?network?api?web3Provider))
         web3.eth.provider-url = wallet.network.api.web3Provider
         { HOME_BRIDGE, HECO_SWAP__HOME_BRIDGE, BSC_SWAP__HOME_BRIDGE } = wallet.network 
@@ -999,18 +1009,27 @@ module.exports = (store, web3t)->
             store.current.send.homeFeePercent = homeFeePercent  
         catch err
             #console.log "[getHomeFeeError]: " err
-            store.current.send.homeFeePercent = 0  
+            return cb err    
+            #store.current.send.homeFeePercent = 0  
             
         dailyLimit = contract.dailyLimit!
         dailyLimit = dailyLimit `div` (10 ^ wallet.network.decimals)
         
-        store.current.send.homeDailyLimit = dailyLimit     
-        store.current.network-details <<<< { dailyLimit, homeFeePercent }  
+        try 
+            maxAvailablePerTx = contract.maxAvailablePerTx!
+            maxAvailablePerTx = maxAvailablePerTx `div` (10 ^ wallet.network.decimals)
+            store.current.send.maxAvailablePerTx = maxAvailablePerTx
+        catch err
+            console.log "[maxAvailablePerTx error]: " err
+            return cb err    
         
-        return homeFeePercent   
+        store.current.send.homeDailyLimit = dailyLimit     
+        store.current.network-details <<<< { dailyLimit, homeFeePercent, maxAvailablePerTx }  
+        
+        cb null  
     
     export execute-contract-data    
-    export getHomeFee
+    export getBridgeInfo
     export homeFee
     export homeFeeUsd    
     export change-amount

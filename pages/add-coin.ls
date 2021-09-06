@@ -1,6 +1,6 @@
 require! {
     \react
-    \prelude-ls : { map, filter, group-by, keys, obj-to-pairs }
+    \prelude-ls : { map, filter, group-by, keys, obj-to-pairs, sortWith }
     \./loading2.ls
     \../web3.ls
     \../get-primary-info.ls
@@ -274,13 +274,21 @@ module.exports = ({ store, web3t } )->
         border: "0"
 
     plugins = store.registry
+          
     
-    wallets-groups =
-        store.current.account.wallets
-            |> filter ({coin, network}) -> (network.disabled isnt yes)
-            |> group-by (.network.group)
-
-    groups = wallets-groups |> keys 
+    groups =    
+        plugins
+            |> filter (it)->
+                it[current-network]?
+            |> filter (it)->
+                (it[current-network]?disabled is no) or (not it[current-network]?disabled?)
+            |> filter filter-item store
+            |> group-by (-> it[current-network].group)
+    
+    velas-group = 
+        | groups.Velas? => { groups.Velas } 
+        | _ => null   
+    delete groups.Velas    
     
     create-group = ({ store, web3t }, item)--> 
         group-name =
@@ -308,15 +316,12 @@ module.exports = ({ store, web3t } )->
                 if store.registry.length > 0
                     .pug.section
                         .list.pug
-                            if plugins.length > 0
-                                plugins
-                                    |> filter (it)->
-                                        it[current-network]?
-                                    |> filter (it)->
-                                        (it[current-network]?disabled is no) or (not it[current-network]?disabled?)
-                                    |> filter filter-item store
-                                    |> group-by (-> it[current-network].group)
+                            if velas-group? 
+                                velas-group
                                     |> obj-to-pairs
                                     |> map create-group { store, web3t }
+                            groups
+                                |> obj-to-pairs
+                                |> map create-group { store, web3t }
 
                 
