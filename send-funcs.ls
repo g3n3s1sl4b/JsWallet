@@ -180,9 +180,7 @@ module.exports = (store, web3t)->
         
         /* Check for allowed amount for contract */
         allowedRaw = contract.allowance(wallet.address, FOREIGN_BRIDGE)
-        allowed = allowedRaw `div` (10 ^ wallet.network.decimals)
-        err <- check-allowed-amount { contract, wallet, amount: send.amountSend, allowed, bridge: FOREIGN_BRIDGE, bridgeToken: FOREIGN_BRIDGE_TOKEN }
-        return cb err if err?     
+        allowed = allowedRaw `div` (10 ^ wallet.network.decimals)    
 
         { coin, gas, gas-price, amount-send, amount-send-fee, fee-type, network, tx-type } = send 
              
@@ -198,6 +196,9 @@ module.exports = (store, web3t)->
         maxPerTx = maxPerTxRaw `div` (10 ^ 6)                
         if +send.amountSend > +(maxPerTx) then
             return cb "Max amount per transaction is #{maxPerTx} USDC"
+            
+        err <- check-allowed-amount { contract, wallet, amount: send.amountSend, allowed, bridge: FOREIGN_BRIDGE, bridgeToken: FOREIGN_BRIDGE_TOKEN }
+        return cb err if err? 
         
         data = 
            | is-self-send is yes => contract.transfer.get-data(FOREIGN_BRIDGE, value)
@@ -301,9 +302,7 @@ module.exports = (store, web3t)->
         
         /* Check for allowed amount for contract */
         allowedRaw = contract.allowance(wallet.address, FOREIGN_BRIDGE)
-        allowed = allowedRaw `div` (10 ^ 0)
-        err <- check-allowed-amount { contract, wallet, amount: send.amountSend, allowed, bridge: FOREIGN_BRIDGE, bridgeToken: FOREIGN_BRIDGE_TOKEN  }
-        return cb err if err?
+        allowed = allowedRaw `div` (10 ^ 0)   
  
         contract = web3.eth.contract(abis.ForeignBridgeErcToErc).at(FOREIGN_BRIDGE)         
         minPerTxRaw = contract.minPerTx!         
@@ -314,6 +313,9 @@ module.exports = (store, web3t)->
         maxPerTx = maxPerTxRaw `div` (10 ^ 18)                
         if +send.amountSend > +(maxPerTx) then
             return cb "Max amount per transaction is #{maxPerTx} BUSD"
+            
+        err <- check-allowed-amount { contract, wallet, amount: send.amountSend, allowed, bridge: FOREIGN_BRIDGE, bridgeToken: FOREIGN_BRIDGE_TOKEN  }
+        return cb err if err?
         
         data = 
             | is-self-send is yes => contract.transfer.get-data(FOREIGN_BRIDGE, value)
@@ -337,7 +339,7 @@ module.exports = (store, web3t)->
         
         token = (wallet?coin?nickname ? "").to-upper-case!    
         
-        agree <- confirm store, "In order to proceed you need to confirm transaction to approve sending #{amount} #{token}"
+        agree <- confirm store, "To execute this swap please approve that bridge contract can withdraw your #{token} and automate payments for you."
         return cb "Canceled by user" if not agree   
         
         UINT_MAX_NUMBER = 4294967295 `times` (10 ^ wallet.network.decimals)
@@ -382,16 +384,11 @@ module.exports = (store, web3t)->
         
         web3 = new Web3(new Web3.providers.HttpProvider(wallet?network?api?web3Provider))
         web3.eth.provider-url = wallet?network?api?web3Provider
-        contract = web3.eth.contract(abis.ForeignBridgeErcToErc).at(FOREIGN_BRIDGE_TOKEN) 
-        try
-            totalSupply = contract.totalSupply()
-        catch err   
+        contract = web3.eth.contract(abis.ForeignBridgeErcToErc).at(FOREIGN_BRIDGE_TOKEN)
         
-        /* Check for allowed amount for contract */
         allowedRaw = contract.allowance(wallet.address, FOREIGN_BRIDGE)
-        allowed = allowedRaw `div` (10 ^ 0)
-        err <- check-allowed-amount { contract, wallet, amount: send.amountSend, allowed, bridge: FOREIGN_BRIDGE, bridgeToken: FOREIGN_BRIDGE_TOKEN }       
-        return cb err if err?   
+        allowed = allowedRaw `div` (10 ^ 0) 
+
         { network } = wallet   
         contract = web3.eth.contract(abis.ForeignBridgeErcToErc).at(FOREIGN_BRIDGE)  
      
@@ -403,6 +400,10 @@ module.exports = (store, web3t)->
         maxPerTx = maxPerTxRaw `div` (10 ^ 6)                
         if +send.amountSend > +(maxPerTx) then
             return cb "Max amount per transaction is #{maxPerTx} USDT"
+            
+        /* Check for allowed amount for contract */    
+        err <- check-allowed-amount { contract, wallet, amount: send.amountSend, allowed, bridge: FOREIGN_BRIDGE, bridgeToken: FOREIGN_BRIDGE_TOKEN }       
+        return cb err if err? 
         
         current-network = store.current.network    
         
@@ -822,7 +823,11 @@ module.exports = (store, web3t)->
         cb = console.log    
         (document.query-selector \.textfield).blur!
         err <- execute-contract-data!
-        return store.current.send.error = err.toString() if err?    
+        if err?    
+            error = err.toString()
+            if error.to-lower-case!.index-of("canceled") isnt -1
+                return  
+            return store.current.send.error = error  
         send-money!  
     send-anyway = ->
         send-money!
