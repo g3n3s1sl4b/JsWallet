@@ -28,6 +28,7 @@ module.exports = (store, web3t)->
             wallet-receiver = store.current.account.wallets |> find (-> it.coin.token is receiver-token)
             receiverGroup =
                 | receiver-token is \vlx_native => "Velas Native"
+                | (wallet-receiver?network?group ? "").to-lower-case! is \velas => "Velas EVM" 
                 | _ => wallet-receiver?network?group
             homeFeePercent = store.current.send.homeFeePercent
             homeFee = store.current.send.amount-send `times` store.current.send.homeFeePercent 
