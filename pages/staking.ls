@@ -872,7 +872,7 @@ to-keystore = (store, with-keystore)->
     mining  = get-pair wallet, \m0/2 , index, password, with-keystore
     { staking, mining, password }
 show-validator = (store, web3t)-> (validator)->
-    li.pug #{validator}
+    li.pug(key="validator-#{validator}" ) #{validator}
 staking-content = (store, web3t)->
     style = get-primary-info store
     lang = get-lang store
@@ -1087,10 +1087,10 @@ staking-content = (store, web3t)->
                     .description.pug
                         .pug.left
                             ul.pug
-                                li.pug 1. #{lang.check-node1}
-                                li.pug 2. #{lang.check-node2}
-                                li.pug 3. #{lang.check-node3}
-                                li.pug 4. #{lang.check-node4}
+                                li.pug(key="langs-check-node1" ) 1. #{lang.check-node1}
+                                li.pug(key="langs-check-node2" ) 2. #{lang.check-node2}
+                                li.pug(key="langs-check-node3" ) 3. #{lang.check-node3}
+                                li.pug(key="langs-check-node4" ) 4. #{lang.check-node4}
             if +store.staking.stake-amount-total is 0
                 .pug.section
                     .title.pug
@@ -1148,8 +1148,8 @@ staking-content = (store, web3t)->
                                 if store.staking.is-active-staker is no
                                     .pug.warning
                                         ol.pug
-                                            li.pug #{lang.your-status1}
-                                            li.pug #{lang.your-status2}
+                                            li.pug(key="your-status" ) #{lang.your-status1}
+                                            li.pug(key="your-status2" ) #{lang.your-status2}
                             hr.pug
                             label.pug #{lang.stake-more}
                             amount-field { store, value: store.staking.add.add-validator-stake , on-change: change-stake , placeholder: lang.stake, show-details: yes, id: "vlx-stake-input", token:"vlx2" }

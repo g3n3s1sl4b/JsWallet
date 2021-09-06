@@ -332,7 +332,7 @@ module.exports = (store, web3t)->
     /* Check for allowed amount for contract */
     check-allowed-amount = ({ contract, wallet, amount, allowed, bridge, bridgeToken }, cb)->
         return if checking-allowed
-        return cb null is-self-send is yes 
+        return cb null if is-self-send is yes 
         return cb "bridge is not defined" if not bridge? 
         return cb "bridgeToken is not defined" if not bridgeToken? 
 
@@ -972,7 +972,8 @@ module.exports = (store, web3t)->
         
     getBridgeInfo = (cb)-> 
             
-        chosen-network = store.current.send.chosen-network
+        chosen-network = store?current?send?chosen-network
+        return cb null if not chosen-network?    
         token = store.current.send.coin.token
         
         if not chosen-network? 

@@ -528,7 +528,7 @@ send = ({ store, web3t })->
     /* Render */
     .pug.content
         .pug.title(style=border-header)
-            .pug.header(class="#{show-class}") #{lang.title}
+            .pug.header(class="#{show-class}") #{title}
             .pug.close(on-click=go-back-from-send)
                 img.icon-svg.pug(src="#{icons.arrow-left}")
             burger store, web3t
@@ -667,8 +667,9 @@ module.exports.init = ({ store, web3t }, cb)->
         else
             console.error "networks prop in #{store.current.send.token} wallet is defined but is empty" 
     
-    err <- execute-contract-data
-    return cb err if err?
+    #err <- execute-contract-data
+    #console.log "err " err
+    #return cb err if err?
     #try
     err <- getBridgeInfo!
     return cb err if err?

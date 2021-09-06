@@ -32,6 +32,7 @@ require! {
     min-height: 100vh
     box-sizing: border-box
     background-color: var(--bgspare)
+    overflow: auto
     @media(max-width: 430px)
         padding-top: 0px
     .title
@@ -48,10 +49,6 @@ require! {
         margin: 5px auto
     .downloadwalletlist
         padding: 30px 0 30px
-        position: fixed
-        bottom: 30px
-        left: 0
-        right: 0
         .icon-download
             padding: 10px
             height: 20px
@@ -69,11 +66,8 @@ require! {
         overflow: hidden
         width: 100%
         margin-top: 0vh
-        margin-bottom: 25vh
-        padding-bottom: 50px
         border-radius: $border
         position: relative
-        max-height: 100vh
         box-sizing: border-box
         >.title
             position: absolute
@@ -253,6 +247,16 @@ language = (store, web3t)->
         return set-lang \es
     change-lang-ar = ->
         return set-lang \ar
+    change-lang-id = ->
+        return set-lang \id
+    change-lang-ph = ->
+        return set-lang \ph
+    change-lang-yr = ->
+        return set-lang \yr
+    change-lang-vn = ->
+        return set-lang \vn
+    change-lang-in = ->
+        return set-lang \in
     comming-soon =
         opacity: ".3"
         cursor: "no-drop"
@@ -267,44 +271,57 @@ language = (store, web3t)->
             .welcome.pug(style=text-style) #{lang.language}
             .pug.langs
                 ul.pug
-                    li.pug.lang-item(style=comming-soon id="lang-gr")
+                    li.pug.lang-item(key="lang-gr" style=comming-soon id="lang-gr")
                         img.pug(src="#{icons.langs-gr}")
                         .pug Deutsch
-                    li.pug.lang-item(on-click=change-lang-fr style=color id="lang-fr")
+                    li.pug.lang-item(key="lang-fr" on-click=change-lang-fr style=color id="lang-fr")
                         img.pug(src="#{icons.langs-fr}")
                         .pug Français
-                    li.pug.lang-item(on-click=change-lang-en style=color id="lang-en")
+                    li.pug.lang-item(key="lang-en" on-click=change-lang-en style=color id="lang-en")
                         img.pug(src="#{icons.langs-en}")
                         .pug English
-                    li.pug.lang-item(on-click=change-lang-kr style=color id="lang-kr")
+                    li.pug.lang-item(key="lang-kr" on-click=change-lang-kr style=color id="lang-kr")
                         img.pug(src="#{icons.langs-cn}")
                         .pug 한국어
                 ul.pug
-                    li.pug.lang-item(on-click=change-lang-cn style=color id="lang-cn")
+                    li.pug.lang-item(key="lang-cn" on-click=change-lang-cn style=color id="lang-cn")
                         img.pug(src="#{icons.langs-kr}")
                         .pug 中文語言
-                    li.pug.lang-item(style=comming-soon id="lang-jp")
+                    li.pug.lang-item(key="lang-jp" style=comming-soon id="lang-jp")
                         img.pug(src="#{icons.langs-jp}")
                         .pug 日本語
-                    li.pug.lang-item(style=comming-soon id="lang-hn")
+                    li.pug.lang-item(key="lang-in" on-click=change-lang-in style=color id="lang-in")
                         img.pug(src="#{icons.langs-hn}")
                         .pug हिंदी
-                    li.pug.lang-item(on-click=change-lang-es style=color id="lang-sp")
+                    li.pug.lang-item(key="lang-sp" on-click=change-lang-es style=color id="lang-sp")
                         img.pug(src="#{icons.langs-sp}")
                         .pug Español
                 ul.pug
-                    li.pug.lang-item(on-click=change-lang-ua style=color id="lang-ua")
+                    li.pug.lang-item(key="lang-ua" on-click=change-lang-ua style=color id="lang-ua")
                         img.pug(src="#{icons.langs-ua}")
                         .pug Українська
-                    li.pug.lang-item(on-click=change-lang-ru style=color id="lang-ru")
+                    li.pug.lang-item(key="lang-ru" on-click=change-lang-ru style=color id="lang-ru")
                         img.pug(src="#{icons.langs-ru}")
                         .pug Русский
-                    li.pug.lang-item(style=comming-soon id="lang-kz")
+                    li.pug.lang-item(key="lang-kz" style=comming-soon id="lang-kz")
                         img.pug(src="#{icons.langs-kz}")
                         .pug Қазақ
-                    li.pug.lang-item(on-click=change-lang-ar style=color id="lang-ar")
+                    li.pug.lang-item(key="lang-ar" on-click=change-lang-ar style=color id="lang-ar")
                         img.pug(src="#{icons.langs-ar}")
                         .pug عربى
+                ul.pug
+                    li.pug.lang-item(key="lang-id" on-click=change-lang-id style=color id="lang-id")
+                        img.pug(src="#{icons.langs-id}")
+                        .pug Indonesian
+                    li.pug.lang-item(key="lang-ph" on-click=change-lang-ph style=color id="lang-ph")
+                        img.pug(src="#{icons.langs-ph}")
+                        .pug Pilipino
+                    li.pug.lang-item(key="lang-yr" on-click=change-lang-yr style=color id="lang-yr")
+                        img.pug(src="#{icons.langs-yr}")
+                        .pug Yoruba
+                    li.pug.lang-item(key="lang-vn" on-click=change-lang-vn style=color id="lang-vn")
+                        img.pug(src="#{icons.langs-vn}")
+                        .pug Tiếng Việt
             .pug.downloadwalletlist
                 a.pug(href="https://apps.apple.com/us/app/velas-mobile-wallet/id1541032748" target="_blank")
                     img.icon-download.pug(src="#{icons[\ios]}")
