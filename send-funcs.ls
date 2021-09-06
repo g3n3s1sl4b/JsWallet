@@ -972,7 +972,8 @@ module.exports = (store, web3t)->
         
     getBridgeInfo = (cb)-> 
             
-        chosen-network = store.current.send.chosen-network
+        chosen-network = store?current?send?chosen-network
+        return cb null if not chosen-network?    
         token = store.current.send.coin.token
         
         if not chosen-network? 
