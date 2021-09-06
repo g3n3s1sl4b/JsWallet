@@ -667,8 +667,9 @@ module.exports.init = ({ store, web3t }, cb)->
         else
             console.error "networks prop in #{store.current.send.token} wallet is defined but is empty" 
     
-    err <- execute-contract-data
-    return cb err if err?
+    #err <- execute-contract-data
+    #console.log "err " err
+    #return cb err if err?
     #try
     err <- getBridgeInfo!
     return cb err if err?
