@@ -35,9 +35,9 @@ module.exports = (store, web3t)->
             amount-receive = round-human (send.amount-send `minus` homeFee), {decimals: decimalsConfig}
             "Please confirm that you would like to send #{amount-send} #{token-display} from #{walletGroup} to receive #{amount-receive} #{token-display} on #{receiverGroup}." 
         |  +send.amount-send > 0 => 
-            "Send #{amount-send} #{token-display} to #{contract} contract" 
+            "Send #{amount-send} #{token-display} to #{contract} contract." 
         | _ =>  
-            "Execute the #{contract} contract"
+            "Execute the #{contract} contract."
     text-parts-contract =
         * funtype
         * "You are allowed to spend your resources on execution #{round-number send.amount-send-fee, {decimals: decimalsConfig}} #{token-display}."
