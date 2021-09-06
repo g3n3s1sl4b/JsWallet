@@ -52,10 +52,15 @@ module.exports = (store)->
     cut = (tx)->
         return \none if not tx?
         t = tx.to-string!
-        r = t.substr(0, 10) + \.. + t.substr(tx.length - 25, 0) + \.. + t.substr(t.length - 10, 10)
+        if t.to-lower-case!.indexOf("private key") > -1
+            t
+        else
+            t.substr(0, 10) + \.. + t.substr(tx.length - 25, 0) + \.. + t.substr(t.length - 10, 10)
+        
         #r.to-upper-case!
     copy-style=
         color: style.app.text
+        z-index: 99999999999
     cancel = ->
         store.current.copied = ""
     .copied.pug(class="#{copied-class}" key="copy-message" style=copy-style)

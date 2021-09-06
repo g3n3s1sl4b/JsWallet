@@ -19,6 +19,9 @@ require! {
     position: relative
     overflow: visible
     z-index: 0
+    .custom-title
+        font-size: 12px
+        text-transform: lowercase
     .browse
         display: inline-block
         position: absolute
@@ -141,7 +144,7 @@ module.exports = ({ store, wallet, type, text })->
                 address-display = contracts.get-contract-name(store, address)
                 a.pug(target="_blank" href="#{address-link}" class="#{active}") #{address-display}     
             else if text?
-                a.pug(target="_blank" href="#{address-link}" class="#{active}") #{text}
+                a.pug(target="_blank" href="#{address-link}" class="#{active} custom-title") #{text}
             else
                 MiddleEllipsis.pug(key=address-title)
                     a.pug(target="_blank" href="#{address-link}" class="#{active}") #{address-display}

@@ -48,11 +48,18 @@ module.exports = (store, web3t)->
         res
     amount-beautify = (amount, max)->
         str = (amount ? "")to-string!
-        data = str.match(/(.+[^0])(0+)$/)
+        #data = str.match(/(.+[^0])(0+)$/)
         $amount = round-human(str, {decimals: 4})
+        [int, dec] = $amount.split(".")
+        gray-style = 
+            opacity: 0.8
+            font-size: "90%"
+            font-weight: 600
         return
             .pug.balance
-                span.color.pug #{$amount}
+                span.color.pug #{int}
+            if dec? then
+               span.gray-color.pug(style=gray-style)\.#{dec}     
     is-active = (value)->
         types = store.current.filter-txs-types
         if value in types then \active else ''
@@ -117,5 +124,4 @@ module.exports = (store, web3t)->
         <- web3t.refresh
     transaction-info = (config)-> (event)->
         err, info <- get-transaction-info config
-        console.log err, info
     { go-back, switch-type-in, transaction-info, remove-type-from-filter, remove-filter-raram, switch-sender, switch-receiver, switch-type-out, store.coins, is-active, switch-filter, arrow, arrow-lg, sign, delete-pending-tx, amount-beautify, ago }

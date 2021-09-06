@@ -494,6 +494,8 @@ switch-network = (store, web3t)->
     change-network = ->
         value = it.target.value is \true
         web3t.use networks-reverted[not value]
+        store.current.wallet-index = 0
+        store.current.group-index = 0
     value= networks[store.current.network]
     isChecked = store.current.network is "testnet"
     label.active-network.pug
@@ -552,6 +554,8 @@ manage-account = (store, web3t)->
             .pug.description(style=color)
                 if store.current.network is \testnet
                     span.pug #{lang.network-description2}
+                else if store.current.network is \devnet
+                    span.pug The default network for all transactions is Devnet
                 else
                     span.pug #{lang.network-description}
             .pug.content

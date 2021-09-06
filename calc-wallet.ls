@@ -22,7 +22,6 @@ calc-wallet = (store, cb)->
             | not rates[token]? =>  \..
             | rates[token] is "" => \..
             | _ => rates[token]
-
         # convert usd-rate to string because bigint does not like number type and can throw exception
         usd-rate = usd-rate + ''
         #coin =

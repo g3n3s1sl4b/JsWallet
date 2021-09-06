@@ -72,3 +72,28 @@ jobs:
           mkdir -p ~/.kube && echo $KUBE_CONFIG_DATA|base64 --decode > ~/.kube/config
           cd deploy/prod
           helmfile -e default -l namespace=${NAMESPACE},name=velas-wallet apply  --set image.tag=$IMAGE_TAG,image.repository=$ECR_REGISTRY/$ECR_REPOSITORY --skip-deps
+  e2e-tests:
+    runs-on: macos-internal2
+    needs: [docker-build-push, deploy]
+    defaults:
+      run:
+        working-directory: ./e2e
+    steps:
+      - uses: actions/checkout@v2
+      - name: install modules required for testrun
+        run: npm ci
+      - name: clean previous test results
+        run: rm -rf ./test-results/
+      - name: run tests
+        run: CI=true LOG_LEVEL=debug ENVIRONMENT=testnet npm run test-testnet
+        # report creation will fail if tests fail
+      - name: create html report from junit
+        if: always()
+        run: junit2html test-results/test-results.xml test-results/report.html
+      - name: upload artifacts
+        if: always()
+        uses: actions/upload-artifact@v2
+        with:
+          name: test-results
+          path: |
+            e2e/test-results/

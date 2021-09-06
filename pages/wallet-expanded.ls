@@ -1,7 +1,7 @@
 require! {
     \react
     \../tools.ls : { money }
-    \prelude-ls : { each, find, filter, foldl, map }
+    \prelude-ls : { each, filter, foldl, map, obj-to-pairs, group-by, keys }
     \../wallet-funcs.ls
     \../get-lang.ls
     \../math.ls : { plus }
@@ -156,7 +156,16 @@ require! {
                 width: inherit
 cb = console~log
 module.exports = (store, web3t, wallets, wallet)-->
-    { uninstall, wallet, balance, balance-usd, pending, send, receive, swap, usd-rate } = wallet-funcs store, web3t, wallets, wallet
+    return null if not wallets? or not wallet?
+    wallets-groups =
+        (wallets ? [])
+            |> filter ({coin, network}) -> ((coin.name + coin.token).to-lower-case!.index-of store.current.search.to-lower-case!) != -1 and (network.disabled isnt yes)
+            |> group-by (.network.group)
+            |> keys
+
+    group-name = wallet.network.group
+
+    { uninstall, wallet, balance, balance-usd, pending, send, receive, swap, usd-rate } = wallet-funcs store, web3t, wallets, wallet, wallets-groups, group-name
     lang = get-lang store
     style = get-primary-info store
     label-uninstall =
@@ -170,12 +179,17 @@ module.exports = (store, web3t, wallets, wallet)-->
     placeholder-coin =
         | store.current.refreshing => "placeholder-coin"
         | _ => ""
-    name = wallet.coin.name ? wallet.coin.token
+        
+    wallet-is-disabled = isNaN(wallet?balance)
+    is-loading = store.current.refreshing is yes
+    send-swap-disabled = wallet-is-disabled or is-loading
+        
+    name = wallet?coin?name ? wallet?coin?token
     receive-click = receive(wallet)
     send-click = send(wallet)
     swap-click = swap(store, wallet)
-    token = wallet.coin.token.to-upper-case!
-    tokenDisplay = (wallet.coin.nickname ? "").to-upper-case!
+    token = (wallet?coin?token ? "").to-upper-case!
+    tokenDisplay = (wallet?coin?nickname ? "").to-upper-case!
     style = get-primary-info store
     color1 =
         color: style.app.text
@@ -192,6 +206,14 @@ module.exports = (store, web3t, wallets, wallet)-->
             |> round-human
     total-sent = get-total \OUT, wallet.address
     total-received = get-total \IN, wallet.address
+    
+    installed-networks = store.coins |> map (.token)
+    available-networks = 
+        (wallet?network?networks ? []) 
+            |> obj-to-pairs
+            |> map (-> it.1 )
+            |> filter (-> it.disabled isnt yes and it.referTo in installed-networks)    
+    
     wallet-style=
         color: style.app.text3
         background: style.app.wallet
@@ -207,21 +229,17 @@ module.exports = (store, web3t, wallets, wallet)-->
     color-label2=
         background: style.app.primary1
         background-color: style.app.primary1-spare
-    makeDisabled = store.current.refreshing
     .wallet-detailed.pug(key="#{token}" style=wallet-style)
         .wallet-part.left.pug(style=text)
             .wallet-header.pug
-                if no
-                    .wallet-header-part.left.pug
-                        img.label-coin.pug(class="#{placeholder-coin}" src="#{wallet.coin.image}")
                 .wallet-header-part.right.pug
                     .pug
                         span.title.pug(class="#{placeholder}") #{name}
-                        if wallet.coin.token not in <[ btc vlx vlx_native vlx2 ]>
+                        if wallet?coin?token not in <[ btc vlx vlx_native vlx2 eth vlx_evm ]>
                             span.pug.uninstall(on-click=uninstall style=uninstall-style) #{label-uninstall}
                     .balance.pug(class="#{placeholder}")
-                        .pug.token-balance(title="#{wallet.balance}")
-                            span.pug #{ round-human wallet.balance }
+                        .pug.token-balance(title="#{wallet?balance}")
+                            span.pug #{ round-human wallet?balance }
                             span.pug #{ tokenDisplay }
                         .pug.usd-balance(class="#{placeholder}" title="#{balance-usd}")
                             span.pug #{ round-human balance-usd }
@@ -230,17 +248,17 @@ module.exports = (store, web3t, wallets, wallet)-->
                             .pug.pending
                                 span.pug -#{ pending }
             address-holder { store, wallet, type: \bg }
-            if (wallet.network.networks? and Object.keys(wallet.network.networks).length > 0) then
+            if (available-networks.length > 0) then
                 .buttons.pug
                     .with-swap.pug
-                        button { store, on-click=send-click, text: \send , icon: \send , type: \secondary, id: "wallets-send", makeDisabled=no }
+                        button { store, on-click=send-click, text: \send , icon: \send , type: \secondary, id: "wallets-send", makeDisabled=send-swap-disabled }
                         button { store, on-click=receive-click, text: \receive , icon: \get  , type : \primary, id: "wallets-receive", makeDisabled=no }
                     .with-swap.pug
-                        button { store, on-click=swap-click, text: \swap , icon: \swap  , id: "wallet-swap", makeDisabled=no, classes="wallet-swap" }                       
+                        button { store, on-click=swap-click, text: \swap , icon: \swap  , id: "wallet-swap", classes="wallet-swap", makeDisabled=send-swap-disabled  }                       
             else
                 .buttons.pug
                     .with-swap.pug
-                        button { store, on-click=send-click, text: \send , icon: \send , type: \secondary, id: "wallets-send", makeDisabled=no }
+                        button { store, on-click=send-click, text: \send , icon: \send , type: \secondary, id: "wallets-send", makeDisabled=send-swap-disabled }
                         button { store, on-click=receive-click, text: \receive , icon: \get  , type : \primary, id: "wallets-receive", makeDisabled=no }
             .details.pug
                 .price.pug(class="#{placeholder}" title="#{balance-usd}") $#{ round-human balance-usd }
@@ -251,7 +269,7 @@ module.exports = (store, web3t, wallets, wallet)-->
                     .stats.pug
                         span.stats-style.pug
                             .pug.coin(style=text)
-                                img.label-coin.pug(class="#{placeholder-coin}" src="#{wallet.coin.image}")
+                                img.label-coin.pug(class="#{placeholder-coin}" src="#{wallet?coin?image}")
                                 .pug(class="#{placeholder}") #{ token-display }
                                 .pug.course(class="#{placeholder}" title="#{usd-rate}") $#{ round-human usd-rate}
                         wallet-stats store, web3t

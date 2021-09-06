@@ -2,7 +2,8 @@ require! {
     \react
     \./wallet-expanded.ls
     \./wallet.ls
-    \prelude-ls : { map, take, drop, filter, find }
+    \./wallet-group.ls
+    \prelude-ls : { map, take, drop, filter, find, group-by, sort-by, obj-to-pairs, keys }
     \./menu.ls
     \../web3.ls
     \../wallets-funcs.ls
@@ -265,10 +266,23 @@ mobile = ({ store, web3t })->
                 icon "X", 20
     chosen-account-template =
         if store.current.edit-account-name is "" then view-account-template! else edit-account-template!
-    wallet-detail =
-        wallets
-            |> find (-> wallets.index-of(it) is store.current.wallet-index)
+
+    wallets-groups =
+        ^^wallets
+            |> filter ({coin, network}) -> ((coin.name + coin.token).to-lower-case!.index-of store.current.search.to-lower-case!) != -1 and (network.disabled isnt yes)
+            |> group-by (.network.group)
+
+    groups = wallets-groups |> keys
+    group-index = store.current.group-index
+    groups-wallets =
+        wallets-groups
+            |> obj-to-pairs
+            |> map (.1)
+    group-wallets = groups-wallets[group-index]
+    return null if not group-wallets?
+    wallet-detail = group-wallets |> find (-> group-wallets.index-of(it) is store.current.wallet-index)
     return null if not wallet-detail?
+
     .wallets-container.pug(key="wallets")
         header store, web3t
         .pug.left-side(style=row)
@@ -287,8 +301,10 @@ mobile = ({ store, web3t })->
                             your-account store, web3t
                     .wallet-container.pug(key="wallets-viewport")
                         wallets
-                            |> filter ({coin}) -> ((coin.name + coin.token).to-lower-case!.index-of store.current.search.to-lower-case!) != -1
-                            |> map wallet store, web3t, wallets
+                            |> filter ({coin, network}) -> ((coin.name + coin.token).to-lower-case!.index-of store.current.search.to-lower-case!) != -1 and (network.disabled isnt yes)
+                            |> group-by (.network.group)
+                            |> obj-to-pairs
+                            |> map wallet-group store, web3t, wallets, groups
             .pug.show-detail(style=right-side)
                 wallet-expanded store, web3t, wallets, wallet-detail
                 .history-area.pug(key="#{store.current.wallet-index}")

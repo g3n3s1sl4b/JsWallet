@@ -18,6 +18,27 @@
 
 Tested with `node --version` v11.10.1
 
+
+### Run wallet locally
+(Works on node 14.16)
+1. `npm i lsxc -g`
+2. `git clone https://github.com/velas/JsWallet`
+#### Prepare web3t
+2. `git clone http://github.com/velas/web3t`
+3. `cd web3t`
+4. `npm i`
+5. Delete git cache
+`cd .. && rm -rf JsWallet/.compiled-ssr/web3t/.git/objects/`
+Copy web3t to JsWallet
+6. `mkdir -p JsWallet/.compiled-ssr/web3t/ && cp -pr web3t/ JsWallet/.compiled-ssr/web3t/`
+7. `cd JsWallet`
+8. `npm run wallet-start`
+9. open `localhost:8080/main-index.html`
+
+
+### Run e2e tests
+Please refer to e2e/README.md
+
 ### Features
 
 * All coins managed by single mnemonic pharse

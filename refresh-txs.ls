@@ -17,7 +17,6 @@ refresh-txs = (web3, store, cb)->
     task1 = task (cb)->
         load-all-transactions store, web3, cb
     <- run [ task1 ] .then
-    console.log "load finish"
     store.current.transactions-are-loading = no
     return cb null
 module.exports = refresh-txs

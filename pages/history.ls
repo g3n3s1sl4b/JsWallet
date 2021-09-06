@@ -78,9 +78,13 @@ require! {
         border-radius: 0px
         height: 15px
         top: 2px
+        transition: transform .2s
         &.more
             height: 8px
             top: 0
+        &.rotate
+            transform: rotate(180deg)
+            transition: transform .2s
     .icon-svg-arrow
         position: relative
         height: 12px
@@ -374,7 +378,8 @@ require! {
                     position: relative
                 .tx-middle
                     height: 60px
-                    animation: appear .1s ease-in
+                    overflow: hidden
+                    animation: appearSixtyHeight .1s ease-in
                 &:last-child
                     margin-bottom: 0px
             .cell
@@ -745,6 +750,9 @@ render-transaction = (store, web3t, tran)-->
         store.history.tx-details =
             | store.history.tx-details is "#{tx}#{type}" => null
             | _ => "#{tx}#{type}"
+    rotate-class = 
+        | store.history.tx-details is "#{tx}#{type}" => "rotate"
+        | _ => ""    
     icon-pending=
         filter: if pending is yes then 'grayscale(100%) brightness(40%) sepia(100%) hue-rotate(-370deg) saturate(790%) contrast(0.5)' else style.app.icon-filter
     amount-pending=
@@ -825,7 +833,7 @@ render-transaction = (store, web3t, tran)-->
                     span.pug
                         span.pug.bold.confirmed.done #{lang.confirmed}
             .cell.pug.divider.more(on-click=tx-details)
-                img.icon-svg1.more.pug(src="#{icons.arrow-down}" style=icon1)
+                img.icon-svg1.more.pug( class="#{rotate-class}" src="#{icons.arrow-down}" style=icon1)
                 .arrow_box.pug(style=tooltip) #{lang.details}
         if store.history.tx-details is "#{tx}#{type}"
             .pug.tx-middle(style=light-style on-click=transaction-info(request))

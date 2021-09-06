@@ -23,8 +23,7 @@ require! {
     $card-height: 60px
     height: $card-height
     &.disabled-wallet-item
-        opacity: 0.4
-        filter: grayscale(1)
+        opacity: 0.24
         cursor: no-drop
     &.last
         height: 60px
@@ -275,6 +274,11 @@ module.exports = (store, web3t, wallets, wallet)-->
     wallet-is-disabled  = isNaN(wallet.balance)
     is-loading = store.current.refreshing is yes
     disabled-class = if not is-loading and wallet-is-disabled then "disabled-wallet-item" else ""
+    
+    wallet-is-disabled = isNaN(wallet.balance)
+    is-loading = store.current.refreshing is yes
+    send-swap-disabled = wallet-is-disabled or is-loading
+    
     .wallet.pug.wallet-item(class="#{big} #{disabled-class}" key="#{token}" style=border-style)
         .wallet-top.pug(on-click=expand)
             .top-left.pug(style=wallet-style)
@@ -305,16 +309,17 @@ module.exports = (store, web3t, wallets, wallet)-->
                     span.pug.icon(on-click=expand)
                         img.icon-svg-create.pug(src="#{icons.arrow-down}" style=icon-color)
                             .pug expand
-                button { store, on-click=send-click, text: \send , icon: \send , type: \secondary }
-                button { store, on-click=receive-click, text: \receive , icon: \get  , type : \primary }
-                if token in <[ vlx vlx_native vlx2 vlx_evm vlx_erc20 ]> then
-                    button {    store, on-click=swap-click, text: \swap , icon: \swap  , id: "wallet-swap", makeDisabled=no, classes="wallet-swap" }
-        .wallet-middle.pug(style=border)
-            address-holder { store, wallet, type: \bg }
-            if token not in <[ btc vlx vlx_native vlx2 ]>
-                .pug.uninstall(on-click=uninstall style=wallet-style) #{label-uninstall}
-        .wallet-middle.title-balance.pug(style=border)
-            .name.pug(class="#{placeholder}" title="#{usd-rate}") $#{ round-human(usd-rate)}
-            .name.per.pug(class="#{placeholder}")
-                span.pug #{lang.per}
-                | #{ token-display }
+                button { store, on-click=send-click, text: \send , icon: \send , type: \secondary, makeDisabled=send-swap-disabled }
+                button { store, on-click=receive-click, text: \receive , icon: \get, type : \primary }
+                if token in <[ vlx vlx_native vlx2 vlx_evm vlx_erc20 vlx_bep20 ]> then
+                    button { store, on-click=swap-click, text: \swap , icon: \swap, id: "wallet-swap", makeDisabled=send-swap-disabled, classes="wallet-swap" }
+        if no
+            .wallet-middle.pug(style=border)
+                address-holder { store, wallet, type: \bg }
+                if token not in <[ btc vlx vlx_native vlx2 eth vlx_evm ]>
+                    .pug.uninstall(on-click=uninstall style=wallet-style) #{label-uninstall}
+            .wallet-middle.title-balance.pug(style=border)
+                .name.pug(class="#{placeholder}" title="#{usd-rate}") $#{ round-human(usd-rate)}
+                .name.per.pug(class="#{placeholder}")
+                    span.pug #{lang.per}
+                    | #{ token-display }

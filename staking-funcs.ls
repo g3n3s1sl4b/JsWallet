@@ -52,12 +52,12 @@ fill-pools = ({ store, web3t, on-progress}, on-finish, [item, ...rest]) ->
     on-progress-local = (pools) ->
         on-progress [item, ...pools]
     fill-pools { store, web3t, on-progress: on-progress-local}, on-finish-local, rest
-load-validators-from-cache = ({store}, cb)->
+load-validators-from-cache = ({store, web3t}, cb)->
     DEADLINE = 60000 # 1 minute
     last-time = store.staking.last-time ? new Date().getTime()
     now = new Date().getTime()
     if now `minus` last-time <= DEADLINE and store.staking.cachedValidators? and store.staking.cachedValidators.length
-        console.log "get validators from cache"
+        #console.log "get validators from cache"
         cache-result = store.staking.cachedValidators  
         return cb null, cache-result  
     err, validators <- as-callback web3t.velas.NativeStaking.getStakingValidators()
@@ -67,12 +67,12 @@ load-validators-from-cache = ({store}, cb)->
     store.staking.last-time = new Date().getTime()
     cb null, validators    
 query-pools-web3t = ({store, web3t, on-progress}, on-finish) -> 
-    err, validators <- load-validators-from-cache { store }     
+    err, validators <- load-validators-from-cache { store, web3t }     
     #err, validators <- as-callback web3t.velas.NativeStaking.getStakingValidators()
     return on-finish err if err?
     validators = [] if err?
     store.staking.totalValidators = validators.length
-    console.log "Got validators" validators.length
+    #console.log "Got validators" validators.length
     store.staking.pools-are-loading = yes
     fill-pools { store, web3t, on-progress}, on-finish, validators
 query-pools = ({store, web3t, on-progress}, on-finish) ->
@@ -95,7 +95,7 @@ fill-delegator = (store, web3t, [acc, ...accounts])!->
 query-accounts = (store, web3t, on-progress, on-finish) ->
     accountIndex = store.current.accountIndex
     if (store.staking.getAccountsFromCashe is yes) and store.staking.accountsCached[accountIndex]? and store.staking.accountsCached[accountIndex].length > 0
-        console.log "get accounts from cache"
+        #console.log "get accounts from cache"
         store.staking.all-accounts-loaded = yes
         store.staking.accounts-are-loading = no
         return on-finish null, store.staking.accountsCached[accountIndex]
@@ -103,14 +103,17 @@ query-accounts = (store, web3t, on-progress, on-finish) ->
     return on-finish err if err?
     store.staking.accountsCached[accountIndex] = accounts
     on-finish err, accounts
-query-accounts-web3t = (store, web3t, on-progress, on-finish) ->
-    err, parsedProgramAccounts <- as-callback web3t.velas.NativeStaking.getParsedProgramAccounts()
+query-accounts-web3t = (store, web3t, on-progress, on-finish) -> 
+    #owner-wallet = store.current.account.wallets |> find(-> it.coin.token is "vlx_native")
+    #owner = 
+        #| owner-wallet? => owner-wallet.address
+        #| _ => null    
+    err, parsedProgramAccounts <- as-callback web3t.velas.NativeStaking.getParsedProgramAccounts(null)
     parsedProgramAccounts = [] if err?
     store.staking.parsedProgramAccounts = parsedProgramAccounts
     err, accs <- as-callback web3t.velas.NativeStaking.getOwnStakingAccounts(parsedProgramAccounts) 
     accs = [] if err?
     store.staking.totalOwnStakingAccounts = accs.length
-    console.log "accs" accs 
     return on-finish err if err?
     store.staking.accounts-are-loading = yes
     fill-accounts { store, web3t, on-progress, on-finish }, accs
@@ -188,7 +191,7 @@ convert-pools-to-view-model = (pools) ->
             lastVote: if it.lastVote then round-human(it.lastVote) else '..'
             stakers: if it.delegators? then it.delegators else '..',
             is-validator:  (it?stakes? and it.stakes.length isnt 0) ? false,
-            status: it.status,
+            status: if it?delinquent is yes then "delinquent" else it.status,
             my-stake: if it?stakes then it.stakes else []
             credits_observed : it.credits_observed
         }

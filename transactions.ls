@@ -38,7 +38,6 @@ check-transaction-task = (bg-store, web3, network, token, ptx)-> (store, cb)->
         store.transactions.all
             |> find -> it.token is token and it.tx is ptx.0
     return cb null if not tx?
-    console.log ptx.0, tx?pending
     tx.checked = tx.checked ? 0
     tx.checked += 1
     return cb null if not tx?
@@ -60,7 +59,6 @@ check-ptxs-in-background = (store, web3, network, token, [ptx, ...rest], cb)->
         rest.push ptx
     check-ptxs-in-background store, web3, network, token, rest, cb
 export rebuild-history = (store, web3, wallet, cb)->
-    console.log "[rebuild-history]"    
     { address, network, coin, private-key } = wallet
     err, data <- get-transactions { address, network, coin.token, account: { address, private-key } }
     #console.log \rebuild-history, coin.token, err, data
