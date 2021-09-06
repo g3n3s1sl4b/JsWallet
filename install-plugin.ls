@@ -32,7 +32,7 @@ require! {
 current-configs = { vlx_eth, eth_legacy, syx, syx2, usdt, usdt_erc20, ltc, vlx_erc20, bnb, vlx_busd, busd, huobi, vlx_huobi, vlx_usdt,  usdt_erc20_legacy, usdc, vlx_usdc, bsc_vlx, vlx_evm_legacy }
 plugin-pairs = {
     vlx_huobi: \huobi
-    vlx_busd: \bnb
+    busd: \bnb
     vlx_erc20: \eth 
     vlx_usdc: \usdc   
      
