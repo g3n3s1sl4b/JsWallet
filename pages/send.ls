@@ -528,7 +528,7 @@ send = ({ store, web3t })->
     /* Render */
     .pug.content
         .pug.title(style=border-header)
-            .pug.header(class="#{show-class}") #{lang.title}
+            .pug.header(class="#{show-class}") #{title}
             .pug.close(on-click=go-back-from-send)
                 img.icon-svg.pug(src="#{icons.arrow-left}")
             burger store, web3t
