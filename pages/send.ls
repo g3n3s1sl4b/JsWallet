@@ -26,6 +26,8 @@ require! {
     \../velas/addresses.ls
     \../contracts.ls
     \../swaping/networks.ls : \token-networks
+    "../../web3t/contracts/HomeBridgeNativeToErc.json" : \HomeBridgeNativeToErc    
+    "../../web3t/contracts/ForeignBridgeNativeToErc.json" : \ForeignBridgeNativeToErc
 }
 .content
     position: relative
@@ -85,6 +87,10 @@ require! {
         width: 100%
         box-sizing: border-box
         border-radius: $border-radius
+    .swap-notification
+        p
+            font-size: 12px
+            opacity: 0.3
     .more-buttons
         top: 30px
         right: 0
@@ -412,7 +418,7 @@ form-group = (classes, title, style, content)->
         label.pug.control-label(style=style) #{title}
         content!
 send = ({ store, web3t })->
-    { execute-contract-data, token, name, homeFee, homeFeeUsd, fee-token, bridge-fee-token, network, send, wallet, pending, recipient-change, amount-change, amount-usd-change, amount-eur-change, use-max-amount, show-data, show-label, history, cancel, send-anyway, before-send-anyway, choose-auto, round5edit, round5, is-data, encode-decode, change-amount, invoice } = send-funcs store, web3t
+    { execute-contract-data, getBridgeInfo, token, name, homeFee, homeFeeUsd, fee-token, bridge-fee-token, network, send, wallet, pending, recipient-change, amount-change, amount-usd-change, amount-eur-change, use-max-amount, show-data, show-label, history, cancel, send-anyway, before-send-anyway, choose-auto, round5edit, round5, is-data, encode-decode, change-amount, invoice } = send-funcs store, web3t
     return send-contract { store, web3t } if send.details is no
     theme = get-primary-info(store)
     send.sending = false
@@ -503,16 +509,26 @@ send = ({ store, web3t })->
     get-recipient = (address)->
         address
     recipient = get-recipient(send.to)
-    title = if store.current.send.is-swap isnt yes then lang.send else \Swap
+    title = if store.current.send.is-swap isnt yes then \send else \swap
     homeFeePercent = send.homeFeePercent `times` 100
     
-    /*TODO: remove this prop in prod*/
-    address-to-disabled = (token is \usdt_erc20 and store.current.send?chosen-network?id is \vlx_usdt) and store.current.network is \mainnet
+    
+    is-swap = ({from, to})->
+        { chosen-network, coin, wallet } = store.current.send
+        token = coin.token
+        token is from and chosen-network.refer-to is to
+    
+    network-on-change = ->
+        err <- execute-contract-data!
+        return store.current.send.error = err if err?
+        err <- getBridgeInfo!
+        return store.current.send.error = err if err?
+       
     
     /* Render */
     .pug.content
         .pug.title(style=border-header)
-            .pug.header(class="#{show-class}") #{title}
+            .pug.header(class="#{show-class}") #{lang.title}
             .pug.close(on-click=go-back-from-send)
                 img.icon-svg.pug(src="#{icons.arrow-left}")
             burger store, web3t
@@ -547,11 +563,11 @@ send = ({ store, web3t })->
                     .address.pug(style=border-style)
                         address-holder { store, wallet }
                 .pug.network.form-group
-                    network-slider { web3t, wallet, store}
+                    network-slider { web3t, wallet, store, on-change: network-on-change}
                 form-group \receiver, lang.to, icon-style, ->
                     .pug
                         identicon { store, address: send.to }
-                        input.pug(type='text' style=input-style on-change=recipient-change value="#{recipient}" placeholder="#{store.current.send-to-mask}" id="send-recipient" disabled=address-to-disabled )
+                        input.pug(type='text' style=input-style on-change=recipient-change value="#{recipient}" placeholder="#{store.current.send-to-mask}" id="send-recipient" )
                 form-group \send-amount, lang.amount, icon-style, ->
                     .pug
                         .pug.amount-field
@@ -608,11 +624,15 @@ send = ({ store, web3t })->
                                     .pug.usd $ #{round-human homeFeeUsd}
             .pug.button-container
                 .pug.buttons
-                    button { store, text: \send , on-click: send-func , loading: send.sending, type: \primary, error: send.error, makeDisabled: makeDisabled, id: "send-confirm" }
+                    button { store, text: "#{title}" , on-click: send-func , loading: send.sending, type: \primary, error: send.error, makeDisabled: makeDisabled, id: "send-confirm" }
                     button { store, text: \cancel , on-click: cancel, icon: \close2, id: "send-cancel" }
+                if store.current.send.is-swap is yes
+                    .pug.swap-notification
+                        p.pug #{lang.swapNotification}
+
 module.exports = send
 module.exports.init = ({ store, web3t }, cb)->
-    { execute-contract-data, wallet, getHomeFee } = send-funcs store, web3t
+    { execute-contract-data, wallet, getBridgeInfo } = send-funcs store, web3t
     return cb null if not wallet?
     return cb null if send.sending is yes
     store.current.send.foreign-network-fee = 0
@@ -646,9 +666,14 @@ module.exports.init = ({ store, web3t }, cb)->
             store.current.send.to = token-networks.get-default-recipient-address(store)  
         else
             console.error "networks prop in #{store.current.send.token} wallet is defined but is empty" 
-    #err <- execute-contract-data
-    #return cb err if err?
-    homeFee = getHomeFee!
+    
+    err <- execute-contract-data
+    return cb err if err?
+    #try
+    err <- getBridgeInfo!
+    return cb err if err?
+    #catch err
+        #console.error err
     
     { wallets } = wallets-funcs store, web3t
     current-wallet =

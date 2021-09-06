@@ -71,7 +71,7 @@ change-amount-generic = (field)-> (store, amount-send, fast, cb)->
     send.amount-send-eur = calc-eur store, amount-send
     calc-fee-fun = if fast then calc-fee else calc-fee-proxy
     send-to = store.current.send.wallet.address
-    err, calced-fee <- calc-fee-fun { store, token, to: send-to, send.data, send.network, amount: result-amount-send, fee-type, tx-type, account }
+    err, calced-fee <- calc-fee-fun { store, token, to: send-to, send.data, send.network, amount: result-amount-send, fee-type, tx-type, account, send.swap }
     send.error = "#{err.message ? err}" if err?
     return cb "#{err.message ? err}" if err?
     tx-fee =
@@ -126,7 +126,8 @@ export change-amount-send = (store, amount-send, fast, cb)->
     send.amount-obtain-usd = send.amount-obtain `times` usd-rate
     calc-fee-fun = if fast then calc-fee else calc-fee-proxy
     send-to = store.current.send.wallet.address
-    err, calced-fee <- calc-fee-fun { token, to: send-to, send.data, send.network, amount: result-amount-send, fee-type, tx-type, account }
+    console.log "change-amount-send" {send.data} 
+    err, calced-fee <- calc-fee-fun { token, to: send-to, send.data, send.network, amount: result-amount-send, fee-type, tx-type, account, send.swap }
     send.error = "#{err.message ? err}" if err?
     return cb "#{err.message ? err}" if err?
     tx-fee =
@@ -192,7 +193,7 @@ export change-amount-calc-fiat = (store, amount-send, fast, cb)->
     send.amount-obtain-usd = send.amount-obtain `times` usd-rate   
     calc-fee-fun = if fast then calc-fee else calc-fee-proxy
     send-to = store.current.send.wallet.address
-    err, calced-fee <- calc-fee-fun { token, to: send-to, send.data, send.network, amount: result-amount-send, fee-type, tx-type, account }
+    err, calced-fee <- calc-fee-fun { token, to: send-to, send.data, send.network, amount: result-amount-send, fee-type, tx-type, account, send.swap }
     send.error = "#{err.message ? err}" if err?
     return cb "#{err.message ? err}" if err?
     tx-fee =
