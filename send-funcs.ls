@@ -332,7 +332,7 @@ module.exports = (store, web3t)->
     /* Check for allowed amount for contract */
     check-allowed-amount = ({ contract, wallet, amount, allowed, bridge, bridgeToken }, cb)->
         return if checking-allowed
-        return cb null is-self-send is yes 
+        return cb null if is-self-send is yes 
         return cb "bridge is not defined" if not bridge? 
         return cb "bridgeToken is not defined" if not bridgeToken? 
 
