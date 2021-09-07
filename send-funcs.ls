@@ -51,7 +51,7 @@ abis =
 module.exports = (store, web3t)->
     return null if not store? or not web3t?
     lang = get-lang store
-    { send-to } = web3t.naming
+    #{ send-to } = web3t?naming
     { send } = store.current
     { wallet, fee-type } = send
     return null if not wallet?
@@ -146,7 +146,7 @@ module.exports = (store, web3t)->
     send-escrow = ->
         name = send.to
         amount-ethers = send.amount-send
-        err <- send-to { name, amount-ethers }
+        #err <- send-to { name, amount-ethers }
     
     up = (str)->
         (str ? "").trim!.to-upper-case!    
