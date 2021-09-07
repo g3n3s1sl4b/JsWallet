@@ -730,28 +730,24 @@ module.exports = (store, web3t)->
         /* Swap from VLX ERC20 to COIN VLX */    
         if token is \vlx_erc20 and chosen-network.id in <[ vlx_evm vlx2 ]>
             value = store.current.send.amountSend
-            send-to = web3t.velas.ForeignBridgeNativeToErc.address 
             value = to-hex (value `times` (10^18))
-            token-address = web3t.velas.ERC20BridgeToken.address   
-            network = wallet.network   
-            
-            try
-                web3 = new Web3(new Web3.providers.HttpProvider(wallet.network.api.web3Provider))
-                web3.eth.provider-url = wallet.network.api.web3Provider
-                abi = [{"constant": true,"inputs":[],"name":"totalSupply","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"view","type":"function"}]
-                totalSupply = web3.eth.contract(abi).at(token-address).totalSupply()
-            catch err
-             
-            
+            network = wallet.network
+
+            { FOREIGN_BRIDGE, FOREIGN_BRIDGE_TOKEN } = wallet.network
+
+            web3 = new Web3(new Web3.providers.HttpProvider(wallet.network.api.web3Provider))
+            web3.eth.provider-url = wallet.network.api.web3Provider
+            contract = web3.eth.contract(abis.ForeignBridgeNativeToErc).at(FOREIGN_BRIDGE)
+
             /* Get minPerTx from HomeBridge */
-            minPerTxRaw = web3t.velas.HomeBridgeNativeToErc.minPerTx!
+            minPerTxRaw = contract.minPerTx!
             minPerTx = minPerTxRaw `div` (10 ^ network.decimals)
            
             /* Get maxPerTx from HomeBridge */
-            maxPerTxRaw = web3t.velas.HomeBridgeNativeToErc.maxPerTx!
+            maxPerTxRaw = contract.maxPerTx!
             maxPerTx = maxPerTxRaw `div` (10 ^ network.decimals)
             
-            #homeFeeRaw = web3t.velas.ForeignBridgeNativeToErc.getHomeFee! 
+            #homeFeeRaw = contract.getHomeFee!
             #homeFee = homeFeeRaw `div` (10 ^ network.decimals)
             #contract-home-fee = send.amountSend `times` homeFee
             
@@ -763,11 +759,12 @@ module.exports = (store, web3t)->
             sending-to = 
                 | send.to.starts-with \V => to-eth-address send.to
                 | _ => send.to
-              
-            data = web3t.velas.ERC20BridgeToken.transferAndCall.get-data(send-to, value, sending-to)
+
+            contract = web3.eth.contract(abis.ERC20BridgeToken).at(FOREIGN_BRIDGE_TOKEN)
+            data = contract.transferAndCall.get-data(FOREIGN_BRIDGE, value, sending-to)
             
             send.data = data
-            send.contract-address = web3t.velas.ERC20BridgeToken.address  
+            send.contract-address = FOREIGN_BRIDGE_TOKEN
             
         
         /* DONE */    
