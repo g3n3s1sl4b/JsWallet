@@ -519,10 +519,11 @@ send = ({ store, web3t })->
         token is from and chosen-network.refer-to is to
     
     network-on-change = ->
-        err <- execute-contract-data!
-        return store.current.send.error = err if err?
         err <- getBridgeInfo!
         return store.current.send.error = err if err?
+        err <- execute-contract-data!
+        return store.current.send.error = err if err?
+        
        
     
     /* Render */
@@ -638,6 +639,7 @@ module.exports.init = ({ store, web3t }, cb)->
     store.current.send.foreign-network-fee = 0
     store.current.send.amountCharged = 0
     store.current.send.amountChargedUsd = 0
+    store.current.send.homeFeePercent = 0
     store.current.send.error = ''
     if store.current.send.is-swap isnt yes
         store.current.send.contract-address = null
