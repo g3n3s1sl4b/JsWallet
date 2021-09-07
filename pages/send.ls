@@ -513,7 +513,7 @@ send = ({ store, web3t })->
     homeFeePercent = send.homeFeePercent `times` 100
     
     
-    is-swap = ({from, to})->
+    is-swap-pair = ({from, to})->
         { chosen-network, coin, wallet } = store.current.send
         token = coin.token
         token is from and chosen-network.refer-to is to
@@ -628,8 +628,9 @@ send = ({ store, web3t })->
                     button { store, text: "#{title}" , on-click: send-func , loading: send.sending, type: \primary, error: send.error, makeDisabled: makeDisabled, id: "send-confirm" }
                     button { store, text: \cancel , on-click: cancel, icon: \close2, id: "send-cancel" }
                 if store.current.send.is-swap is yes
-                    .pug.swap-notification
-                        p.pug #{lang.swapNotification}
+                    if not (is-swap-pair({from: \vlx_evm, to: \vlx_native}) or is-swap-pair({from: \vlx_native, to: \vlx_evm}) or is-swap-pair({from: \vlx2, to: \vlx_evm}) or is-swap-pair({from: \vlx_evm, to: \vlx2}) )
+                        .pug.swap-notification
+                            p.pug #{lang.swapNotification}
 
 module.exports = send
 module.exports.init = ({ store, web3t }, cb)->
