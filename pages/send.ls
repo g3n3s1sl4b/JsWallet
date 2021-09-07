@@ -487,7 +487,7 @@ send = ({ store, web3t })->
         if store.current.open-menu then \hide else \ ""
     token-display = (wallet.coin.nickname ? "").to-upper-case!
     fee-token-display = 
-        | fee-token in <[ VLX2 VLX_EVM VLX_NATIVE ]> => \VLX
+        | fee-token in <[ VLX2 VLX_EVM VLX_NATIVE VLX_EVM_LEGACY ]> => \VLX
         | fee-token in <[ ETH_LEGACY ]> => \ETH
         | bridge-fee-token? => bridge-fee-token
         | wallet.network.tx-fee-in? => wallet.network.tx-fee-in
