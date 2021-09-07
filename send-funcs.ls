@@ -730,7 +730,7 @@ module.exports = (store, web3t)->
         /* Swap from VLX ERC20 to COIN VLX */    
         if token is \vlx_erc20 and chosen-network.id in <[ vlx_evm vlx2 ]>
             value = store.current.send.amountSend
-            value = to-hex (value `times` (10^18))
+            value = (value `times` (10^18))
             network = wallet.network
 
             { FOREIGN_BRIDGE, FOREIGN_BRIDGE_TOKEN } = wallet.network
@@ -761,6 +761,7 @@ module.exports = (store, web3t)->
                 | _ => send.to
 
             contract = web3.eth.contract(abis.ERC20BridgeToken).at(FOREIGN_BRIDGE_TOKEN)
+            console.log {FOREIGN_BRIDGE, value, sending-to}
             data = contract.transferAndCall.get-data(FOREIGN_BRIDGE, value, sending-to)
             
             send.data = data
