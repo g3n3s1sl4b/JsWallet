@@ -91,8 +91,7 @@ module.exports = (store, web3t)->
             if (err.toString()).indexOf("Insufficient priority. Code:-26. Please try to increase fee") then
                 store.current.send.error = err
                 <- set-timeout _, 2000
-                console.log "in2 seconds remove error"    
-                store.current.send.error = ""    
+                store.current.send.error = ""
             return cb err   
         err <- create-pending-tx { store, token, recipient, network, tx, amount-send, amount-send-fee, send.to, from: wallet.address }
         cb err, tx
@@ -761,7 +760,6 @@ module.exports = (store, web3t)->
                 | _ => send.to
 
             contract = web3.eth.contract(abis.ERC20BridgeToken).at(FOREIGN_BRIDGE_TOKEN)
-            console.log {FOREIGN_BRIDGE, value, sending-to}
             data = contract.transferAndCall.get-data(FOREIGN_BRIDGE, value, sending-to)
             
             send.data = data
