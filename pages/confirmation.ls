@@ -81,7 +81,7 @@ require! {
                 li
                     transition: all .5s
                     margin: 3px
-                    opacity: 0.5
+                    opacity: .9
                     padding: 2px 5px 5px !important
                     flex: 1 0 15
                     &.active
@@ -98,6 +98,7 @@ require! {
                         line-height: normal
                         display: block
                         white-space: nowrap
+                        margin-bottom: 2px
                     .network
                         font-size: 12px
                         opacity: 0.35
@@ -497,7 +498,6 @@ prompt-modal2 = (store)->
                         | #{lang.cancel}
 prompt-modal3 = (store)->
     return null if typeof! store.current.prompt3 isnt \String
-    console.log "prompt modal split" 
     chosenAccount = store.staking.chosenAccount
     rent = chosenAccount.rent
     active_stake = chosenAccount.active_stake `div` (10^9)
@@ -578,9 +578,7 @@ data = {token: null}
 prompt-choose-token-modal = (store)->
     return null if typeof! store.current.choose-token isnt \String
     text = store.current.choose-token
-    console.log "store.current.choose-token" store.current.choose-token
     wallets = store.current.account.wallets
-    console.log "walletsn" wallets
     confirm = ->
         on-focus!
         return if not store.current.prompt-answer? or store.current.prompt-answer is ""
@@ -591,7 +589,8 @@ prompt-choose-token-modal = (store)->
         store.current.prompt-answer = ""
         data.token = null
         callback prompt-answer if typeof! callback is \Function
-    cancel = ->
+    cancel = (e)->
+        return if e.target.className isnt "confirmation-body" and e.target.className.index-of("confirmation") is -1 and e.target.id isnt \prompt-close
         store.current.choose-token = no
         callback = state.callback
         state.callback = null
@@ -706,7 +705,7 @@ prompt-choose-token-modal = (store)->
     btn-disabled = (typeof store.current.prompt-answer isnt "string") or (typeof store.current.prompt-answer is "string" and store.current.prompt-answer.length is 0)
     on-focus = ->
         (document.query-selector \.tokeninput).focus!
-    .pug.confirmation
+    .pug.confirmation(on-click=cancel)
         .pug.confirmation-body(style=confirmation)
             .pug.header(style=style=confirmation-style)#{text}
             .pug.token-select
@@ -776,7 +775,6 @@ prompt-password-modal = (store)->
 $network-details-modal = (store)->
     return null if store.current.current-network-details.show isnt yes 
     cancel = ->
-        console.log "close"
         store.current.current-network-details.show = no
     
     style = get-primary-info store
