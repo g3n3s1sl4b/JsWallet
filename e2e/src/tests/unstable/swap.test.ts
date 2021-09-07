@@ -23,41 +23,45 @@ test.describe('Swap: ', () => {
   });
 
   test('VLX Legacy > VLX Native', async ({ page }) => {
+    // TODO
     test.skip();
-    const vlxSenderInitialBalance = (await walletsScreen.getWalletsBalances())['Velas Legacy'];
+
+    const vlxSenderInitialBalance = (await walletsScreen.getWalletsBalances())['Velas'];
     const nativeReceiverInitialBalance = await velasNative.getBalance(data.wallets.swap.address);
     const transactionAmount = 0.0001;
 
-    await walletsScreen.swapTokens('Velas Legacy', 'Velas Native', transactionAmount);
+    await walletsScreen.swapTokens('Velas', 'Velas Native', transactionAmount);
     await walletsScreen.openMenu('wallets');
 
     const previousTx = (await velasTestnet.getConfirmedTransactionsForAddress(data.wallets.swap.address)).signatures[0];
     let currentTx = previousTx;
 
-    while (previousTx === currentTx){
+    while (previousTx === currentTx) {
       log.debug('No new transactions in the chain, wait and retry...');
       await page.waitForTimeout(1000);
       currentTx = (await velasTestnet.getConfirmedTransactionsForAddress(data.wallets.swap.address)).signatures[0];
     }
     log.debug(currentTx);
-    
+
     await walletsScreen.waitForWalletsDataLoaded();
 
-    const vlxSenderFinalBalance = (await walletsScreen.getWalletsBalances())['Velas Legacy'];
+    const vlxSenderFinalBalance = (await walletsScreen.getWalletsBalances())['Velas'];
     assert.isBelow(Number(vlxSenderFinalBalance), Number(vlxSenderInitialBalance) - transactionAmount);
-    
+
     const nativeReceiverFinalBalance = await velasNative.getBalance(data.wallets.swap.address);
     assert.equal(Number(nativeReceiverFinalBalance.VLX).toFixed(6), Number(nativeReceiverInitialBalance.VLX + transactionAmount).toFixed(6));
   });
 
   test('VLX Native > VLX Legacy', async ({ page }) => {
+    // TODO
     test.skip();
+
     const nativeSenderInitialBalance = await velasNative.getBalance(data.wallets.swap.address);
-    const vlxReceiverInitialBalance = (await walletsScreen.getWalletsBalances())['Velas Legacy'];
+    const vlxReceiverInitialBalance = (await walletsScreen.getWalletsBalances())['Velas'];
 
     const transactionAmount = 0.0001;
 
-    await walletsScreen.swapTokens('Velas Native', 'Velas Legacy', transactionAmount);
+    await walletsScreen.swapTokens('Velas Native', 'Velas', transactionAmount);
 
     const txSignatureLink = String(await page.getAttribute('.sent .text a', 'href'));
     const txSignature = txSignatureLink.replace('https://native.velas.com/tx/', '');
@@ -70,12 +74,12 @@ test.describe('Swap: ', () => {
     const nativeSenderFinalBalance = await velasNative.getBalance(data.wallets.swap.address);
     assert.isBelow(Number(nativeSenderFinalBalance.VLX), Number(nativeSenderInitialBalance.VLX) - transactionAmount);
 
-    const vlxReceiverFinalBalance = (await walletsScreen.getWalletsBalances())['Velas Legacy'];
+    const vlxReceiverFinalBalance = (await walletsScreen.getWalletsBalances())['Velas'];
     assert.equal(Number(vlxReceiverFinalBalance).toFixed(6), (Number(vlxReceiverInitialBalance) + transactionAmount).toFixed(6));
   });
 
   test('EVM > Legacy', async ({ page }) => {
-    await walletsScreen.swapTokens('Velas EVM', 'Velas Legacy', 0.0001);
+    await walletsScreen.swapTokens('Velas EVM', 'Velas', 0.0001);
 
     const txSignatureLink = String(await page.getAttribute('.sent .text a', 'href'));
     log.debug(txSignatureLink);
@@ -84,7 +88,7 @@ test.describe('Swap: ', () => {
   });
 
   test('Legacy > EVM', async ({ page }) => {
-    await walletsScreen.swapTokens('Velas Legacy', 'Velas EVM', 0.0001);
+    await walletsScreen.swapTokens('Velas', 'Velas EVM', 0.0001);
 
     const txSignatureLink = String(await page.getAttribute('.sent .text a', 'href'));
     log.debug(txSignatureLink);

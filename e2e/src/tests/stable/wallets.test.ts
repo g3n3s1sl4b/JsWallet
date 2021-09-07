@@ -117,7 +117,7 @@ test.describe('Wallets screen >', () => {
         if (amountOfTokens === null) continue;
 
         switch (wallets[i]) {
-          case 'Velas Legacy':
+          case 'Velas':
             assert.equal(amountOfTokens, '0.999958');
             break;
           case 'Velas Native':
