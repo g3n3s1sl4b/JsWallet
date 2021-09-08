@@ -299,7 +299,7 @@ confirmation-modal = (store)->
             if store.current.send.swap is yes
                 refer-to = store.current.send?chosen-network?refer-to
                 minutes =
-                    | refer-to is \eth => 30
+                    | refer-to in <[ eth vlx_erc20 ]> => 30
                     | refer-to in <[ bsc_vlx busd ]> => 10
                     | refer-to is \vlx_huobi => 10     
                     | _ => 0
