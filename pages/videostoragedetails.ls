@@ -762,9 +762,9 @@ video = (store, web3t)->
                 iframe.pug(width='560' height='315' src='https://www.youtube.com/embed/USGLlp-zfhI' frameborder='0' allow='accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture' allowfullscreen='')
                 .pug.header Velas Explainer Video
                 ul.pug.stat
-                    li.pug
+                    li.pug(key="custom-views11")
                         span.pug 1.4K views
-                    li.pug
+                    li.pug(key="custom-views12")
                         span.pug 8 mounths ago
             add-comments store, web3t
             comments store, web3t
@@ -782,9 +782,9 @@ add-comments = (store, web3t)->
         span.pug.action
             input.pug(type="text" placeholder="Leave a comment" vlue="Leave a comment")
             ul.pug.stat
-                li.pug
+                li.pug(key="cancel3")
                     button.pug Cancel
-                li.pug
+                li.pug(key="leavecomment")
                     button.pug(style=button-primary1-style) Leave a Comment
 comments = (store, web3t)->
     lang = get-lang store
@@ -794,21 +794,21 @@ comments = (store, web3t)->
             img.pug.account(src="#{info.branding.logo}")
         span.pug.action
             ul.pug.stat
-                li.pug
+                li.pug(key="velasnetworkag")
                     span.user.pug Velas Network AG
-                li.pug
+                li.pug(key="velasnetworkag-date")
                     span.pug 1 week ago
             .pug.header There will be any comment on this video..
             ul.pug.rating
-                li.pug
+                li.pug(key="rating-like")
                     img.like.pug(src="#{icons.img-like}")
-                li.pug
+                li.pug(key="counts")
                     span.pug 124
-                li.pug
+                li.pug(key="dislikes")
                     img.dislike.pug(src="#{icons.img-like}")
-                li.pug
+                li.pug(key="custom-empty")
                     span.pug 
-                li.pug
+                li.pug(key="reply-leave")
                     span.action.pug REPLY
 next = (store, web3t)->
     lang = get-lang store
@@ -885,9 +885,9 @@ next = (store, web3t)->
                 span.pug.content-right
                     .pug.header How to setup New Velas Web Wallet Tutorial
                     ul.pug.stat
-                        li.pug
+                        li.pug(key="velas logo")
                             span.pug Velas
-                        li.pug
+                        li.pug(key="velas views")
                             span.pug 122 views • 5 days ago
 similarvideo = (store, web3t)->
     lang = get-lang store
@@ -956,9 +956,9 @@ similarvideo = (store, web3t)->
                 span.pug.content-right
                     .pug.header Velas Explainer Video
                     ul.pug.stat
-                        li.pug
+                        li.pug(key="velas-expl-video")
                             span.pug Velas
-                        li.pug
+                        li.pug(key="velas-views")
                             span.pug 1.4K views • 8 days ago
         .pug.section
             .source.pug(on-click=goto-details)
@@ -968,9 +968,9 @@ similarvideo = (store, web3t)->
                 span.pug.content-right
                     .pug.header How to setup New Velas Web Wallet Tutorial
                     ul.pug.stat
-                        li.pug
+                        li.pug(key="velas-logo2")
                             span.pug Velas
-                        li.pug
+                        li.pug(key="velas-ago2")
                             span.pug 122 views • 5 days ago
         .pug.section
             .source.pug(on-click=goto-details)
@@ -980,9 +980,9 @@ similarvideo = (store, web3t)->
                 span.pug.content-right
                     .pug.header Velas Explainer Video
                     ul.pug.stat
-                        li.pug
+                        li.pug(key="velas-logo4")
                             span.pug Velas
-                        li.pug
+                        li.pug(key="velas-ago5")
                             span.pug 1.4K views • 8 days ago
 videodetails = ({ store, web3t })->
     lang = get-lang store

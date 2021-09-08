@@ -1287,7 +1287,7 @@ item = (store, web3t)->
                 .pug.name Paul Smith
                 .pug.activity last seen 2 minutes ago
             ul.action.pug
-                li.pug
+                li.pug(key="icon-serach" )
                     img.icon-svg-video.pug(on-click=search src="#{icons.search}")
         .search.pug(style=border-b class="#{search-show}")
             input.pug(type='text' style=input-style value="" placeholder="#{lang.search}")
@@ -1295,27 +1295,27 @@ item = (store, web3t)->
             input.pug(type='text' style=input-style value="" placeholder="#{lang.writemsg}")
         .pug.content-msg
             ul.pug
-                li.pug.in
+                li.pug.in(key="dialog1" )
                     span.pug 
                         | Hello
                         span.pug 22:53
-                li.pug.out
+                li.pug.out(key="dialog2" )
                     span.pug 
                         | Hi
                         span.pug 22:53
-                li.pug.in
+                li.pug.in(key="dialog-message-3" )
                     span.pug 
                         | How are you?
                         span.pug 22:53
-                li.pug.out
+                li.pug.out(key="dialog-message-4" )
                     span.pug 
                         | Fine
                         span.pug 22:53
-                li.pug.out
+                li.pug.out(key="dialog-message-5" )
                     span.pug 
                         | And you?
                         span.pug 22:53
-                li.pug.in
+                li.pug.in(key="dialog-message-6" )
                     span.pug 
                         | Inconspicuous motes of rock and gas how far away brain is the seed of intelligence gathered by gravity concept of the number one Orions sword.
                         span.pug 22:53
@@ -1393,7 +1393,7 @@ item2 = (store, web3t)->
                 .pug.name Nicolas Gate
                 .pug.activity last seen 2 minutes ago
             ul.action.pug
-                li.pug
+                li.pug(key="search-video" )
                     img.icon-svg-video.pug(on-click=search src="#{icons.search}")
         .search.pug(style=border-b class="#{search-show}")
             input.pug(type='text' style=input-style value="" placeholder="#{lang.search}")
@@ -1401,27 +1401,27 @@ item2 = (store, web3t)->
             input.pug(type='text' style=input-style value="" placeholder="#{lang.writemsg}")
         .pug.content-msg
             ul.pug
-                li.pug.in
+                li.pug.in(key="dialog-message-8" )
                     span.pug 
                         | Hi, bro
                         span.pug 22:53
-                li.pug.out
+                li.pug.out(key="dialog-message-9" )
                     span.pug 
                         | Hello
                         span.pug 22:53
-                li.pug.in
+                li.pug.in(key="dialog-message-10" )
                     span.pug 
                         | How are you feeling?
                         span.pug 22:53
-                li.pug.out
+                li.pug.out(key="dialog-message-11" )
                     span.pug 
                         | Good
                         span.pug 22:53
-                li.pug.out
+                li.pug.out(key="dialog-message-12" )
                     span.pug 
                         | And you?
                         span.pug 22:53
-                li.pug.in
+                li.pug.in(key="dialog-message-13" )
                     span.pug 
                         | Also good!
                         span.pug 22:53
@@ -1544,10 +1544,10 @@ notice = ({ store, web3t })->
                     .tabs.pug
                         .pug.left-menu(style=border-t)
                         ul.pug(style=border-style3)
-                            li.pug(style=search-bg)
+                            li.pug(key="icons-create" style=search-bg)
                                 input.pug(type='text' style=input-style value="" placeholder="#{lang.search}")
                                 img.edit.pug(src="#{icons.create}")
-                            li.pug(on-click=activate-item class="#{active-item}" style=border-b)
+                            li.pug(key="avatar" on-click=activate-item class="#{active-item}" style=border-b)
                                 img.pug.ava(src="#{imgs.ava}")
                                 span.pug.preview
                                     .pug.name Paul Smith
@@ -1555,7 +1555,7 @@ notice = ({ store, web3t })->
                                 span.pug.notification
                                     .pug.time 22:51
                                     .pug.count 2
-                            li.pug(on-click=activate-item2 class="#{active-item2}" style=border-b)
+                            li.pug(key="avatar2" on-click=activate-item2 class="#{active-item2}" style=border-b)
                                 img.pug.ava(src="#{imgs.ava}")
                                 span.pug.preview
                                     .pug.name Nicolas Gate

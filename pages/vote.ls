@@ -375,23 +375,23 @@ content = (store, web3t)->
         if no
             .pug.filter(style=style)
                 ul.pug
-                    li.pug
+                    li.pug(key="best" )
                         img.pug(src="#{icons.best}")
                         | Best
-                    li.pug.active
+                    li.pug.active(key="hot" )
                         img.pug(src="#{icons.hot}")
                         | Hot
-                    li.pug
+                    li.pug(key="new" )
                         img.pug(src="#{icons.new}")
                         | New
-                    li.pug
+                    li.pug(key="top" )
                         img.pug(src="#{icons.top}")
                         | Top
                 ul.pug.view
-                    li.pug(class="#{view}" on-click=add-class)
+                    li.pug(class="#{view}" on-click=add-class key="compound1" )
                         img.pug(src="#{icons.compact}")
                         img.pug(src="#{icons.classic}")
-                    li.pug(on-click=create-new-vote)
+                    li.pug(on-click=create-new-vote key="compound2" )
                         img.pug(src="#{icons.create}" width=18 height=18)
                         img.pug(src="#{icons.create}" width=18 height=18)
         .pug.notice

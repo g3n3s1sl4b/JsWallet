@@ -48,8 +48,9 @@ require! {
         $radius: 15px
         position: relative
         cursor: pointer
-        $card-height: 60px
+        $card-height: 63px
         height: $card-height
+        border-radius: 0
         &.disabled-wallet-item
             opacity: 0.24
             cursor: no-drop
@@ -70,13 +71,20 @@ require! {
         &.over
             background: #CCC
         &.big
-            height: 125px
+            height: 170px
         &.active
         .wallet-middle
             >.uninstall
-                text-align: left
-                font-size: 10px
-                padding-top: 5px
+                position: absolute
+                bottom: 11px
+                right: 10px
+                height: 20px
+                max-height: 20px
+                z-index: 99999
+                font-size: 17px
+                line-height: 1.2
+                text-align: center
+                font-weight: bold
             box-sizing: border-box
             width: 70%
             height: 85px
@@ -106,12 +114,13 @@ require! {
                 color: #fff
                 font-size: 14px
                 text-align: left
-            span
-                padding-left: 10px
+                
+
             a
                 text-align: left
         >.wallet-top
-            padding: 0 12px
+            min-height: 62px
+            padding: 0 0 0 12px
             box-sizing: border-box
             $card-top-height: 50px
             width: 100%
@@ -119,17 +128,21 @@ require! {
             font-size: 14px
             text-align: center
             overflow: hidden
+            .inner-container
+                display: flex
+                flex-direction: row
+                width: 70%
+                float: left
             >*
                 display: inline-block
                 box-sizing: border-box
                 vertical-align: top
                 padding-top: 12px
                 height: $card-top-height
-                line-height: 16px
-            >.top-left
+            .top-left
+                float: left
                 width: 30%
                 text-align: left
-                overflow: hidden
                 text-overflow: ellipsis
                 @media screen and (min-width: 801px)
                     padding-top: 5px
@@ -138,16 +151,13 @@ require! {
                 >*
                     display: inline-block
                 >.img
-                    line-height: $card-top-height
-                    vertical-align: top
-                    margin-right: 10px
-                    width: 40px
+                    margin-top: 5px
+                    height: 32px
                     >img
-                        vertical-align: top
                         max-width: 50px
-                        $s: 35px
                         border-radius: 0
-                        height: $s
+                        width: 100%
+                        height: 100%
                         @media screen and (min-width: 801px)
                             padding-top: 4px
                 >.info
@@ -171,29 +181,59 @@ require! {
                         &.token
                             opacity: 1
                             font-size: 12px
-            >.top-middle
-                width: 30%
+            .top-middle
                 text-align: center
+                display: flex
+                float: left
+                margin-left: 5px
                 .label-coin
                     height: 16px
                     top: 3px
                     padding-left: 4px
                     position: relative
                 @media screen and (max-width: 800px)
-                    width: 50%
                     text-align: left
                 >.balance
                     &:last-child
                         font-weight: bold
                         font-size: 13px
-                    &.title
-                        @media screen and (max-width: 220px)
-                            display: none
-                    .title-balance
-                        display: none
+                .first-block
+                    margin-right: 20px
+                    width: 120px
+                    white-space: nowrap
+                    text-overflow: ellipsis
+                    overflow: hidden
+                .usd-balance
+                    color: white
+                    font-weight: 500
+                .flexy 
+                    .block-row
+                        &:last-child
+                            margin-top: 5px
+                    .block-row
+                        &:last-child
+                            font-size: 13px
+                    
+
             >.top-right
-                width: 40%  
                 text-align: right
+                .graph-container
+                    position: relative
+                    .percent
+                        position: absolute
+                        color: white
+                        font-size: 11px
+                        margin: auto
+                        left: 0
+                        right: 0
+                        text-align: center
+                        top: 0
+                        bottom: 0
+                        height: 12px
+                        &.positive 
+                            color: "green"
+                        &.negative
+                            color: "red"    
                 .wallet-swap img
                     filter: invert(1)
                 .icon
@@ -204,7 +244,6 @@ require! {
                         vertical-align: inherit
                         opacity: .3
                 @media screen and (max-width: 800px)
-                    width: 35%
                     display: flex
                     float: right
                     flex-direction: row-reverse
@@ -389,7 +428,7 @@ require! {
             overflow: hidden
         .wallet-middle
             width: 100%
-            padding: 10px 0px
+            padding: 10px 12px
             box-sizing: border-box
             color: #A8BACB
             font-size: 14px
@@ -407,7 +446,7 @@ require! {
                     margin: 0
                 div
                     a
-                        padding: 0 10px 0 30px
+                        padding: 0 10px 0 20px
            
             .buttons
                 margin-top: 10px
@@ -598,44 +637,37 @@ wallet-group = (store, web3t, wallets, wallets-groups, wallets-group)-->
                     |> filter (-> it.disabled isnt yes and it.referTo in installed-networks)
 
             /* Render */
-            .wallet.wallet-mobile.pug.wallet-item(class="#{big} #{disabled-class}" key="#{token}" style=border-style)
+            .wallet.pug.wallet-item(class="#{big} #{disabled-class}" key="#{token}")
                 .wallet-top.pug(on-click=expand)
-                    .top-left.pug(style=wallet-style)
-                        .img.pug(class="#{placeholder-coin}")
-                            img.pug(src="#{wallet.coin.image}")
-                        .info.pug
-                            .balance.pug.title(class="#{placeholder}") #{name}
-                            if store.current.device is \desktop
-                                .price.token.pug(class="#{placeholder}" title="#{wallet.balance}")
-                                    span.pug #{ round-human wallet.balance }
-                                    span.pug #{ token-display }
-                            .price.pug(class="#{placeholder}" title="#{balance-usd}")
-                                span.pug #{ round-human balance-usd}
-                                span.pug USD
-                    if store.current.device is \mobile
-                        .top-middle.pug(style=wallet-style)
-                            if +wallet.pending-sent is 0
-                                .balance.pug.title(class="#{placeholder}") #{name}
-                            .balance.pug(class="#{placeholder}")
-                                span.pug(title="#{wallet.balance}") #{ round-human wallet.balance }
-                                    img.label-coin.pug(class="#{placeholder-coin}" src="#{wallet.coin.image}")
-                                    span.pug #{ token-display }
-                                if +wallet.pending-sent >0
-                                    .pug.pending
-                                        span.pug -#{ pending }
+                    .inner-container.pug
+                        .top-left.pug(style=wallet-style)
+                            .img.pug(class="#{placeholder-coin}")
+                                img.pug(src="#{wallet.coin.image}")
+                                if no
+                                    .pug #{name}           
+                        .top-middle.pug 
+                            .first-block.flexy.pug
+                                span.pug.title.block-row(class="#{placeholder}") #{name} 
+                                .title-balance.pug.block-row
+                                    .name.pug(class="#{placeholder}" title="#{usd-rate}") $#{ round-human(usd-rate)}     
+                            .second-block.flexy.pug
+                                .pug.usd-balance.block-row $#{ round-human balance-usd} 
+                                .pug.coin-balance.block-row #{ round-human wallet.balance }                      
                     .top-right.pug
-                        if no and store.current.device is \desktop                    
-                            span.pug.icon(on-click=expand)
-                                img.icon-svg-create.pug(src="#{icons.arrow-down}" style=icon-color)
-                                    .pug expand
+                        .pug.graph-container
+                            .percent.pug(class="#{percent-class}") #{percent-display}
+                            Line.pug(data=data options=options width=100 height=50 legend=legend)
+                        
+                .wallet-middle.pug(style=border)
+                    address-holder { store, wallet, type: \bg }
+                    if token not in <[ btc vlx vlx_native vlx2 eth vlx_evm ]>
+                        .pug.uninstall(on-click=uninstall style=wallet-style) #{label-uninstall}
+                    .buttons.pug
                         button { store, on-click=send-click, text: \send , icon: \send , type: \secondary, makeDisabled=send-swap-disabled }
                         button { store, on-click=receive-click, text: \receive , icon: \get, type : \primary }
                         if (available-networks.length > 0) then
-                            button { store, on-click=swap-click, text: \swap , icon: \swap, id: "wallet-swap", makeDisabled=send-swap-disabled, classes="wallet-swap" }
-                    .wallet-middle.pug(style=border)
-                        address-holder { store, wallet, type: \bg }
-                        if token not in <[ btc vlx vlx_native vlx2 eth vlx_evm ]>
-                            .pug.uninstall(on-click=uninstall style=wallet-style) #{label-uninstall}
+                            button { store, on-click=swap-click, text: \swap , icon: \swap, id: "wallet-swap", makeDisabled=send-swap-disabled, classes="button-swap" }
+                
                 
                 
 mobile = ({ store, web3t })->
