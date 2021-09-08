@@ -487,7 +487,7 @@ send = ({ store, web3t })->
         if store.current.open-menu then \hide else \ ""
     token-display = (wallet.coin.nickname ? "").to-upper-case!
     fee-token-display = 
-        | fee-token in <[ VLX2 VLX_EVM VLX_NATIVE ]> => \VLX
+        | fee-token in <[ VLX2 VLX_EVM VLX_NATIVE VLX_EVM_LEGACY ]> => \VLX
         | fee-token in <[ ETH_LEGACY ]> => \ETH
         | bridge-fee-token? => bridge-fee-token
         | wallet.network.tx-fee-in? => wallet.network.tx-fee-in
@@ -503,7 +503,7 @@ send = ({ store, web3t })->
     token = store.current.send.coin.token
     is-swap = store.current.send.is-swap is yes
     send-func = before-send-anyway
-    disabled = not send.to? or send.to.trim!.length is 0 or (send.error.index-of "address") > -1     
+    disabled = not send.to? or send.to.trim!.length is 0 or ((send.error ? "").index-of "address") > -1     
     receiver-is-swap-contract = contracts.is-swap-contract(store, store.current.send.contract-address)
     visible-error = if send.error? and send.error.length > 0 then "visible" else ""
     get-recipient = (address)->
@@ -513,7 +513,7 @@ send = ({ store, web3t })->
     homeFeePercent = send.homeFeePercent `times` 100
     
     
-    is-swap = ({from, to})->
+    is-swap-pair = ({from, to})->
         { chosen-network, coin, wallet } = store.current.send
         token = coin.token
         token is from and chosen-network.refer-to is to
@@ -628,8 +628,9 @@ send = ({ store, web3t })->
                     button { store, text: "#{title}" , on-click: send-func , loading: send.sending, type: \primary, error: send.error, makeDisabled: makeDisabled, id: "send-confirm" }
                     button { store, text: \cancel , on-click: cancel, icon: \close2, id: "send-cancel" }
                 if store.current.send.is-swap is yes
-                    .pug.swap-notification
-                        p.pug #{lang.swapNotification}
+                    if not (is-swap-pair({from: \vlx_evm, to: \vlx_native}) or is-swap-pair({from: \vlx_native, to: \vlx_evm}) or is-swap-pair({from: \vlx2, to: \vlx_evm}) or is-swap-pair({from: \vlx_evm, to: \vlx2}) )
+                        .pug.swap-notification
+                            p.pug #{lang.swapNotification}
 
 module.exports = send
 module.exports.init = ({ store, web3t }, cb)->

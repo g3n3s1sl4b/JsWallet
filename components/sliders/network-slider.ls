@@ -166,6 +166,7 @@ module.exports = ({ web3t, wallet, store, id, on-change })->
     go = (inc)-> ->
         current = network-labels.index-of(store.current.send.chosen-network.id)
         lenght = network-labels.length
+        return if lenght <= 1
         index = current + inc 
         if (current + inc) >= lenght then 
             index = 0 
