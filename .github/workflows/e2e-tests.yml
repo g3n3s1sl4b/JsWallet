@@ -32,7 +32,7 @@ jobs:
 
       - name: copy web3 side by side to wallet
         working-directory: ../
-        run: mkdir -p web3t/ && cp -pr JsWallet/.compiled-ssr/web3t/ web3t/
+        run: rm -rf JsWallet/.compiled-ssr/web3t/.git/objects/ && mkdir -p web3t/ && cp -pr JsWallet/.compiled-ssr/web3t/ web3t/
 
 
       - name: install web3t modules
