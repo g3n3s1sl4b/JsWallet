@@ -464,7 +464,7 @@ module.exports = (store, web3t)->
         return cb null if not store.current.send.chosen-network?
         chosen-network = store.current.send.chosen-network
         token = store.current.send.coin.token
-        if chosen-network.id in <[ evm legacy ]> and token in <[ vlx_evm vlx2 ]>   
+        if chosen-network.id in <[ vlx_evm vlx2 ]> and token in <[ vlx_evm vlx2 ]>   
             store.current.send.contractAddress = null 
             return cb null 
         wallet = store.current.send.wallet  
@@ -801,10 +801,13 @@ module.exports = (store, web3t)->
         
         /* DONE */
         /* Swap into native */   
-        if chosen-network.id is \native then
+        if chosen-network.id is \vlx_native then
             $recipient = ""
             try
-                $recipient = bs58.decode send.to
+                recipient =
+                    | send.to.starts-with \V => to-eth-address(send.to)     
+                    | _ => send.to
+                $recipient = bs58.decode recipient
                 hex = $recipient.toString('hex')
             catch err
                 return cb "Please enter valid address"
@@ -976,6 +979,7 @@ module.exports = (store, web3t)->
             or chosen-network.referTo in <[ vlx_native ]>        
             or token is \vlx_native and chosen-network.referTo in <[ vlx vlx2 vlx_evm ]>
             or token in <[ vlx vlx_evm ]> and chosen-network.referTo in <[ vlx_native vlx2 ]> 
+            or token in <[ vlx2 vlx_native vlx_evm ]> and chosen-network.referTo in <[ vlx_native vlx2 vlx_evm ]> 
             or token is \vlx_native and chosen-network.referTo in <[ vlx vlx2 vlx_evm ]>   
                 store.current.send.homeFeePercent = 0 
                 return cb null    
