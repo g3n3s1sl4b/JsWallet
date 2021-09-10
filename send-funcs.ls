@@ -1007,6 +1007,7 @@ module.exports = (store, web3t)->
             | token is \vlx_erc20 and chosen-network.referTo is \vlx_evm => FOREIGN_BRIDGE
             | token is \bsc_vlx and chosen-network.referTo is \vlx_evm => FOREIGN_BRIDGE
             | token is \vlx_huobi and chosen-network.referTo is \vlx_evm => FOREIGN_BRIDGE
+            | token is \busd and chosen-network.referTo is \vlx_busd => FOREIGN_BRIDGE
             | _ => HOME_BRIDGE         
         contract = web3.eth.contract(abi).at(addr)        
         homeFeePercent = 0  
@@ -1058,6 +1059,7 @@ module.exports = (store, web3t)->
             | token is \vlx_erc20 and chosen-network.referTo is \vlx_evm => HOME_BRIDGE
             | token is \bsc_vlx and chosen-network.referTo is \vlx_evm => BSC_SWAP__HOME_BRIDGE
             | token is \vlx_huobi and chosen-network.referTo is \vlx_evm => HECO_SWAP__HOME_BRIDGE 
+            | token is \busd and chosen-network.referTo is \vlx_busd => HOME_BRIDGE
             | _ => FOREIGN_BRIDGE
         contract = web3.eth.contract(abi).at(addr)
         
