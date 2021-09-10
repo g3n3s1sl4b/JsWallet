@@ -512,6 +512,10 @@ send = ({ store, web3t })->
     title = if store.current.send.is-swap isnt yes then \send else \swap
     homeFeePercent = send.homeFeePercent `times` 100
     
+    is-not-bridge = ->
+        { token } = store.current.send.wallet.coin  
+        { chosen-network } = store.current.send
+        chosen-network.refer-to in <[ vlx_evm vlx2 vlx_native ]> and token in <[ vlx_evm vlx2 vlx_native ]> 
     
     is-swap-pair = ({from, to})->
         { chosen-network, coin, wallet } = store.current.send
@@ -632,7 +636,7 @@ send = ({ store, web3t })->
                     button { store, text: "#{title}" , on-click: send-func , loading: send.sending, type: \primary, error: send.error, makeDisabled: makeDisabled, id: "send-confirm" }
                     button { store, text: \cancel , on-click: cancel, icon: \close2, id: "send-cancel" }
                 if store.current.send.is-swap is yes
-                    if not (is-swap-pair({from: \vlx_evm, to: \vlx_native}) or is-swap-pair({from: \vlx_native, to: \vlx_evm}) or is-swap-pair({from: \vlx2, to: \vlx_evm}) or is-swap-pair({from: \vlx_evm, to: \vlx2}) )
+                    if not is-not-bridge!
                         .pug.swap-notification
                             p.pug #{lang.swapNotification}
 
