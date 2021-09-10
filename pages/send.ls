@@ -518,12 +518,16 @@ send = ({ store, web3t })->
         token = coin.token
         token is from and chosen-network.refer-to is to
     
-    network-on-change = ->
+    network-on-change = (cb)->
         err <- getBridgeInfo!
-        return store.current.send.error = err if err?
+        if err?
+            store.current.send.error = err 
+            return cb err     
         err <- execute-contract-data!
-        return store.current.send.error = err if err?
-        
+        if err?
+            store.current.send.error = err
+            return cb err 
+        cb null
        
     
     /* Render */

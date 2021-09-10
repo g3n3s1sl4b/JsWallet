@@ -32,6 +32,8 @@ create-send =->
     amount-send-fee-usd: \0
     amount-obtain: \0
     data: ""
+    gas: null
+    gas-price: null    
     homeFee: 0
     homeFeePercent: 0
     is-swap: no 
@@ -242,6 +244,7 @@ store =
         applied: []
     releases: []
     current:
+        switch-network: no  
         current-network-details: 
             show: no    
         network-details:
