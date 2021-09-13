@@ -34,11 +34,6 @@ jobs:
         working-directory: ../
         run: rm -rf JsWallet/.compiled-ssr/web3t/.git/objects/ && mkdir -p web3t/ && cp -pr JsWallet/.compiled-ssr/web3t/ web3t/
 
-
-      - name: install web3t modules
-        working-directory: ../web3t
-        run: npm i
-
       - name: delete wallet build cache
         working-directory: ./
         run: rm -rf ./.compiled
