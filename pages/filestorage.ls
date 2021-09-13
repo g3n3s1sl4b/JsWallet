@@ -495,20 +495,20 @@ filestorage = ({ store, web3t })->
             span.files.pug(on-click=switch-files class="#{file-tree}")
                 img.pug(src="#{icons.file-side-menu}")
             ul.path.pug
-                li.pug
+                li.pug(key="files" )
                     span.pug Files  #{store.filestore.path} 
-                li.pug
+                li.pug(key="docs" )
                     span.pug Documents
             span.add-file.pug(on-click=expand-collapse)
                 icon "Plus", 20
             ul.action.pug(class="#{active}")
-                li.pug
+                li.pug(key="cloud-download" )
                     span.pug
                         icon "CloudDownload", 20
-                li.pug
+                li.pug(key="link-external" )
                     span.pug
                         icon "LinkExternal", 20
-                li.pug
+                li.pug(key="trashcan" )
                     span.pug
                         icon "Trashcan", 20
             if store.filestore.menu-open
@@ -571,10 +571,10 @@ filestorage = ({ store, web3t })->
                         span.col.folder-menu.pug
                             .pug Uploading 1 item
                         ul.action.col.pug(class="#{active}")
-                            li.pug(on-click=switch-progress class="#{hide-progress}")
+                            li.pug(key="hide-progress" on-click=switch-progress class="#{hide-progress}")
                                 span.pug
                                     icon "ChevronDown", 15
-                            li.pug
+                            li.pug(key="close-icon" )
                                 span.pug
                                     icon \X, 15
                 .pug(style=header-table-style class="#{hide-progress}")

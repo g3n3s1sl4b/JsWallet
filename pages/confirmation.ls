@@ -6,10 +6,15 @@ require! {
     \../icons.ls 
     \../components/text-field.ls
     \../components/button.ls
+    \../copy.ls
     \../round5edit.ls
+    \../round-human.ls
     \../components/amount-field.ls
     \prelude-ls : { find, map }
     \../math.ls : { minus, div, plus, times }
+    #\copy-to-clipboard
+    \react-copy-to-clipboard : { CopyToClipboard }
+    \../copied-pk-inform.ls
 }
 .confirmation
     backdrop-filter: blur(5px)
@@ -67,23 +72,39 @@ require! {
     align-items: center
     animation: appear .1s ease-in
     .token-select
-        max-width: 300px
+        max-width: 500px
         margin: auto
         input
-            width: 80% !important
+            width: 100% !important
         .tokens-drop
             ul
                 li
                     transition: all .5s
                     margin: 3px
-                    opacity: 0.5
-                    padding: 2px 10px 10px !important
+                    opacity: .9
+                    padding: 2px 5px 5px !important
+                    flex: 1 0 15
                     &.active
                         opacity: 1
                         background: rgb(5, 6, 31) none repeat scroll 0% 0%
                     &:hover
                         opacity: 1
                         background: rgb(5, 6, 31) none repeat scroll 0% 0%
+                    img
+                        margin-bottom: 10px
+                    .token-name
+                        font-size: 15px
+                        opacity: 0.8
+                        line-height: normal
+                        display: block
+                        white-space: nowrap
+                        margin-bottom: 2px
+                    .network
+                        font-size: 12px
+                        opacity: 0.35
+                        line-height: normal
+                        display: block
+                        white-space: nowrap
     .icon-svg-apply
         position: relative
         height: 12px
@@ -260,6 +281,11 @@ confirmation-modal = (store)->
         color: style.app.text
     button-style=
         color: style.app.text
+    notification-style=
+        font-size: "12px"
+        opacity: "0.6"
+    text-style=
+        padding: "10px 10%"
     confirmation=
         background: style.app.background
         background-color: style.app.bgspare
@@ -270,6 +296,17 @@ confirmation-modal = (store)->
         .pug.confirmation-body(style=confirmation)
             .pug.header(style=confirmation-style) #{lang.confirmation}
             .pug.text(style=confirmation-style2) #{store.current.confirmation}
+            if store.current.send.swap is yes
+                refer-to = store.current.send?chosen-network?refer-to
+                minutes =
+                    | refer-to in <[ eth vlx_erc20 ]> => 30
+                    | refer-to in <[ bsc_vlx busd ]> => 10
+                    | refer-to is \vlx_huobi => 10     
+                    | _ => 0
+                if minutes > 0 
+                    text = "Depending on the network congestions it may take a long time to finish swap. Average confirmation time is ~#{minutes} min."  
+                    .pug.notification(style=notification-style)
+                        p.pug(style=text-style)  #{text}
             .pug.buttons
                 button.pug.button(on-click=confirm style=button-style id="confirmation-confirm")
                     span.apply.pug
@@ -279,6 +316,62 @@ confirmation-modal = (store)->
                     span.cancel.pug
                         img.icon-svg-cancel.pug(src="#{icons.close}")
                         | #{lang.cancel}
+                        
+swap-confirmation-modal = (store)->
+    return null if typeof! store.current.swap-confirmation isnt \String
+    confirm = ->
+        store.current.swap-confirmation = yes
+        callback = state.callback
+        state.callback = null
+        callback yes if typeof! callback is \Function
+    cancel = ->
+        store.current.swap-confirmation = no
+        callback = state.callback
+        state.callback = null
+        callback no if typeof! callback is \Function
+    style = get-primary-info store
+    confirmation-style =
+        background: style.app.background
+        background-color: style.app.bgspare
+        color: style.app.text
+    confirmation-style2 =
+        color: style.app.text
+    button-style=
+        color: style.app.text
+    confirmation=
+        background: style.app.background
+        background-color: style.app.bgspare
+        color: style.app.text
+        border-bottom: "1px solid #{style.app.border}"
+    { amount-send, tokenFrom, amount-receive, tokenTo, bridgeFee, homeBridge, foreignBridge, fromNetwork, toNetwork} = store.current.swap-confirmation
+    # "Please confirm that you would like to send #{amount-send} #{token-display} from #{walletGroup} to receive #{amount-receive} #{token-display} on #{receiverGroup}." 
+    lang = get-lang store
+    .pug.confirmation
+        .pug.confirmation-body(style=confirmation)
+            .pug.header(style=confirmation-style) #{lang.confirmation}
+            .pug.text(style=confirmation-style2) 
+                span.pug Please confirm that you would like to send
+                span.pug.amount #{amount-send} 
+                span.pug.token #{tokenFrom}
+                span.pug from
+                span.pug.network #{fromNetwork}
+                span.pug to receive
+                span.pug.amount #{amount-receive} 
+                span.pug.token #{tokenTo}
+                span.pug on
+                span.pug.network #{toNetwork}
+                 
+                
+            .pug.buttons
+                button.pug.button(on-click=confirm style=button-style id="confirmation-confirm")
+                    span.apply.pug
+                        img.icon-svg-apply.pug(src="#{icons.apply}")
+                        | #{lang.confirm}
+                button.pug.button(on-click=cancel style=button-style id="confirmation-close")
+                    span.cancel.pug
+                        img.icon-svg-cancel.pug(src="#{icons.close}")
+                        | #{lang.cancel}
+                        
 prompt-modal = (store)->
     return null if typeof! store.current.prompt isnt \String
     confirm = ->
@@ -405,7 +498,6 @@ prompt-modal2 = (store)->
                         | #{lang.cancel}
 prompt-modal3 = (store)->
     return null if typeof! store.current.prompt3 isnt \String
-    console.log "prompt modal split" 
     chosenAccount = store.staking.chosenAccount
     rent = chosenAccount.rent
     active_stake = chosenAccount.active_stake `div` (10^9)
@@ -486,6 +578,7 @@ data = {token: null}
 prompt-choose-token-modal = (store)->
     return null if typeof! store.current.choose-token isnt \String
     text = store.current.choose-token
+    wallets = store.current.account.wallets
     confirm = ->
         on-focus!
         return if not store.current.prompt-answer? or store.current.prompt-answer is ""
@@ -496,7 +589,8 @@ prompt-choose-token-modal = (store)->
         store.current.prompt-answer = ""
         data.token = null
         callback prompt-answer if typeof! callback is \Function
-    cancel = ->
+    cancel = (e)->
+        return if e.target.className isnt "confirmation-body" and e.target.className.index-of("confirmation") is -1 and e.target.id isnt \prompt-close
         store.current.choose-token = no
         callback = state.callback
         state.callback = null
@@ -517,11 +611,14 @@ prompt-choose-token-modal = (store)->
         margin: 'auto'
     button-style=
         color: style.app.text
+        width: "46%"
     confirmation=
         background: style.app.background
         background-color: style.app.bgspare
         color: style.app.text
         border-bottom: "1px solid #{style.app.border}"
+        max-height: "80%"
+        overflow: "hidden"
     lang = get-lang store
     button-primary3-style=
         border: "0"
@@ -548,26 +645,46 @@ prompt-choose-token-modal = (store)->
         padding: "5px 10px"
         cursor: "pointer"
         display: "inline-block"
+        flex: 1
+        text-align: "center"
     ul-style=
         padding: 0
         text-align: "left"
-        max-width: "300px"
+        max-width: "500px"
         margin: "20px auto"
+        display: "flex"
+        flex-wrap: "wrap"
     text-style =
         padding: "5px"
+    icon2-style =
+        padding: "5px"
+        position: "relative"
+        top: "8px"
     build-item = (item)->
         {image, name, token} = item.coin
-        on-click = ->
-            store.current.prompt-answer = token
-            data.token = name
+        wallet = wallets |> find (-> it.coin.token is token)
+        return null if not wallet?
+        #on-click = ->
+            #store.current.prompt-answer = token
+            #data.token = name
+            #copy-to-clipboard wallet.private-key 
+            #notify store, "Your Private KEY is copied into your clipboard", cb
+        token-network = item?network?group
         active-class = if store.current.prompt-answer is token then "active" else ""
-        li.pug.lang-item(on-click=on-click style=optionStyle class="#{active-class}")
-            img.pug(src="#{image}" style=imgStyle)
-            span.pug(style=text-style) #{name}
+        token = (wallet?coin?name ? "").to-upper-case!
+        li.pug.lang-item(style=optionStyle class="#{active-class}")
+            .pug        
+                CopyToClipboard.pug(text="#{wallet.private-key}" on-copy=copied-pk-inform(store) style=icon2-style)
+                    .pug
+                        img.pug(src="#{image}" style=imgStyle)
+                        span.token-name.pug #{name} 
+                        span.pug.network #{token-network} Network
     input-style = 
         position: "relative"
         text-align: "center"
-        display: "flex"
+        display: "block"
+        color: "rgb(70 70 70)"
+        width: "100% !important"
     disabled-layout-style =
         z-index: 1 
         background: "transparent"
@@ -576,29 +693,27 @@ prompt-choose-token-modal = (store)->
         bottom: 0
         left: 0
         right: 0
-        width: "62%"
+        width: "100%"
+    tokens-drop-style = 
+        max-height: "300px"
+        overflow: "scroll"
+    button-section-style = 
+        max-width: "500px"
+        margin: "auto"
     prompt-answer = store.current.prompt-answer ? null
     display-token = data.token ? ""
     btn-disabled = (typeof store.current.prompt-answer isnt "string") or (typeof store.current.prompt-answer is "string" and store.current.prompt-answer.length is 0)
     on-focus = ->
         (document.query-selector \.tokeninput).focus!
-    .pug.confirmation
+    .pug.confirmation(on-click=cancel)
         .pug.confirmation-body(style=confirmation)
             .pug.header(style=style=confirmation-style)#{text}
-            .pug.text(style=style=confirmation-style)
             .pug.token-select
-                .input-holder.pug(style=input-style)
-                    .pug.dlayout(style=disabled-layout-style)
-                    input.pug.tokeninput( type="text" value="#{display-token}" style=inputStyle )
-                .pug.tokens-drop
+                .pug.tokens-drop(style=tokens-drop-style)
                     ul.pug(style=ul-style)
                         store.current.account.wallets
                             |> map build-item
-            .pug.buttons
-                button.pug.button(on-click=confirm style=button-style id="prompt-confirm" disabled=btn-disabled)
-                    span.apply.pug
-                        img.icon-svg-apply.pug(src="#{icons.apply}")
-                        | #{lang.confirm}
+            .pug.buttons(style=button-section-style)
                 button.pug.button(on-click=cancel style=button-style id="prompt-close")
                     span.cancel.pug
                         img.icon-svg-cancel.pug(src="#{icons.close}")
@@ -656,6 +771,79 @@ prompt-password-modal = (store)->
                     span.cancel.pug
                         img.icon-svg-cancel.pug(src="#{icons.close}")
                         | #{lang.cancel}
+                        
+$network-details-modal = (store)->
+    return null if store.current.current-network-details.show isnt yes 
+    cancel = ->
+        store.current.current-network-details.show = no
+    
+    style = get-primary-info store
+    table-item-style-title=
+        flex: 1
+    confirmation-style =
+        background: style.app.background
+        background-color: style.app.bgspare
+        color: style.app.text
+        padding: "20px" 
+        text-align: "left"
+    close-button-style = 
+        float: "right"
+        padding: "5px"
+        background: "transparent"
+        border: "none"
+        cursor: "pointer"
+    table-item-style=
+        display: "flex"
+        flex-wrap: "wrap"
+    button-style=
+        color: style.app.text
+    bridge-fee-style =
+        color: "rgb(207, 149, 44)"
+    confirmation=
+        background: style.app.background
+        background-color: style.app.bgspare
+        color: style.app.text
+        border-bottom: "1px solid #{style.app.border}"
+    lang = get-lang store
+    { dailyLimit, homeFeePercent, minPerTx, maxPerTx, wallet } = store.current.current-network-details
+    { name, nickname } = wallet?coin
+    bridgeFeePercent = homeFeePercent `times` 100
+    dailyLimit = round-human(dailyLimit, {decimals: 2})
+    minPerTx   = round-human(minPerTx,   {decimals: 8})
+    maxPerTx   = round-human(maxPerTx,   {decimals: 2})
+    currency = (nickname ? "").to-upper-case!
+      
+    title = (name ? "").to-upper-case!
+    .pug.confirmation
+        .pug.confirmation-body(style=confirmation)
+            .pug.buttons
+                button.pug(on-click=cancel style=close-button-style id="prompt-close")
+                    span.cancel.pug
+                        img.icon-svg-cancel.pug(src="#{icons.close}")
+            .pug.header(style=style=confirmation-style) #{title}
+            .pug.table(style=style=confirmation-style)
+                .table-item.pug(style=table-item-style)
+                    .title.h5.pug(style=table-item-style-title) Remaining Daily Quota 
+                    .value.pug 
+                        | #{dailyLimit}
+                        | #{currency}
+                .table-item.pug(style=table-item-style)
+                    .title.h5.pug(style=table-item-style-title) Maximum Amount Per Transaction
+                    .value.pug 
+                        | #{maxPerTx}
+                        | #{currency}
+                .table-item.pug(style=table-item-style)
+                    .title.h5.pug(style=table-item-style-title) Minimum Amount Per Transaction
+                    .value.pug
+                        | #{minPerTx} 
+                        | #{currency}
+                if +homeFeePercent > 0
+                    .table-item.pug(style=table-item-style)
+                        .title.h5.pug(style=table-item-style-title) Bridge fee
+                        .value.pug(style=bridge-fee-style) #{bridgeFeePercent} %   
+            
+                        
+                        
 export confirmation-control = (store)->
     #for situation when we ask peen before action. this window should be hidden
     return null if store.current.page-pin?
@@ -668,8 +856,12 @@ export confirmation-control = (store)->
         alert-modal store
         notification-modal store
         prompt-choose-token-modal store
+        $network-details-modal store
 state=
     callback: null
+export swap-confirm = (store, text, cb)->
+    store.current.swap-confirmation = text
+    state.callback = cb
 export confirm = (store, text, cb)->
     store.current.confirmation = text
     state.callback = cb
@@ -695,4 +887,7 @@ export prompt-choose-token = (store, text, cb)->
 export alert = (store, text, cb)->
     store.current.alert = text
     state.callback = cb
+export network-details-modal = ->
+    store.current.current-network-details.show = yes
+   
 window.confirm-state = state

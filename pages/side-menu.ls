@@ -350,17 +350,17 @@ module.exports = (store, web3t)->
                 .menu-item.pug(on-click=open-submenu style=icon-style class="#{staking + ' ' + menu-staking}")
                     .menu.pug.arrow_box(style=background-menu)
                         ul.pug
-                            li.pug(on-click=goto-staking style=icon-style class="#{staking-active}")
+                            li.pug(key="install-node" on-click=goto-staking style=icon-style class="#{staking-active}")
                                 img.pug(src="#{icons.node}" style=icon-node)
                                 | #{lang.install-node}
-                            li.pug(on-click=goto-choose-staker style=icon-style class="#{delegate-active}")
+                            li.pug(key="delegate-stake" on-click=goto-choose-staker style=icon-style class="#{delegate-active}")
                                 img.pug(src="#{icons.delegate}" style=icon-node)
                                 | #{lang.delegate-stake}
                             if no
-                                li.pug(on-click=goto-claim style=icon-style class="#{claim-active}")
+                                li.pug(key="claim" on-click=goto-claim style=icon-style class="#{claim-active}")
                                     img.pug(src="#{icons.claim}" style=icon-node)
                                     | #{lang.claim-reward}
-                            li.pug(on-click=goto-info style=icon-style class="#{info-active}")
+                            li.pug(key="stats" on-click=goto-info style=icon-style class="#{info-active}")
                                 img.pug(src="#{icons.info}" style=icon-node)
                                 | #{lang.stats}
                     span.arrow_box.pug(style=tooltip) #{lang.staking}

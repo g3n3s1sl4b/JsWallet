@@ -241,8 +241,8 @@ video-upload = (store, web3t)->
     active-preview = active-class \preview
     .pug
         ul.pug.tab
-            li.pug(on-click=activate-upload class="#{active-upload}") Upload
-            li.pug(on-click=activate-preview class="#{active-preview}") Preview
+            li.pug(key="activate-upload" on-click=activate-upload class="#{active-upload}") Upload
+            li.pug(key="activate-preview" on-click=activate-preview class="#{active-preview}") Preview
         .pug.header
             img.pug(src="#{icons.img-drag}" style=icon-style)
             if active-upload is \active

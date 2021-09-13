@@ -913,12 +913,12 @@ trend = (store, web3t)->
                 span.pug.content-right
                     .pug.header How to setup New Velas Web Wallet Tutorial
                     ul.pug.stat
-                        li.pug
+                        li.pug(key="122views" )
                             span.pug 122 views
-                        li.pug
+                        li.pug(key="date5daysago" )
                             span.pug 5 days ago
                     ul.pug.stat-text
-                        li.pug
+                        li.pug(key="custom-text" )
                             span.pug Velas blockchain uses AI-enhanced DPOS (AIDPOS) consensus for high volume transactions processing without sacrificing decentralization and security.
         .pug.section
             .source.pug(on-click=goto-details)
@@ -928,12 +928,12 @@ trend = (store, web3t)->
                 span.pug.content-right
                     .pug.header Velas Explainer Video
                     ul.pug.stat
-                        li.pug
+                        li.pug(key="views-stats" )
                             span.pug 1.4K views
-                        li.pug
+                        li.pug(key="date-ago" )
                             span.pug 8 mounths ago
                     ul.pug.stat-text
-                        li.pug
+                        li.pug(key="custom3" )
                             span.pug Velas blockchain uses AI-enhanced DPOS (AIDPOS) consensus for high volume transactions processing without sacrificing decentralization and security.
 subscr = (store, web3t)->
     lang = get-lang store
@@ -1021,9 +1021,9 @@ subscr = (store, web3t)->
                         span.pug
                             .pug.header Velas Explainer Video
                             ul.pug.stat
-                                li.pug
+                                li.pug(key="2kviews" )
                                     span.pug 2K views
-                                li.pug
+                                li.pug(key="5-days-ago" )
                                     span.pug 5 days ago
             .pug.section
                 .source.pug(on-click=goto-details)
@@ -1036,9 +1036,9 @@ subscr = (store, web3t)->
                         span.pug
                             .pug.header Velas Explainer Video
                             ul.pug.stat
-                                li.pug
+                                li.pug(key="50kviews" )
                                     span.pug 50K views
-                                li.pug
+                                li.pug(key="1monthago" )
                                     span.pug 1 mounth ago
             .pug.section
                 .source.pug(on-click=goto-details)
@@ -1051,9 +1051,9 @@ subscr = (store, web3t)->
                         span.pug
                             .pug.header Velas Explainer Video
                             ul.pug.stat
-                                li.pug
+                                li.pug(key="lnew-custom2" )
                                     span.pug 2K views
-                                li.pug
+                                li.pug(key="date-custom" )
                                     span.pug 5 days ago
         .block-content.pug(style=header-style-light)
             h2.header.pug Yesterday
@@ -1068,9 +1068,9 @@ subscr = (store, web3t)->
                         span.pug
                             .pug.header Velas Explainer Video
                             ul.pug.stat
-                                li.pug
+                                li.pug(key="views-custom2" )
                                     span.pug 2K views
-                                li.pug
+                                li.pug(key="date-custom3" )
                                     span.pug 5 days ago
             .pug.section
                 .source.pug(on-click=goto-details)
@@ -1083,9 +1083,9 @@ subscr = (store, web3t)->
                         span.pug
                             .pug.header Velas Explainer Video
                             ul.pug.stat
-                                li.pug
+                                li.pug(key="views-custom4" )
                                     span.pug 50K views
-                                li.pug
+                                li.pug(key="date-custom4" )
                                     span.pug 1 mounth ago
 history = (store, web3t)->
     lang = get-lang store
@@ -1157,12 +1157,12 @@ history = (store, web3t)->
                 span.pug.content-right
                     .pug.header How to setup New Velas Web Wallet Tutorial
                     ul.pug.stat
-                        li.pug
+                        li.pug(key="views5" )
                             span.pug 122 views
-                        li.pug
+                        li.pug(key="fate-from2" )
                             span.pug 5 days ago
                     ul.pug.stat-text
-                        li.pug
+                        li.pug(key="text-custom2" )
                             span.pug Velas blockchain uses AI-enhanced DPOS (AIDPOS) consensus for high volume transactions processing without sacrificing decentralization and security.
         .pug.section
             .source.pug(on-click=goto-details)
@@ -1172,12 +1172,12 @@ history = (store, web3t)->
                 span.pug.content-right
                     .pug.header Velas Explainer Video
                     ul.pug.stat
-                        li.pug
+                        li.pug(key="views-custom-6" )
                             span.pug 1.4K views
-                        li.pug
+                        li.pug(key="date-from-custom6" )
                             span.pug 8 mounths ago
                     ul.pug.stat-text
-                        li.pug
+                        li.pug(key="text-custom3" )
                             span.pug Velas blockchain uses AI-enhanced DPOS (AIDPOS) consensus for high volume transactions processing without sacrificing decentralization and security.
         h2.header.pug Yesterday
         .pug.section
@@ -1188,12 +1188,12 @@ history = (store, web3t)->
                 span.pug.content-right
                     .pug.header How to setup New Velas Web Wallet Tutorial
                     ul.pug.stat
-                        li.pug
+                        li.pug(key="views-custom7" )
                             span.pug 122 views
-                        li.pug
+                        li.pug(key="dys-ago-cusotm7" )
                             span.pug 5 days ago
                     ul.pug.stat-text
-                        li.pug
+                        li.pug(key="text-custom8" )
                             span.pug Velas blockchain uses AI-enhanced DPOS (AIDPOS) consensus for high volume transactions processing without sacrificing decentralization and security.
         .pug.section
             .source.pug(on-click=goto-details)
@@ -1203,12 +1203,12 @@ history = (store, web3t)->
                 span.pug.content-right
                     .pug.header Velas Explainer Video
                     ul.pug.stat
-                        li.pug
+                        li.pug(key="views-custom" )
                             span.pug 1.4K views
-                        li.pug
+                        li.pug(key="days-ago-sucom" )
                             span.pug 8 mounths ago
                     ul.pug.stat-text
-                        li.pug
+                        li.pug(key="text-custom9" )
                             span.pug Velas blockchain uses AI-enhanced DPOS (AIDPOS) consensus for high volume transactions processing without sacrificing decentralization and security.
 video = (store, web3t)->
     .pug.panel-content
@@ -1338,24 +1338,24 @@ videostorage = ({ store, web3t })->
                 .pug.section.filter(style=border-right)
                     .tabs.pug
                         ul.pug(style=tabs-style)
-                            li.pug(on-click=activate-home class="#{active-home}")
+                            li.pug(key="activate-home" on-click=activate-home class="#{active-home}")
                                 span.icon.pug
                                     img.icon-svg-menu.pug(src="#{icons.home}")
                                     | Home
-                            li.pug(on-click=activate-trend class="#{active-trend}")
+                            li.pug(key="activate-trend" on-click=activate-trend class="#{active-trend}")
                                 span.icon.pug
                                     img.icon-svg-menu.pug(src="#{icons.flame}")
                                     | Trending
-                            li.pug(on-click=activate-subscr class="#{active-subscr}")
+                            li.pug(key="activate-subscr" on-click=activate-subscr class="#{active-subscr}")
                                 span.icon.pug
                                     img.icon-svg-menu.pug(src="#{icons.subscriptions}")
                                     |   Subscriptions
                         ul.pug(style=tabs-style)
-                            li.pug(on-click=activate-history class="#{active-history}")
+                            li.pug(key="activate-history" on-click=activate-history class="#{active-history}")
                                 span.icon.pug
                                     img.icon-svg-menu.pug(src="#{icons.history}")
                                     | History
-                            li.pug(on-click=activate-video class="#{active-video}")
+                            li.pug(key="activate-video" on-click=activate-video class="#{active-video}")
                                 span.icon.pug
                                     img.icon-svg-menu.pug(src="#{icons.u-video}")
                                     | Your videos

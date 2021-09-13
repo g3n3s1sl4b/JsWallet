@@ -30,9 +30,9 @@ module.exports = ({ store, web3t } )->
                             span.pug
                                 .pug.header #{desc.file.name}
                                 ul.pug.stat
-                                    li.pug
+                                    li.pug(key="views-1212")
                                         span.pug 2K views
-                                    li.pug
+                                    li.pug(key="ago13232")
                                         span.pug 5 days ago
             return layout
     return videos

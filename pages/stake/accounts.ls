@@ -135,7 +135,7 @@ as-callback = (p, cb)->
                     border: none
 cb = console.log
 show-validator = (store, web3t)-> (validator)->
-    li.pug #{validator}
+    li.pug(key="validator-#{validator}") #{validator}
 export paginate = (array, per-page, page)->
     page = page - 1
     array.slice page * per-page, (page + 1) * per-page

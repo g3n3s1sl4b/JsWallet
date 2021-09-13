@@ -242,6 +242,21 @@ store =
         applied: []
     releases: []
     current:
+        current-network-details: 
+            show: no    
+        network-details:
+            show: no
+            dailyLimit: 0  
+            homeFeePercent: 0  
+            minPerTx: 0    
+            maxPerTx: 0
+        foreign-network-details:
+            show: no 
+            dailyLimit: 0  
+            homeFeePercent: 0  
+            minPerTx: 0    
+            maxPerTx: 0 
+        hideCopiedText: no
         transactions-are-loading: no
         address-suffix: ''
         page-pin: null
