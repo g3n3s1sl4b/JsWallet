@@ -36,6 +36,7 @@ require! {
     \../../components/burger.ls
     \./error-funcs.ls : { get-error-message }
     \./rewards-stats.ls : RewardsStats
+    \moment
 }
 .staking
     @import scheme
@@ -945,12 +946,37 @@ staking-content = (store, web3t)->
         | _ => store.staking.chosenAccount.status
     inactiveStakeLabel =
         | store.staking.chosenAccount.status is "activating" => lang.warminUp
-        | _ => lang.inactiveStake   
+        | _ => lang.inactiveStake 
+    is-locked = store.staking.chosenAccount.account?data?parsed?info?meta?lockup? and store.staking.chosenAccount.account?data?parsed?info?meta?lockup.unixTimestamp > moment!.unix!    
+    { unixTimestamp, epoch, custodian } = store.staking.chosenAccount.account?data?parsed?info?meta?lockup 
+    date-expires =
+        | is-locked is yes => moment.unix(unixTimestamp).format(); 
+        | _ => ""
+    time-expires =
+        | is-locked is yes => 
+            h = moment.unix(unixTimestamp).hour()
+            m = moment.unix(unixTimestamp).minutes()
+            "#{h}:#{m}"
+        | _ => ""  
+        
+    lockup-warning-style = 
+        padding: "20px"
+        background: "rgb(255, 179, 0)"
+        font-weight: "bold"
+        text-align: "center"
+          
+    /* Render */    
     .pug.staking-content.delegate
         .pug.single-section.form-group(id="choosen-pull")
             .pug.section
                 .title.pug
                     h2.pug #{lang.stakeAccount}
+                if is-locked is yes
+                    .description.pug
+                        .pug.locked-warning-table(style=lockup-warning-style)
+                            span.pug Account is locked! Lockup expires on 
+                                | #{date-expires}
+                            
             .pug.section
                 .title.pug
                     h3.pug #{lang.address}
@@ -1067,7 +1093,8 @@ staking-content = (store, web3t)->
                         if (store.staking.chosenAccount.status is "inactive") 
                             .pug
                                 button { store, on-click: delegate , type: \secondary , text: lang.to_delegate, icon : \arrowRight }
-                                button { store, on-click: withdraw , type: \secondary , text: lang.withdraw, icon : \arrowLeft }
+                                if is-locked is no
+                                    button { store, on-click: withdraw , type: \secondary , text: lang.withdraw, icon : \arrowLeft }
                         else if store.staking.chosenAccount.status isnt \deactivating then
                             button { store, on-click: undelegate , type: \secondary , text: lang.to_undelegate, icon : \arrowLeft, classes: "action-undelegate" }
                         button { store, on-click: split-account , type: \secondary , text: lang.to_split, classes: "action-split", no-icon: yes }
