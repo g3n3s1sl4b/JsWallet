@@ -950,20 +950,18 @@ staking-content = (store, web3t)->
     is-locked = store.staking.chosenAccount.account?data?parsed?info?meta?lockup? and store.staking.chosenAccount.account?data?parsed?info?meta?lockup.unixTimestamp > moment!.unix!    
     { unixTimestamp, epoch, custodian } = store.staking.chosenAccount.account?data?parsed?info?meta?lockup 
     date-expires =
-        | is-locked is yes => moment.unix(unixTimestamp).format(); 
+        | is-locked is yes => moment.unix(unixTimestamp).format("MMMM D, YYYY"); 
         | _ => ""
     time-expires =
-        | is-locked is yes => 
-            h = moment.unix(unixTimestamp).hour()
-            m = moment.unix(unixTimestamp).minutes()
-            "#{h}:#{m}"
+        | is-locked is yes => moment.unix(unixTimestamp).format("hh:mm:ss"); 
         | _ => ""  
         
     lockup-warning-style = 
         padding: "20px"
-        background: "rgb(255, 179, 0)"
+        background: "rgb(207, 149, 44)"
         font-weight: "bold"
         text-align: "center"
+        max-width: "500px"
           
     /* Render */    
     .pug.staking-content.delegate
@@ -976,7 +974,8 @@ staking-content = (store, web3t)->
                         .pug.locked-warning-table(style=lockup-warning-style)
                             span.pug Account is locked! Lockup expires on 
                                 | #{date-expires}
-                            
+                                | at
+                                | #{time-expires}
             .pug.section
                 .title.pug
                     h3.pug #{lang.address}
