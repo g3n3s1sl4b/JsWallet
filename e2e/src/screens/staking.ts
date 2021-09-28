@@ -22,7 +22,7 @@ export class StakingScreen extends BaseScreen {
   async waitForLoaded(): Promise<void> {
     try {
       const loadingSelector = '" Loading..."';
-      await this.page.waitForSelector(loadingSelector, { timeout: 500 });
+      await this.page.waitForSelector(loadingSelector, { timeout: 1000 });
       while (await this.page.isVisible(loadingSelector)) {
         await this.page.waitForTimeout(500);
       }
