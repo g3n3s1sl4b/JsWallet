@@ -805,15 +805,20 @@ $network-details-modal = (store)->
         color: style.app.text
         border-bottom: "1px solid #{style.app.border}"
     lang = get-lang store
-    { dailyLimit, homeFeePercent, minPerTx, maxPerTx, wallet } = store.current.current-network-details
+    { dailyLimit, homeFeePercent, minPerTx, maxPerTx, remainingDailyLimit, wallet } = store.current.current-network-details
     { name, nickname } = wallet?coin
+    { referTo } = store.current.send.chosenNetwork
+    wallet-to = store.current.account.wallets |> find (-> it.coin.token is referTo)
     bridgeFeePercent = homeFeePercent `times` 100
     dailyLimit = round-human(dailyLimit, {decimals: 2})
     minPerTx   = round-human(minPerTx,   {decimals: 8})
     maxPerTx   = round-human(maxPerTx,   {decimals: 2})
+    remaining  = round-human(remainingDailyLimit,   {decimals: 2})
     currency = (nickname ? "").to-upper-case!
       
-    title = (name ? "").to-upper-case!
+    from-network = (name ? "").to-upper-case!
+    to-network   = (wallet-to.coin.name ? "").to-upper-case!
+    title = "Swap from #{from-network} to #{to-network}"
     .pug.confirmation
         .pug.confirmation-body(style=confirmation)
             .pug.buttons
@@ -825,7 +830,7 @@ $network-details-modal = (store)->
                 .table-item.pug(style=table-item-style)
                     .title.h5.pug(style=table-item-style-title) Remaining Daily Quota 
                     .value.pug 
-                        | #{dailyLimit}
+                        | #{remaining}
                         | #{currency}
                 .table-item.pug(style=table-item-style)
                     .title.h5.pug(style=table-item-style-title) Maximum Amount Per Transaction
