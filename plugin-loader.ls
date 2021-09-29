@@ -2,6 +2,7 @@ require! {
     \prelude-ls : { filter, sort-by, reverse, map }
     \./install-plugin.ls : { get-install-list, install-plugin }
     \./browser/window.ls
+    \localStorage
 }
 gobyte = require \../web3t/plugins/gobyte-coin.ls
 common = (store)->
