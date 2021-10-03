@@ -1,0 +1,2362 @@
+{
+  "uid" : "7873107f7a17b81b",
+  "name" : "Check VLX Legacy, VLX Native, Litecoin and Bitcoin balances",
+  "fullName" : "Check VLX Legacy, VLX Native, Litecoin and Bitcoin balances",
+  "historyId" : "Chrome Stable src/tests/unstable/balance.test.ts Balance > Check VLX Legacy, VLX Native, Litecoin and Bitcoin balances",
+  "time" : {
+    "start" : 1633300410490,
+    "stop" : 1633300460508,
+    "duration" : 50018
+  },
+  "status" : "failed",
+  "statusMessage" : "expected '..' to equal '0'",
+  "statusTrace" : "AssertionError: expected '..' to equal '0'\n    at /home/runner/work/JsWallet/JsWallet/e2e/src/tests/unstable/balance.test.ts:68:18\n    at runMicrotasks (<anonymous>)\n    at processTicksAndRejections (internal/process/task_queues.js:95:5)\n    at WorkerRunner._runTestWithBeforeHooks (/home/runner/work/JsWallet/JsWallet/e2e/node_modules/@playwright/test/lib/test/workerRunner.js:449:7)",
+  "flaky" : false,
+  "newFailed" : false,
+  "beforeStages" : [ ],
+  "testStage" : {
+    "status" : "failed",
+    "statusMessage" : "expected '..' to equal '0'",
+    "statusTrace" : "AssertionError: expected '..' to equal '0'\n    at /home/runner/work/JsWallet/JsWallet/e2e/src/tests/unstable/balance.test.ts:68:18\n    at runMicrotasks (<anonymous>)\n    at processTicksAndRejections (internal/process/task_queues.js:95:5)\n    at WorkerRunner._runTestWithBeforeHooks (/home/runner/work/JsWallet/JsWallet/e2e/node_modules/@playwright/test/lib/test/workerRunner.js:449:7)",
+    "steps" : [ {
+      "name" : "Before Hooks",
+      "time" : {
+        "start" : 1633300410490,
+        "stop" : 1633300420358,
+        "duration" : 9868
+      },
+      "status" : "passed",
+      "steps" : [ {
+        "name" : "browserContext.newPage",
+        "time" : {
+          "start" : 1633300410578,
+          "stop" : 1633300410615,
+          "duration" : 37
+        },
+        "status" : "passed",
+        "steps" : [ ],
+        "attachments" : [ ],
+        "parameters" : [ ],
+        "stepsCount" : 0,
+        "attachmentsCount" : 0,
+        "shouldDisplayMessage" : false,
+        "hasContent" : false
+      }, {
+        "name" : "page.goto(localhost:8080/main-index.html?network=testnet)",
+        "time" : {
+          "start" : 1633300410618,
+          "stop" : 1633300412314,
+          "duration" : 1696
+        },
+        "status" : "passed",
+        "steps" : [ ],
+        "attachments" : [ ],
+        "parameters" : [ ],
+        "stepsCount" : 0,
+        "attachmentsCount" : 0,
+        "shouldDisplayMessage" : false,
+        "hasContent" : false
+      }, {
+        "name" : "page.waitForSelector(.balance)",
+        "time" : {
+          "start" : 1633300412333,
+          "stop" : 1633300412838,
+          "duration" : 505
+        },
+        "status" : "failed",
+        "steps" : [ ],
+        "attachments" : [ ],
+        "parameters" : [ ],
+        "stepsCount" : 0,
+        "attachmentsCount" : 0,
+        "shouldDisplayMessage" : false,
+        "hasContent" : false
+      }, {
+        "name" : "page.isVisible([placeholder=\"Password or PIN\"])",
+        "time" : {
+          "start" : 1633300412846,
+          "stop" : 1633300412850,
+          "duration" : 4
+        },
+        "status" : "passed",
+        "steps" : [ ],
+        "attachments" : [ ],
+        "parameters" : [ ],
+        "stepsCount" : 0,
+        "attachmentsCount" : 0,
+        "shouldDisplayMessage" : false,
+        "hasContent" : false
+      }, {
+        "name" : "page.click(#lang-en)",
+        "time" : {
+          "start" : 1633300412851,
+          "stop" : 1633300413098,
+          "duration" : 247
+        },
+        "status" : "passed",
+        "steps" : [ ],
+        "attachments" : [ ],
+        "parameters" : [ ],
+        "stepsCount" : 0,
+        "attachmentsCount" : 0,
+        "shouldDisplayMessage" : false,
+        "hasContent" : false
+      }, {
+        "name" : "page.click(#btn-restore)",
+        "time" : {
+          "start" : 1633300413099,
+          "stop" : 1633300413330,
+          "duration" : 231
+        },
+        "status" : "passed",
+        "steps" : [ ],
+        "attachments" : [ ],
+        "parameters" : [ ],
+        "stepsCount" : 0,
+        "attachmentsCount" : 0,
+        "shouldDisplayMessage" : false,
+        "hasContent" : false
+      }, {
+        "name" : "page.click(#restore-custom)",
+        "time" : {
+          "start" : 1633300413331,
+          "stop" : 1633300413572,
+          "duration" : 241
+        },
+        "status" : "passed",
+        "steps" : [ ],
+        "attachments" : [ ],
+        "parameters" : [ ],
+        "stepsCount" : 0,
+        "attachmentsCount" : 0,
+        "shouldDisplayMessage" : false,
+        "hasContent" : false
+      }, {
+        "name" : "page.fill([type=\"password\"])",
+        "time" : {
+          "start" : 1633300413574,
+          "stop" : 1633300413812,
+          "duration" : 238
+        },
+        "status" : "passed",
+        "steps" : [ ],
+        "attachments" : [ ],
+        "parameters" : [ ],
+        "stepsCount" : 0,
+        "attachmentsCount" : 0,
+        "shouldDisplayMessage" : false,
+        "hasContent" : false
+      }, {
+        "name" : "page.click(button.setup)",
+        "time" : {
+          "start" : 1633300413812,
+          "stop" : 1633300414097,
+          "duration" : 285
+        },
+        "status" : "passed",
+        "steps" : [ ],
+        "attachments" : [ ],
+        "parameters" : [ ],
+        "stepsCount" : 0,
+        "attachmentsCount" : 0,
+        "shouldDisplayMessage" : false,
+        "hasContent" : false
+      }, {
+        "name" : "page.fill(#seedphrase-custom)",
+        "time" : {
+          "start" : 1633300414107,
+          "stop" : 1633300414337,
+          "duration" : 230
+        },
+        "status" : "passed",
+        "steps" : [ ],
+        "attachments" : [ ],
+        "parameters" : [ ],
+        "stepsCount" : 0,
+        "attachmentsCount" : 0,
+        "shouldDisplayMessage" : false,
+        "hasContent" : false
+      }, {
+        "name" : "page.click(#seed-phrase-next)",
+        "time" : {
+          "start" : 1633300414338,
+          "stop" : 1633300415187,
+          "duration" : 849
+        },
+        "status" : "passed",
+        "steps" : [ ],
+        "attachments" : [ ],
+        "parameters" : [ ],
+        "stepsCount" : 0,
+        "attachmentsCount" : 0,
+        "shouldDisplayMessage" : false,
+        "hasContent" : false
+      }, {
+        "name" : "page.waitForSelector(.menu-item)",
+        "time" : {
+          "start" : 1633300415188,
+          "stop" : 1633300415261,
+          "duration" : 73
+        },
+        "status" : "passed",
+        "steps" : [ ],
+        "attachments" : [ ],
+        "parameters" : [ ],
+        "stepsCount" : 0,
+        "attachmentsCount" : 0,
+        "shouldDisplayMessage" : false,
+        "hasContent" : false
+      }, {
+        "name" : "page.waitForSelector(.balance)",
+        "time" : {
+          "start" : 1633300415262,
+          "stop" : 1633300415280,
+          "duration" : 18
+        },
+        "status" : "passed",
+        "steps" : [ ],
+        "attachments" : [ ],
+        "parameters" : [ ],
+        "stepsCount" : 0,
+        "attachmentsCount" : 0,
+        "shouldDisplayMessage" : false,
+        "hasContent" : false
+      }, {
+        "name" : "page.waitForSelector(.wallet-item .top-left [class=\" img\"])",
+        "time" : {
+          "start" : 1633300415288,
+          "stop" : 1633300420257,
+          "duration" : 4969
+        },
+        "status" : "passed",
+        "steps" : [ ],
+        "attachments" : [ ],
+        "parameters" : [ ],
+        "stepsCount" : 0,
+        "attachmentsCount" : 0,
+        "shouldDisplayMessage" : false,
+        "hasContent" : false
+      } ],
+      "attachments" : [ ],
+      "parameters" : [ ],
+      "stepsCount" : 14,
+      "attachmentsCount" : 0,
+      "shouldDisplayMessage" : false,
+      "hasContent" : true
+    }, {
+      "name" : "page.click(.header .button.lock.mt-5)",
+      "time" : {
+        "start" : 1633300420359,
+        "stop" : 1633300420759,
+        "duration" : 400
+      },
+      "status" : "passed",
+      "steps" : [ ],
+      "attachments" : [ ],
+      "parameters" : [ ],
+      "stepsCount" : 0,
+      "attachmentsCount" : 0,
+      "shouldDisplayMessage" : false,
+      "hasContent" : false
+    }, {
+      "name" : "page.$$(.manage-account .settings .list .item)",
+      "time" : {
+        "start" : 1633300420760,
+        "stop" : 1633300420826,
+        "duration" : 66
+      },
+      "status" : "passed",
+      "steps" : [ ],
+      "attachments" : [ ],
+      "parameters" : [ ],
+      "stepsCount" : 0,
+      "attachmentsCount" : 0,
+      "shouldDisplayMessage" : false,
+      "hasContent" : false
+    }, {
+      "name" : "elementHandle.$(span.title:text(\"Litecoin\"))",
+      "time" : {
+        "start" : 1633300420827,
+        "stop" : 1633300420835,
+        "duration" : 8
+      },
+      "status" : "passed",
+      "steps" : [ ],
+      "attachments" : [ ],
+      "parameters" : [ ],
+      "stepsCount" : 0,
+      "attachmentsCount" : 0,
+      "shouldDisplayMessage" : false,
+      "hasContent" : false
+    }, {
+      "name" : "elementHandle.$(button)",
+      "time" : {
+        "start" : 1633300420836,
+        "stop" : 1633300420863,
+        "duration" : 27
+      },
+      "status" : "passed",
+      "steps" : [ ],
+      "attachments" : [ ],
+      "parameters" : [ ],
+      "stepsCount" : 0,
+      "attachmentsCount" : 0,
+      "shouldDisplayMessage" : false,
+      "hasContent" : false
+    }, {
+      "name" : "elementHandle.$(span.title:text(\"Litecoin\"))",
+      "time" : {
+        "start" : 1633300420863,
+        "stop" : 1633300420885,
+        "duration" : 22
+      },
+      "status" : "passed",
+      "steps" : [ ],
+      "attachments" : [ ],
+      "parameters" : [ ],
+      "stepsCount" : 0,
+      "attachmentsCount" : 0,
+      "shouldDisplayMessage" : false,
+      "hasContent" : false
+    }, {
+      "name" : "elementHandle.$(button)",
+      "time" : {
+        "start" : 1633300420885,
+        "stop" : 1633300420898,
+        "duration" : 13
+      },
+      "status" : "passed",
+      "steps" : [ ],
+      "attachments" : [ ],
+      "parameters" : [ ],
+      "stepsCount" : 0,
+      "attachmentsCount" : 0,
+      "shouldDisplayMessage" : false,
+      "hasContent" : false
+    }, {
+      "name" : "elementHandle.$(span.title:text(\"Litecoin\"))",
+      "time" : {
+        "start" : 1633300420899,
+        "stop" : 1633300420911,
+        "duration" : 12
+      },
+      "status" : "passed",
+      "steps" : [ ],
+      "attachments" : [ ],
+      "parameters" : [ ],
+      "stepsCount" : 0,
+      "attachmentsCount" : 0,
+      "shouldDisplayMessage" : false,
+      "hasContent" : false
+    }, {
+      "name" : "elementHandle.$(button)",
+      "time" : {
+        "start" : 1633300420911,
+        "stop" : 1633300420915,
+        "duration" : 4
+      },
+      "status" : "passed",
+      "steps" : [ ],
+      "attachments" : [ ],
+      "parameters" : [ ],
+      "stepsCount" : 0,
+      "attachmentsCount" : 0,
+      "shouldDisplayMessage" : false,
+      "hasContent" : false
+    }, {
+      "name" : "elementHandle.$(span.title:text(\"Litecoin\"))",
+      "time" : {
+        "start" : 1633300420915,
+        "stop" : 1633300420918,
+        "duration" : 3
+      },
+      "status" : "passed",
+      "steps" : [ ],
+      "attachments" : [ ],
+      "parameters" : [ ],
+      "stepsCount" : 0,
+      "attachmentsCount" : 0,
+      "shouldDisplayMessage" : false,
+      "hasContent" : false
+    }, {
+      "name" : "elementHandle.$(button)",
+      "time" : {
+        "start" : 1633300420919,
+        "stop" : 1633300420928,
+        "duration" : 9
+      },
+      "status" : "passed",
+      "steps" : [ ],
+      "attachments" : [ ],
+      "parameters" : [ ],
+      "stepsCount" : 0,
+      "attachmentsCount" : 0,
+      "shouldDisplayMessage" : false,
+      "hasContent" : false
+    }, {
+      "name" : "elementHandle.$(span.title:text(\"Litecoin\"))",
+      "time" : {
+        "start" : 1633300420928,
+        "stop" : 1633300420931,
+        "duration" : 3
+      },
+      "status" : "passed",
+      "steps" : [ ],
+      "attachments" : [ ],
+      "parameters" : [ ],
+      "stepsCount" : 0,
+      "attachmentsCount" : 0,
+      "shouldDisplayMessage" : false,
+      "hasContent" : false
+    }, {
+      "name" : "elementHandle.$(button)",
+      "time" : {
+        "start" : 1633300420942,
+        "stop" : 1633300420947,
+        "duration" : 5
+      },
+      "status" : "passed",
+      "steps" : [ ],
+      "attachments" : [ ],
+      "parameters" : [ ],
+      "stepsCount" : 0,
+      "attachmentsCount" : 0,
+      "shouldDisplayMessage" : false,
+      "hasContent" : false
+    }, {
+      "name" : "elementHandle.$(span.title:text(\"Litecoin\"))",
+      "time" : {
+        "start" : 1633300420947,
+        "stop" : 1633300420953,
+        "duration" : 6
+      },
+      "status" : "passed",
+      "steps" : [ ],
+      "attachments" : [ ],
+      "parameters" : [ ],
+      "stepsCount" : 0,
+      "attachmentsCount" : 0,
+      "shouldDisplayMessage" : false,
+      "hasContent" : false
+    }, {
+      "name" : "elementHandle.$(button)",
+      "time" : {
+        "start" : 1633300420954,
+        "stop" : 1633300420958,
+        "duration" : 4
+      },
+      "status" : "passed",
+      "steps" : [ ],
+      "attachments" : [ ],
+      "parameters" : [ ],
+      "stepsCount" : 0,
+      "attachmentsCount" : 0,
+      "shouldDisplayMessage" : false,
+      "hasContent" : false
+    }, {
+      "name" : "elementHandle.$(span.title:text(\"Litecoin\"))",
+      "time" : {
+        "start" : 1633300420959,
+        "stop" : 1633300420968,
+        "duration" : 9
+      },
+      "status" : "passed",
+      "steps" : [ ],
+      "attachments" : [ ],
+      "parameters" : [ ],
+      "stepsCount" : 0,
+      "attachmentsCount" : 0,
+      "shouldDisplayMessage" : false,
+      "hasContent" : false
+    }, {
+      "name" : "elementHandle.$(button)",
+      "time" : {
+        "start" : 1633300420968,
+        "stop" : 1633300420971,
+        "duration" : 3
+      },
+      "status" : "passed",
+      "steps" : [ ],
+      "attachments" : [ ],
+      "parameters" : [ ],
+      "stepsCount" : 0,
+      "attachmentsCount" : 0,
+      "shouldDisplayMessage" : false,
+      "hasContent" : false
+    }, {
+      "name" : "elementHandle.$(span.title:text(\"Litecoin\"))",
+      "time" : {
+        "start" : 1633300420972,
+        "stop" : 1633300420976,
+        "duration" : 4
+      },
+      "status" : "passed",
+      "steps" : [ ],
+      "attachments" : [ ],
+      "parameters" : [ ],
+      "stepsCount" : 0,
+      "attachmentsCount" : 0,
+      "shouldDisplayMessage" : false,
+      "hasContent" : false
+    }, {
+      "name" : "elementHandle.textContent",
+      "time" : {
+        "start" : 1633300420977,
+        "stop" : 1633300420986,
+        "duration" : 9
+      },
+      "status" : "passed",
+      "steps" : [ ],
+      "attachments" : [ ],
+      "parameters" : [ ],
+      "stepsCount" : 0,
+      "attachmentsCount" : 0,
+      "shouldDisplayMessage" : false,
+      "hasContent" : false
+    }, {
+      "name" : "elementHandle.$(button)",
+      "time" : {
+        "start" : 1633300420987,
+        "stop" : 1633300420990,
+        "duration" : 3
+      },
+      "status" : "passed",
+      "steps" : [ ],
+      "attachments" : [ ],
+      "parameters" : [ ],
+      "stepsCount" : 0,
+      "attachmentsCount" : 0,
+      "shouldDisplayMessage" : false,
+      "hasContent" : false
+    }, {
+      "name" : "elementHandle.click",
+      "time" : {
+        "start" : 1633300420991,
+        "stop" : 1633300422131,
+        "duration" : 1140
+      },
+      "status" : "passed",
+      "steps" : [ ],
+      "attachments" : [ ],
+      "parameters" : [ ],
+      "stepsCount" : 0,
+      "attachmentsCount" : 0,
+      "shouldDisplayMessage" : false,
+      "hasContent" : false
+    }, {
+      "name" : "elementHandle.$(span.title:text(\"Litecoin\"))",
+      "time" : {
+        "start" : 1633300422131,
+        "stop" : 1633300422140,
+        "duration" : 9
+      },
+      "status" : "passed",
+      "steps" : [ ],
+      "attachments" : [ ],
+      "parameters" : [ ],
+      "stepsCount" : 0,
+      "attachmentsCount" : 0,
+      "shouldDisplayMessage" : false,
+      "hasContent" : false
+    }, {
+      "name" : "elementHandle.$(button)",
+      "time" : {
+        "start" : 1633300422141,
+        "stop" : 1633300422146,
+        "duration" : 5
+      },
+      "status" : "passed",
+      "steps" : [ ],
+      "attachments" : [ ],
+      "parameters" : [ ],
+      "stepsCount" : 0,
+      "attachmentsCount" : 0,
+      "shouldDisplayMessage" : false,
+      "hasContent" : false
+    }, {
+      "name" : "elementHandle.$(span.title:text(\"Litecoin\"))",
+      "time" : {
+        "start" : 1633300422147,
+        "stop" : 1633300422150,
+        "duration" : 3
+      },
+      "status" : "passed",
+      "steps" : [ ],
+      "attachments" : [ ],
+      "parameters" : [ ],
+      "stepsCount" : 0,
+      "attachmentsCount" : 0,
+      "shouldDisplayMessage" : false,
+      "hasContent" : false
+    }, {
+      "name" : "elementHandle.$(button)",
+      "time" : {
+        "start" : 1633300422151,
+        "stop" : 1633300422156,
+        "duration" : 5
+      },
+      "status" : "passed",
+      "steps" : [ ],
+      "attachments" : [ ],
+      "parameters" : [ ],
+      "stepsCount" : 0,
+      "attachmentsCount" : 0,
+      "shouldDisplayMessage" : false,
+      "hasContent" : false
+    }, {
+      "name" : "elementHandle.$(span.title:text(\"Litecoin\"))",
+      "time" : {
+        "start" : 1633300422158,
+        "stop" : 1633300422166,
+        "duration" : 8
+      },
+      "status" : "passed",
+      "steps" : [ ],
+      "attachments" : [ ],
+      "parameters" : [ ],
+      "stepsCount" : 0,
+      "attachmentsCount" : 0,
+      "shouldDisplayMessage" : false,
+      "hasContent" : false
+    }, {
+      "name" : "elementHandle.$(button)",
+      "time" : {
+        "start" : 1633300422166,
+        "stop" : 1633300422171,
+        "duration" : 5
+      },
+      "status" : "passed",
+      "steps" : [ ],
+      "attachments" : [ ],
+      "parameters" : [ ],
+      "stepsCount" : 0,
+      "attachmentsCount" : 0,
+      "shouldDisplayMessage" : false,
+      "hasContent" : false
+    }, {
+      "name" : "elementHandle.$(span.title:text(\"Litecoin\"))",
+      "time" : {
+        "start" : 1633300422171,
+        "stop" : 1633300422193,
+        "duration" : 22
+      },
+      "status" : "passed",
+      "steps" : [ ],
+      "attachments" : [ ],
+      "parameters" : [ ],
+      "stepsCount" : 0,
+      "attachmentsCount" : 0,
+      "shouldDisplayMessage" : false,
+      "hasContent" : false
+    }, {
+      "name" : "elementHandle.$(button)",
+      "time" : {
+        "start" : 1633300422193,
+        "stop" : 1633300422197,
+        "duration" : 4
+      },
+      "status" : "passed",
+      "steps" : [ ],
+      "attachments" : [ ],
+      "parameters" : [ ],
+      "stepsCount" : 0,
+      "attachmentsCount" : 0,
+      "shouldDisplayMessage" : false,
+      "hasContent" : false
+    }, {
+      "name" : "elementHandle.$(span.title:text(\"Litecoin\"))",
+      "time" : {
+        "start" : 1633300422197,
+        "stop" : 1633300422200,
+        "duration" : 3
+      },
+      "status" : "passed",
+      "steps" : [ ],
+      "attachments" : [ ],
+      "parameters" : [ ],
+      "stepsCount" : 0,
+      "attachmentsCount" : 0,
+      "shouldDisplayMessage" : false,
+      "hasContent" : false
+    }, {
+      "name" : "elementHandle.$(button)",
+      "time" : {
+        "start" : 1633300422200,
+        "stop" : 1633300422207,
+        "duration" : 7
+      },
+      "status" : "passed",
+      "steps" : [ ],
+      "attachments" : [ ],
+      "parameters" : [ ],
+      "stepsCount" : 0,
+      "attachmentsCount" : 0,
+      "shouldDisplayMessage" : false,
+      "hasContent" : false
+    }, {
+      "name" : "page.waitForSelector(.wallet-item .top-left [class=\" img\"])",
+      "time" : {
+        "start" : 1633300422208,
+        "stop" : 1633300427318,
+        "duration" : 5110
+      },
+      "status" : "passed",
+      "steps" : [ ],
+      "attachments" : [ ],
+      "parameters" : [ ],
+      "stepsCount" : 0,
+      "attachmentsCount" : 0,
+      "shouldDisplayMessage" : false,
+      "hasContent" : false
+    }, {
+      "name" : "page.$$(.wallet-item)",
+      "time" : {
+        "start" : 1633300427419,
+        "stop" : 1633300427440,
+        "duration" : 21
+      },
+      "status" : "passed",
+      "steps" : [ ],
+      "attachments" : [ ],
+      "parameters" : [ ],
+      "stepsCount" : 0,
+      "attachmentsCount" : 0,
+      "shouldDisplayMessage" : false,
+      "hasContent" : false
+    }, {
+      "name" : "elementHandle.$(.balance.title)",
+      "time" : {
+        "start" : 1633300427441,
+        "stop" : 1633300427448,
+        "duration" : 7
+      },
+      "status" : "passed",
+      "steps" : [ ],
+      "attachments" : [ ],
+      "parameters" : [ ],
+      "stepsCount" : 0,
+      "attachmentsCount" : 0,
+      "shouldDisplayMessage" : false,
+      "hasContent" : false
+    }, {
+      "name" : "elementHandle.textContent",
+      "time" : {
+        "start" : 1633300427449,
+        "stop" : 1633300427486,
+        "duration" : 37
+      },
+      "status" : "passed",
+      "steps" : [ ],
+      "attachments" : [ ],
+      "parameters" : [ ],
+      "stepsCount" : 0,
+      "attachmentsCount" : 0,
+      "shouldDisplayMessage" : false,
+      "hasContent" : false
+    }, {
+      "name" : "page.isVisible(.balance.title:text(\" Velas Native\"))",
+      "time" : {
+        "start" : 1633300427486,
+        "stop" : 1633300427501,
+        "duration" : 15
+      },
+      "status" : "passed",
+      "steps" : [ ],
+      "attachments" : [ ],
+      "parameters" : [ ],
+      "stepsCount" : 0,
+      "attachmentsCount" : 0,
+      "shouldDisplayMessage" : false,
+      "hasContent" : false
+    }, {
+      "name" : "elementHandle.$(.info .token.price)",
+      "time" : {
+        "start" : 1633300427502,
+        "stop" : 1633300427507,
+        "duration" : 5
+      },
+      "status" : "passed",
+      "steps" : [ ],
+      "attachments" : [ ],
+      "parameters" : [ ],
+      "stepsCount" : 0,
+      "attachmentsCount" : 0,
+      "shouldDisplayMessage" : false,
+      "hasContent" : false
+    }, {
+      "name" : "elementHandle.getAttribute",
+      "time" : {
+        "start" : 1633300427508,
+        "stop" : 1633300427515,
+        "duration" : 7
+      },
+      "status" : "passed",
+      "steps" : [ ],
+      "attachments" : [ ],
+      "parameters" : [ ],
+      "stepsCount" : 0,
+      "attachmentsCount" : 0,
+      "shouldDisplayMessage" : false,
+      "hasContent" : false
+    }, {
+      "name" : "elementHandle.$(.balance.title)",
+      "time" : {
+        "start" : 1633300427516,
+        "stop" : 1633300427551,
+        "duration" : 35
+      },
+      "status" : "passed",
+      "steps" : [ ],
+      "attachments" : [ ],
+      "parameters" : [ ],
+      "stepsCount" : 0,
+      "attachmentsCount" : 0,
+      "shouldDisplayMessage" : false,
+      "hasContent" : false
+    }, {
+      "name" : "elementHandle.textContent",
+      "time" : {
+        "start" : 1633300427551,
+        "stop" : 1633300427553,
+        "duration" : 2
+      },
+      "status" : "passed",
+      "steps" : [ ],
+      "attachments" : [ ],
+      "parameters" : [ ],
+      "stepsCount" : 0,
+      "attachmentsCount" : 0,
+      "shouldDisplayMessage" : false,
+      "hasContent" : false
+    }, {
+      "name" : "page.isVisible(.balance.title:text(\" Velas EVM\"))",
+      "time" : {
+        "start" : 1633300427553,
+        "stop" : 1633300427564,
+        "duration" : 11
+      },
+      "status" : "passed",
+      "steps" : [ ],
+      "attachments" : [ ],
+      "parameters" : [ ],
+      "stepsCount" : 0,
+      "attachmentsCount" : 0,
+      "shouldDisplayMessage" : false,
+      "hasContent" : false
+    }, {
+      "name" : "elementHandle.$(.info .token.price)",
+      "time" : {
+        "start" : 1633300427564,
+        "stop" : 1633300427582,
+        "duration" : 18
+      },
+      "status" : "passed",
+      "steps" : [ ],
+      "attachments" : [ ],
+      "parameters" : [ ],
+      "stepsCount" : 0,
+      "attachmentsCount" : 0,
+      "shouldDisplayMessage" : false,
+      "hasContent" : false
+    }, {
+      "name" : "elementHandle.getAttribute",
+      "time" : {
+        "start" : 1633300427582,
+        "stop" : 1633300427592,
+        "duration" : 10
+      },
+      "status" : "passed",
+      "steps" : [ ],
+      "attachments" : [ ],
+      "parameters" : [ ],
+      "stepsCount" : 0,
+      "attachmentsCount" : 0,
+      "shouldDisplayMessage" : false,
+      "hasContent" : false
+    }, {
+      "name" : "elementHandle.$(.balance.title)",
+      "time" : {
+        "start" : 1633300427592,
+        "stop" : 1633300427598,
+        "duration" : 6
+      },
+      "status" : "passed",
+      "steps" : [ ],
+      "attachments" : [ ],
+      "parameters" : [ ],
+      "stepsCount" : 0,
+      "attachmentsCount" : 0,
+      "shouldDisplayMessage" : false,
+      "hasContent" : false
+    }, {
+      "name" : "elementHandle.textContent",
+      "time" : {
+        "start" : 1633300427598,
+        "stop" : 1633300427601,
+        "duration" : 3
+      },
+      "status" : "passed",
+      "steps" : [ ],
+      "attachments" : [ ],
+      "parameters" : [ ],
+      "stepsCount" : 0,
+      "attachmentsCount" : 0,
+      "shouldDisplayMessage" : false,
+      "hasContent" : false
+    }, {
+      "name" : "page.isVisible(.balance.title:text(\" Velas Legacy\"))",
+      "time" : {
+        "start" : 1633300427602,
+        "stop" : 1633300427618,
+        "duration" : 16
+      },
+      "status" : "passed",
+      "steps" : [ ],
+      "attachments" : [ ],
+      "parameters" : [ ],
+      "stepsCount" : 0,
+      "attachmentsCount" : 0,
+      "shouldDisplayMessage" : false,
+      "hasContent" : false
+    }, {
+      "name" : "elementHandle.$(.info .token.price)",
+      "time" : {
+        "start" : 1633300427619,
+        "stop" : 1633300427638,
+        "duration" : 19
+      },
+      "status" : "passed",
+      "steps" : [ ],
+      "attachments" : [ ],
+      "parameters" : [ ],
+      "stepsCount" : 0,
+      "attachmentsCount" : 0,
+      "shouldDisplayMessage" : false,
+      "hasContent" : false
+    }, {
+      "name" : "elementHandle.getAttribute",
+      "time" : {
+        "start" : 1633300427638,
+        "stop" : 1633300427641,
+        "duration" : 3
+      },
+      "status" : "passed",
+      "steps" : [ ],
+      "attachments" : [ ],
+      "parameters" : [ ],
+      "stepsCount" : 0,
+      "attachmentsCount" : 0,
+      "shouldDisplayMessage" : false,
+      "hasContent" : false
+    }, {
+      "name" : "elementHandle.$(.balance.title)",
+      "time" : {
+        "start" : 1633300427641,
+        "stop" : 1633300427654,
+        "duration" : 13
+      },
+      "status" : "passed",
+      "steps" : [ ],
+      "attachments" : [ ],
+      "parameters" : [ ],
+      "stepsCount" : 0,
+      "attachmentsCount" : 0,
+      "shouldDisplayMessage" : false,
+      "hasContent" : false
+    }, {
+      "name" : "elementHandle.textContent",
+      "time" : {
+        "start" : 1633300427655,
+        "stop" : 1633300427658,
+        "duration" : 3
+      },
+      "status" : "passed",
+      "steps" : [ ],
+      "attachments" : [ ],
+      "parameters" : [ ],
+      "stepsCount" : 0,
+      "attachmentsCount" : 0,
+      "shouldDisplayMessage" : false,
+      "hasContent" : false
+    }, {
+      "name" : "page.isVisible(.balance.title:text(\" Velas EVM Legacy\"))",
+      "time" : {
+        "start" : 1633300427658,
+        "stop" : 1633300427676,
+        "duration" : 18
+      },
+      "status" : "passed",
+      "steps" : [ ],
+      "attachments" : [ ],
+      "parameters" : [ ],
+      "stepsCount" : 0,
+      "attachmentsCount" : 0,
+      "shouldDisplayMessage" : false,
+      "hasContent" : false
+    }, {
+      "name" : "elementHandle.$(.info .token.price)",
+      "time" : {
+        "start" : 1633300427676,
+        "stop" : 1633300427681,
+        "duration" : 5
+      },
+      "status" : "passed",
+      "steps" : [ ],
+      "attachments" : [ ],
+      "parameters" : [ ],
+      "stepsCount" : 0,
+      "attachmentsCount" : 0,
+      "shouldDisplayMessage" : false,
+      "hasContent" : false
+    }, {
+      "name" : "elementHandle.getAttribute",
+      "time" : {
+        "start" : 1633300427682,
+        "stop" : 1633300427684,
+        "duration" : 2
+      },
+      "status" : "passed",
+      "steps" : [ ],
+      "attachments" : [ ],
+      "parameters" : [ ],
+      "stepsCount" : 0,
+      "attachmentsCount" : 0,
+      "shouldDisplayMessage" : false,
+      "hasContent" : false
+    }, {
+      "name" : "elementHandle.$(.balance.title)",
+      "time" : {
+        "start" : 1633300427685,
+        "stop" : 1633300427696,
+        "duration" : 11
+      },
+      "status" : "passed",
+      "steps" : [ ],
+      "attachments" : [ ],
+      "parameters" : [ ],
+      "stepsCount" : 0,
+      "attachmentsCount" : 0,
+      "shouldDisplayMessage" : false,
+      "hasContent" : false
+    }, {
+      "name" : "elementHandle.textContent",
+      "time" : {
+        "start" : 1633300427696,
+        "stop" : 1633300427702,
+        "duration" : 6
+      },
+      "status" : "passed",
+      "steps" : [ ],
+      "attachments" : [ ],
+      "parameters" : [ ],
+      "stepsCount" : 0,
+      "attachmentsCount" : 0,
+      "shouldDisplayMessage" : false,
+      "hasContent" : false
+    }, {
+      "name" : "page.isVisible(.balance.title:text(\" Bitcoin\"))",
+      "time" : {
+        "start" : 1633300427702,
+        "stop" : 1633300427832,
+        "duration" : 130
+      },
+      "status" : "passed",
+      "steps" : [ ],
+      "attachments" : [ ],
+      "parameters" : [ ],
+      "stepsCount" : 0,
+      "attachmentsCount" : 0,
+      "shouldDisplayMessage" : false,
+      "hasContent" : false
+    }, {
+      "name" : "elementHandle.$(.info .token.price)",
+      "time" : {
+        "start" : 1633300427833,
+        "stop" : 1633300427837,
+        "duration" : 4
+      },
+      "status" : "passed",
+      "steps" : [ ],
+      "attachments" : [ ],
+      "parameters" : [ ],
+      "stepsCount" : 0,
+      "attachmentsCount" : 0,
+      "shouldDisplayMessage" : false,
+      "hasContent" : false
+    }, {
+      "name" : "elementHandle.getAttribute",
+      "time" : {
+        "start" : 1633300427838,
+        "stop" : 1633300427840,
+        "duration" : 2
+      },
+      "status" : "passed",
+      "steps" : [ ],
+      "attachments" : [ ],
+      "parameters" : [ ],
+      "stepsCount" : 0,
+      "attachmentsCount" : 0,
+      "shouldDisplayMessage" : false,
+      "hasContent" : false
+    }, {
+      "name" : "elementHandle.$(.balance.title)",
+      "time" : {
+        "start" : 1633300427841,
+        "stop" : 1633300427855,
+        "duration" : 14
+      },
+      "status" : "passed",
+      "steps" : [ ],
+      "attachments" : [ ],
+      "parameters" : [ ],
+      "stepsCount" : 0,
+      "attachmentsCount" : 0,
+      "shouldDisplayMessage" : false,
+      "hasContent" : false
+    }, {
+      "name" : "elementHandle.textContent",
+      "time" : {
+        "start" : 1633300427856,
+        "stop" : 1633300427858,
+        "duration" : 2
+      },
+      "status" : "passed",
+      "steps" : [ ],
+      "attachments" : [ ],
+      "parameters" : [ ],
+      "stepsCount" : 0,
+      "attachmentsCount" : 0,
+      "shouldDisplayMessage" : false,
+      "hasContent" : false
+    }, {
+      "name" : "page.isVisible(.balance.title:text(\" Ethereum\"))",
+      "time" : {
+        "start" : 1633300427866,
+        "stop" : 1633300427872,
+        "duration" : 6
+      },
+      "status" : "passed",
+      "steps" : [ ],
+      "attachments" : [ ],
+      "parameters" : [ ],
+      "stepsCount" : 0,
+      "attachmentsCount" : 0,
+      "shouldDisplayMessage" : false,
+      "hasContent" : false
+    }, {
+      "name" : "elementHandle.$(.info .token.price)",
+      "time" : {
+        "start" : 1633300427873,
+        "stop" : 1633300427881,
+        "duration" : 8
+      },
+      "status" : "passed",
+      "steps" : [ ],
+      "attachments" : [ ],
+      "parameters" : [ ],
+      "stepsCount" : 0,
+      "attachmentsCount" : 0,
+      "shouldDisplayMessage" : false,
+      "hasContent" : false
+    }, {
+      "name" : "elementHandle.getAttribute",
+      "time" : {
+        "start" : 1633300427881,
+        "stop" : 1633300427892,
+        "duration" : 11
+      },
+      "status" : "passed",
+      "steps" : [ ],
+      "attachments" : [ ],
+      "parameters" : [ ],
+      "stepsCount" : 0,
+      "attachmentsCount" : 0,
+      "shouldDisplayMessage" : false,
+      "hasContent" : false
+    }, {
+      "name" : "elementHandle.$(.balance.title)",
+      "time" : {
+        "start" : 1633300427893,
+        "stop" : 1633300427910,
+        "duration" : 17
+      },
+      "status" : "passed",
+      "steps" : [ ],
+      "attachments" : [ ],
+      "parameters" : [ ],
+      "stepsCount" : 0,
+      "attachmentsCount" : 0,
+      "shouldDisplayMessage" : false,
+      "hasContent" : false
+    }, {
+      "name" : "elementHandle.textContent",
+      "time" : {
+        "start" : 1633300427911,
+        "stop" : 1633300427920,
+        "duration" : 9
+      },
+      "status" : "passed",
+      "steps" : [ ],
+      "attachments" : [ ],
+      "parameters" : [ ],
+      "stepsCount" : 0,
+      "attachmentsCount" : 0,
+      "shouldDisplayMessage" : false,
+      "hasContent" : false
+    }, {
+      "name" : "page.isVisible(.balance.title:text(\" Ethereum Legacy\"))",
+      "time" : {
+        "start" : 1633300427921,
+        "stop" : 1633300427926,
+        "duration" : 5
+      },
+      "status" : "passed",
+      "steps" : [ ],
+      "attachments" : [ ],
+      "parameters" : [ ],
+      "stepsCount" : 0,
+      "attachmentsCount" : 0,
+      "shouldDisplayMessage" : false,
+      "hasContent" : false
+    }, {
+      "name" : "elementHandle.$(.info .token.price)",
+      "time" : {
+        "start" : 1633300427927,
+        "stop" : 1633300427931,
+        "duration" : 4
+      },
+      "status" : "passed",
+      "steps" : [ ],
+      "attachments" : [ ],
+      "parameters" : [ ],
+      "stepsCount" : 0,
+      "attachmentsCount" : 0,
+      "shouldDisplayMessage" : false,
+      "hasContent" : false
+    }, {
+      "name" : "elementHandle.getAttribute",
+      "time" : {
+        "start" : 1633300427932,
+        "stop" : 1633300427942,
+        "duration" : 10
+      },
+      "status" : "passed",
+      "steps" : [ ],
+      "attachments" : [ ],
+      "parameters" : [ ],
+      "stepsCount" : 0,
+      "attachmentsCount" : 0,
+      "shouldDisplayMessage" : false,
+      "hasContent" : false
+    }, {
+      "name" : "elementHandle.$(.balance.title)",
+      "time" : {
+        "start" : 1633300427943,
+        "stop" : 1633300427964,
+        "duration" : 21
+      },
+      "status" : "passed",
+      "steps" : [ ],
+      "attachments" : [ ],
+      "parameters" : [ ],
+      "stepsCount" : 0,
+      "attachmentsCount" : 0,
+      "shouldDisplayMessage" : false,
+      "hasContent" : false
+    }, {
+      "name" : "elementHandle.textContent",
+      "time" : {
+        "start" : 1633300427965,
+        "stop" : 1633300427979,
+        "duration" : 14
+      },
+      "status" : "passed",
+      "steps" : [ ],
+      "attachments" : [ ],
+      "parameters" : [ ],
+      "stepsCount" : 0,
+      "attachmentsCount" : 0,
+      "shouldDisplayMessage" : false,
+      "hasContent" : false
+    }, {
+      "name" : "page.isVisible(.balance.title:text(\" Tether USD Legacy\"))",
+      "time" : {
+        "start" : 1633300427980,
+        "stop" : 1633300427986,
+        "duration" : 6
+      },
+      "status" : "passed",
+      "steps" : [ ],
+      "attachments" : [ ],
+      "parameters" : [ ],
+      "stepsCount" : 0,
+      "attachmentsCount" : 0,
+      "shouldDisplayMessage" : false,
+      "hasContent" : false
+    }, {
+      "name" : "elementHandle.$(.info .token.price)",
+      "time" : {
+        "start" : 1633300427986,
+        "stop" : 1633300427996,
+        "duration" : 10
+      },
+      "status" : "passed",
+      "steps" : [ ],
+      "attachments" : [ ],
+      "parameters" : [ ],
+      "stepsCount" : 0,
+      "attachmentsCount" : 0,
+      "shouldDisplayMessage" : false,
+      "hasContent" : false
+    }, {
+      "name" : "elementHandle.getAttribute",
+      "time" : {
+        "start" : 1633300427996,
+        "stop" : 1633300427998,
+        "duration" : 2
+      },
+      "status" : "passed",
+      "steps" : [ ],
+      "attachments" : [ ],
+      "parameters" : [ ],
+      "stepsCount" : 0,
+      "attachmentsCount" : 0,
+      "shouldDisplayMessage" : false,
+      "hasContent" : false
+    }, {
+      "name" : "elementHandle.$(.balance.title)",
+      "time" : {
+        "start" : 1633300427998,
+        "stop" : 1633300428001,
+        "duration" : 3
+      },
+      "status" : "passed",
+      "steps" : [ ],
+      "attachments" : [ ],
+      "parameters" : [ ],
+      "stepsCount" : 0,
+      "attachmentsCount" : 0,
+      "shouldDisplayMessage" : false,
+      "hasContent" : false
+    }, {
+      "name" : "elementHandle.textContent",
+      "time" : {
+        "start" : 1633300428002,
+        "stop" : 1633300428011,
+        "duration" : 9
+      },
+      "status" : "passed",
+      "steps" : [ ],
+      "attachments" : [ ],
+      "parameters" : [ ],
+      "stepsCount" : 0,
+      "attachmentsCount" : 0,
+      "shouldDisplayMessage" : false,
+      "hasContent" : false
+    }, {
+      "name" : "page.isVisible(.balance.title:text(\" Litecoin\"))",
+      "time" : {
+        "start" : 1633300428011,
+        "stop" : 1633300428035,
+        "duration" : 24
+      },
+      "status" : "passed",
+      "steps" : [ ],
+      "attachments" : [ ],
+      "parameters" : [ ],
+      "stepsCount" : 0,
+      "attachmentsCount" : 0,
+      "shouldDisplayMessage" : false,
+      "hasContent" : false
+    }, {
+      "name" : "elementHandle.$(.info .token.price)",
+      "time" : {
+        "start" : 1633300428036,
+        "stop" : 1633300428046,
+        "duration" : 10
+      },
+      "status" : "passed",
+      "steps" : [ ],
+      "attachments" : [ ],
+      "parameters" : [ ],
+      "stepsCount" : 0,
+      "attachmentsCount" : 0,
+      "shouldDisplayMessage" : false,
+      "hasContent" : false
+    }, {
+      "name" : "elementHandle.getAttribute",
+      "time" : {
+        "start" : 1633300428047,
+        "stop" : 1633300428048,
+        "duration" : 1
+      },
+      "status" : "passed",
+      "steps" : [ ],
+      "attachments" : [ ],
+      "parameters" : [ ],
+      "stepsCount" : 0,
+      "attachmentsCount" : 0,
+      "shouldDisplayMessage" : false,
+      "hasContent" : false
+    }, {
+      "name" : "page.click(.balance .button.lock)",
+      "time" : {
+        "start" : 1633300443216,
+        "stop" : 1633300443602,
+        "duration" : 386
+      },
+      "status" : "passed",
+      "steps" : [ ],
+      "attachments" : [ ],
+      "parameters" : [ ],
+      "stepsCount" : 0,
+      "attachmentsCount" : 0,
+      "shouldDisplayMessage" : false,
+      "hasContent" : false
+    }, {
+      "name" : "page.waitForSelector(.wallet-item .top-left [class=\" img\"])",
+      "time" : {
+        "start" : 1633300443603,
+        "stop" : 1633300448805,
+        "duration" : 5202
+      },
+      "status" : "passed",
+      "steps" : [ ],
+      "attachments" : [ ],
+      "parameters" : [ ],
+      "stepsCount" : 0,
+      "attachmentsCount" : 0,
+      "shouldDisplayMessage" : false,
+      "hasContent" : false
+    }, {
+      "name" : "page.waitForSelector(.wallet-item .top-left [class=\" img\"])",
+      "time" : {
+        "start" : 1633300448907,
+        "stop" : 1633300448933,
+        "duration" : 26
+      },
+      "status" : "passed",
+      "steps" : [ ],
+      "attachments" : [ ],
+      "parameters" : [ ],
+      "stepsCount" : 0,
+      "attachmentsCount" : 0,
+      "shouldDisplayMessage" : false,
+      "hasContent" : false
+    }, {
+      "name" : "page.$$(.wallet-item)",
+      "time" : {
+        "start" : 1633300449035,
+        "stop" : 1633300449062,
+        "duration" : 27
+      },
+      "status" : "passed",
+      "steps" : [ ],
+      "attachments" : [ ],
+      "parameters" : [ ],
+      "stepsCount" : 0,
+      "attachmentsCount" : 0,
+      "shouldDisplayMessage" : false,
+      "hasContent" : false
+    }, {
+      "name" : "elementHandle.$(.balance.title)",
+      "time" : {
+        "start" : 1633300449063,
+        "stop" : 1633300449084,
+        "duration" : 21
+      },
+      "status" : "passed",
+      "steps" : [ ],
+      "attachments" : [ ],
+      "parameters" : [ ],
+      "stepsCount" : 0,
+      "attachmentsCount" : 0,
+      "shouldDisplayMessage" : false,
+      "hasContent" : false
+    }, {
+      "name" : "elementHandle.textContent",
+      "time" : {
+        "start" : 1633300449085,
+        "stop" : 1633300449091,
+        "duration" : 6
+      },
+      "status" : "passed",
+      "steps" : [ ],
+      "attachments" : [ ],
+      "parameters" : [ ],
+      "stepsCount" : 0,
+      "attachmentsCount" : 0,
+      "shouldDisplayMessage" : false,
+      "hasContent" : false
+    }, {
+      "name" : "page.isVisible(.balance.title:text(\" Velas Native\"))",
+      "time" : {
+        "start" : 1633300449091,
+        "stop" : 1633300449108,
+        "duration" : 17
+      },
+      "status" : "passed",
+      "steps" : [ ],
+      "attachments" : [ ],
+      "parameters" : [ ],
+      "stepsCount" : 0,
+      "attachmentsCount" : 0,
+      "shouldDisplayMessage" : false,
+      "hasContent" : false
+    }, {
+      "name" : "elementHandle.$(.info .token.price)",
+      "time" : {
+        "start" : 1633300449109,
+        "stop" : 1633300449135,
+        "duration" : 26
+      },
+      "status" : "passed",
+      "steps" : [ ],
+      "attachments" : [ ],
+      "parameters" : [ ],
+      "stepsCount" : 0,
+      "attachmentsCount" : 0,
+      "shouldDisplayMessage" : false,
+      "hasContent" : false
+    }, {
+      "name" : "elementHandle.getAttribute",
+      "time" : {
+        "start" : 1633300449136,
+        "stop" : 1633300449151,
+        "duration" : 15
+      },
+      "status" : "passed",
+      "steps" : [ ],
+      "attachments" : [ ],
+      "parameters" : [ ],
+      "stepsCount" : 0,
+      "attachmentsCount" : 0,
+      "shouldDisplayMessage" : false,
+      "hasContent" : false
+    }, {
+      "name" : "elementHandle.$(.balance.title)",
+      "time" : {
+        "start" : 1633300449151,
+        "stop" : 1633300449176,
+        "duration" : 25
+      },
+      "status" : "passed",
+      "steps" : [ ],
+      "attachments" : [ ],
+      "parameters" : [ ],
+      "stepsCount" : 0,
+      "attachmentsCount" : 0,
+      "shouldDisplayMessage" : false,
+      "hasContent" : false
+    }, {
+      "name" : "elementHandle.textContent",
+      "time" : {
+        "start" : 1633300449177,
+        "stop" : 1633300449180,
+        "duration" : 3
+      },
+      "status" : "passed",
+      "steps" : [ ],
+      "attachments" : [ ],
+      "parameters" : [ ],
+      "stepsCount" : 0,
+      "attachmentsCount" : 0,
+      "shouldDisplayMessage" : false,
+      "hasContent" : false
+    }, {
+      "name" : "page.isVisible(.balance.title:text(\" Velas EVM\"))",
+      "time" : {
+        "start" : 1633300449181,
+        "stop" : 1633300449188,
+        "duration" : 7
+      },
+      "status" : "passed",
+      "steps" : [ ],
+      "attachments" : [ ],
+      "parameters" : [ ],
+      "stepsCount" : 0,
+      "attachmentsCount" : 0,
+      "shouldDisplayMessage" : false,
+      "hasContent" : false
+    }, {
+      "name" : "elementHandle.$(.info .token.price)",
+      "time" : {
+        "start" : 1633300449189,
+        "stop" : 1633300449234,
+        "duration" : 45
+      },
+      "status" : "passed",
+      "steps" : [ ],
+      "attachments" : [ ],
+      "parameters" : [ ],
+      "stepsCount" : 0,
+      "attachmentsCount" : 0,
+      "shouldDisplayMessage" : false,
+      "hasContent" : false
+    }, {
+      "name" : "elementHandle.getAttribute",
+      "time" : {
+        "start" : 1633300449235,
+        "stop" : 1633300449261,
+        "duration" : 26
+      },
+      "status" : "passed",
+      "steps" : [ ],
+      "attachments" : [ ],
+      "parameters" : [ ],
+      "stepsCount" : 0,
+      "attachmentsCount" : 0,
+      "shouldDisplayMessage" : false,
+      "hasContent" : false
+    }, {
+      "name" : "elementHandle.$(.balance.title)",
+      "time" : {
+        "start" : 1633300449262,
+        "stop" : 1633300449266,
+        "duration" : 4
+      },
+      "status" : "passed",
+      "steps" : [ ],
+      "attachments" : [ ],
+      "parameters" : [ ],
+      "stepsCount" : 0,
+      "attachmentsCount" : 0,
+      "shouldDisplayMessage" : false,
+      "hasContent" : false
+    }, {
+      "name" : "elementHandle.textContent",
+      "time" : {
+        "start" : 1633300449267,
+        "stop" : 1633300449275,
+        "duration" : 8
+      },
+      "status" : "passed",
+      "steps" : [ ],
+      "attachments" : [ ],
+      "parameters" : [ ],
+      "stepsCount" : 0,
+      "attachmentsCount" : 0,
+      "shouldDisplayMessage" : false,
+      "hasContent" : false
+    }, {
+      "name" : "page.isVisible(.balance.title:text(\" Velas Legacy\"))",
+      "time" : {
+        "start" : 1633300449278,
+        "stop" : 1633300449301,
+        "duration" : 23
+      },
+      "status" : "passed",
+      "steps" : [ ],
+      "attachments" : [ ],
+      "parameters" : [ ],
+      "stepsCount" : 0,
+      "attachmentsCount" : 0,
+      "shouldDisplayMessage" : false,
+      "hasContent" : false
+    }, {
+      "name" : "elementHandle.$(.info .token.price)",
+      "time" : {
+        "start" : 1633300449303,
+        "stop" : 1633300449318,
+        "duration" : 15
+      },
+      "status" : "passed",
+      "steps" : [ ],
+      "attachments" : [ ],
+      "parameters" : [ ],
+      "stepsCount" : 0,
+      "attachmentsCount" : 0,
+      "shouldDisplayMessage" : false,
+      "hasContent" : false
+    }, {
+      "name" : "elementHandle.getAttribute",
+      "time" : {
+        "start" : 1633300449319,
+        "stop" : 1633300449321,
+        "duration" : 2
+      },
+      "status" : "passed",
+      "steps" : [ ],
+      "attachments" : [ ],
+      "parameters" : [ ],
+      "stepsCount" : 0,
+      "attachmentsCount" : 0,
+      "shouldDisplayMessage" : false,
+      "hasContent" : false
+    }, {
+      "name" : "elementHandle.$(.balance.title)",
+      "time" : {
+        "start" : 1633300449322,
+        "stop" : 1633300449326,
+        "duration" : 4
+      },
+      "status" : "passed",
+      "steps" : [ ],
+      "attachments" : [ ],
+      "parameters" : [ ],
+      "stepsCount" : 0,
+      "attachmentsCount" : 0,
+      "shouldDisplayMessage" : false,
+      "hasContent" : false
+    }, {
+      "name" : "elementHandle.textContent",
+      "time" : {
+        "start" : 1633300449326,
+        "stop" : 1633300449329,
+        "duration" : 3
+      },
+      "status" : "passed",
+      "steps" : [ ],
+      "attachments" : [ ],
+      "parameters" : [ ],
+      "stepsCount" : 0,
+      "attachmentsCount" : 0,
+      "shouldDisplayMessage" : false,
+      "hasContent" : false
+    }, {
+      "name" : "page.isVisible(.balance.title:text(\" Velas EVM Legacy\"))",
+      "time" : {
+        "start" : 1633300449330,
+        "stop" : 1633300449345,
+        "duration" : 15
+      },
+      "status" : "passed",
+      "steps" : [ ],
+      "attachments" : [ ],
+      "parameters" : [ ],
+      "stepsCount" : 0,
+      "attachmentsCount" : 0,
+      "shouldDisplayMessage" : false,
+      "hasContent" : false
+    }, {
+      "name" : "elementHandle.$(.info .token.price)",
+      "time" : {
+        "start" : 1633300449346,
+        "stop" : 1633300449367,
+        "duration" : 21
+      },
+      "status" : "passed",
+      "steps" : [ ],
+      "attachments" : [ ],
+      "parameters" : [ ],
+      "stepsCount" : 0,
+      "attachmentsCount" : 0,
+      "shouldDisplayMessage" : false,
+      "hasContent" : false
+    }, {
+      "name" : "elementHandle.getAttribute",
+      "time" : {
+        "start" : 1633300449367,
+        "stop" : 1633300449374,
+        "duration" : 7
+      },
+      "status" : "passed",
+      "steps" : [ ],
+      "attachments" : [ ],
+      "parameters" : [ ],
+      "stepsCount" : 0,
+      "attachmentsCount" : 0,
+      "shouldDisplayMessage" : false,
+      "hasContent" : false
+    }, {
+      "name" : "elementHandle.$(.balance.title)",
+      "time" : {
+        "start" : 1633300449374,
+        "stop" : 1633300449399,
+        "duration" : 25
+      },
+      "status" : "passed",
+      "steps" : [ ],
+      "attachments" : [ ],
+      "parameters" : [ ],
+      "stepsCount" : 0,
+      "attachmentsCount" : 0,
+      "shouldDisplayMessage" : false,
+      "hasContent" : false
+    }, {
+      "name" : "elementHandle.textContent",
+      "time" : {
+        "start" : 1633300449400,
+        "stop" : 1633300449402,
+        "duration" : 2
+      },
+      "status" : "passed",
+      "steps" : [ ],
+      "attachments" : [ ],
+      "parameters" : [ ],
+      "stepsCount" : 0,
+      "attachmentsCount" : 0,
+      "shouldDisplayMessage" : false,
+      "hasContent" : false
+    }, {
+      "name" : "page.isVisible(.balance.title:text(\" Bitcoin\"))",
+      "time" : {
+        "start" : 1633300449402,
+        "stop" : 1633300449412,
+        "duration" : 10
+      },
+      "status" : "passed",
+      "steps" : [ ],
+      "attachments" : [ ],
+      "parameters" : [ ],
+      "stepsCount" : 0,
+      "attachmentsCount" : 0,
+      "shouldDisplayMessage" : false,
+      "hasContent" : false
+    }, {
+      "name" : "elementHandle.$(.info .token.price)",
+      "time" : {
+        "start" : 1633300449412,
+        "stop" : 1633300449433,
+        "duration" : 21
+      },
+      "status" : "passed",
+      "steps" : [ ],
+      "attachments" : [ ],
+      "parameters" : [ ],
+      "stepsCount" : 0,
+      "attachmentsCount" : 0,
+      "shouldDisplayMessage" : false,
+      "hasContent" : false
+    }, {
+      "name" : "elementHandle.getAttribute",
+      "time" : {
+        "start" : 1633300449434,
+        "stop" : 1633300449436,
+        "duration" : 2
+      },
+      "status" : "passed",
+      "steps" : [ ],
+      "attachments" : [ ],
+      "parameters" : [ ],
+      "stepsCount" : 0,
+      "attachmentsCount" : 0,
+      "shouldDisplayMessage" : false,
+      "hasContent" : false
+    }, {
+      "name" : "elementHandle.$(.balance.title)",
+      "time" : {
+        "start" : 1633300449437,
+        "stop" : 1633300449456,
+        "duration" : 19
+      },
+      "status" : "passed",
+      "steps" : [ ],
+      "attachments" : [ ],
+      "parameters" : [ ],
+      "stepsCount" : 0,
+      "attachmentsCount" : 0,
+      "shouldDisplayMessage" : false,
+      "hasContent" : false
+    }, {
+      "name" : "elementHandle.textContent",
+      "time" : {
+        "start" : 1633300449456,
+        "stop" : 1633300449458,
+        "duration" : 2
+      },
+      "status" : "passed",
+      "steps" : [ ],
+      "attachments" : [ ],
+      "parameters" : [ ],
+      "stepsCount" : 0,
+      "attachmentsCount" : 0,
+      "shouldDisplayMessage" : false,
+      "hasContent" : false
+    }, {
+      "name" : "page.isVisible(.balance.title:text(\" Ethereum\"))",
+      "time" : {
+        "start" : 1633300449459,
+        "stop" : 1633300449477,
+        "duration" : 18
+      },
+      "status" : "passed",
+      "steps" : [ ],
+      "attachments" : [ ],
+      "parameters" : [ ],
+      "stepsCount" : 0,
+      "attachmentsCount" : 0,
+      "shouldDisplayMessage" : false,
+      "hasContent" : false
+    }, {
+      "name" : "elementHandle.$(.info .token.price)",
+      "time" : {
+        "start" : 1633300449477,
+        "stop" : 1633300449498,
+        "duration" : 21
+      },
+      "status" : "passed",
+      "steps" : [ ],
+      "attachments" : [ ],
+      "parameters" : [ ],
+      "stepsCount" : 0,
+      "attachmentsCount" : 0,
+      "shouldDisplayMessage" : false,
+      "hasContent" : false
+    }, {
+      "name" : "elementHandle.getAttribute",
+      "time" : {
+        "start" : 1633300449499,
+        "stop" : 1633300449507,
+        "duration" : 8
+      },
+      "status" : "passed",
+      "steps" : [ ],
+      "attachments" : [ ],
+      "parameters" : [ ],
+      "stepsCount" : 0,
+      "attachmentsCount" : 0,
+      "shouldDisplayMessage" : false,
+      "hasContent" : false
+    }, {
+      "name" : "elementHandle.$(.balance.title)",
+      "time" : {
+        "start" : 1633300449507,
+        "stop" : 1633300449518,
+        "duration" : 11
+      },
+      "status" : "passed",
+      "steps" : [ ],
+      "attachments" : [ ],
+      "parameters" : [ ],
+      "stepsCount" : 0,
+      "attachmentsCount" : 0,
+      "shouldDisplayMessage" : false,
+      "hasContent" : false
+    }, {
+      "name" : "elementHandle.textContent",
+      "time" : {
+        "start" : 1633300449519,
+        "stop" : 1633300449521,
+        "duration" : 2
+      },
+      "status" : "passed",
+      "steps" : [ ],
+      "attachments" : [ ],
+      "parameters" : [ ],
+      "stepsCount" : 0,
+      "attachmentsCount" : 0,
+      "shouldDisplayMessage" : false,
+      "hasContent" : false
+    }, {
+      "name" : "page.isVisible(.balance.title:text(\" Ethereum Legacy\"))",
+      "time" : {
+        "start" : 1633300449521,
+        "stop" : 1633300449547,
+        "duration" : 26
+      },
+      "status" : "passed",
+      "steps" : [ ],
+      "attachments" : [ ],
+      "parameters" : [ ],
+      "stepsCount" : 0,
+      "attachmentsCount" : 0,
+      "shouldDisplayMessage" : false,
+      "hasContent" : false
+    }, {
+      "name" : "elementHandle.$(.info .token.price)",
+      "time" : {
+        "start" : 1633300449547,
+        "stop" : 1633300449551,
+        "duration" : 4
+      },
+      "status" : "passed",
+      "steps" : [ ],
+      "attachments" : [ ],
+      "parameters" : [ ],
+      "stepsCount" : 0,
+      "attachmentsCount" : 0,
+      "shouldDisplayMessage" : false,
+      "hasContent" : false
+    }, {
+      "name" : "elementHandle.getAttribute",
+      "time" : {
+        "start" : 1633300449552,
+        "stop" : 1633300449554,
+        "duration" : 2
+      },
+      "status" : "passed",
+      "steps" : [ ],
+      "attachments" : [ ],
+      "parameters" : [ ],
+      "stepsCount" : 0,
+      "attachmentsCount" : 0,
+      "shouldDisplayMessage" : false,
+      "hasContent" : false
+    }, {
+      "name" : "elementHandle.$(.balance.title)",
+      "time" : {
+        "start" : 1633300449554,
+        "stop" : 1633300449594,
+        "duration" : 40
+      },
+      "status" : "passed",
+      "steps" : [ ],
+      "attachments" : [ ],
+      "parameters" : [ ],
+      "stepsCount" : 0,
+      "attachmentsCount" : 0,
+      "shouldDisplayMessage" : false,
+      "hasContent" : false
+    }, {
+      "name" : "elementHandle.textContent",
+      "time" : {
+        "start" : 1633300449595,
+        "stop" : 1633300449597,
+        "duration" : 2
+      },
+      "status" : "passed",
+      "steps" : [ ],
+      "attachments" : [ ],
+      "parameters" : [ ],
+      "stepsCount" : 0,
+      "attachmentsCount" : 0,
+      "shouldDisplayMessage" : false,
+      "hasContent" : false
+    }, {
+      "name" : "page.isVisible(.balance.title:text(\" Tether USD Legacy\"))",
+      "time" : {
+        "start" : 1633300449598,
+        "stop" : 1633300449661,
+        "duration" : 63
+      },
+      "status" : "passed",
+      "steps" : [ ],
+      "attachments" : [ ],
+      "parameters" : [ ],
+      "stepsCount" : 0,
+      "attachmentsCount" : 0,
+      "shouldDisplayMessage" : false,
+      "hasContent" : false
+    }, {
+      "name" : "elementHandle.$(.info .token.price)",
+      "time" : {
+        "start" : 1633300449662,
+        "stop" : 1633300449737,
+        "duration" : 75
+      },
+      "status" : "passed",
+      "steps" : [ ],
+      "attachments" : [ ],
+      "parameters" : [ ],
+      "stepsCount" : 0,
+      "attachmentsCount" : 0,
+      "shouldDisplayMessage" : false,
+      "hasContent" : false
+    }, {
+      "name" : "elementHandle.getAttribute",
+      "time" : {
+        "start" : 1633300449740,
+        "stop" : 1633300449758,
+        "duration" : 18
+      },
+      "status" : "passed",
+      "steps" : [ ],
+      "attachments" : [ ],
+      "parameters" : [ ],
+      "stepsCount" : 0,
+      "attachmentsCount" : 0,
+      "shouldDisplayMessage" : false,
+      "hasContent" : false
+    }, {
+      "name" : "elementHandle.$(.balance.title)",
+      "time" : {
+        "start" : 1633300449758,
+        "stop" : 1633300449766,
+        "duration" : 8
+      },
+      "status" : "passed",
+      "steps" : [ ],
+      "attachments" : [ ],
+      "parameters" : [ ],
+      "stepsCount" : 0,
+      "attachmentsCount" : 0,
+      "shouldDisplayMessage" : false,
+      "hasContent" : false
+    }, {
+      "name" : "elementHandle.textContent",
+      "time" : {
+        "start" : 1633300449766,
+        "stop" : 1633300449768,
+        "duration" : 2
+      },
+      "status" : "passed",
+      "steps" : [ ],
+      "attachments" : [ ],
+      "parameters" : [ ],
+      "stepsCount" : 0,
+      "attachmentsCount" : 0,
+      "shouldDisplayMessage" : false,
+      "hasContent" : false
+    }, {
+      "name" : "page.isVisible(.balance.title:text(\" Litecoin\"))",
+      "time" : {
+        "start" : 1633300449769,
+        "stop" : 1633300449796,
+        "duration" : 27
+      },
+      "status" : "passed",
+      "steps" : [ ],
+      "attachments" : [ ],
+      "parameters" : [ ],
+      "stepsCount" : 0,
+      "attachmentsCount" : 0,
+      "shouldDisplayMessage" : false,
+      "hasContent" : false
+    }, {
+      "name" : "elementHandle.$(.info .token.price)",
+      "time" : {
+        "start" : 1633300449796,
+        "stop" : 1633300449801,
+        "duration" : 5
+      },
+      "status" : "passed",
+      "steps" : [ ],
+      "attachments" : [ ],
+      "parameters" : [ ],
+      "stepsCount" : 0,
+      "attachmentsCount" : 0,
+      "shouldDisplayMessage" : false,
+      "hasContent" : false
+    }, {
+      "name" : "elementHandle.getAttribute",
+      "time" : {
+        "start" : 1633300449801,
+        "stop" : 1633300449803,
+        "duration" : 2
+      },
+      "status" : "passed",
+      "steps" : [ ],
+      "attachments" : [ ],
+      "parameters" : [ ],
+      "stepsCount" : 0,
+      "attachmentsCount" : 0,
+      "shouldDisplayMessage" : false,
+      "hasContent" : false
+    }, {
+      "name" : "After Hooks",
+      "time" : {
+        "start" : 1633300450346,
+        "stop" : 1633300460507,
+        "duration" : 10161
+      },
+      "status" : "passed",
+      "steps" : [ {
+        "name" : "browserContext.close",
+        "time" : {
+          "start" : 1633300450853,
+          "stop" : 1633300460501,
+          "duration" : 9648
+        },
+        "status" : "passed",
+        "steps" : [ ],
+        "attachments" : [ ],
+        "parameters" : [ ],
+        "stepsCount" : 0,
+        "attachmentsCount" : 0,
+        "shouldDisplayMessage" : false,
+        "hasContent" : false
+      } ],
+      "attachments" : [ ],
+      "parameters" : [ ],
+      "stepsCount" : 1,
+      "attachmentsCount" : 0,
+      "shouldDisplayMessage" : false,
+      "hasContent" : true
+    } ],
+    "attachments" : [ {
+      "uid" : "fa2311ff2f5f09fc",
+      "name" : "video",
+      "source" : "fa2311ff2f5f09fc.webm",
+      "type" : "video/webm",
+      "size" : 3562158
+    }, {
+      "uid" : "cca7a5324dd1a2ea",
+      "name" : "screenshot",
+      "source" : "cca7a5324dd1a2ea.png",
+      "type" : "image/png",
+      "size" : 256713
+    }, {
+      "uid" : "7533bd79100474de",
+      "name" : "stdout",
+      "source" : "7533bd79100474de.txt",
+      "type" : "text/plain",
+      "size" : 54
+    }, {
+      "uid" : "8fc449194c6b505a",
+      "name" : "stdout",
+      "source" : "8fc449194c6b505a.txt",
+      "type" : "text/plain",
+      "size" : 61
+    }, {
+      "uid" : "e2938685ce6fbd79",
+      "name" : "stdout",
+      "source" : "e2938685ce6fbd79.txt",
+      "type" : "text/plain",
+      "size" : 78
+    }, {
+      "uid" : "1a60462661881bb5",
+      "name" : "stdout",
+      "source" : "1a60462661881bb5.txt",
+      "type" : "text/plain",
+      "size" : 280
+    }, {
+      "uid" : "3fbf2e5e51dac309",
+      "name" : "stdout",
+      "source" : "3fbf2e5e51dac309.txt",
+      "type" : "text/plain",
+      "size" : 66
+    }, {
+      "uid" : "cb54e0c7b345fcf2",
+      "name" : "stdout",
+      "source" : "cb54e0c7b345fcf2.txt",
+      "type" : "text/plain",
+      "size" : 66
+    }, {
+      "uid" : "fd4e5f5862e55762",
+      "name" : "stdout",
+      "source" : "fd4e5f5862e55762.txt",
+      "type" : "text/plain",
+      "size" : 66
+    }, {
+      "uid" : "343d04796cb8e659",
+      "name" : "stdout",
+      "source" : "343d04796cb8e659.txt",
+      "type" : "text/plain",
+      "size" : 146
+    }, {
+      "uid" : "ad8875bc034d6ff1",
+      "name" : "stdout",
+      "source" : "ad8875bc034d6ff1.txt",
+      "type" : "text/plain",
+      "size" : 81
+    }, {
+      "uid" : "7d541283821ac3c6",
+      "name" : "stdout",
+      "source" : "7d541283821ac3c6.txt",
+      "type" : "text/plain",
+      "size" : 280
+    }, {
+      "uid" : "e0fab763fd1ba8a0",
+      "name" : "stdout",
+      "source" : "e0fab763fd1ba8a0.txt",
+      "type" : "text/plain",
+      "size" : 66
+    }, {
+      "uid" : "c6083476f3bec870",
+      "name" : "stdout",
+      "source" : "c6083476f3bec870.txt",
+      "type" : "text/plain",
+      "size" : 66
+    } ],
+    "parameters" : [ ],
+    "stepsCount" : 143,
+    "attachmentsCount" : 14,
+    "shouldDisplayMessage" : true,
+    "hasContent" : true
+  },
+  "afterStages" : [ ],
+  "labels" : [ {
+    "name" : "language",
+    "value" : "JavaScript"
+  }, {
+    "name" : "framework",
+    "value" : "Playwright"
+  }, {
+    "name" : "parentSuite",
+    "value" : "Chrome Stable"
+  }, {
+    "name" : "suite",
+    "value" : "src/tests/unstable/balance.test.ts"
+  }, {
+    "name" : "subSuite",
+    "value" : "Balance >"
+  }, {
+    "name" : "resultFormat",
+    "value" : "allure2"
+  } ],
+  "parameters" : [ ],
+  "links" : [ ],
+  "hidden" : false,
+  "retry" : false,
+  "extra" : {
+    "severity" : "normal",
+    "retries" : [ ],
+    "categories" : [ {
+      "name" : "Product defects",
+      "matchedStatuses" : [ ],
+      "flaky" : false
+    } ],
+    "history" : {
+      "statistic" : {
+        "failed" : 4,
+        "broken" : 0,
+        "skipped" : 1,
+        "passed" : 2,
+        "unknown" : 0,
+        "total" : 7
+      },
+      "items" : [ {
+        "uid" : "822b081fb146d2ad",
+        "reportUrl" : "https://velas.github.io/JsWallet/383//#testresult/822b081fb146d2ad",
+        "status" : "skipped",
+        "time" : {
+          "start" : 1633299658818,
+          "stop" : 1633299658818,
+          "duration" : 0
+        }
+      }, {
+        "uid" : "14cebc61f8ee2d89",
+        "reportUrl" : "https://velas.github.io/JsWallet/382//#testresult/14cebc61f8ee2d89",
+        "status" : "failed",
+        "statusDetails" : "expected '..' to equal '0'",
+        "time" : {
+          "start" : 1633297967754,
+          "stop" : 1633298005483,
+          "duration" : 37729
+        }
+      }, {
+        "uid" : "c159dab8f7db2a1c",
+        "reportUrl" : "https://velas.github.io/JsWallet/381//#testresult/c159dab8f7db2a1c",
+        "status" : "failed",
+        "statusDetails" : "expected '..' to equal '0'",
+        "time" : {
+          "start" : 1633296765155,
+          "stop" : 1633296800803,
+          "duration" : 35648
+        }
+      }, {
+        "uid" : "a2ad7b00b184b3c2",
+        "reportUrl" : "https://velas.github.io/JsWallet/380//#testresult/a2ad7b00b184b3c2",
+        "status" : "failed",
+        "statusDetails" : "expected '..' to equal '0'",
+        "time" : {
+          "start" : 1633269282870,
+          "stop" : 1633269332714,
+          "duration" : 49844
+        }
+      }, {
+        "uid" : "8170ee6d5e485c38",
+        "reportUrl" : "https://velas.github.io/JsWallet/379//#testresult/8170ee6d5e485c38",
+        "status" : "passed",
+        "time" : {
+          "start" : 1633092824639,
+          "stop" : 1633092858767,
+          "duration" : 34128
+        }
+      }, {
+        "uid" : "c3e8cb4c74f2027",
+        "reportUrl" : "https://velas.github.io/JsWallet/378//#testresult/c3e8cb4c74f2027",
+        "status" : "passed",
+        "time" : {
+          "start" : 1633090923603,
+          "stop" : 1633090964327,
+          "duration" : 40724
+        }
+      } ]
+    },
+    "tags" : [ ]
+  },
+  "source" : "7873107f7a17b81b.json",
+  "parameterValues" : [ ]
+}
