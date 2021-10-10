@@ -7,6 +7,7 @@ require! {
     \../icons.ls
     \../navigate.ls
     \../components/burger.ls
+    \../seed.ls : seedmem
 }
 .wallets
     @import scheme
@@ -118,7 +119,7 @@ build-version = (store, release)-->
     console.log "#{release.name}.md5"
     md5-file =
         store.releases |> find (-> it.name is "#{release.name}.md5")
-    .pug.platform(style=resource)
+    .pug.platform(style=resource id="platform-#{name}")
         img.pug.title-icons(src="#{icon}")
         .pug.title #{name}
         .pug.tag_name #{release.tag_name}
@@ -142,7 +143,9 @@ header = (store, web3t)->
         background: info.app.background
         background-color: info.app.bgspare
     lock = ->
-        navigate store, web3t, \locked
+        saved-seed = seedmem.saved!
+        prev-page = if saved-seed then \locked else \chooseinit
+        navigate store, web3t, prev-page
     .pug.title(style=border-style)
         .pug.header Install Wallets
         .pug.close(on-click=lock)
