@@ -1,0 +1,785 @@
+{
+  "uid" : "f65acf5c3f8e3270",
+  "name" : "Change language setting",
+  "fullName" : "Change language setting",
+  "historyId" : "Chrome Stable src/tests/stable/settings.test.ts Settings > Change language setting",
+  "time" : {
+    "start" : 1633945037573,
+    "stop" : 1633945051351,
+    "duration" : 13778
+  },
+  "status" : "passed",
+  "flaky" : false,
+  "newFailed" : false,
+  "beforeStages" : [ ],
+  "testStage" : {
+    "status" : "passed",
+    "steps" : [ {
+      "name" : "Before Hooks",
+      "time" : {
+        "start" : 1633945037573,
+        "stop" : 1633945042673,
+        "duration" : 5100
+      },
+      "status" : "passed",
+      "steps" : [ {
+        "name" : "browserContext.newPage",
+        "time" : {
+          "start" : 1633945037577,
+          "stop" : 1633945037609,
+          "duration" : 32
+        },
+        "status" : "passed",
+        "steps" : [ ],
+        "attachments" : [ ],
+        "parameters" : [ ],
+        "stepsCount" : 0,
+        "attachmentsCount" : 0,
+        "shouldDisplayMessage" : false,
+        "hasContent" : false
+      }, {
+        "name" : "page.goto(localhost:8080/main-index.html?network=testnet)",
+        "time" : {
+          "start" : 1633945037610,
+          "stop" : 1633945039595,
+          "duration" : 1985
+        },
+        "status" : "passed",
+        "steps" : [ ],
+        "attachments" : [ ],
+        "parameters" : [ ],
+        "stepsCount" : 0,
+        "attachmentsCount" : 0,
+        "shouldDisplayMessage" : false,
+        "hasContent" : false
+      }, {
+        "name" : "page.waitForSelector(.balance)",
+        "time" : {
+          "start" : 1633945039596,
+          "stop" : 1633945040099,
+          "duration" : 503
+        },
+        "status" : "failed",
+        "steps" : [ ],
+        "attachments" : [ ],
+        "parameters" : [ ],
+        "stepsCount" : 0,
+        "attachmentsCount" : 0,
+        "shouldDisplayMessage" : false,
+        "hasContent" : false
+      }, {
+        "name" : "page.isVisible([placeholder=\"Password or PIN\"])",
+        "time" : {
+          "start" : 1633945040104,
+          "stop" : 1633945040107,
+          "duration" : 3
+        },
+        "status" : "passed",
+        "steps" : [ ],
+        "attachments" : [ ],
+        "parameters" : [ ],
+        "stepsCount" : 0,
+        "attachmentsCount" : 0,
+        "shouldDisplayMessage" : false,
+        "hasContent" : false
+      }, {
+        "name" : "page.click(#lang-en)",
+        "time" : {
+          "start" : 1633945040108,
+          "stop" : 1633945040364,
+          "duration" : 256
+        },
+        "status" : "passed",
+        "steps" : [ ],
+        "attachments" : [ ],
+        "parameters" : [ ],
+        "stepsCount" : 0,
+        "attachmentsCount" : 0,
+        "shouldDisplayMessage" : false,
+        "hasContent" : false
+      }, {
+        "name" : "page.click(#btn-restore)",
+        "time" : {
+          "start" : 1633945040364,
+          "stop" : 1633945040596,
+          "duration" : 232
+        },
+        "status" : "passed",
+        "steps" : [ ],
+        "attachments" : [ ],
+        "parameters" : [ ],
+        "stepsCount" : 0,
+        "attachmentsCount" : 0,
+        "shouldDisplayMessage" : false,
+        "hasContent" : false
+      }, {
+        "name" : "page.click(#restore-custom)",
+        "time" : {
+          "start" : 1633945040597,
+          "stop" : 1633945040842,
+          "duration" : 245
+        },
+        "status" : "passed",
+        "steps" : [ ],
+        "attachments" : [ ],
+        "parameters" : [ ],
+        "stepsCount" : 0,
+        "attachmentsCount" : 0,
+        "shouldDisplayMessage" : false,
+        "hasContent" : false
+      }, {
+        "name" : "page.fill([type=\"password\"])",
+        "time" : {
+          "start" : 1633945040843,
+          "stop" : 1633945041078,
+          "duration" : 235
+        },
+        "status" : "passed",
+        "steps" : [ ],
+        "attachments" : [ ],
+        "parameters" : [ ],
+        "stepsCount" : 0,
+        "attachmentsCount" : 0,
+        "shouldDisplayMessage" : false,
+        "hasContent" : false
+      }, {
+        "name" : "page.click(button.setup)",
+        "time" : {
+          "start" : 1633945041079,
+          "stop" : 1633945041369,
+          "duration" : 290
+        },
+        "status" : "passed",
+        "steps" : [ ],
+        "attachments" : [ ],
+        "parameters" : [ ],
+        "stepsCount" : 0,
+        "attachmentsCount" : 0,
+        "shouldDisplayMessage" : false,
+        "hasContent" : false
+      }, {
+        "name" : "page.fill(#seedphrase-custom)",
+        "time" : {
+          "start" : 1633945041371,
+          "stop" : 1633945041628,
+          "duration" : 257
+        },
+        "status" : "passed",
+        "steps" : [ ],
+        "attachments" : [ ],
+        "parameters" : [ ],
+        "stepsCount" : 0,
+        "attachmentsCount" : 0,
+        "shouldDisplayMessage" : false,
+        "hasContent" : false
+      }, {
+        "name" : "page.click(#seed-phrase-next)",
+        "time" : {
+          "start" : 1633945041629,
+          "stop" : 1633945042628,
+          "duration" : 999
+        },
+        "status" : "passed",
+        "steps" : [ ],
+        "attachments" : [ ],
+        "parameters" : [ ],
+        "stepsCount" : 0,
+        "attachmentsCount" : 0,
+        "shouldDisplayMessage" : false,
+        "hasContent" : false
+      }, {
+        "name" : "page.waitForSelector(.menu-item)",
+        "time" : {
+          "start" : 1633945042629,
+          "stop" : 1633945042647,
+          "duration" : 18
+        },
+        "status" : "passed",
+        "steps" : [ ],
+        "attachments" : [ ],
+        "parameters" : [ ],
+        "stepsCount" : 0,
+        "attachmentsCount" : 0,
+        "shouldDisplayMessage" : false,
+        "hasContent" : false
+      }, {
+        "name" : "page.waitForSelector(.balance)",
+        "time" : {
+          "start" : 1633945042648,
+          "stop" : 1633945042667,
+          "duration" : 19
+        },
+        "status" : "passed",
+        "steps" : [ ],
+        "attachments" : [ ],
+        "parameters" : [ ],
+        "stepsCount" : 0,
+        "attachmentsCount" : 0,
+        "shouldDisplayMessage" : false,
+        "hasContent" : false
+      } ],
+      "attachments" : [ ],
+      "parameters" : [ ],
+      "stepsCount" : 13,
+      "attachmentsCount" : 0,
+      "shouldDisplayMessage" : false,
+      "hasContent" : true
+    }, {
+      "name" : "page.click(#menu-settings)",
+      "time" : {
+        "start" : 1633945042674,
+        "stop" : 1633945043039,
+        "duration" : 365
+      },
+      "status" : "passed",
+      "steps" : [ ],
+      "attachments" : [ ],
+      "parameters" : [ ],
+      "stepsCount" : 0,
+      "attachmentsCount" : 0,
+      "shouldDisplayMessage" : false,
+      "hasContent" : false
+    }, {
+      "name" : "page.click(.settings button:nth-of-type(1))",
+      "time" : {
+        "start" : 1633945043040,
+        "stop" : 1633945043539,
+        "duration" : 499
+      },
+      "status" : "passed",
+      "steps" : [ ],
+      "attachments" : [ ],
+      "parameters" : [ ],
+      "stepsCount" : 0,
+      "attachmentsCount" : 0,
+      "shouldDisplayMessage" : false,
+      "hasContent" : false
+    }, {
+      "name" : "page.click(.lang-item:has-text(\"Français\"))",
+      "time" : {
+        "start" : 1633945043539,
+        "stop" : 1633945043917,
+        "duration" : 378
+      },
+      "status" : "passed",
+      "steps" : [ ],
+      "attachments" : [ ],
+      "parameters" : [ ],
+      "stepsCount" : 0,
+      "attachmentsCount" : 0,
+      "shouldDisplayMessage" : false,
+      "hasContent" : false
+    }, {
+      "name" : "page.textContent(.header)",
+      "time" : {
+        "start" : 1633945043918,
+        "stop" : 1633945043926,
+        "duration" : 8
+      },
+      "status" : "passed",
+      "steps" : [ ],
+      "attachments" : [ ],
+      "parameters" : [ ],
+      "stepsCount" : 0,
+      "attachmentsCount" : 0,
+      "shouldDisplayMessage" : false,
+      "hasContent" : false
+    }, {
+      "name" : "page.click(.settings button:nth-of-type(1))",
+      "time" : {
+        "start" : 1633945043928,
+        "stop" : 1633945044290,
+        "duration" : 362
+      },
+      "status" : "passed",
+      "steps" : [ ],
+      "attachments" : [ ],
+      "parameters" : [ ],
+      "stepsCount" : 0,
+      "attachmentsCount" : 0,
+      "shouldDisplayMessage" : false,
+      "hasContent" : false
+    }, {
+      "name" : "page.click(.lang-item:has-text(\"English\"))",
+      "time" : {
+        "start" : 1633945044290,
+        "stop" : 1633945044606,
+        "duration" : 316
+      },
+      "status" : "passed",
+      "steps" : [ ],
+      "attachments" : [ ],
+      "parameters" : [ ],
+      "stepsCount" : 0,
+      "attachmentsCount" : 0,
+      "shouldDisplayMessage" : false,
+      "hasContent" : false
+    }, {
+      "name" : "page.textContent(.header)",
+      "time" : {
+        "start" : 1633945044606,
+        "stop" : 1633945044613,
+        "duration" : 7
+      },
+      "status" : "passed",
+      "steps" : [ ],
+      "attachments" : [ ],
+      "parameters" : [ ],
+      "stepsCount" : 0,
+      "attachmentsCount" : 0,
+      "shouldDisplayMessage" : false,
+      "hasContent" : false
+    }, {
+      "name" : "page.click(.settings button:nth-of-type(1))",
+      "time" : {
+        "start" : 1633945044614,
+        "stop" : 1633945045010,
+        "duration" : 396
+      },
+      "status" : "passed",
+      "steps" : [ ],
+      "attachments" : [ ],
+      "parameters" : [ ],
+      "stepsCount" : 0,
+      "attachmentsCount" : 0,
+      "shouldDisplayMessage" : false,
+      "hasContent" : false
+    }, {
+      "name" : "page.click(.lang-item:has-text(\"한국어\"))",
+      "time" : {
+        "start" : 1633945045011,
+        "stop" : 1633945045388,
+        "duration" : 377
+      },
+      "status" : "passed",
+      "steps" : [ ],
+      "attachments" : [ ],
+      "parameters" : [ ],
+      "stepsCount" : 0,
+      "attachmentsCount" : 0,
+      "shouldDisplayMessage" : false,
+      "hasContent" : false
+    }, {
+      "name" : "page.textContent(.header)",
+      "time" : {
+        "start" : 1633945045390,
+        "stop" : 1633945045460,
+        "duration" : 70
+      },
+      "status" : "passed",
+      "steps" : [ ],
+      "attachments" : [ ],
+      "parameters" : [ ],
+      "stepsCount" : 0,
+      "attachmentsCount" : 0,
+      "shouldDisplayMessage" : false,
+      "hasContent" : false
+    }, {
+      "name" : "page.click(.settings button:nth-of-type(1))",
+      "time" : {
+        "start" : 1633945045462,
+        "stop" : 1633945045852,
+        "duration" : 390
+      },
+      "status" : "passed",
+      "steps" : [ ],
+      "attachments" : [ ],
+      "parameters" : [ ],
+      "stepsCount" : 0,
+      "attachmentsCount" : 0,
+      "shouldDisplayMessage" : false,
+      "hasContent" : false
+    }, {
+      "name" : "page.click(.lang-item:has-text(\"中文語言\"))",
+      "time" : {
+        "start" : 1633945045853,
+        "stop" : 1633945046207,
+        "duration" : 354
+      },
+      "status" : "passed",
+      "steps" : [ ],
+      "attachments" : [ ],
+      "parameters" : [ ],
+      "stepsCount" : 0,
+      "attachmentsCount" : 0,
+      "shouldDisplayMessage" : false,
+      "hasContent" : false
+    }, {
+      "name" : "page.textContent(.header)",
+      "time" : {
+        "start" : 1633945046208,
+        "stop" : 1633945046214,
+        "duration" : 6
+      },
+      "status" : "passed",
+      "steps" : [ ],
+      "attachments" : [ ],
+      "parameters" : [ ],
+      "stepsCount" : 0,
+      "attachmentsCount" : 0,
+      "shouldDisplayMessage" : false,
+      "hasContent" : false
+    }, {
+      "name" : "page.click(.settings button:nth-of-type(1))",
+      "time" : {
+        "start" : 1633945046215,
+        "stop" : 1633945046581,
+        "duration" : 366
+      },
+      "status" : "passed",
+      "steps" : [ ],
+      "attachments" : [ ],
+      "parameters" : [ ],
+      "stepsCount" : 0,
+      "attachmentsCount" : 0,
+      "shouldDisplayMessage" : false,
+      "hasContent" : false
+    }, {
+      "name" : "page.click(.lang-item:has-text(\"Español\"))",
+      "time" : {
+        "start" : 1633945046581,
+        "stop" : 1633945046999,
+        "duration" : 418
+      },
+      "status" : "passed",
+      "steps" : [ ],
+      "attachments" : [ ],
+      "parameters" : [ ],
+      "stepsCount" : 0,
+      "attachmentsCount" : 0,
+      "shouldDisplayMessage" : false,
+      "hasContent" : false
+    }, {
+      "name" : "page.textContent(.header)",
+      "time" : {
+        "start" : 1633945046999,
+        "stop" : 1633945047006,
+        "duration" : 7
+      },
+      "status" : "passed",
+      "steps" : [ ],
+      "attachments" : [ ],
+      "parameters" : [ ],
+      "stepsCount" : 0,
+      "attachmentsCount" : 0,
+      "shouldDisplayMessage" : false,
+      "hasContent" : false
+    }, {
+      "name" : "page.click(.settings button:nth-of-type(1))",
+      "time" : {
+        "start" : 1633945047007,
+        "stop" : 1633945047366,
+        "duration" : 359
+      },
+      "status" : "passed",
+      "steps" : [ ],
+      "attachments" : [ ],
+      "parameters" : [ ],
+      "stepsCount" : 0,
+      "attachmentsCount" : 0,
+      "shouldDisplayMessage" : false,
+      "hasContent" : false
+    }, {
+      "name" : "page.click(.lang-item:has-text(\"Українська\"))",
+      "time" : {
+        "start" : 1633945047366,
+        "stop" : 1633945047751,
+        "duration" : 385
+      },
+      "status" : "passed",
+      "steps" : [ ],
+      "attachments" : [ ],
+      "parameters" : [ ],
+      "stepsCount" : 0,
+      "attachmentsCount" : 0,
+      "shouldDisplayMessage" : false,
+      "hasContent" : false
+    }, {
+      "name" : "page.textContent(.header)",
+      "time" : {
+        "start" : 1633945047752,
+        "stop" : 1633945047757,
+        "duration" : 5
+      },
+      "status" : "passed",
+      "steps" : [ ],
+      "attachments" : [ ],
+      "parameters" : [ ],
+      "stepsCount" : 0,
+      "attachmentsCount" : 0,
+      "shouldDisplayMessage" : false,
+      "hasContent" : false
+    }, {
+      "name" : "page.click(.settings button:nth-of-type(1))",
+      "time" : {
+        "start" : 1633945047759,
+        "stop" : 1633945048139,
+        "duration" : 380
+      },
+      "status" : "passed",
+      "steps" : [ ],
+      "attachments" : [ ],
+      "parameters" : [ ],
+      "stepsCount" : 0,
+      "attachmentsCount" : 0,
+      "shouldDisplayMessage" : false,
+      "hasContent" : false
+    }, {
+      "name" : "page.click(.lang-item:has-text(\"Русский\"))",
+      "time" : {
+        "start" : 1633945048140,
+        "stop" : 1633945048491,
+        "duration" : 351
+      },
+      "status" : "passed",
+      "steps" : [ ],
+      "attachments" : [ ],
+      "parameters" : [ ],
+      "stepsCount" : 0,
+      "attachmentsCount" : 0,
+      "shouldDisplayMessage" : false,
+      "hasContent" : false
+    }, {
+      "name" : "page.textContent(.header)",
+      "time" : {
+        "start" : 1633945048492,
+        "stop" : 1633945048496,
+        "duration" : 4
+      },
+      "status" : "passed",
+      "steps" : [ ],
+      "attachments" : [ ],
+      "parameters" : [ ],
+      "stepsCount" : 0,
+      "attachmentsCount" : 0,
+      "shouldDisplayMessage" : false,
+      "hasContent" : false
+    }, {
+      "name" : "page.click(.settings button:nth-of-type(1))",
+      "time" : {
+        "start" : 1633945048498,
+        "stop" : 1633945048876,
+        "duration" : 378
+      },
+      "status" : "passed",
+      "steps" : [ ],
+      "attachments" : [ ],
+      "parameters" : [ ],
+      "stepsCount" : 0,
+      "attachmentsCount" : 0,
+      "shouldDisplayMessage" : false,
+      "hasContent" : false
+    }, {
+      "name" : "page.click(.lang-item:has-text(\"عربى\"))",
+      "time" : {
+        "start" : 1633945048876,
+        "stop" : 1633945049325,
+        "duration" : 449
+      },
+      "status" : "passed",
+      "steps" : [ ],
+      "attachments" : [ ],
+      "parameters" : [ ],
+      "stepsCount" : 0,
+      "attachmentsCount" : 0,
+      "shouldDisplayMessage" : false,
+      "hasContent" : false
+    }, {
+      "name" : "page.textContent(.header)",
+      "time" : {
+        "start" : 1633945049325,
+        "stop" : 1633945049331,
+        "duration" : 6
+      },
+      "status" : "passed",
+      "steps" : [ ],
+      "attachments" : [ ],
+      "parameters" : [ ],
+      "stepsCount" : 0,
+      "attachmentsCount" : 0,
+      "shouldDisplayMessage" : false,
+      "hasContent" : false
+    }, {
+      "name" : "After Hooks",
+      "time" : {
+        "start" : 1633945049332,
+        "stop" : 1633945051351,
+        "duration" : 2019
+      },
+      "status" : "passed",
+      "steps" : [ {
+        "name" : "browserContext.close",
+        "time" : {
+          "start" : 1633945049754,
+          "stop" : 1633945051351,
+          "duration" : 1597
+        },
+        "status" : "passed",
+        "steps" : [ ],
+        "attachments" : [ ],
+        "parameters" : [ ],
+        "stepsCount" : 0,
+        "attachmentsCount" : 0,
+        "shouldDisplayMessage" : false,
+        "hasContent" : false
+      } ],
+      "attachments" : [ ],
+      "parameters" : [ ],
+      "stepsCount" : 1,
+      "attachmentsCount" : 0,
+      "shouldDisplayMessage" : false,
+      "hasContent" : true
+    } ],
+    "attachments" : [ {
+      "uid" : "f17f56d344701931",
+      "name" : "stdout",
+      "source" : "f17f56d344701931.txt",
+      "type" : "text/plain",
+      "size" : 54
+    }, {
+      "uid" : "87f271cc8a2b42b1",
+      "name" : "stdout",
+      "source" : "87f271cc8a2b42b1.txt",
+      "type" : "text/plain",
+      "size" : 208
+    }, {
+      "uid" : "10a7dcdacf7fefce",
+      "name" : "stdout",
+      "source" : "10a7dcdacf7fefce.txt",
+      "type" : "text/plain",
+      "size" : 225
+    }, {
+      "uid" : "ebc4c29e9a383aa5",
+      "name" : "stdout",
+      "source" : "ebc4c29e9a383aa5.txt",
+      "type" : "text/plain",
+      "size" : 44
+    }, {
+      "uid" : "3509b048936329f",
+      "name" : "stdout",
+      "source" : "3509b048936329f.txt",
+      "type" : "text/plain",
+      "size" : 44
+    }, {
+      "uid" : "83fa535f01f45457",
+      "name" : "stdout",
+      "source" : "83fa535f01f45457.txt",
+      "type" : "text/plain",
+      "size" : 44
+    }, {
+      "uid" : "d1a3c395a0ccd62e",
+      "name" : "stdout",
+      "source" : "d1a3c395a0ccd62e.txt",
+      "type" : "text/plain",
+      "size" : 44
+    }, {
+      "uid" : "c58a8302a6314f1a",
+      "name" : "stdout",
+      "source" : "c58a8302a6314f1a.txt",
+      "type" : "text/plain",
+      "size" : 44
+    }, {
+      "uid" : "50487abdeb8285f9",
+      "name" : "stdout",
+      "source" : "50487abdeb8285f9.txt",
+      "type" : "text/plain",
+      "size" : 44
+    }, {
+      "uid" : "c2019337a836037f",
+      "name" : "stdout",
+      "source" : "c2019337a836037f.txt",
+      "type" : "text/plain",
+      "size" : 44
+    }, {
+      "uid" : "5a4723ff1db778a8",
+      "name" : "stdout",
+      "source" : "5a4723ff1db778a8.txt",
+      "type" : "text/plain",
+      "size" : 44
+    } ],
+    "parameters" : [ ],
+    "stepsCount" : 41,
+    "attachmentsCount" : 11,
+    "shouldDisplayMessage" : false,
+    "hasContent" : true
+  },
+  "afterStages" : [ ],
+  "labels" : [ {
+    "name" : "language",
+    "value" : "JavaScript"
+  }, {
+    "name" : "framework",
+    "value" : "Playwright"
+  }, {
+    "name" : "parentSuite",
+    "value" : "Chrome Stable"
+  }, {
+    "name" : "suite",
+    "value" : "src/tests/stable/settings.test.ts"
+  }, {
+    "name" : "subSuite",
+    "value" : "Settings >"
+  }, {
+    "name" : "resultFormat",
+    "value" : "allure2"
+  } ],
+  "parameters" : [ ],
+  "links" : [ ],
+  "hidden" : false,
+  "retry" : false,
+  "extra" : {
+    "severity" : "normal",
+    "retries" : [ ],
+    "categories" : [ ],
+    "history" : {
+      "statistic" : {
+        "failed" : 0,
+        "broken" : 0,
+        "skipped" : 1,
+        "passed" : 4,
+        "unknown" : 0,
+        "total" : 5
+      },
+      "items" : [ {
+        "uid" : "195d8f5158c89453",
+        "reportUrl" : "https://velas.github.io/JsWallet/391//#testresult/195d8f5158c89453",
+        "status" : "skipped",
+        "time" : {
+          "start" : 1633943340959,
+          "stop" : 1633943340959,
+          "duration" : 0
+        }
+      }, {
+        "uid" : "69d92746b248e18e",
+        "reportUrl" : "https://velas.github.io/JsWallet/391//#testresult/69d92746b248e18e",
+        "status" : "passed",
+        "time" : {
+          "start" : 1633878129549,
+          "stop" : 1633878144582,
+          "duration" : 15033
+        }
+      }, {
+        "uid" : "29b9fb252ed721f3",
+        "reportUrl" : "https://velas.github.io/JsWallet/390//#testresult/29b9fb252ed721f3",
+        "status" : "passed",
+        "time" : {
+          "start" : 1633433289594,
+          "stop" : 1633433300213,
+          "duration" : 10619
+        }
+      }, {
+        "uid" : "71eff4db34424403",
+        "reportUrl" : "https://velas.github.io/JsWallet/389//#testresult/71eff4db34424403",
+        "status" : "passed",
+        "time" : {
+          "start" : 1633431193525,
+          "stop" : 1633431204235,
+          "duration" : 10710
+        }
+      } ]
+    },
+    "tags" : [ ]
+  },
+  "source" : "f65acf5c3f8e3270.json",
+  "parameterValues" : [ ]
+}
