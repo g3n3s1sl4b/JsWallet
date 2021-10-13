@@ -13,6 +13,8 @@ jobs:
       run:
         working-directory: ./e2e
     steps:
+      - uses: actions/checkout
+
       - uses: ./.github/actions/e2e-tests-template@new_workflow_test
         with:
           test_script: 'npm run test'
