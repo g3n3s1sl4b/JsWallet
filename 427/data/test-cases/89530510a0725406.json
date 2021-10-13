@@ -1,0 +1,403 @@
+{
+  "uid" : "89530510a0725406",
+  "name" : "custom seed phrase",
+  "fullName" : "custom seed phrase",
+  "historyId" : "Chrome Stable src/tests/stable/auth.test.ts Auth > Restore with > custom seed phrase",
+  "time" : {
+    "start" : 1634121556134,
+    "stop" : 1634121592004,
+    "duration" : 35870
+  },
+  "status" : "failed",
+  "statusMessage" : "page.waitForSelector: Timeout 25000ms exceeded.\n=========================== logs ===========================\nwaiting for selector \".wallet-item .top-left [class=\" img\"]\" to be visible\n============================================================",
+  "statusTrace" : "page.waitForSelector: Timeout 25000ms exceeded.\n=========================== logs ===========================\nwaiting for selector \".wallet-item .top-left [class=\" img\"]\" to be visible\n============================================================\n    at WalletsScreen.waitForWalletsDataLoaded (/home/runner/work/JsWallet/JsWallet/e2e/src/screens/wallets.ts:92:21)\n    at WalletsScreen.selectWallet (/home/runner/work/JsWallet/JsWallet/e2e/src/screens/wallets.ts:23:16)\n    at /home/runner/work/JsWallet/JsWallet/e2e/src/tests/stable/auth.test.ts:47:27\n    at WorkerRunner._runTestWithBeforeHooks (/home/runner/work/JsWallet/JsWallet/e2e/node_modules/@playwright/test/lib/test/workerRunner.js:449:7)",
+  "flaky" : false,
+  "newFailed" : true,
+  "beforeStages" : [ ],
+  "testStage" : {
+    "status" : "failed",
+    "statusMessage" : "page.waitForSelector: Timeout 25000ms exceeded.\n=========================== logs ===========================\nwaiting for selector \".wallet-item .top-left [class=\" img\"]\" to be visible\n============================================================",
+    "statusTrace" : "page.waitForSelector: Timeout 25000ms exceeded.\n=========================== logs ===========================\nwaiting for selector \".wallet-item .top-left [class=\" img\"]\" to be visible\n============================================================\n    at WalletsScreen.waitForWalletsDataLoaded (/home/runner/work/JsWallet/JsWallet/e2e/src/screens/wallets.ts:92:21)\n    at WalletsScreen.selectWallet (/home/runner/work/JsWallet/JsWallet/e2e/src/screens/wallets.ts:23:16)\n    at /home/runner/work/JsWallet/JsWallet/e2e/src/tests/stable/auth.test.ts:47:27\n    at WorkerRunner._runTestWithBeforeHooks (/home/runner/work/JsWallet/JsWallet/e2e/node_modules/@playwright/test/lib/test/workerRunner.js:449:7)",
+    "steps" : [ {
+      "name" : "Before Hooks",
+      "time" : {
+        "start" : 1634121556134,
+        "stop" : 1634121557882,
+        "duration" : 1748
+      },
+      "status" : "passed",
+      "steps" : [ {
+        "name" : "browserContext.newPage",
+        "time" : {
+          "start" : 1634121556224,
+          "stop" : 1634121556260,
+          "duration" : 36
+        },
+        "status" : "passed",
+        "steps" : [ ],
+        "attachments" : [ ],
+        "parameters" : [ ],
+        "attachmentsCount" : 0,
+        "shouldDisplayMessage" : false,
+        "hasContent" : false,
+        "stepsCount" : 0
+      }, {
+        "name" : "page.goto(localhost:8080/main-index.html?network=testnet)",
+        "time" : {
+          "start" : 1634121556262,
+          "stop" : 1634121557882,
+          "duration" : 1620
+        },
+        "status" : "passed",
+        "steps" : [ ],
+        "attachments" : [ ],
+        "parameters" : [ ],
+        "attachmentsCount" : 0,
+        "shouldDisplayMessage" : false,
+        "hasContent" : false,
+        "stepsCount" : 0
+      } ],
+      "attachments" : [ ],
+      "parameters" : [ ],
+      "attachmentsCount" : 0,
+      "shouldDisplayMessage" : false,
+      "hasContent" : true,
+      "stepsCount" : 2
+    }, {
+      "name" : "page.waitForSelector(.balance)",
+      "time" : {
+        "start" : 1634121557890,
+        "stop" : 1634121558395,
+        "duration" : 505
+      },
+      "status" : "failed",
+      "steps" : [ ],
+      "attachments" : [ ],
+      "parameters" : [ ],
+      "attachmentsCount" : 0,
+      "shouldDisplayMessage" : false,
+      "hasContent" : false,
+      "stepsCount" : 0
+    }, {
+      "name" : "page.isVisible([placeholder=\"Password or PIN\"])",
+      "time" : {
+        "start" : 1634121558399,
+        "stop" : 1634121558402,
+        "duration" : 3
+      },
+      "status" : "passed",
+      "steps" : [ ],
+      "attachments" : [ ],
+      "parameters" : [ ],
+      "attachmentsCount" : 0,
+      "shouldDisplayMessage" : false,
+      "hasContent" : false,
+      "stepsCount" : 0
+    }, {
+      "name" : "page.click(#lang-en)",
+      "time" : {
+        "start" : 1634121558403,
+        "stop" : 1634121558703,
+        "duration" : 300
+      },
+      "status" : "passed",
+      "steps" : [ ],
+      "attachments" : [ ],
+      "parameters" : [ ],
+      "attachmentsCount" : 0,
+      "shouldDisplayMessage" : false,
+      "hasContent" : false,
+      "stepsCount" : 0
+    }, {
+      "name" : "page.click(#btn-restore)",
+      "time" : {
+        "start" : 1634121558703,
+        "stop" : 1634121558984,
+        "duration" : 281
+      },
+      "status" : "passed",
+      "steps" : [ ],
+      "attachments" : [ ],
+      "parameters" : [ ],
+      "attachmentsCount" : 0,
+      "shouldDisplayMessage" : false,
+      "hasContent" : false,
+      "stepsCount" : 0
+    }, {
+      "name" : "page.click(#restore-custom)",
+      "time" : {
+        "start" : 1634121558985,
+        "stop" : 1634121559279,
+        "duration" : 294
+      },
+      "status" : "passed",
+      "steps" : [ ],
+      "attachments" : [ ],
+      "parameters" : [ ],
+      "attachmentsCount" : 0,
+      "shouldDisplayMessage" : false,
+      "hasContent" : false,
+      "stepsCount" : 0
+    }, {
+      "name" : "page.fill([type=\"password\"])",
+      "time" : {
+        "start" : 1634121559280,
+        "stop" : 1634121559555,
+        "duration" : 275
+      },
+      "status" : "passed",
+      "steps" : [ ],
+      "attachments" : [ ],
+      "parameters" : [ ],
+      "attachmentsCount" : 0,
+      "shouldDisplayMessage" : false,
+      "hasContent" : false,
+      "stepsCount" : 0
+    }, {
+      "name" : "page.click(button.setup)",
+      "time" : {
+        "start" : 1634121559556,
+        "stop" : 1634121559877,
+        "duration" : 321
+      },
+      "status" : "passed",
+      "steps" : [ ],
+      "attachments" : [ ],
+      "parameters" : [ ],
+      "attachmentsCount" : 0,
+      "shouldDisplayMessage" : false,
+      "hasContent" : false,
+      "stepsCount" : 0
+    }, {
+      "name" : "page.fill(#seedphrase-custom)",
+      "time" : {
+        "start" : 1634121559878,
+        "stop" : 1634121560159,
+        "duration" : 281
+      },
+      "status" : "passed",
+      "steps" : [ ],
+      "attachments" : [ ],
+      "parameters" : [ ],
+      "attachmentsCount" : 0,
+      "shouldDisplayMessage" : false,
+      "hasContent" : false,
+      "stepsCount" : 0
+    }, {
+      "name" : "page.click(#seed-phrase-next)",
+      "time" : {
+        "start" : 1634121560160,
+        "stop" : 1634121560904,
+        "duration" : 744
+      },
+      "status" : "passed",
+      "steps" : [ ],
+      "attachments" : [ ],
+      "parameters" : [ ],
+      "attachmentsCount" : 0,
+      "shouldDisplayMessage" : false,
+      "hasContent" : false,
+      "stepsCount" : 0
+    }, {
+      "name" : "page.waitForSelector(.menu-item)",
+      "time" : {
+        "start" : 1634121560909,
+        "stop" : 1634121560972,
+        "duration" : 63
+      },
+      "status" : "passed",
+      "steps" : [ ],
+      "attachments" : [ ],
+      "parameters" : [ ],
+      "attachmentsCount" : 0,
+      "shouldDisplayMessage" : false,
+      "hasContent" : false,
+      "stepsCount" : 0
+    }, {
+      "name" : "page.waitForSelector(.balance)",
+      "time" : {
+        "start" : 1634121560972,
+        "stop" : 1634121560988,
+        "duration" : 16
+      },
+      "status" : "passed",
+      "steps" : [ ],
+      "attachments" : [ ],
+      "parameters" : [ ],
+      "attachmentsCount" : 0,
+      "shouldDisplayMessage" : false,
+      "hasContent" : false,
+      "stepsCount" : 0
+    }, {
+      "name" : "page.waitForSelector(.wallet-item .top-left [class=\" img\"])",
+      "time" : {
+        "start" : 1634121561018,
+        "stop" : 1634121586019,
+        "duration" : 25001
+      },
+      "status" : "failed",
+      "steps" : [ ],
+      "attachments" : [ ],
+      "parameters" : [ ],
+      "attachmentsCount" : 0,
+      "shouldDisplayMessage" : false,
+      "hasContent" : false,
+      "stepsCount" : 0
+    }, {
+      "name" : "After Hooks",
+      "time" : {
+        "start" : 1634121586020,
+        "stop" : 1634121592004,
+        "duration" : 5984
+      },
+      "status" : "passed",
+      "steps" : [ {
+        "name" : "browserContext.close",
+        "time" : {
+          "start" : 1634121586502,
+          "stop" : 1634121591998,
+          "duration" : 5496
+        },
+        "status" : "passed",
+        "steps" : [ ],
+        "attachments" : [ ],
+        "parameters" : [ ],
+        "attachmentsCount" : 0,
+        "shouldDisplayMessage" : false,
+        "hasContent" : false,
+        "stepsCount" : 0
+      }, {
+        "name" : "browserContext.close",
+        "time" : {
+          "start" : 1634121591999,
+          "stop" : 1634121591999,
+          "duration" : 0
+        },
+        "status" : "failed",
+        "steps" : [ ],
+        "attachments" : [ ],
+        "parameters" : [ ],
+        "attachmentsCount" : 0,
+        "shouldDisplayMessage" : false,
+        "hasContent" : false,
+        "stepsCount" : 0
+      } ],
+      "attachments" : [ ],
+      "parameters" : [ ],
+      "attachmentsCount" : 0,
+      "shouldDisplayMessage" : false,
+      "hasContent" : true,
+      "stepsCount" : 2
+    } ],
+    "attachments" : [ {
+      "uid" : "72f33538f65dbdb0",
+      "name" : "video",
+      "source" : "72f33538f65dbdb0.webm",
+      "type" : "video/webm",
+      "size" : 1882757
+    }, {
+      "uid" : "ff7900b45ffd9e93",
+      "name" : "screenshot",
+      "source" : "ff7900b45ffd9e93.png",
+      "type" : "image/png",
+      "size" : 70390
+    }, {
+      "uid" : "4a6d0565b191f81b",
+      "name" : "stdout",
+      "source" : "4a6d0565b191f81b.txt",
+      "type" : "text/plain",
+      "size" : 54
+    }, {
+      "uid" : "be1f2da7e2fcdda1",
+      "name" : "stdout",
+      "source" : "be1f2da7e2fcdda1.txt",
+      "type" : "text/plain",
+      "size" : 208
+    }, {
+      "uid" : "7572c063526aa152",
+      "name" : "stdout",
+      "source" : "7572c063526aa152.txt",
+      "type" : "text/plain",
+      "size" : 225
+    } ],
+    "parameters" : [ ],
+    "attachmentsCount" : 5,
+    "shouldDisplayMessage" : true,
+    "hasContent" : true,
+    "stepsCount" : 18
+  },
+  "afterStages" : [ ],
+  "labels" : [ {
+    "name" : "language",
+    "value" : "JavaScript"
+  }, {
+    "name" : "framework",
+    "value" : "Playwright"
+  }, {
+    "name" : "parentSuite",
+    "value" : "Chrome Stable"
+  }, {
+    "name" : "suite",
+    "value" : "src/tests/stable/auth.test.ts"
+  }, {
+    "name" : "subSuite",
+    "value" : "Auth > > Restore with >"
+  }, {
+    "name" : "resultFormat",
+    "value" : "allure2"
+  } ],
+  "parameters" : [ ],
+  "links" : [ ],
+  "hidden" : false,
+  "retry" : false,
+  "extra" : {
+    "severity" : "normal",
+    "retries" : [ {
+      "uid" : "bafcf22aec582397",
+      "status" : "failed",
+      "statusDetails" : "page.waitForSelector: Timeout 25000ms exceeded.\n=========================== logs ===========================\nwaiting for selector \".wallet-item .top-left [class=\" img\"]\" to be visible\n============================================================",
+      "time" : {
+        "start" : 1634121473237,
+        "stop" : 1634121507901,
+        "duration" : 34664
+      }
+    }, {
+      "uid" : "9abe9983eba0eb2f",
+      "status" : "failed",
+      "statusDetails" : "page.waitForSelector: Timeout 25000ms exceeded.\n=========================== logs ===========================\nwaiting for selector \".wallet-item .top-left [class=\" img\"]\" to be visible\n============================================================",
+      "time" : {
+        "start" : 1634121434849,
+        "stop" : 1634121469031,
+        "duration" : 34182
+      }
+    } ],
+    "categories" : [ {
+      "name" : "Product defects",
+      "matchedStatuses" : [ ],
+      "flaky" : false
+    } ],
+    "history" : {
+      "statistic" : {
+        "failed" : 1,
+        "broken" : 0,
+        "skipped" : 0,
+        "passed" : 1,
+        "unknown" : 0,
+        "total" : 2
+      },
+      "items" : [ {
+        "uid" : "67629b6b09d649ee",
+        "reportUrl" : "https://velas.github.io/JsWallet/426//#testresult/67629b6b09d649ee",
+        "status" : "passed",
+        "time" : {
+          "start" : 1634119654279,
+          "stop" : 1634119661789,
+          "duration" : 7510
+        }
+      } ]
+    },
+    "tags" : [ ]
+  },
+  "source" : "89530510a0725406.json",
+  "parameterValues" : [ ]
+}
