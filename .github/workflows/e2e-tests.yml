@@ -20,8 +20,8 @@ jobs:
     #     with:
     #       test_script: 'npm run test'
     #       environment: 'local'
-  reuseaction:
-    uses: ./.github/workflows/e2e-tests-template
+  reuse_action:
+    uses: ./.github/workflows/e2e-tests-template@${GITHUB_REF#refs/heads/}
     with:
       test_script: 'npm run test'
       environment: 'local'
