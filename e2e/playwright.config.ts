@@ -7,12 +7,12 @@ const config: PlaywrightTestConfig = {
   globalSetup: 'src/pw-helpers/before-hook.ts',
   // globalTeardown: '',
   maxFailures: globalConfig.CI ? 10 : 2,
-  retries: process.env.CI ? 1 : 0,
+  retries: globalConfig.CI ? 2 : 0,
   timeout: 120000,
   workers: 1,
   // reporter: 'list',
   // repeatEach: 5,
-  reporter: [['list'], ['junit', { outputFile: 'test-results/test-results.xml' }]],
+  reporter: [['list'], ['junit', { outputFile: 'test-results/test-results.xml' }], ['allure-playwright']],
   projects: [
     {
       name: 'Chrome Stable',
@@ -26,7 +26,7 @@ const config: PlaywrightTestConfig = {
           slowMo: globalConfig.pw.slowMo,
         },
         screenshot: 'only-on-failure',
-        viewport: { width: 1900, height: 1080 },
+        viewport: { width: 1890, height: 1080 },
         video: {
           mode: 'retain-on-failure',
           size: {
