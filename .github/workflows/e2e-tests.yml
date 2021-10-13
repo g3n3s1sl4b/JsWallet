@@ -5,22 +5,26 @@ concurrency:
   group: js-wallet-e2e-tests-${{github.event.pull_request.number}}
   cancel-in-progress: true
 jobs:
-  e2e-tests:
-    runs-on: ubuntu-latest
+  # e2e-tests:
+  #   runs-on: ubuntu-latest
     # container:
     #   image: node:14.16
     # defaults:
       # run:
       #   working-directory: ./e2e
-    steps:
-      - name: actions checkout
-        uses: actions/checkout@v2
+    # steps:
+    #   - name: actions checkout
+    #     uses: actions/checkout@v2
 
-      - uses: ./.github/workflows/e2e-tests-template
+    #   - uses: ./.github/workflows/e2e-tests-template
+    #     with:
+    #       test_script: 'npm run test'
+    #       environment: 'local'
+  reuse:
+    uses: ./.github/workflows/e2e-tests-template
         with:
           test_script: 'npm run test'
           environment: 'local'
-
       # - name: checkout JsWallet
       #   uses: actions/checkout@v2
 
