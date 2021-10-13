@@ -1,5 +1,552 @@
 {
   "uid" : "98d3104e051c652961429bf95fa0b5d6",
-  "children" : [ ],
+  "children" : [ {
+    "name" : "Chrome Stable",
+    "children" : [ {
+      "name" : "src/tests/stable/auth.test.ts",
+      "children" : [ {
+        "name" : "Auth > > Sign up >",
+        "children" : [ {
+          "name" : "Create wallet",
+          "uid" : "caa94d245cd5a03f",
+          "parentUid" : "06962ba6bf6ed0ee438d0ebb1d6009f2",
+          "status" : "passed",
+          "time" : {
+            "start" : 1634119634561,
+            "stop" : 1634119654278,
+            "duration" : 19717
+          },
+          "flaky" : false,
+          "newFailed" : false,
+          "parameters" : [ ]
+        } ],
+        "uid" : "06962ba6bf6ed0ee438d0ebb1d6009f2"
+      }, {
+        "name" : "Auth > > Restore with >",
+        "children" : [ {
+          "name" : "custom seed phrase",
+          "uid" : "67629b6b09d649ee",
+          "parentUid" : "d3620f5d3e861fb5b1ab2fe93d69bad9",
+          "status" : "passed",
+          "time" : {
+            "start" : 1634119654279,
+            "stop" : 1634119661789,
+            "duration" : 7510
+          },
+          "flaky" : false,
+          "newFailed" : false,
+          "parameters" : [ ]
+        }, {
+          "name" : "24-words seed phrase",
+          "uid" : "60488a5abb6abd3c",
+          "parentUid" : "d3620f5d3e861fb5b1ab2fe93d69bad9",
+          "status" : "passed",
+          "time" : {
+            "start" : 1634119661789,
+            "stop" : 1634119683419,
+            "duration" : 21630
+          },
+          "flaky" : false,
+          "newFailed" : false,
+          "parameters" : [ ]
+        }, {
+          "name" : "12-words seed phrase",
+          "uid" : "737b6288e652e3d9",
+          "parentUid" : "d3620f5d3e861fb5b1ab2fe93d69bad9",
+          "status" : "passed",
+          "time" : {
+            "start" : 1634119683420,
+            "stop" : 1634119733890,
+            "duration" : 50470
+          },
+          "flaky" : false,
+          "newFailed" : false,
+          "parameters" : [ ]
+        }, {
+          "name" : "Can't restore with incorrect 24-word seed phrase",
+          "uid" : "7da7ff78e06a19b0",
+          "parentUid" : "d3620f5d3e861fb5b1ab2fe93d69bad9",
+          "status" : "passed",
+          "time" : {
+            "start" : 1634119733890,
+            "stop" : 1634119752149,
+            "duration" : 18259
+          },
+          "flaky" : false,
+          "newFailed" : false,
+          "parameters" : [ ]
+        } ],
+        "uid" : "d3620f5d3e861fb5b1ab2fe93d69bad9"
+      }, {
+        "name" : "Auth > > Log in >",
+        "children" : [ {
+          "name" : "Can't log in with incorrect password",
+          "uid" : "58a871d6bcfc14ff",
+          "parentUid" : "a6df3dbc85732523062f7c253259a8ee",
+          "status" : "passed",
+          "time" : {
+            "start" : 1634119752149,
+            "stop" : 1634119761478,
+            "duration" : 9329
+          },
+          "flaky" : false,
+          "newFailed" : false,
+          "parameters" : [ ]
+        }, {
+          "name" : "Log in with pin",
+          "uid" : "581560493a2f74fb",
+          "parentUid" : "a6df3dbc85732523062f7c253259a8ee",
+          "status" : "passed",
+          "time" : {
+            "start" : 1634119761479,
+            "stop" : 1634119772740,
+            "duration" : 11261
+          },
+          "flaky" : false,
+          "newFailed" : false,
+          "parameters" : [ ]
+        } ],
+        "uid" : "a6df3dbc85732523062f7c253259a8ee"
+      }, {
+        "name" : "Auth > > Choose language on sign up >",
+        "children" : [ {
+          "name" : "Change language",
+          "uid" : "84ce7c2bd06e5e2a",
+          "parentUid" : "2f7688cb1d453aa8e94537f0df169c9b",
+          "status" : "passed",
+          "time" : {
+            "start" : 1634119772741,
+            "stop" : 1634119784838,
+            "duration" : 12097
+          },
+          "flaky" : false,
+          "newFailed" : false,
+          "parameters" : [ ]
+        } ],
+        "uid" : "2f7688cb1d453aa8e94537f0df169c9b"
+      } ],
+      "uid" : "8fafcd2e388df21db6eeed7e254ff09c"
+    }, {
+      "name" : "src/tests/stable/links.test.ts",
+      "children" : [ {
+        "name" : "Links >",
+        "children" : [ {
+          "name" : "Download links are correct",
+          "uid" : "ed19226c57c81843",
+          "parentUid" : "ba37d3d101479c4efddb82f5fc4ced9b",
+          "status" : "passed",
+          "time" : {
+            "start" : 1634119784850,
+            "stop" : 1634119788719,
+            "duration" : 3869
+          },
+          "flaky" : false,
+          "newFailed" : false,
+          "parameters" : [ ]
+        } ],
+        "uid" : "ba37d3d101479c4efddb82f5fc4ced9b"
+      } ],
+      "uid" : "d174356e568157613f4585abd9ba56ee"
+    }, {
+      "name" : "src/tests/stable/navigation.test.ts",
+      "children" : [ {
+        "name" : "Navigation >",
+        "children" : [ {
+          "name" : "Navigate with back button in header",
+          "uid" : "78cea8654141e096",
+          "parentUid" : "71372ec5a8ce0048f6f96f0d6830760f",
+          "status" : "passed",
+          "time" : {
+            "start" : 1634119788724,
+            "stop" : 1634119805294,
+            "duration" : 16570
+          },
+          "flaky" : false,
+          "newFailed" : false,
+          "parameters" : [ ]
+        }, {
+          "name" : "Redirects to support page from menu",
+          "uid" : "fe12d4449d90ec9c",
+          "parentUid" : "71372ec5a8ce0048f6f96f0d6830760f",
+          "status" : "passed",
+          "time" : {
+            "start" : 1634119805294,
+            "stop" : 1634119814127,
+            "duration" : 8833
+          },
+          "flaky" : false,
+          "newFailed" : false,
+          "parameters" : [ ]
+        } ],
+        "uid" : "71372ec5a8ce0048f6f96f0d6830760f"
+      } ],
+      "uid" : "4fed76a307f47bc3c324cf2c06ea0a47"
+    }, {
+      "name" : "src/tests/stable/settings.test.ts",
+      "children" : [ {
+        "name" : "Settings >",
+        "children" : [ {
+          "name" : "Copy private key",
+          "uid" : "e0c192fe9462e285",
+          "parentUid" : "682a224c5f9b63247ce16003f796413a",
+          "status" : "passed",
+          "time" : {
+            "start" : 1634119814135,
+            "stop" : 1634119824832,
+            "duration" : 10697
+          },
+          "flaky" : false,
+          "newFailed" : false,
+          "parameters" : [ ]
+        }, {
+          "name" : "Switch account index",
+          "uid" : "5f5dcd3c19743c2b",
+          "parentUid" : "682a224c5f9b63247ce16003f796413a",
+          "status" : "passed",
+          "time" : {
+            "start" : 1634119824832,
+            "stop" : 1634119835767,
+            "duration" : 10935
+          },
+          "flaky" : false,
+          "newFailed" : false,
+          "parameters" : [ ]
+        }, {
+          "name" : "Enable/Disable testnet",
+          "uid" : "f92bbcc3b3fe5339",
+          "parentUid" : "682a224c5f9b63247ce16003f796413a",
+          "status" : "passed",
+          "time" : {
+            "start" : 1634119835767,
+            "stop" : 1634119849772,
+            "duration" : 14005
+          },
+          "flaky" : false,
+          "newFailed" : false,
+          "parameters" : [ ]
+        }, {
+          "name" : "Change language setting",
+          "uid" : "6bd6fcd4a2d2d4a5",
+          "parentUid" : "682a224c5f9b63247ce16003f796413a",
+          "status" : "passed",
+          "time" : {
+            "start" : 1634119849773,
+            "stop" : 1634119863504,
+            "duration" : 13731
+          },
+          "flaky" : false,
+          "newFailed" : false,
+          "parameters" : [ ]
+        } ],
+        "uid" : "682a224c5f9b63247ce16003f796413a"
+      } ],
+      "uid" : "b087cc9bcc7587be51ffea78d692958d"
+    }, {
+      "name" : "src/tests/stable/validation.test.ts",
+      "children" : [ {
+        "name" : "Validation >",
+        "children" : [ {
+          "name" : "VLX Native: Show Invalid Address error",
+          "uid" : "7939fffe031004e",
+          "parentUid" : "53e453c1fcacdd6ae32aeba980b8f4cd",
+          "status" : "passed",
+          "time" : {
+            "start" : 1634119863515,
+            "stop" : 1634119873921,
+            "duration" : 10406
+          },
+          "flaky" : false,
+          "newFailed" : false,
+          "parameters" : [ ]
+        }, {
+          "name" : "VLX Native: Show Not Enough Funds error",
+          "uid" : "529dfe3dc39f5a7a",
+          "parentUid" : "53e453c1fcacdd6ae32aeba980b8f4cd",
+          "status" : "passed",
+          "time" : {
+            "start" : 1634119873921,
+            "stop" : 1634119883381,
+            "duration" : 9460
+          },
+          "flaky" : false,
+          "newFailed" : false,
+          "parameters" : [ ]
+        } ],
+        "uid" : "53e453c1fcacdd6ae32aeba980b8f4cd"
+      } ],
+      "uid" : "273ef9a219ed94d078051f2f5e282e1f"
+    }, {
+      "name" : "src/tests/stable/wallets.test.ts",
+      "children" : [ {
+        "name" : "Wallets screen > > Transactions >",
+        "children" : [ {
+          "name" : "Transactions list is displayed",
+          "uid" : "cd8ada9966222e82",
+          "parentUid" : "0373d39a7b0a83a0b821387ddc66ac98",
+          "status" : "passed",
+          "time" : {
+            "start" : 1634119883386,
+            "stop" : 1634119897378,
+            "duration" : 13992
+          },
+          "flaky" : false,
+          "newFailed" : false,
+          "parameters" : [ ]
+        } ],
+        "uid" : "0373d39a7b0a83a0b821387ddc66ac98"
+      }, {
+        "name" : "Wallets screen > >  > ",
+        "children" : [ {
+          "name" : "Lock and unlock",
+          "uid" : "724883b343f37171",
+          "parentUid" : "ca0aee38e088a9f33bc64bbe7fee6c2d",
+          "status" : "passed",
+          "time" : {
+            "start" : 1634119897379,
+            "stop" : 1634119907290,
+            "duration" : 9911
+          },
+          "flaky" : false,
+          "newFailed" : false,
+          "parameters" : [ ]
+        }, {
+          "name" : "Add and hide litecoin wallet",
+          "uid" : "83843c07bdefbb8a",
+          "parentUid" : "ca0aee38e088a9f33bc64bbe7fee6c2d",
+          "status" : "passed",
+          "time" : {
+            "start" : 1634119907290,
+            "stop" : 1634119922927,
+            "duration" : 15637
+          },
+          "flaky" : false,
+          "newFailed" : false,
+          "parameters" : [ ]
+        }, {
+          "name" : "Switch account",
+          "uid" : "83f1106708d43e11",
+          "parentUid" : "ca0aee38e088a9f33bc64bbe7fee6c2d",
+          "status" : "passed",
+          "time" : {
+            "start" : 1634119922926,
+            "stop" : 1634119932420,
+            "duration" : 9494
+          },
+          "flaky" : false,
+          "newFailed" : false,
+          "parameters" : [ ]
+        }, {
+          "name" : "Show QR",
+          "uid" : "d096e89b28192616",
+          "parentUid" : "ca0aee38e088a9f33bc64bbe7fee6c2d",
+          "status" : "passed",
+          "time" : {
+            "start" : 1634119932420,
+            "stop" : 1634119941575,
+            "duration" : 9155
+          },
+          "flaky" : false,
+          "newFailed" : false,
+          "parameters" : [ ]
+        }, {
+          "name" : "Copy wallet address from \"Receive\" page",
+          "uid" : "67f1814b6e4988ef",
+          "parentUid" : "ca0aee38e088a9f33bc64bbe7fee6c2d",
+          "status" : "passed",
+          "time" : {
+            "start" : 1634119941576,
+            "stop" : 1634119954329,
+            "duration" : 12753
+          },
+          "flaky" : false,
+          "newFailed" : false,
+          "parameters" : [ ]
+        } ],
+        "uid" : "ca0aee38e088a9f33bc64bbe7fee6c2d"
+      } ],
+      "uid" : "747ca196dbbcea099a4c0e82712a9c95"
+    }, {
+      "name" : "src/tests/unstable/balance.test.ts",
+      "children" : [ {
+        "name" : "Balance >",
+        "children" : [ {
+          "name" : "Check VLX Legacy, VLX Native, Litecoin and Bitcoin balances",
+          "uid" : "2a2b1014fe839df6",
+          "parentUid" : "36fd3352e2a79f092fa371f6a70d1641",
+          "status" : "passed",
+          "time" : {
+            "start" : 1634119954439,
+            "stop" : 1634119992352,
+            "duration" : 37913
+          },
+          "flaky" : false,
+          "newFailed" : false,
+          "parameters" : [ ]
+        } ],
+        "uid" : "36fd3352e2a79f092fa371f6a70d1641"
+      } ],
+      "uid" : "d314ef4b0b5ff784e439104bc6d48774"
+    }, {
+      "name" : "src/tests/unstable/transactions.test.ts",
+      "children" : [ {
+        "name" : "Transactions >",
+        "children" : [ {
+          "name" : "Send VLX native",
+          "uid" : "f3581b035fbb58e6",
+          "parentUid" : "02faceff022ddd3858e528ae184ec03d",
+          "status" : "passed",
+          "time" : {
+            "start" : 1634120209632,
+            "stop" : 1634120236709,
+            "duration" : 27077
+          },
+          "flaky" : false,
+          "newFailed" : false,
+          "parameters" : [ ]
+        }, {
+          "name" : "Send BTC",
+          "uid" : "87021814f80826d4",
+          "parentUid" : "02faceff022ddd3858e528ae184ec03d",
+          "status" : "skipped",
+          "time" : {
+            "start" : 1634120236709,
+            "stop" : 1634120244077,
+            "duration" : 7368
+          },
+          "flaky" : false,
+          "newFailed" : false,
+          "parameters" : [ ]
+        }, {
+          "name" : "Send LTC",
+          "uid" : "b7b7c87696e1153c",
+          "parentUid" : "02faceff022ddd3858e528ae184ec03d",
+          "status" : "skipped",
+          "time" : {
+            "start" : 1634120244078,
+            "stop" : 1634120251298,
+            "duration" : 7220
+          },
+          "flaky" : false,
+          "newFailed" : false,
+          "parameters" : [ ]
+        } ],
+        "uid" : "02faceff022ddd3858e528ae184ec03d"
+      } ],
+      "uid" : "45a5cb414b0a0d5fb1782477c6232a2d"
+    }, {
+      "name" : "src/tests/unstable/staking.test.ts",
+      "children" : [ {
+        "name" : "Staking > > Actions >",
+        "children" : [ {
+          "name" : "Use max",
+          "uid" : "96fa68ea8c6200af",
+          "parentUid" : "78e6fedcef603a0d5ea23a51b6132a6f",
+          "status" : "skipped",
+          "time" : {
+            "start" : 1634120438475,
+            "stop" : 1634120438475,
+            "duration" : 0
+          },
+          "flaky" : false,
+          "newFailed" : false,
+          "parameters" : [ ]
+        }, {
+          "name" : "Withdraw stake",
+          "uid" : "d8be4339ff7f47b1",
+          "parentUid" : "78e6fedcef603a0d5ea23a51b6132a6f",
+          "status" : "skipped",
+          "time" : {
+            "start" : 1634120438475,
+            "stop" : 1634120438475,
+            "duration" : 0
+          },
+          "flaky" : false,
+          "newFailed" : false,
+          "parameters" : [ ]
+        }, {
+          "name" : "Split stake",
+          "uid" : "1d77b34044da21d1",
+          "parentUid" : "78e6fedcef603a0d5ea23a51b6132a6f",
+          "status" : "skipped",
+          "time" : {
+            "start" : 1634120438475,
+            "stop" : 1634120438475,
+            "duration" : 0
+          },
+          "flaky" : false,
+          "newFailed" : false,
+          "parameters" : [ ]
+        }, {
+          "name" : "Undelegate stake",
+          "uid" : "ec9dedc82b232626",
+          "parentUid" : "78e6fedcef603a0d5ea23a51b6132a6f",
+          "status" : "skipped",
+          "time" : {
+            "start" : 1634120438475,
+            "stop" : 1634120438475,
+            "duration" : 0
+          },
+          "flaky" : false,
+          "newFailed" : false,
+          "parameters" : [ ]
+        }, {
+          "name" : "Validators list",
+          "uid" : "15dc9bf61a7d3099",
+          "parentUid" : "78e6fedcef603a0d5ea23a51b6132a6f",
+          "status" : "skipped",
+          "time" : {
+            "start" : 1634120438475,
+            "stop" : 1634120438475,
+            "duration" : 0
+          },
+          "flaky" : false,
+          "newFailed" : false,
+          "parameters" : [ ]
+        }, {
+          "name" : "Delegate stake",
+          "uid" : "7315c60f0eb119fe",
+          "parentUid" : "78e6fedcef603a0d5ea23a51b6132a6f",
+          "status" : "skipped",
+          "time" : {
+            "start" : 1634120438475,
+            "stop" : 1634120438475,
+            "duration" : 0
+          },
+          "flaky" : false,
+          "newFailed" : false,
+          "parameters" : [ ]
+        }, {
+          "name" : "Create staking account",
+          "uid" : "4d0078fc03568c1d",
+          "parentUid" : "78e6fedcef603a0d5ea23a51b6132a6f",
+          "status" : "skipped",
+          "time" : {
+            "start" : 1634120438475,
+            "stop" : 1634120438475,
+            "duration" : 0
+          },
+          "flaky" : false,
+          "newFailed" : false,
+          "parameters" : [ ]
+        }, {
+          "name" : "Previous run cleanup",
+          "uid" : "b26ab1e88c9177bf",
+          "parentUid" : "78e6fedcef603a0d5ea23a51b6132a6f",
+          "status" : "failed",
+          "time" : {
+            "start" : 1634120439158,
+            "stop" : 1634120464591,
+            "duration" : 25433
+          },
+          "flaky" : false,
+          "newFailed" : false,
+          "parameters" : [ ]
+        } ],
+        "uid" : "78e6fedcef603a0d5ea23a51b6132a6f"
+      } ],
+      "uid" : "cefb402f32c97975ad58ecf249a1d924"
+    } ],
+    "uid" : "79bb47716cfcc4225620b7792fd715c5"
+  } ],
   "name" : "suites"
 }
