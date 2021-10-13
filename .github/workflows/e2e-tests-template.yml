@@ -1,0 +1,94 @@
+name: e2e-tests
+on:
+  workflow_call:
+    inputs:
+      test_script:
+        description: 'npm script to run the tests'
+        default: 'npm run test'
+        required: true
+        type: string
+      environment:
+        description: 'local | testnet | prod'
+        default: 'local'
+        required: true
+        type: string
+jobs:
+  e2e-tests:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./e2e
+    steps:
+      - name: checkout JsWallet
+        uses: actions/checkout@v2
+
+      - name: checkout web3t
+        uses: actions/checkout@v2
+        with:
+          repository: velas/web3t
+          path: .compiled-ssr/web3t
+          ref: testnet
+
+      - name: npm version
+        run: npm -v
+
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '14.x'
+      
+      - uses: joschi/setup-jdk@v2
+        with:
+          java-version: '8'
+
+      - name: install web3t modules
+        working-directory: .compiled-ssr/web3t
+        run: npm i
+
+      - name: install lsxc
+        run: npm i lsxc -g --unsafe-perm
+
+      - name: copy web3 side by side to wallet
+        working-directory: ../
+        run: rm -rf JsWallet/.compiled-ssr/web3t/.git/objects/ && mkdir -p web3t/ && cp -pr JsWallet/.compiled-ssr/web3t/ ./
+
+      - name: delete wallet build cache
+        working-directory: ./
+        run: rm -rf ./.compiled
+
+      # sleep required for wallet start
+      - name: run wallet
+        working-directory: ./
+        run: |
+          npm run wallet-start:no-watch &
+          sleep 16 &&
+          echo '- - - - - Wallet started - - - - -'
+
+      - name: install npm modules
+        run: npm i
+
+      - name: install PW deps
+        run: npx playwright install --with-deps
+
+      - name: install chrome
+        run: npx playwright install chrome
+
+      - name: clean previous test results
+        run: rm -rf ./test-results/
+
+      - name: blockchain health check
+        run: CI=true npm run blockchain-health-check
+
+      - name: run tests
+        run: CI=true npm test
+
+      - name: generate allure report
+        if: always()
+        run: npm run allure:generate
+
+      - name: upload artifacts
+        if: always()
+        uses: actions/upload-artifact@v2
+        with:
+          name: test-results
+          path: e2e/test-results/
+          retention-days: 30

@@ -155,7 +155,8 @@ export class StakingScreen extends BaseScreen {
     const diff = helpers.getArraysDiff(initialAccountsAddressesList, finalAccountsAddressesList);
     log.debug(`This is log of getStakingAccountsUpdate function
     initialAccountsAddressesList:
-    ${initialAccountsAddressesList};
+    ${initialAccountsAddressesList || '-- none --'}
+
     finalAccountsAddressesList:
     ${finalAccountsAddressesList};
     diff: ${diff}`);

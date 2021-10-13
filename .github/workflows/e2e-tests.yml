@@ -13,122 +13,126 @@ jobs:
       run:
         working-directory: ./e2e
     steps:
-      - name: checkout JsWallet
-        uses: actions/checkout@v2
-
-      - name: checkout web3t
-        uses: actions/checkout@v2
+      - uses: ./.github/actions/e2e-tests-template@v1
         with:
-          repository: velas/web3t
-          path: .compiled-ssr/web3t
-          ref: testnet
+          test_script: 'npm run test'
+          environment: 'local'
 
-      - name: npm version
-        run: npm -v
+      # - name: checkout JsWallet
+      #   uses: actions/checkout@v2
 
-      - uses: actions/setup-node@v2
-        with:
-          node-version: '14.x'
+      # - name: checkout web3t
+      #   uses: actions/checkout@v2
+      #   with:
+      #     repository: velas/web3t
+      #     path: .compiled-ssr/web3t
+      #     ref: testnet
+
+      # - name: npm version
+      #   run: npm -v
+
+      # - uses: actions/setup-node@v2
+      #   with:
+      #     node-version: '14.x'
       
-      - uses: joschi/setup-jdk@v2
-        with:
-          java-version: '8'
+      # - uses: joschi/setup-jdk@v2
+      #   with:
+      #     java-version: '8'
 
-      - name: install web3t modules
-        working-directory: .compiled-ssr/web3t
-        run: npm i
+      # - name: install web3t modules
+      #   working-directory: .compiled-ssr/web3t
+      #   run: npm i
 
-      - name: install lsxc
-        run: npm i lsxc -g --unsafe-perm
+      # - name: install lsxc
+      #   run: npm i lsxc -g --unsafe-perm
 
-      - name: copy web3 side by side to wallet
-        working-directory: ../
-        run: rm -rf JsWallet/.compiled-ssr/web3t/.git/objects/ && mkdir -p web3t/ && cp -pr JsWallet/.compiled-ssr/web3t/ ./
+      # - name: copy web3 side by side to wallet
+      #   working-directory: ../
+      #   run: rm -rf JsWallet/.compiled-ssr/web3t/.git/objects/ && mkdir -p web3t/ && cp -pr JsWallet/.compiled-ssr/web3t/ ./
 
-      - name: delete wallet build cache
-        working-directory: ./
-        run: rm -rf ./.compiled
+      # - name: delete wallet build cache
+      #   working-directory: ./
+      #   run: rm -rf ./.compiled
 
-      # sleep required for wallet start
-      - name: run wallet
-        working-directory: ./
-        run: |
-          npm run wallet-start:no-watch &
-          sleep 16 &&
-          echo '- - - - - Wallet started - - - - -'
+      # # sleep required for wallet start
+      # - name: run wallet
+      #   working-directory: ./
+      #   run: |
+      #     npm run wallet-start:no-watch &
+      #     sleep 16 &&
+      #     echo '- - - - - Wallet started - - - - -'
 
-      - name: install npm modules
-        run: npm i
+      # - name: install npm modules
+      #   run: npm i
 
-      - name: install PW deps
-        # run: npx playwright install chrome
-        run: npx playwright install --with-deps
+      # - name: install PW deps
+      #   run: npx playwright install --with-deps
 
-      - name: install chrome
-        run: npx playwright install chrome
+      # - name: install chrome
+      #   run: npx playwright install chrome
 
-      - name: clean previous test results
-        run: rm -rf ./test-results/
+      # - name: clean previous test results
+      #   run: rm -rf ./test-results/
 
-      - name: blockchain health check
-        run: CI=true npm run blockchain-health-check
+      # - name: blockchain health check
+      #   run: CI=true npm run blockchain-health-check
 
-      - name: run tests
-        run: CI=true npm test
+      # - name: run tests
+      #   run: CI=true npm test
 
-      - name: generate allure report
-        if: always()
-        # run: export JAVA_HOME=/usr/lib/jvm/jdk1.8.0 && npm run allure:generate
-        run: npm run allure:generate
+      # - name: generate allure report
+      #   if: always()
+      #   run: npm run allure:generate
 
-      - name: upload artifacts
-        if: always()
-        uses: actions/upload-artifact@v2
-        with:
-          name: test-results
-          path: e2e/test-results/
-          retention-days: 30
+      # - name: upload artifacts
+      #   if: always()
+      #   uses: actions/upload-artifact@v2
+      #   with:
+      #     name: test-results
+      #     path: e2e/test-results/
+      #     retention-days: 30
 
-      - uses: actions/upload-artifact@master
-        if: always()
-        with:
-          name: allure-results
-          path: e2e/allure-results
-          retention-days: 30
+      # - name: upload aftifacts for allure
+      #   uses: actions/upload-artifact@master
+      #   if: always()
+      #   with:
+      #     name: allure-results
+      #     path: e2e/allure-results
+      #     retention-days: 30
 
-      - name: get allure history
-        uses: actions/checkout@v2
-        if: always()
-        continue-on-error: true
-        with:
-          ref: gh-pages
-          path: gh-pages
+      # - name: get allure history
+      #   uses: actions/checkout@v2
+      #   if: always()
+      #   continue-on-error: true
+      #   with:
+      #     ref: gh-pages
+      #     path: gh-pages
 
-      - name: generates allure report with history
-        uses: simple-elf/allure-report-action@master
-        if: always()
-        id: allure-report
-        with:
-          allure_results: e2e/allure-results
-          gh_pages: gh-pages
-          allure_report: allure-report
-          allure_history: allure-history
-          keep_reports: 30
+      # - name: generates allure report with history
+      #   uses: simple-elf/allure-report-action@master
+      #   if: always()
+      #   id: allure-report
+      #   with:
+      #     allure_results: e2e/allure-results
+      #     gh_pages: gh-pages
+      #     allure_report: allure-report
+      #     allure_history: allure-history
+      #     keep_reports: 30
 
-      - name: deploy report to Github pages
-        if: always()
-        uses: peaceiris/actions-gh-pages@v2
-        env:
-          PERSONAL_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          PUBLISH_BRANCH: gh-pages
-          PUBLISH_DIR: allure-history
+      # - name: deploy report to Github pages
+      #   if: always()
+      #   uses: peaceiris/actions-gh-pages@v2
+      #   env:
+      #     PERSONAL_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      #     PUBLISH_BRANCH: gh-pages
+      #     PUBLISH_DIR: allure-history
 
-      - name: post the link to the report
-        if: always()
-        uses: Sibz/github-status-action@v1
-        with: 
-            authToken: ${{secrets.GITHUB_TOKEN}}
-            context: 'Test report'
-            state: 'success'
-            sha: ${{ github.event.pull_request.head.sha }}
-            target_url: https://velas.github.io/JsWallet/${{ github.run_number }}
+      # - name: post the link to the report
+      #   if: always()
+      #   uses: Sibz/github-status-action@v1
+      #   with: 
+      #       authToken: ${{secrets.GITHUB_TOKEN}}
+      #       context: 'Click "Details" to view test report >>'
+      #       state: 'success'
+      #       sha: ${{ github.event.pull_request.head.sha }}
+      #       target_url: https://velas.github.io/JsWallet/${{ github.run_number }}
