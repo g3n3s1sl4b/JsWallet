@@ -20,11 +20,11 @@ jobs:
     #     with:
     #       test_script: 'npm run test'
     #       environment: 'local'
-  reuse:
+  reuseaction:
     uses: ./.github/workflows/e2e-tests-template
-        with:
-          test_script: 'npm run test'
-          environment: 'local'
+      with:
+        test_script: 'npm run test'
+        environment: 'local'
       # - name: checkout JsWallet
       #   uses: actions/checkout@v2
 
