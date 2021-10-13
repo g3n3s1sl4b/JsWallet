@@ -16,7 +16,7 @@ jobs:
       - name: actions checkout
         uses: actions/checkout@v2
 
-      - uses: ./.github/workflows/e2e-tests-template.yml@d799dfbc331753b6d5c8107fc286d268e6098451
+      - uses: ./.github/workflows/e2e-tests-template.yml
         with:
           test_script: 'npm run test'
           environment: 'local'
