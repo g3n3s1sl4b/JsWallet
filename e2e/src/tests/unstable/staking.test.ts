@@ -37,7 +37,6 @@ test.describe('Staking >', () => {
 
     test('Use max', async ({ page }) => {
       await stakingScreen.makeSureUiBalanceEqualsChainBalance(data.wallets.staking.staker.publicKey);
-
       const initialWalletBalance = helpers.toFixed((await velasNative.getBalance(data.wallets.staking.staker.publicKey)).VLX);
       await page.click('" Create Account"');
       await page.click('#send-max');
