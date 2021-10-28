@@ -22,7 +22,7 @@ require! {
     \bignumber.js
     \../install-plugin.ls : { get-install-list }
     \../plugin-loader.ls : { common }
-    \lodash/clonedeep
+    \lodash/cloneDeep
     
 }
 .custom-token-content
@@ -581,7 +581,7 @@ custom-token = ({ store, web3t })->
         plugins = all-tokens
         prototype-token = store.customToken.network.token
         found-plugin = plugins |> find (-> it.token is prototype-token)
-        proto-plugin = clonedeep(found-plugin) 
+        proto-plugin = cloneDeep(found-plugin) 
         
         { symbol, decimals, selectedNetwork } = store.customToken
         err <- get-contract-symbol(contract-address)
