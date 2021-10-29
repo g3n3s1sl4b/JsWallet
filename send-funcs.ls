@@ -377,7 +377,6 @@ module.exports = (store, web3t)->
     */     
     eth_usdt-usdt_velas-swap = (token, chosen-network, cb)->     
         return cb null if not (token is \usdt_erc20 and chosen-network.id is \vlx_usdt)
-        #console.log "eth_usdt-usdt_velas-swap"   
         web3 = velas-web3 store
         { FOREIGN_BRIDGE, FOREIGN_BRIDGE_TOKEN } = wallet.network
         return cb "FOREIGN_BRIDGE is not defined" if not FOREIGN_BRIDGE?
@@ -458,7 +457,6 @@ module.exports = (store, web3t)->
         cb null, data        
         
     execute-contract-data = ( { store }, cb)->
-        console.log "[execute-contract-data]"    
         return cb null if not store.current.send.chosen-network?
         chosen-network = store.current.send.chosen-network
         token = store.current.send.coin.token
@@ -728,7 +726,6 @@ module.exports = (store, web3t)->
         if token is \vlx_erc20 and chosen-network.id in <[ vlx_evm vlx2 ]>
             value = store.current.send.amountSend
             value2 = to-hex(value `times` (10^18)).toString(16)
-            console.log "value2" value2  
             value = (value `times` (10^18))
             network = wallet.network
 
