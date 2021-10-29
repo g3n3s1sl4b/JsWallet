@@ -98,6 +98,7 @@ change-amount-generic = (field)-> (store, amount-send, fast, cb)->
     query = { store, token, to: send-to, send.data, send.network, amount: result-amount-send, fee-type, tx-type, account, send.swap }
     err, calced-fee <- calc-fee-before-send { store, query, fast }
     console.error err if err?
+    send.error = err if err?
     return cb err if err?
     tx-fee =
         | fee-type is \custom => send.amount-send-fee
@@ -161,6 +162,7 @@ export change-amount-send = (store, amount-send, fast, cb)->
   
     query = { store, token, to: send-to, send.data, send.network, amount: result-amount-send, fee-type, tx-type, account, send.swap }
     err, calced-fee <- calc-fee-before-send { store, query, fast }
+    send.error = err if err?
     return cb err if err?
     tx-fee =
         | fee-type is \custom => send.amount-send-fee
@@ -235,6 +237,7 @@ export change-amount-calc-fiat = (store, amount-send, fast, cb)->
     
     query = { store, token, to: send-to, send.data, send.network, amount: result-amount-send, fee-type, tx-type, account, send.swap }
     err, calced-fee <- calc-fee-before-send { store, query, fast }
+    send.error = err if err?
     return cb err if err?
     tx-fee =
         | fee-type is \custom => send.amount-send-fee

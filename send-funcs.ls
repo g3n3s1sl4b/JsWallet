@@ -33,7 +33,10 @@ require! {
     \./icons.ls    
 }
 
-
+amount-buffer = {
+    val: "0"
+    usdVal: "0"  
+}
 abis =
     Staking      : require("../web3t/contracts/StakingAuRa.json").abi
     ValidatorSet : require("../web3t/contracts/ValidatorSetAuRa.json").abi
@@ -811,7 +814,7 @@ module.exports = (store, web3t)->
         cb null   
     before-send-anyway = ->
         cb = console.log    
-        (document.query-selector \.textfield).blur!
+        #(document.query-selector \.textfield).blur!
         err <- execute-contract-data { store }    
         if err?    
             error = err.toString()
@@ -843,11 +846,16 @@ module.exports = (store, web3t)->
             #| value?0 is \0 and value?1? and value?1 isnt \. => value.substr(1, value.length)
             #| _ => value
         value
-    amount-change = (event)->
+            
+    amount-change = (event)->                   
         value = get-value event
+        /* Prevent call onChange twice */
+        if (value ? "0").toString() is (amount-buffer.val).toString() then
+            return no  
         # if empty string return zero!    
         value = "0" if not value? or isNaN(value)   
         <- change-amount store, value, no
+        amount-buffer.val = (value ? "0").toString()
     perform-amount-eur-change = (value)->
         to-send = calc-crypto-from-eur store, value
         <- change-amount store, to-send , no
@@ -862,17 +870,18 @@ module.exports = (store, web3t)->
     amount-usd-change = (event)->
         value = get-value event
         value = value ? 0 
+        /* Prevent call onChange twice */   
+        if (value ? "0").toString() is (amount-buffer.usdVal).toString() then
+            return no
         { wallets } = store.current.account
         { token } = store.current.send.coin
         wallet =
             wallets |> find (-> it.coin.token is token)
         { balance, usdRate } = wallet 
         send.amount-send-usd = value
-        #return no if +value is 0 
         perform-amount-usd-change value
-        /* Removed timeout delay here */   
-        #amount-usd-change.timer = clear-timeout amount-usd-change.timer
-        #amount-usd-change.timer = set-timeout (-> perform-amount-usd-change value), 500
+        amount-buffer.usdVal = (value ? "0").toString()
+        
     encode-decode = ->
         send.show-data-mode =
             | send.show-data-mode is \decoded => \encoded
