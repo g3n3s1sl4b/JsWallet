@@ -24,6 +24,9 @@ create-send =->
     fee-type: \auto
     fee-custom-amount: \0
     tx-type: \regular
+    amount-buffer:
+        val: "0"
+        usdVal: "0"    
     amount-send: \0
     amount-charged: \0
     amount-charged-usd: \0

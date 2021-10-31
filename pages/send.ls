@@ -668,6 +668,8 @@ module.exports.init = ({ store, web3t }, cb)->
     store.current.send.amountCharged = 0
     store.current.send.amountChargedUsd = 0
     store.current.send.homeFeePercent = 0
+    store.current.send.amount-buffer.val = \0
+    store.current.send.amount-buffer.usdVal = \0
     store.current.send.error = ''
     if store.current.send.is-swap isnt yes
         store.current.send.contract-address = null
