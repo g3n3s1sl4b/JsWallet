@@ -546,15 +546,14 @@ send = ({ store, web3t })->
     before-amount-change = (e)->
         { TYPING_THRESHOLD_MS, typing-amount-time-ms, fee-calculating } = send
         fee-calculating = yes
-        clear-timeout before-amount-change.timer
+        #clear-timeout before-amount-change.timer
         now = moment!.valueOf!
         timeout = +(now `minus` typing-amount-time-ms)
-        if timeout < TYPING_THRESHOLD_MS then
-            store.current.send.amount-send = e.target.value
-            store.current.send.typing-amount-time-ms = moment!.valueOf!
-            before-amount-change.timer = set-timeout check-stop(e), 500
-            return no 
+        #if timeout < TYPING_THRESHOLD_MS then
+        #store.current.send.amount-send = e.target.value
         store.current.send.typing-amount-time-ms = moment!.valueOf!
+        #before-amount-change.timer = set-timeout check-stop(e), 50
+        #store.current.send.typing-amount-time-ms = moment!.valueOf!
         amount-change(e)
         
     check-stop = (e)->
