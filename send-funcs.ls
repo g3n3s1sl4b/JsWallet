@@ -850,6 +850,7 @@ module.exports = (store, web3t)->
         # if empty string return zero!    
         value = "0" if not value? or isNaN(value)   
         <- change-amount store, value, no
+        store.current.send.fee-calculating = no
         amount-buffer.val = (value ? "0").toString()
     perform-amount-eur-change = (value)->
         to-send = calc-crypto-from-eur store, value
@@ -857,6 +858,7 @@ module.exports = (store, web3t)->
     perform-amount-usd-change = (value)->
         to-send = calc-crypto-from-usd store, value
         <- change-amount-calc-fiat store, to-send, no
+        store.current.send.fee-calculating = no
     amount-eur-change = (event)->
         value = get-value event
         send.amount-send-eur = value

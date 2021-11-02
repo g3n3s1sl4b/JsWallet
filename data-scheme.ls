@@ -37,7 +37,10 @@ create-send =->
     amount-obtain: \0
     data: ""
     gas: null
-    gas-price: null    
+    gas-price: null  
+    typing-amount-time-ms: 0
+    TYPING_THRESHOLD_MS: 500   
+    gasEstimate: \0    
     homeFee: 0
     homeFeePercent: 0
     is-swap: no 

@@ -45,19 +45,15 @@ calc-fee-before-send = ({ store, query, fast }, cb)->
     send.fee-calculating = yes
     calc-fee-fun = if fast then calc-fee else calc-fee-proxy
     err, calced-fee <- calc-fee-fun { store, token, to, data, network, amount, fee-type, tx-type, account, swap }
-    send.fee-calculating = no
+    
     send.error = "#{err.message ? err}" if err?
     return cb "#{err.message ? err}" if err?
     return cb null, calced-fee
 
 change-amount-generic = (field)-> (store, amount-send, fast, cb)->
-    return cb null if store.current.send.fee-calculating is yes  
     send = store.current[field]
     /* Prevent call onChange twice */
     amount-buffer = store.current.send.amount-buffer
-    if (amount-send ? "0").toString() is (amount-buffer.val).toString() then
-        store.current.send.amount-send = amount-send 
-        return cb null
     { wallet } = send
     { token } = send.coin
     { wallets } = store.current.account
@@ -105,7 +101,8 @@ change-amount-generic = (field)-> (store, amount-send, fast, cb)->
     err, calced-fee <- calc-fee-before-send { store, query, fast }
     console.error err if err?
     send.error = err if err?
-    return cb err if err?
+    calced-fee = 0 if err?
+    #return cb err if err?
     tx-fee =
         | fee-type is \custom => send.amount-send-fee
         | calced-fee? => calced-fee
