@@ -51,6 +51,7 @@ calc-fee-before-send = ({ store, query, fast }, cb)->
     return cb null, calced-fee
 
 change-amount-generic = (field)-> (store, amount-send, fast, cb)->
+    return cb null if store.current.send.fee-calculating is yes  
     send = store.current[field]
     { wallet } = send
     { token } = send.coin
