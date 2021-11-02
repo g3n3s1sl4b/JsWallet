@@ -53,6 +53,11 @@ calc-fee-before-send = ({ store, query, fast }, cb)->
 change-amount-generic = (field)-> (store, amount-send, fast, cb)->
     return cb null if store.current.send.fee-calculating is yes  
     send = store.current[field]
+    /* Prevent call onChange twice */
+    amount-buffer = store.current.send.amount-buffer
+    if (amount-send ? "0").toString() is (amount-buffer.val).toString() then
+        store.current.send.amount-send = amount-send 
+        return cb null
     { wallet } = send
     { token } = send.coin
     { wallets } = store.current.account
