@@ -45,7 +45,7 @@ calc-fee-before-send = ({ store, query, fast }, cb)->
     send.fee-calculating = yes
     calc-fee-fun = if fast then calc-fee else calc-fee-proxy
     err, calced-fee <- calc-fee-fun { store, token, to, data, network, amount, fee-type, tx-type, account, swap }
-    
+    send.fee-calculating = no
     send.error = "#{err.message ? err}" if err?
     return cb "#{err.message ? err}" if err?
     return cb null, calced-fee
