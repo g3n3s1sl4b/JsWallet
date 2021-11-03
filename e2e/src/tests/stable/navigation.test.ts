@@ -1,6 +1,6 @@
 import { test } from '@playwright/test';
 import { assert } from '../../assert';
-import { getWalletURL } from '../../config';
+import { walletURL } from '../../config';
 import { setupPage } from '../../pw-helpers/setup-page';
 import { Auth } from '../../screens/auth';
 import { WalletsScreen } from '../../screens/wallets';
@@ -9,12 +9,12 @@ import { data } from '../../test-data';
 let walletsScreen: WalletsScreen;
 let auth: Auth;
 
-test.describe('Navigation >', () => {
+test.describe.parallel('Navigation', () => {
   test.beforeEach(async ({ page }) => {
     setupPage(page);
     walletsScreen = new WalletsScreen(page);
     auth = new Auth(page);
-    await page.goto(getWalletURL(), { waitUntil: 'networkidle' });
+    await page.goto(walletURL, { waitUntil: 'networkidle' });
     await auth.loginByRestoringSeed(data.wallets.login.seed);
   });
 
@@ -40,29 +40,34 @@ test.describe('Navigation >', () => {
           break;
 
         case 'search':
+          await walletsScreen.openMenu('wallets');
           await walletsScreen.openMenu('search');
           await page.waitForSelector('[placeholder="dapps"]');
           break;
 
         case 'staking':
+          await walletsScreen.openMenu('wallets');
           await walletsScreen.openMenu('staking');
-          await page.waitForSelector('.validator-item', { timeout: 20000 });
+          await page.waitForSelector('.create-staking-account');
           break;
 
         case 'swap':
+          await walletsScreen.openMenu('wallets');
           await page.waitForSelector('.with-swap #wallet-swap', { timeout: 20000, state: 'visible' });
           await page.click('.with-swap #wallet-swap');
           await page.waitForSelector('.network-slider');
           break;
 
         case 'send':
+          await walletsScreen.openMenu('wallets');
           await page.click('#wallets-send');
           await page.waitForSelector('#send-recipient');
           assert.isFalse(await page.isVisible('.network-slider'));
           break;
       }
       await page.click('.close');
-      assert.isTrue(await auth.isLoggedIn());
+      await walletsScreen.waitForWalletsDataLoaded();
+      assert.isTrue(await page.isVisible('.big.wallet'));
     }
   });
 

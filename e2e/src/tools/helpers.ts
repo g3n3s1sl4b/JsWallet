@@ -1,6 +1,3 @@
-import { config } from "../config";
-import { data } from "../test-data";
-
 export const helpers = {
   getArraysDiff: (a1: any[], a2: any[]) => {
     const a: any[] = []; const diff = [];
@@ -24,15 +21,10 @@ export const helpers = {
     return diff;
   },
 
-  getWalletURL(params: { testnet: boolean } = { testnet: false }, { env: Env } = { env: config.environment }) {
-    const url = data.walletURLs[Env];
-    return params.testnet ? `${url}?network=testnet` : url;
-  },
-
   toFixed(number: Number, fractionDigits: Number = 0) {
     const re = new RegExp('^-?\\d+(?:\.\\d{0,' + (fractionDigits || -1) + '})?');
     const fixedNumber = Number(number.toString().match(re));
-    if(!fixedNumber) throw new Error ('Failed to trim decimal\'s fractional part')
+    if (!fixedNumber) throw new Error('Failed to trim decimal\'s fractional part')
     return fixedNumber;
   }
 };
