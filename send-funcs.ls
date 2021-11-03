@@ -846,7 +846,10 @@ module.exports = (store, web3t)->
         value
             
     amount-change = (event)->                   
-        value = get-value event  
+        value = get-value event
+        /* Prevent call onChange twice */
+        if (value ? "0").toString() is (amount-buffer.val).toString() then
+            return no  
         # if empty string return zero!    
         value = "0" if not value? or isNaN(value)   
         <- change-amount store, value, no
