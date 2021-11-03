@@ -957,10 +957,12 @@ module.exports = (store, web3t)->
         #amount-send = 0 if amount-send < 0 
         #flag = yes   
         <- change-amount-send store, amount-send, no
+        store.current.send.fee-calculating = no
     use-max-try-catch = (cb)->
         try
             use-max cb
         catch err
+            store.current.send.fee-calculating = no
             cb err
     export use-max-amount = ->
         err <- use-max-try-catch
