@@ -21,7 +21,7 @@ require! {
     \../components/amount-field.ls
     \../components/amount-fiat-field.ls
     \../components/sliders/network-slider.ls
-    \../math.ls : { times, div }
+    \../math.ls : { times, div, minus }
     \ethereumjs-util : {BN}
     \../velas/addresses.ls
     \../contracts.ls
@@ -29,6 +29,7 @@ require! {
     "../../web3t/contracts/HomeBridgeNativeToErc.json" : \HomeBridgeNativeToErc    
     "../../web3t/contracts/ForeignBridgeNativeToErc.json" : \ForeignBridgeNativeToErc
     \../contract-data.ls
+    \moment
 }
 .content
     position: relative
@@ -507,11 +508,12 @@ send = ({ store, web3t })->
     go-back-from-send = ->
         send.error = ''
         go-back!  
-    makeDisabled = send.amount-send <= 0
+    makeDisabled = send.amount-send <= 0 or store.current.send.fee-calculating is yes
     token = store.current.send.coin.token
     is-swap = store.current.send.is-swap is yes
     send-func = before-send-anyway
-    disabled = not send.to? or send.to.trim!.length is 0 or ((send.error ? "").index-of "address") > -1     
+    disabled = not send.to? or send.to.trim!.length is 0 or ((send.error ? "").index-of "address") > -1 
+    placeholder-class = if store.current.send.fee-calculating is yes then "placeholder" else ""   
     receiver-is-swap-contract = contracts.is-swap-contract(store, store.current.send.contract-address)
     visible-error = if send.error? and send.error.length > 0 then "visible" else ""
     get-recipient = (address)->
@@ -540,10 +542,35 @@ send = ({ store, web3t })->
             store.current.send.error = err
             return cb err 
         cb null
+        
+    before-amount-change = (e)->
+        { TYPING_THRESHOLD_MS, typing-amount-time-ms, fee-calculating } = send
+        fee-calculating = yes
+        #clear-timeout before-amount-change.timer
+        now = moment!.valueOf!
+        timeout = +(now `minus` typing-amount-time-ms)
+        #if timeout < TYPING_THRESHOLD_MS then
+        #store.current.send.amount-send = e.target.value
+        store.current.send.typing-amount-time-ms = moment!.valueOf!
+        #before-amount-change.timer = set-timeout check-stop(e), 50
+        #store.current.send.typing-amount-time-ms = moment!.valueOf!
+        amount-change(e)
+        
+    check-stop = (e)->
+        ->
+            { TYPING_THRESHOLD_MS, typing-amount-time-ms, fee-calculating } = send
+            now = moment!.valueOf!
+            timeout = +(now `minus` typing-amount-time-ms)
+            if timeout > TYPING_THRESHOLD_MS then
+                console.log "run amount-change"
+                amount-change(e)    
      
     input-wrapper-style = 
         | is-custom is yes => input-custom-style
-        | _ => input-style   
+        | _ => input-style 
+    inline-style = 
+        display: "inline"
+        min-width: "30px"  
     
     /* Render */
     .pug.content
@@ -595,7 +622,7 @@ send = ({ store, web3t })->
                                 .label.crypto.pug
                                     img.label-coin.pug(src="#{wallet-icon}")
                                     | #{token-display}
-                                amount-field { store, value: send.amount-send, on-change: amount-change, placeholder="0", id="send-amount", token, disabled }
+                                amount-field { store, value: send.amount-send, on-change: before-amount-change, placeholder="0", id="send-amount", token, disabled }
                             if active-usd is \active
                                 if not is-custom
                                     amount-fiat-field { store, on-change:amount-usd-change, placeholder:"0", title:"#{send.amount-send-usd}" value:"#{send.amount-send-usd}", id:"send-amount-usd", disabled: no }
@@ -630,7 +657,7 @@ send = ({ store, web3t })->
                         tr.pug.orange
                             td.pug #{lang.fee}
                             td.pug
-                                span.pug(title="#{send.amount-send-fee}") #{round-human send.amount-send-fee}
+                                span.pug(class="#{placeholder-class}" title="#{send.amount-send-fee}" style=inline-style) #{round-human send.amount-send-fee}
                                     img.label-coin.pug(src="#{fee-coin-image}")
                                     span.pug(title="#{send.amount-send-fee}") #{fee-token-display}
                                 .pug.usd $ #{round-human send.amount-send-fee-usd}
@@ -659,10 +686,14 @@ module.exports.init = ({ store, web3t }, cb)->
     { execute-contract-data, wallet, getBridgeInfo } = send-funcs store, web3t
     return cb null if not wallet?
     return cb null if send.sending is yes
+    store.current.send.fee-calculating = no
     store.current.send.foreign-network-fee = 0
     store.current.send.amountCharged = 0
     store.current.send.amountChargedUsd = 0
     store.current.send.homeFeePercent = 0
+    store.current.send.gasEstimate = \0
+    store.current.send.amount-buffer.val = \0
+    store.current.send.amount-buffer.usdVal = \0
     store.current.send.error = ''
     if store.current.send.is-swap isnt yes
         store.current.send.contract-address = null

@@ -60,6 +60,7 @@ module.exports = (store, web3t)->
     primary-button-style =
         background: color
     default-button-style = { color }
+    amount-buffer = send.amount-buffer  
     send-tx = ({ to, wallet, network, amount-send, amount-send-fee, data, coin, tx-type, gas, gas-price, swap }, cb)->
         { token } = send.coin
         current-network = store.current.network 
@@ -377,7 +378,6 @@ module.exports = (store, web3t)->
     */     
     eth_usdt-usdt_velas-swap = (token, chosen-network, cb)->     
         return cb null if not (token is \usdt_erc20 and chosen-network.id is \vlx_usdt)
-        #console.log "eth_usdt-usdt_velas-swap"   
         web3 = velas-web3 store
         { FOREIGN_BRIDGE, FOREIGN_BRIDGE_TOKEN } = wallet.network
         return cb "FOREIGN_BRIDGE is not defined" if not FOREIGN_BRIDGE?
@@ -458,7 +458,6 @@ module.exports = (store, web3t)->
         cb null, data        
         
     execute-contract-data = ( { store }, cb)->
-        console.log "[execute-contract-data]"    
         return cb null if not store.current.send.chosen-network?
         chosen-network = store.current.send.chosen-network
         token = store.current.send.coin.token
@@ -728,7 +727,6 @@ module.exports = (store, web3t)->
         if token is \vlx_erc20 and chosen-network.id in <[ vlx_evm vlx2 ]>
             value = store.current.send.amountSend
             value2 = to-hex(value `times` (10^18)).toString(16)
-            console.log "value2" value2  
             value = (value `times` (10^18))
             network = wallet.network
 
@@ -814,7 +812,7 @@ module.exports = (store, web3t)->
         cb null   
     before-send-anyway = ->
         cb = console.log    
-        (document.query-selector \.textfield).blur!
+        #(document.query-selector \.textfield).blur!
         err <- execute-contract-data { store }    
         if err?    
             error = err.toString()
@@ -839,24 +837,28 @@ module.exports = (store, web3t)->
         #err <- calc-fee { token, send.network, amount: amount-send, send.fee-type, send.tx-type, send.to, send.data, account } 
     get-value = (event)-> 
         value = event.target?value     
-        return null if not event.target?value      
+        return \0 if not event.target?value      
         return \0 if event.target?value is ""    
         #value = event.target.value.match(/^[0-9]+([.]([0-9]+)?)?$/)?0
         #value2 =
             #| value?0 is \0 and value?1? and value?1 isnt \. => value.substr(1, value.length)
             #| _ => value
         value
-    amount-change = (event)->
-        value = get-value event
+            
+    amount-change = (event)->                   
+        value = get-value event  
         # if empty string return zero!    
         value = "0" if not value? or isNaN(value)   
         <- change-amount store, value, no
+        store.current.send.fee-calculating = no
+        amount-buffer.val = (value ? "0").toString()
     perform-amount-eur-change = (value)->
         to-send = calc-crypto-from-eur store, value
         <- change-amount store, to-send , no
     perform-amount-usd-change = (value)->
         to-send = calc-crypto-from-usd store, value
         <- change-amount-calc-fiat store, to-send, no
+        store.current.send.fee-calculating = no
     amount-eur-change = (event)->
         value = get-value event
         send.amount-send-eur = value
@@ -865,17 +867,18 @@ module.exports = (store, web3t)->
     amount-usd-change = (event)->
         value = get-value event
         value = value ? 0 
+        /* Prevent call onChange twice */   
+        if (value ? "0").toString() is (amount-buffer.usdVal).toString() then
+            return no
         { wallets } = store.current.account
         { token } = store.current.send.coin
         wallet =
             wallets |> find (-> it.coin.token is token)
         { balance, usdRate } = wallet 
         send.amount-send-usd = value
-        #return no if +value is 0 
         perform-amount-usd-change value
-        /* Removed timeout delay here */   
-        #amount-usd-change.timer = clear-timeout amount-usd-change.timer
-        #amount-usd-change.timer = set-timeout (-> perform-amount-usd-change value), 500
+        amount-buffer.usdVal = (value ? "0").toString()
+        
     encode-decode = ->
         send.show-data-mode =
             | send.show-data-mode is \decoded => \encoded
@@ -954,10 +957,12 @@ module.exports = (store, web3t)->
         #amount-send = 0 if amount-send < 0 
         #flag = yes   
         <- change-amount-send store, amount-send, no
+        store.current.send.fee-calculating = no
     use-max-try-catch = (cb)->
         try
             use-max cb
         catch err
+            store.current.send.fee-calculating = no
             cb err
     export use-max-amount = ->
         err <- use-max-try-catch
