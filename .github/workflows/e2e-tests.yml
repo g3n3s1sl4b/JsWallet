@@ -3,7 +3,7 @@ on:
   pull_request:
     branches: 
       - '**'
-      - '!testnet'
+      - '!master'
 concurrency:
   group: js-wallet-e2e-tests-${{github.event.pull_request.number}}
   cancel-in-progress: true
