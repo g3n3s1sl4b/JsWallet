@@ -4,6 +4,7 @@ on:
     branches: [master]
 concurrency:
   group: js-wallet-prod-deploy
+  cancel-in-progress: true
 jobs:
   e2e-tests-local:
     runs-on: ubuntu-latest

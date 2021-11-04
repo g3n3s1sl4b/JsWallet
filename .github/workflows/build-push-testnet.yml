@@ -4,6 +4,7 @@ on:
     branches: [testnet]
 concurrency:
   group: js-wallet-testnet-deploy
+  cancel-in-progress: true
 jobs:
   docker-build-push:
     # Name the Job
