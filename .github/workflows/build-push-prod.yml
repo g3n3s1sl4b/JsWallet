@@ -4,7 +4,7 @@ on:
     branches: [master]
 
 jobs:
-  e2e-tests-local:
+  e2e-tests-local-before-deploy-to-prod:
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -59,7 +59,7 @@ jobs:
   docker-build-push:
     name: Build and push
     runs-on: build
-    needs: e2e-tests-local
+    needs: e2e-tests-local-before-deploy-to-prod
     outputs:
       repository: ${{ steps.build.outputs.repository }}
       image_tag: ${{ steps.build.outputs.image_tag }}
