@@ -27,8 +27,8 @@ test.describe.parallel('Wallets screen >', () => {
       const transactions = await page.$$('.history-area div[datatesting="transaction"]');
       assert.isAbove(transactions.length, 10, 'Amount of transactions in the list is less than 10');
 
-      const prodSenderAddress = '46LegTMYJ7ZYLftiCv3Ldzzud3dwajrV6S1oonF5wqFV'; 
-      const senderAddressSelector = `.history-area div[datatesting="transaction"] .address-holder a[href*="https://native.velas.com/address/${config.environment === 'prod' ? prodSenderAddress: data.wallets.txSender.address}"]`;
+      const prodSenderAddress = '46LegTMYJ7ZYLftiCv3Ldzzud3dwajrV6S1oonF5wqFV';
+      const senderAddressSelector = `.history-area div[datatesting="transaction"] .address-holder a[href*="https://native.velas.com/address/${config.network === 'mainnet' ? prodSenderAddress : data.wallets.txSender.address}"]`;
       assert.ok(await page.waitForSelector(senderAddressSelector));
     });
   });
