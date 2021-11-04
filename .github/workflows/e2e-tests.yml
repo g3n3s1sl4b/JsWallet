@@ -44,13 +44,11 @@ jobs:
         working-directory: ./
         run: rm -rf ./.compiled
 
-      # sleep required for wallet start
       - name: run wallet
         working-directory: ./
         run: |
           npm run wallet-start:no-watch &
-          sleep 16 &&
-          echo '- - - - - Wallet started - - - - -'
+          echo '- - - - - Wallet is started but it takes till 30 seconds to be up - - - - -'
 
       - name: install npm modules
         run: npm i

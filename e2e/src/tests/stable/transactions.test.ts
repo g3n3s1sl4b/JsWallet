@@ -89,6 +89,7 @@ test.describe.parallel('Transactions >', () => {
     const transactionAmount = 0.00001;
 
     await walletsScreen.selectWallet('token-eth_legacy');
+    if (!await page.waitForSelector('#wallets-send')) throw new Error('Probably ETH wallet is disabled.');
     await page.click('#wallets-send');
     await page.fill('#send-recipient', '0xb322f01cb6a191974e7291600a4dc1b46f00f752'); //accound with index 2
     await page.fill('div.amount-field input[label="Send"]', String(transactionAmount));

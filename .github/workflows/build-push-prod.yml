@@ -32,13 +32,11 @@ jobs:
       - name: delete wallet build cache
         working-directory: ./
         run: rm -rf ./.compiled
-      # sleep required for wallet start
       - name: run wallet
         working-directory: ./
         run: |
-          npm run wallet-start &
-          sleep 16 &&
-          echo '- - - - - Wallet started - - - - -'
+          npm run wallet-start:no-watch &
+          echo '- - - - - Wallet is started but it takes till 30 seconds to be up - - - - -'
       - name: install modules required for testrun
         run: npm i
       - name: clean previous test results
