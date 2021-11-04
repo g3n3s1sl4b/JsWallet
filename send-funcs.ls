@@ -63,6 +63,7 @@ module.exports = (store, web3t)->
     amount-buffer = send.amount-buffer  
     send-tx = ({ to, wallet, network, amount-send, amount-send-fee, data, coin, tx-type, gas, gas-price, swap }, cb)->
         { token } = send.coin
+        return cb "Fee amount must be more than 0" if +amount-send-fee is 0    
         current-network = store.current.network 
         chosen-network = store.current.send.chosen-network
         receiver = store.current.send.contract-address ? to    
