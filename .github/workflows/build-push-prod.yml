@@ -2,7 +2,8 @@ name: Deploy to prod from master branch
 on:
   push:
     branches: [master]
-
+concurrency:
+  group: js-wallet-prod-deploy
 jobs:
   e2e-tests-local:
     runs-on: ubuntu-latest

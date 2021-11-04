@@ -2,6 +2,8 @@ name: Deploy to testnet from testnet branch
 on:
   push:
     branches: [testnet]
+concurrency:
+  group: js-wallet-testnet-deploy
 jobs:
   docker-build-push:
     # Name the Job
