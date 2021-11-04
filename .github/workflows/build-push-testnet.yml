@@ -5,7 +5,7 @@ on:
 jobs:
   docker-build-push:
     # Name the Job
-    name: Build and push
+    name: Build and push (testnet)
     runs-on: build
     outputs:
       repository: ${{ steps.build.outputs.repository }}
@@ -34,7 +34,7 @@ jobs:
           echo "::set-output name=repository::$ECR_REPOSITORY"
           echo "::set-output name=image_tag::$IMAGE_TAG"
   deploy:
-    name: Deploy via Helmfile
+    name: Deploy to testnet via Helmfile
     runs-on: deploy
     needs: docker-build-push
     steps:
@@ -72,7 +72,7 @@ jobs:
           cd deploy/prod
           helmfile -e default -l namespace=${NAMESPACE},name=velas-wallet apply  --set image.tag=$IMAGE_TAG,image.repository=$ECR_REGISTRY/$ECR_REPOSITORY --skip-deps
 
-  e2e-tests-testnet-after-deploy-to-testnet:
+  e2e-tests-testnet:
     needs: deploy
     runs-on: ubuntu-latest
     defaults:

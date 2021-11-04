@@ -4,7 +4,7 @@ on:
     branches: [master]
 
 jobs:
-  e2e-tests-local-before-deploy-to-prod:
+  e2e-tests-local:
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -57,9 +57,9 @@ jobs:
           retention-days: 7
 
   docker-build-push:
-    name: Build and push
+    name: Build and push (prod)
     runs-on: build
-    needs: e2e-tests-local-before-deploy-to-prod
+    needs: e2e-tests-local
     outputs:
       repository: ${{ steps.build.outputs.repository }}
       image_tag: ${{ steps.build.outputs.image_tag }}
@@ -87,7 +87,7 @@ jobs:
           echo "::set-output name=repository::$ECR_REPOSITORY"
           echo "::set-output name=image_tag::$IMAGE_TAG"
   deploy:
-    name: Deploy via Helmfile
+    name: Deploy to prod via Helmfile
     runs-on: deploy
     needs: docker-build-push
     steps:
