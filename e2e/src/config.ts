@@ -1,8 +1,7 @@
 import { data } from './test-data';
 import { Environment } from './types';
 
-const environment: Environment = 'local';
-type Network = 'testnet' | 'mainnet';
+export const environment: Environment = 'local';
 
 export const config = {
   CI: process.env.CI === 'true',
@@ -15,9 +14,4 @@ export const config = {
   },
 };
 
-export function getWalletURL(params?: { network?: Network, environment?: Environment }): string {
-  // default environment used – "local"
-  const url = data.walletURLs[params?.environment || config.environment];
-  // default network used – "testnet"
-  return (!params?.network || params?.network === config.network) ? `${url}?network=testnet` : url;
-}
+export const walletURL = `${data.walletHosts[config.environment]}?network=${config.network}`;

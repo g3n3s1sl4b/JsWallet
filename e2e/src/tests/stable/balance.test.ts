@@ -1,7 +1,7 @@
 import { test } from '@playwright/test';
 import { velasNative } from '@velas/velas-chain-test-wrapper';
 import { assert } from '../../assert';
-import { getWalletURL } from '../../config';
+import { walletURL } from '../../config';
 import { setupPage } from '../../pw-helpers/setup-page';
 import { Auth } from '../../screens/auth';
 import { Currency, WalletsScreen } from '../../screens/wallets';
@@ -18,7 +18,7 @@ test.describe('Balance >', () => {
     setupPage(page);
     auth = new Auth(page);
     walletsScreen = new WalletsScreen(page);
-    await page.goto(getWalletURL());
+    await page.goto(walletURL);
     await auth.loginByRestoringSeed(data.wallets.withFunds.seed);
     await walletsScreen.waitForWalletsDataLoaded();
   });
@@ -26,7 +26,7 @@ test.describe('Balance >', () => {
   // extract "VLX Native balance update" to separate test
   test('Check VLX Legacy, VLX Native, Litecoin and Bitcoin balances', async () => {
     await walletsScreen.addWalletsPopup.open();
-    await walletsScreen.addWalletsPopup.add('Litecoin');
+    await walletsScreen.addWalletsPopup.add('token-ltc');
 
     const balances = await walletsScreen.getWalletsBalances();
 
@@ -42,10 +42,10 @@ test.describe('Balance >', () => {
       if (amountOfTokens === null) continue;
 
       switch (wallets[i]) {
-        case 'Velas':
+        case 'token-vlx2':
           assert.equal(amountOfTokens, '0.999958');
           break;
-        case 'Velas Native':
+        case 'token-vlx_native':
           assert.equal(amountOfTokens, String(VLXNativeBalanceOnBlockchain));
           const tx = await velasNative.transfer({
             payerSeed: data.wallets.payer.seed,
@@ -55,10 +55,10 @@ test.describe('Balance >', () => {
           await velasNative.waitForConfirmedTransaction(tx);
           await walletsScreen.updateBalances();
           // const newAmountOfTokens = Number(await (await walletElement.$('.info .token.price'))?.getAttribute('title')).toFixed(6);
-          const newAmountOfTokens = helpers.toFixed(Number((await walletsScreen.getWalletsBalances())['Velas Native']), 6);
+          const newAmountOfTokens = helpers.toFixed(Number((await walletsScreen.getWalletsBalances())['token-vlx_native']), 6);
           assert.equal(newAmountOfTokens, helpers.toFixed((VLXNativeBalanceOnBlockchain + balanceUpdateAmount), 6), 'Velas Native wallet balance was not updated after funding it');
           break;
-        case 'Bitcoin':
+        case 'token-btc':
           try {
             await balancesAPI.bitcore();
             assert.equal(amountOfTokens, '0.03484302');
@@ -66,14 +66,13 @@ test.describe('Balance >', () => {
             log.debug(e);
             log.warn(`Bitcoin balance check skipped because of 3rd party service is down`);
           }
-          // TODO: make api request before to ckeck if service works; then uncomment next line
           break;
-        case 'Velas EVM':
+        case 'token-vlx_evm':
           assert.equal(amountOfTokens, '13');
           break;
-        case 'Litecoin':
-          //change balance when LTC testnet is up and address myVH5F64jS4gGvjoq4bMouuxQFLxEUmB8U is topped-up
-          assert.equal(amountOfTokens, '0');
+        case 'token-ltc':
+          // ltc testnet is down
+          //assert.equal(amountOfTokens, '0');
           break
       }
     }

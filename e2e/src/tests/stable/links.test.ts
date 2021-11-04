@@ -1,12 +1,12 @@
 import { test } from '@playwright/test';
 import { assert } from '../../assert';
-import { getWalletURL } from '../../config';
+import { walletURL } from '../../config';
 import { setupPage } from '../../pw-helpers/setup-page';
 
-test.describe('Links >', () => {
+test.describe('Links', () => {
   test.beforeEach(async ({ page }) => {
     setupPage(page);
-    await page.goto(getWalletURL(), { waitUntil: 'networkidle' });
+    await page.goto(walletURL, { waitUntil: 'networkidle' });
   });
 
   test('Download links are correct', async ({ page }) => {

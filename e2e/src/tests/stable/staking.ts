@@ -1,7 +1,7 @@
 import { test } from '@playwright/test';
 import { velasNative } from '@velas/velas-chain-test-wrapper';
 import { assert } from '../../assert';
-import { getWalletURL } from '../../config';
+import { walletURL } from '../../config';
 import { setupPage } from '../../pw-helpers/setup-page';
 import { Auth } from '../../screens/auth';
 import { StakingScreen } from '../../screens/staking';
@@ -13,14 +13,16 @@ let auth: Auth;
 let walletsScreen: WalletsScreen;
 let stakingScreen: StakingScreen;
 
+// TODO: validators loading takes too much time
 test.describe('Staking >', () => {
   test.beforeEach(async ({ page }) => {
     setupPage(page);
     auth = new Auth(page);
     walletsScreen = new WalletsScreen(page);
     stakingScreen = new StakingScreen(page);
-    await page.goto(getWalletURL());
+    await page.goto(walletURL);
     await auth.loginByRestoringSeed(data.wallets.staking.staker.seed);
+    await walletsScreen.waitForWalletsDataLoaded();
     await walletsScreen.openMenu('staking');
   });
 
@@ -29,7 +31,6 @@ test.describe('Staking >', () => {
     const stakingAmount = 5;
 
     test('Previous run cleanup', async () => {
-      await stakingScreen.waitForLoaded();
       await stakingScreen.stakingCleanup.stakesToUndelegate();
       await stakingScreen.stakingCleanup.stakesToWithdraw();
       await stakingScreen.stakingCleanup.stakesNotDelegated();
@@ -47,6 +48,8 @@ test.describe('Staking >', () => {
 
     test('Create staking account', async ({ page }) => {
       const VLXNativeAddress = data.wallets.staking.staker.publicKey;
+
+      await stakingScreen.waitForLoaded();
       const initialAmountOfStakingAccounts = await stakingScreen.getAmountOfStakes('Delegate');
       const stakingAccountAddresses = await stakingScreen.getStakingAccountsAddresses();
       const initialWalletBalance = helpers.toFixed((await velasNative.getBalance(VLXNativeAddress)).VLX);
@@ -56,6 +59,7 @@ test.describe('Staking >', () => {
       await stakingScreen.confirmPrompt();
       await page.waitForSelector('" Account created and funds deposited"', { timeout: 15000 });
       await page.click('#notification-close');
+      await stakingScreen.waitForLoaded();
 
       // for some reason new stake does not appear in the list immediately
       const finalAmountOfStakingAccounts = await stakingScreen.waitForStakesAmountUpdated(initialAmountOfStakingAccounts, 'Delegate');
@@ -74,6 +78,7 @@ test.describe('Staking >', () => {
     });
 
     test('Delegate stake', async ({ page }) => {
+      await stakingScreen.waitForLoaded();
       const initialAmountOfDelegatedStakes = await stakingScreen.getAmountOfStakes('Undelegate');
       const stakeAccountAddress = await stakingScreen.getFirstStakingAccountAddressFromTheList('Delegate');
 
@@ -84,6 +89,7 @@ test.describe('Staking >', () => {
       const alertText = await (await page.waitForSelector('.confirmation .text', { timeout: 10000 })).textContent();
       assert.include(alertText, 'Funds delegated to');
       await page.click('" Ok"');
+      await stakingScreen.waitForLoaded();
       const finalAmountOfDelegatedStakes = await stakingScreen.waitForStakesAmountUpdated(initialAmountOfDelegatedStakes, 'Undelegate');
       assert.equal(finalAmountOfDelegatedStakes, initialAmountOfDelegatedStakes + 1);
 
@@ -94,6 +100,7 @@ test.describe('Staking >', () => {
     });
 
     test('Undelegate stake', async ({ page }) => {
+      await stakingScreen.waitForLoaded();
       const initialToUndelegateStakesAmount = await stakingScreen.getAmountOfStakes('Undelegate');
       const initialToDelegateStakesAmount = await stakingScreen.getAmountOfStakes('Delegate');
       const stakeAccountAddress = await stakingScreen.getFirstStakingAccountAddressFromTheList('Delegate');
@@ -102,6 +109,7 @@ test.describe('Staking >', () => {
       await page.click('" Confirm"');
       await page.waitForSelector('" Funds undelegated successfully"', { timeout: 10000 });
       await page.click('" Ok"');
+      await stakingScreen.waitForLoaded();
       const finalToUndelegateStakesAmount = await stakingScreen.waitForStakesAmountUpdated(initialToUndelegateStakesAmount, 'Undelegate');
       assert.equal(finalToUndelegateStakesAmount, initialToUndelegateStakesAmount - 1, 'Amount of stakes to undelegate has not changed after undelegation');
       assert.equal(await stakingScreen.getAmountOfStakes('Delegate'), initialToDelegateStakesAmount + 1, 'Amount of stakes to withdraw has not changed after undelegation');
@@ -113,6 +121,7 @@ test.describe('Staking >', () => {
     });
 
     test('Split stake', async ({ page }) => {
+      await stakingScreen.waitForLoaded();
       const initialAmountOfStakingAccounts = await stakingScreen.getAmountOfStakes('Delegate');
       const stakingAccountAddresses = await stakingScreen.getStakingAccountsAddresses();
 
@@ -121,7 +130,8 @@ test.describe('Staking >', () => {
       await page.fill('.input-area input', '1');
       await page.click('#prompt-confirm');
       await page.waitForSelector('" Account created and funds are splitted successfully"', { timeout: 20000 });
-      await page.click('#notification-close')
+      await page.click('#notification-close');
+      await stakingScreen.waitForLoaded();
 
       const finalAmountOfStakingAccounts = await stakingScreen.waitForStakesAmountUpdated(initialAmountOfStakingAccounts, 'Delegate');
       assert.equal(finalAmountOfStakingAccounts, initialAmountOfStakingAccounts + 1);
@@ -138,6 +148,7 @@ test.describe('Staking >', () => {
     });
 
     test('Withdraw stake', async ({ page }) => {
+      await stakingScreen.waitForLoaded();
       const stakingAccountAddresses = await stakingScreen.getStakingAccountsAddresses();
       const initialAmountOfStakingAccounts = await stakingScreen.getAmountOfStakes('all');
       const stakeAccountAddress = await stakingScreen.getFirstStakingAccountAddressFromTheList('Delegate');
@@ -147,6 +158,8 @@ test.describe('Staking >', () => {
       await page.click('" Confirm"');
       await page.waitForSelector('" Funds withdrawn successfully"', { timeout: 30000 });
       await page.click('" Ok"');
+      await stakingScreen.waitForLoaded();
+
       const finalAmountOfStakingAccounts = await stakingScreen.waitForStakesAmountUpdated(initialAmountOfStakingAccounts, 'all');
 
       assert.equal(finalAmountOfStakingAccounts, initialAmountOfStakingAccounts - 1);

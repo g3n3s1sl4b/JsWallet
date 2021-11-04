@@ -1,6 +1,6 @@
 import { test } from '@playwright/test';
 import { assert } from '../../assert';
-import { getWalletURL } from '../../config';
+import { walletURL } from '../../config';
 import { setupPage } from '../../pw-helpers/setup-page';
 import { Auth, Language } from '../../screens/auth';
 import { WalletsScreen } from '../../screens/wallets';
@@ -10,12 +10,12 @@ import { log } from '../../tools/logger';
 let walletsScreen: WalletsScreen;
 let auth: Auth;
 
-test.describe('Settings >', () => {
+test.describe.parallel('Settings', () => {
   test.beforeEach(async ({ page }) => {
     setupPage(page);
     walletsScreen = new WalletsScreen(page);
     auth = new Auth(page);
-    await page.goto(getWalletURL(), { waitUntil: 'networkidle' });
+    await page.goto(walletURL, { waitUntil: 'networkidle' });
     await auth.loginByRestoringSeed(data.wallets.login.seed);
   });
 
@@ -45,7 +45,7 @@ test.describe('Settings >', () => {
     await page.waitForSelector('.amount:not(.placeholder)');
 
     await walletsScreen.openMenu('wallets');
-    await walletsScreen.selectWallet('Velas Native');
+    await walletsScreen.selectWallet('token-vlx_native');
 
     assert.equal(await walletsScreen.getWalletAddress(), 'BfGhk12f68mBGz5hZqm4bDSDaTBFfNZmegppzVcVdGDW', 'Account 2 address on UI does not equal expected');
   });
@@ -58,7 +58,7 @@ test.describe('Settings >', () => {
     assert.isFalse(await page.isVisible('#menu-testnet'));
     
     await walletsScreen.openMenu('wallets');
-    await walletsScreen.selectWallet('Bitcoin');
+    await walletsScreen.selectWallet('token-btc');
     assert.equal(await walletsScreen.getWalletAddress(), '1PV8RPEL8kNBnQytq2881TE3bSZJbJazDw', 'Mainnet BTC address on UI does not equal expected');
     
     await walletsScreen.openMenu('settings');
@@ -67,7 +67,7 @@ test.describe('Settings >', () => {
     
     
     await walletsScreen.openMenu('wallets');
-    await walletsScreen.selectWallet('Bitcoin');
+    await walletsScreen.selectWallet('token-btc');
     assert.equal(await walletsScreen.getWalletAddress(), 'n415iSKJwmoSZXTWYb6VqNSNTSA1YMwL8U', 'Testnet BTC address on UI does not equal expected');
   });
 

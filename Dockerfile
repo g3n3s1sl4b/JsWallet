@@ -23,7 +23,8 @@ RUN cp -pr /app/web3t .compiled-ssr/web3t
 
 RUN mkdir -p /app/wallet/.compiled-ssr/web3t/providers /app/wallet/.compiled-ssr/web3t/node_modules_embed/ethereumjs-tx
 RUN npm install --ignore-scripts
-RUN npm install -g --unsafe-perm node-sass lsxc livescript
+# npm install is failed sometimes; added retry in case of fail
+RUN npm install -g --unsafe-perm node-sass lsxc livescript || npm install -g --unsafe-perm node-sass lsxc livescript
 RUN mkdir -p /app/wallet/.compiled-ssr/web3t/node_modules_embed/scryptsy/lib
 RUN npm rebuild node-sass
 RUN npm -g run wallet-build
