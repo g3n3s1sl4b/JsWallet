@@ -224,11 +224,11 @@ export class WalletsScreen extends BaseScreen {
     await txPage.waitForLoadState();
 
     let counter = 0;
-    while (await txPage.isVisible('.error-title') && counter < 10) {
+    while (await txPage.isVisible('.error-title') && counter < 30) {
       counter++;
       await txPage.waitForLoadState();
-      log.debug('Tx hash not found on explorer, refreshing...');
-      await txPage.waitForTimeout(2000);
+      log.debug(`Tx hash not found on explorer, refreshing...\n${txPage.url()}`);
+      await txPage.waitForTimeout(1000);
       await txPage.reload();
     }
 
