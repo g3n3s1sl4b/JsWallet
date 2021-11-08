@@ -343,7 +343,7 @@ module.exports = (store, web3t)->
         return cb null if is-self-send is yes 
         return cb "bridge is not defined" if not bridge? 
         return cb "bridgeToken is not defined" if not bridgeToken? 
-
+        console.log {allowed, amount}   
         return cb null if not (new bignumber(allowed).lt(amount))
         
         token = (wallet?coin?nickname ? "").to-upper-case!    
@@ -363,7 +363,7 @@ module.exports = (store, web3t)->
             amount: "0"
             amount-fee: "0.002"    
             data: data
-            gas: 50000
+            gas: 100000
             gas-price: gas-price   
             fee-type: fee-type
         
