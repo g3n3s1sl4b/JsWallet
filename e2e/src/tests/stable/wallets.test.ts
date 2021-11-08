@@ -1,6 +1,6 @@
 import { test } from '@playwright/test';
 import { assert } from '../../assert';
-import { getWalletURL } from '../../config';
+import { config, walletURL } from '../../config';
 import { setupPage } from '../../pw-helpers/setup-page';
 import { Auth } from '../../screens/auth';
 import { WalletsScreen } from '../../screens/wallets';
@@ -9,25 +9,26 @@ import { data } from '../../test-data';
 let auth: Auth;
 let walletsScreen: WalletsScreen;
 
-test.describe('Wallets screen >', () => {
+test.describe.parallel('Wallets screen >', () => {
   test.beforeEach(async ({ page }) => {
     setupPage(page);
     auth = new Auth(page);
     walletsScreen = new WalletsScreen(page);
-    await page.goto(getWalletURL(), { waitUntil: 'networkidle' });
+    await page.goto(walletURL, { waitUntil: 'networkidle' });
   });
 
-  test.describe('Transactions >', () => {
+  test.describe('Transactions', () => {
     test('Transactions list is displayed', async ({ page }) => {
       // arrange
       await auth.loginByRestoringSeed(data.wallets.fundsReceiver.seed);
 
-      await walletsScreen.selectWallet('Velas Native');
+      await walletsScreen.selectWallet('token-vlx_native');
       await page.waitForSelector('.history-area div[datatesting="transaction"]', { timeout: 20000 });
       const transactions = await page.$$('.history-area div[datatesting="transaction"]');
       assert.isAbove(transactions.length, 10, 'Amount of transactions in the list is less than 10');
 
-      const senderAddressSelector = `.history-area div[datatesting="transaction"] .address-holder a[href="https://native.velas.com/address/${data.wallets.txSender.address}?cluster=testnet"]`;
+      const prodSenderAddress = '46LegTMYJ7ZYLftiCv3Ldzzud3dwajrV6S1oonF5wqFV';
+      const senderAddressSelector = `.history-area div[datatesting="transaction"] .address-holder a[href*="https://native.velas.com/address/${config.network === 'mainnet' ? prodSenderAddress : data.wallets.txSender.address}"]`;
       assert.ok(await page.waitForSelector(senderAddressSelector));
     });
   });
@@ -48,19 +49,20 @@ test.describe('Wallets screen >', () => {
     });
 
     test('Add and hide litecoin wallet', async () => {
+      // TODO: need to scroll to launch test for mainnet
       // add litecoin
       await walletsScreen.addWalletsPopup.open();
-      await walletsScreen.addWalletsPopup.add('Litecoin');
-      await walletsScreen.selectWallet('Litecoin');
-      assert.isTrue(await walletsScreen.isWalletInWalletsList('Litecoin'));
+      await walletsScreen.addWalletsPopup.add('token-ltc');
+      await walletsScreen.selectWallet('token-ltc');
+      assert.isTrue(await walletsScreen.isWalletInWalletsList('token-ltc'));
 
       // remove litecoin
       await walletsScreen.hideWallet();
-      assert.isFalse(await walletsScreen.isWalletInWalletsList('Litecoin'));
+      assert.isFalse(await walletsScreen.isWalletInWalletsList('token-ltc'));
     });
 
     test('Switch account', async ({ page }) => {
-      await walletsScreen.selectWallet('Velas Native')
+      await walletsScreen.selectWallet('token-vlx_native');
       await page.click('.switch-account');
       await page.click('" Account 2"');
       assert.equal(await walletsScreen.getWalletAddress(), 'BfGhk12f68mBGz5hZqm4bDSDaTBFfNZmegppzVcVdGDW', 'Account 2 address on UI does not equal expected');
@@ -76,7 +78,7 @@ test.describe('Wallets screen >', () => {
       // clear clipboard
       await page.evaluate(async () => await navigator.clipboard.writeText(''));
 
-      await walletsScreen.selectWallet('Velas Native');
+      await walletsScreen.selectWallet('token-vlx_native');
       await page.click('#wallets-receive');
       await page.waitForSelector('.ill-qr img');
       // qr code is displayed

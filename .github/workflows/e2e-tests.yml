@@ -1,14 +1,15 @@
-name: e2e-tests
+name: e2e-tests-on-PR
 on:
   pull_request:
+    branches: 
+      - '**'
+      - '!master'
 concurrency:
   group: js-wallet-e2e-tests-${{github.event.pull_request.number}}
   cancel-in-progress: true
 jobs:
-  e2e-tests:
+  e2e-tests-local-before-merge-to-testnet:
     runs-on: ubuntu-latest
-    # container:
-    #   image: node:14.16
     defaults:
       run:
         working-directory: ./e2e
@@ -22,9 +23,6 @@ jobs:
           repository: velas/web3t
           path: .compiled-ssr/web3t
           ref: testnet
-
-      - name: npm version
-        run: npm -v
 
       - uses: actions/setup-node@v2
         with:
@@ -49,23 +47,14 @@ jobs:
         working-directory: ./
         run: rm -rf ./.compiled
 
-      # sleep required for wallet start
       - name: run wallet
         working-directory: ./
         run: |
           npm run wallet-start:no-watch &
-          sleep 16 &&
-          echo '- - - - - Wallet started - - - - -'
+          echo '- - - - - Wallet is started but it takes till 30 seconds to be up - - - - -'
 
       - name: install npm modules
         run: npm i
-
-      # - name: install PW deps
-      #   # run: npx playwright install chrome
-      #   run: npx playwright install --with-deps
-
-      # - name: install chrome
-      #   run: npx playwright install chrome
 
       - name: clean previous test results
         run: rm -rf ./test-results/
@@ -81,7 +70,6 @@ jobs:
 
       - name: generate allure report
         if: always()
-        # run: export JAVA_HOME=/usr/lib/jvm/jdk1.8.0 && npm run allure:generate
         run: npm run allure:generate
 
       - name: upload artifacts

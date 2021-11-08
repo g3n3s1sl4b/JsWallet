@@ -4,19 +4,19 @@ import { Auth } from '../../screens/auth';
 import { WalletsScreen } from '../../screens/wallets';
 import { data } from '../../test-data';
 import { setupPage } from '../../pw-helpers/setup-page';
-import { getWalletURL } from '../../config';
+import { walletURL } from '../../config';
 
 let walletsScreen: WalletsScreen;
 let auth: Auth;
 
-test.describe('Validation >', () => {
+test.describe.parallel('Validation >', () => {
   test.beforeEach(async ({ page }) => {
     setupPage(page);
     auth = new Auth(page);
     walletsScreen = new WalletsScreen(page);
-    await page.goto(getWalletURL(), { waitUntil: 'networkidle' });
+    await page.goto(walletURL, { waitUntil: 'networkidle' });
     await auth.loginByRestoringSeed(data.wallets.txSender.seed);
-    await walletsScreen.selectWallet('Velas Native');
+    await walletsScreen.selectWallet('token-vlx_native');
   });
 
   test('VLX Native: Show Invalid Address error', async ({ page }) => {
