@@ -308,7 +308,9 @@ module.exports = (store, web3t)->
         
         /* Check for allowed amount for contract */
         allowedRaw = contract.allowance(wallet.address, FOREIGN_BRIDGE)
-        allowed = allowedRaw `div` (10 ^ 0)   
+        #console.log {wallet.address, FOREIGN_BRIDGE, allowedRaw}    
+        allowed = allowedRaw `div` (10 ^ 0) 
+        #console.log {allowed, send.amountSend}      
  
         contract = web3.eth.contract(abis.ForeignBridgeErcToErc).at(FOREIGN_BRIDGE)         
         minPerTxRaw = contract.minPerTx!         
@@ -342,7 +344,7 @@ module.exports = (store, web3t)->
         return cb "bridge is not defined" if not bridge? 
         return cb "bridgeToken is not defined" if not bridgeToken? 
 
-        return cb null if allowed >= amount
+        return cb null if not (new bignumber(allowed).lt(amount))
         
         token = (wallet?coin?nickname ? "").to-upper-case!    
         
