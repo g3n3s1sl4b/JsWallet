@@ -846,12 +846,16 @@ module.exports = (store, web3t)->
         value
             
     amount-change = (event)->                   
-        value = get-value event  
+        value = get-value event
+        /* Prevent call onChange twice */
+        if (value ? "0").toString() is (amount-buffer.val).toString() and amount-buffer.address is store.current.send.to  then 
+            return no  
         # if empty string return zero!    
         value = "0" if not value? or isNaN(value)   
         <- change-amount store, value, no
         store.current.send.fee-calculating = no
         amount-buffer.val = (value ? "0").toString()
+        amount-buffer.address = store.current.send.to   
     perform-amount-eur-change = (value)->
         to-send = calc-crypto-from-eur store, value
         <- change-amount store, to-send , no
