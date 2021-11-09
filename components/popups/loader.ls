@@ -14,13 +14,23 @@ require! {
     $spin-duration: 1s
     $pulse-duration: 750ms
     z-index: 1
-    opacity: 0.5;
-    position: absolute
+    opacity: 1;
+    position: fixed
     top: 0 
     bottom: 0 
     left: 0 
     right: 0 
-    background: rgba(0, 0, 0,  0.24)          
+    background: rgba(0, 0, 0,  0.34)   
+    .loader-text
+        position: absolute;
+        top: calc(50% + 8px);
+        left: auto;
+        right: auto;
+        display: block;
+        margin: auto;
+        width: 100%;
+        text-shadow: 1px 2px 12px #26e0f3d9;
+        color: #34d9ba;       
     .loading-pulse
         position: absolute
         top: calc(50% - 32px)
@@ -104,7 +114,9 @@ require! {
                 transform: rotateX(35deg) rotateY(55deg) rotateZ(0deg)
             100%
                 transform: rotateX(35deg) rotateY(55deg) rotateZ(360deg)
-module.exports = ({loading})->
+module.exports = ({loading, text})->
     return null if not loading
     .loader-page.pug(key="loading")
+        if text? and (text ? "").length > 0
+            .pug.h3.loader-text #{text} 
         .loading-pulse.pug
