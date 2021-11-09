@@ -363,12 +363,12 @@ module.exports = (store, web3t)->
             amount: "0"
             amount-fee: "0.002"    
             data: data
-            gas: 100000
+            gas: 300000
             gas-price: gas-price   
             fee-type: fee-type
         
         err, tx-data <- create-transaction tx-obj
-        return cb err if err?
+        return cb "[check-allowed-amount / create-transaction] err:" + err if err?
         store.current.send.checking-allowed = yes   
         err, tx <- push-tx { token, tx-type, network, ...tx-data }
         if err?
