@@ -1,7 +1,7 @@
 require! {
     \mobx : { toJS }
     \./math.ls : { times, minus, div, plus }
-    \./api.ls : { create-transaction, push-tx }
+    \./api.ls : { create-transaction, push-tx, get-transaction-info }
     \./calc-amount.ls : { change-amount-calc-fiat, change-amount-send, change-amount, calc-crypto-from-eur, calc-crypto-from-usd, change-amount-without-fee }
     \./send-form.ls : { notify-form-result }
     \./get-name-mask.ls
@@ -336,10 +336,10 @@ module.exports = (store, web3t)->
         store.current.send.contract-address = contract-address
         store.current.send.data = data    
         cb null, data    
-    checking-allowed = no   
+      
     /* Check for allowed amount for contract */
     check-allowed-amount = ({ contract, wallet, amount, allowed, bridge, bridgeToken }, cb)->
-        return if checking-allowed
+        return if store.current.send.checking-allowed is yes 
         return cb null if is-self-send is yes 
         return cb "bridge is not defined" if not bridge? 
         return cb "bridgeToken is not defined" if not bridgeToken? 
@@ -369,10 +369,13 @@ module.exports = (store, web3t)->
         
         err, tx-data <- create-transaction tx-obj
         return cb err if err?
-        checking-allowed = yes   
+        store.current.send.checking-allowed = yes   
         err, tx <- push-tx { token, tx-type, network, ...tx-data }
-        return cb err if err?
-        checking-allowed = no 
+        if err?
+            store.current.send.checking-allowed = no        
+            return cb err
+        <- set-timeout _, 4000 
+        store.current.send.checking-allowed = no    
         cb null
         
    
