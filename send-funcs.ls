@@ -339,13 +339,13 @@ module.exports = (store, web3t)->
       
     /* Check for allowed amount for contract */
     check-allowed-amount = ({ contract, wallet, amount, allowed, bridge, bridgeToken }, cb)->
-#        return if store.current.send.checking-allowed is yes 
-#        return cb null if is-self-send is yes 
-#        return cb "bridge is not defined" if not bridge? 
-#        return cb "bridgeToken is not defined" if not bridgeToken? 
-#        console.log {allowed, amount}   
-#        return cb null if not (new bignumber(allowed).lt(amount))
-#        
+        return if store.current.send.checking-allowed is yes 
+        return cb null if is-self-send is yes 
+        return cb "bridge is not defined" if not bridge? 
+        return cb "bridgeToken is not defined" if not bridgeToken? 
+        console.log {allowed, amount}   
+        return cb null if not (new bignumber(allowed).lt(amount))
+
         token = (wallet?coin?nickname ? "").to-upper-case!    
 
         agree <- confirm store, "To execute this swap please approve that bridge contract can withdraw your #{token} and automate payments for you."
