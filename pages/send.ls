@@ -575,7 +575,7 @@ send = ({ store, web3t })->
     
     /* Render */
     .pug.content
-        loader {loading: store.current.send.checking-allowed, text: "Approving bridge contract..."}
+        loader {loading: store.current.send.checking-allowed, text: "Please wait, approving bridge contract..."}
         .pug.title(style=border-header)
             .pug.header(class="#{show-class}") #{title}
             .pug.close(on-click=go-back-from-send)
