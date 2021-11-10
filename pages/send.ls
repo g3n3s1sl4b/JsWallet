@@ -30,6 +30,7 @@ require! {
     "../../web3t/contracts/ForeignBridgeNativeToErc.json" : \ForeignBridgeNativeToErc
     \../contract-data.ls
     \moment
+    \../components/popups/loader.ls
 }
 .content
     position: relative
@@ -574,6 +575,7 @@ send = ({ store, web3t })->
     
     /* Render */
     .pug.content
+        loader {loading: store.current.send.checking-allowed, text: "Please wait, approving bridge contract..."}
         .pug.title(style=border-header)
             .pug.header(class="#{show-class}") #{title}
             .pug.close(on-click=go-back-from-send)
@@ -687,6 +689,7 @@ module.exports.init = ({ store, web3t }, cb)->
     return cb null if not wallet?
     return cb null if send.sending is yes
     store.current.send.fee-calculating = no
+    store.current.send.checking-allowed = no
     store.current.send.foreign-network-fee = 0
     store.current.send.amountCharged = 0
     store.current.send.amountChargedUsd = 0

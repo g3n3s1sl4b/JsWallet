@@ -49,7 +49,7 @@ module.exports = (store, web3t, wallets, wallet, wallets-groups, group-name)->
         return alert "Not yet loaded" if not wallet?
         return alert "Not yet loaded" if not web3t[wallet.coin.token]?
         { send-transaction } = web3t[wallet.coin.token]
-        config = { to: "", value: 0, swap: yes, gas: 500000 }
+        config = { to: "", value: 0, swap: yes }
         err <- send-transaction config  
         store.current.send.error = err if err?
         return cb err if err?
