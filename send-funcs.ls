@@ -339,18 +339,18 @@ module.exports = (store, web3t)->
       
     /* Check for allowed amount for contract */
     check-allowed-amount = ({ contract, wallet, amount, allowed, bridge, bridgeToken }, cb)->
-        return if store.current.send.checking-allowed is yes 
-        return cb null if is-self-send is yes 
-        return cb "bridge is not defined" if not bridge? 
-        return cb "bridgeToken is not defined" if not bridgeToken? 
-        console.log {allowed, amount}   
-        return cb null if not (new bignumber(allowed).lt(amount))
-        
+#        return if store.current.send.checking-allowed is yes 
+#        return cb null if is-self-send is yes 
+#        return cb "bridge is not defined" if not bridge? 
+#        return cb "bridgeToken is not defined" if not bridgeToken? 
+#        console.log {allowed, amount}   
+#        return cb null if not (new bignumber(allowed).lt(amount))
+#        
         token = (wallet?coin?nickname ? "").to-upper-case!    
-        
+
         agree <- confirm store, "To execute this swap please approve that bridge contract can withdraw your #{token} and automate payments for you."
         return cb "Canceled by user" if not agree   
-        
+
         UINT_MAX_NUMBER = 4294967295 `times` (10 ^ wallet.network.decimals)
         { coin, gas, gas-price, amount-send, amount-send-fee, fee-type, network, tx-type } = send 
         data = contract.approve.get-data(bridge, UINT_MAX_NUMBER) 
@@ -366,7 +366,7 @@ module.exports = (store, web3t)->
             gas: 300000
             gas-price: gas-price   
             fee-type: fee-type
-        
+
         err, tx-data <- create-transaction tx-obj
         return cb "[check-allowed-amount / create-transaction] err:" + err if err?
         store.current.send.checking-allowed = yes   
@@ -374,11 +374,25 @@ module.exports = (store, web3t)->
         if err?
             store.current.send.checking-allowed = no        
             return cb err
-        <- set-timeout _, 4000 
-        store.current.send.checking-allowed = no    
+        err, res <- check-approve({start: Date.now!, token: wallet?coin.token, network: wallet.network, tx})
+        store.current.send.checking-allowed = no 
+        return cb err if err?    
         cb null
-        
-   
+    
+    check-tx-confirmation = ({start, token, network, tx}, cb)->
+        ->
+            if Date.now! > (start + 10000)         
+                return cb "Transaction approve timeout has expired. Try to repeat later."   
+            err, more-info <- get-transaction-info { token, network, tx }
+            if more-info?status is \confirmed or more-info?info?status is "0x1"
+                cb null 
+            console.log {err, more-info}    
+    
+    check-approve = ({start, token, network, tx}, cb)-> 
+        timer-cb = (err, res)->
+            clearInterval(check-approve.timer) 
+            return cb err, res             
+        check-approve.timer = set-interval check-tx-confirmation({start, token, network, tx}, timer-cb), 1000   
     /* 
     * Swap from USDT ETHEREUM to USDT VELAS 
     */     
