@@ -361,9 +361,9 @@ module.exports = (store, web3t)->
             token: token
             coin: coin
             amount: "0"
-            amount-fee: "0.002"    
+            amount-fee: "0.0002"    
             data: data
-            gas: 300000
+            gas: 150000
             gas-price: gas-price   
             fee-type: fee-type
 
@@ -381,7 +381,7 @@ module.exports = (store, web3t)->
     
     check-tx-confirmation = ({start, token, network, tx}, cb)->
         ->
-            if Date.now! > (start + 10000)         
+            if Date.now! > (start + 60000)         
                 return cb "Transaction approve timeout has expired. Try to repeat later."   
             err, more-info <- get-transaction-info { token, network, tx }
             if more-info?status is \confirmed or more-info?info?status is "0x1"
