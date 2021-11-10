@@ -20,7 +20,21 @@ require! {
     bottom: 0 
     left: 0 
     right: 0 
-    background: rgba(0, 0, 0,  0.34)   
+    background: rgba(0, 0, 0,  0.34) 
+    @-webkit-keyframes text-blink
+        0%
+            opacity: 1
+        50%
+            opacity: 0.5
+        100%
+            opacity: 1
+    @keyframes text-blink
+        0%
+            opacity: 1
+        50%
+            opacity: 0.5
+        100%
+            opacity: 1  
     .loader-text
         position: absolute;
         top: calc(50% + 8px);
@@ -30,7 +44,9 @@ require! {
         margin: auto;
         width: 100%;
         text-shadow: 1px 2px 12px #26e0f3d9;
-        color: #34d9ba;       
+        color: #34d9ba; 
+        -webkit-animation: text-blink 0.9s infinite
+        animation: text-blink 0.9s infinite      
     .loading-pulse
         position: absolute
         top: calc(50% - 32px)
