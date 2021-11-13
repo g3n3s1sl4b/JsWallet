@@ -28,7 +28,7 @@ Tested with `node --version` v11.10.1
 3. `cd web3t`
 4. `npm i`
 5. Delete git cache and copy web3t to JsWallet
-   `cd .. && rm -rf JsWallet/.compiled-ssr/web3t/.git/objects/ && mkdir -p JsWallet/.compiled-ssr/web3t/ && cp -pr web3t/ JsWallet/.compiled-ssr/web3t/`
+   `cd .. && rm -rf JsWallet/.compiled-ssr/web3t/.git/objects/ && mkdir -p JsWallet/.compiled-ssr/ && cp -pr web3t/ JsWallet/.compiled-ssr/web3t/`
 6. `cd JsWallet`
 7. `npm run wallet-start`
 8. open `localhost:8080/main-index.html`
